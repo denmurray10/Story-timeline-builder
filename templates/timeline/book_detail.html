@@ -57,9 +57,7 @@ Timeline Builder{% endblock %} {% block content %}
                         aria-valuemin="0"
                         aria-valuemax="100"
                     >
-                        {{ book.current_word_count|floatformat:0 }} / {{
-                        book.word_count_target|floatformat:0 }} words ({{
-                        book.progress_percentage|floatformat:1 }}%)
+                        {{ book.current_word_count|floatformat:0 }} / {{ book.word_count_target|floatformat:0 }} words ({{ book.progress_percentage|floatformat:1 }}%)
                     </div>
                 </div>
             </div>
