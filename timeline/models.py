@@ -1,3 +1,357 @@
-from django.db import models
+"""
+Models for the Story Timeline Builder application.
+These models represent the core entities: Books, Chapters, Characters, Events, Tags, and Relationships.
+"""
 
-# Create your models here.
+from django.db import models
+from django.contrib.auth.models import User
+from django.utils import timezone
+from django.core.validators import MinValueValidator, MaxValueValidator
+
+
+class Book(models.Model):
+    """
+    Represents a book in your series.
+    Each book contains multiple chapters and is owned by a user.
+    """
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='books')
+    title = models.CharField(max_length=200)
+    series_order = models.PositiveIntegerField(
+        help_text="Position in the series (1-20 for your 20-book series)"
+    )
+    description = models.TextField(blank=True)
+    word_count_target = models.PositiveIntegerField(
+        default=160000,
+        help_text="Target word count for this book"
+    )
+    current_word_count = models.PositiveIntegerField(default=0)
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ('planning', 'Planning'),
+            ('drafting', 'Drafting'),
+            ('editing', 'Editing'),
+            ('complete', 'Complete'),
+            ('published', 'Published'),
+        ],
+        default='planning'
+    )
+    started_date = models.DateField(null=True, blank=True)
+    completed_date = models.DateField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['series_order']
+        unique_together = ['user', 'series_order']
+
+    def __str__(self):
+        return f"Book {self.series_order}: {self.title}"
+
+    @property
+    def progress_percentage(self):
+        """Calculate writing progress as a percentage."""
+        if self.word_count_target == 0:
+            return 0
+        return min(100, (self.current_word_count / self.word_count_target) * 100)
+
+
+class Chapter(models.Model):
+    """
+    Represents a chapter within a book.
+    Chapters contain multiple events/scenes.
+    """
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='chapters')
+    chapter_number = models.PositiveIntegerField()
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    word_count = models.PositiveIntegerField(default=0)
+    is_complete = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['book', 'chapter_number']
+        unique_together = ['book', 'chapter_number']
+
+    def __str__(self):
+        return f"{self.book.title} - Chapter {self.chapter_number}: {self.title}"
+
+
+class Character(models.Model):
+    """
+    Represents a character in your story.
+    Characters can appear in multiple events across different books.
+    """
+    ROLE_CHOICES = [
+        ('protagonist', 'Protagonist'),
+        ('antagonist', 'Antagonist'),
+        ('supporting', 'Supporting'),
+        ('minor', 'Minor'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='characters')
+    name = models.CharField(max_length=100)
+    nickname = models.CharField(max_length=100, blank=True)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='supporting')
+    description = models.TextField(
+        blank=True,
+        help_text="Physical description, personality, background"
+    )
+    motivation = models.TextField(
+        blank=True,
+        help_text="What drives this character?"
+    )
+    color_code = models.CharField(
+        max_length=7,
+        default='#3498db',
+        help_text="Hex color code for timeline visualization (e.g., #3498db)"
+    )
+    introduction_book = models.ForeignKey(
+        Book,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='introduced_characters',
+        help_text="Which book does this character first appear in?"
+    )
+    introduction_chapter = models.ForeignKey(
+        Chapter,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='introduced_characters'
+    )
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Is this character still active in the current narrative?"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return f"{self.name} ({self.get_role_display()})"
+
+
+class Tag(models.Model):
+    """
+    Flexible tagging system for organizing events by themes, locations, subplots, etc.
+    """
+    TAG_CATEGORIES = [
+        ('theme', 'Theme'),
+        ('location', 'Location'),
+        ('subplot', 'Subplot'),
+        ('motif', 'Motif'),
+        ('tone', 'Tone'),
+        ('other', 'Other'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tags')
+    name = models.CharField(max_length=50)
+    category = models.CharField(max_length=20, choices=TAG_CATEGORIES, default='other')
+    color = models.CharField(
+        max_length=7,
+        default='#95a5a6',
+        help_text="Hex color code for visual identification"
+    )
+    description = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['category', 'name']
+        unique_together = ['user', 'name']
+
+    def __str__(self):
+        return f"{self.name} ({self.get_category_display()})"
+
+
+class Event(models.Model):
+    """
+    Core model representing a scene, plot point, or story beat.
+    Events are the building blocks of your timeline.
+    """
+    EMOTIONAL_TONE_CHOICES = [
+        ('tension', 'High Tension'),
+        ('action', 'Action'),
+        ('emotional', 'Emotional'),
+        ('reflective', 'Reflective'),
+        ('humorous', 'Humorous'),
+        ('dark', 'Dark'),
+        ('neutral', 'Neutral'),
+    ]
+
+    STORY_BEAT_CHOICES = [
+        ('exposition', 'Exposition'),
+        ('inciting', 'Inciting Incident'),
+        ('rising', 'Rising Action'),
+        ('climax', 'Climax'),
+        ('falling', 'Falling Action'),
+        ('resolution', 'Resolution'),
+        ('setup', 'Setup/Plant'),
+        ('payoff', 'Payoff'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='events')
+    title = models.CharField(max_length=200)
+    description = models.TextField(
+        help_text="Detailed description of what happens in this event/scene"
+    )
+    
+    # Book and chapter assignment
+    book = models.ForeignKey(
+        Book,
+        on_delete=models.CASCADE,
+        related_name='events',
+        null=True,
+        blank=True
+    )
+    chapter = models.ForeignKey(
+        Chapter,
+        on_delete=models.CASCADE,
+        related_name='events',
+        null=True,
+        blank=True
+    )
+    
+    # Timeline positioning
+    sequence_order = models.PositiveIntegerField(
+        default=0,
+        help_text="Order of this event in the narrative sequence"
+    )
+    chronological_order = models.PositiveIntegerField(
+        default=0,
+        help_text="Order of this event in actual story chronology (for flashbacks/non-linear narratives)"
+    )
+    
+    # Story world timestamp (optional - for tracking in-world dates/times)
+    story_date = models.CharField(
+        max_length=100,
+        blank=True,
+        help_text="Date/time within your story world (e.g., 'June 2024' or 'Day 3')"
+    )
+    
+    # Event characteristics
+    location = models.CharField(
+        max_length=200,
+        blank=True,
+        help_text="Where does this event take place?"
+    )
+    pov_character = models.ForeignKey(
+        Character,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='pov_events',
+        help_text="Which character's POV is this scene from?"
+    )
+    characters = models.ManyToManyField(
+        Character,
+        related_name='events',
+        blank=True,
+        help_text="All characters involved in this event"
+    )
+    emotional_tone = models.CharField(
+        max_length=20,
+        choices=EMOTIONAL_TONE_CHOICES,
+        default='neutral'
+    )
+    story_beat = models.CharField(
+        max_length=20,
+        choices=STORY_BEAT_CHOICES,
+        blank=True
+    )
+    tension_level = models.PositiveIntegerField(
+        default=5,
+        validators=[MinValueValidator(1), MaxValueValidator(10)],
+        help_text="Tension/intensity level (1-10)"
+    )
+    
+    # Tags for flexible organization
+    tags = models.ManyToManyField(Tag, related_name='events', blank=True)
+    
+    # Notes and metadata
+    notes = models.TextField(
+        blank=True,
+        help_text="Private notes, reminders, or research notes for this event"
+    )
+    word_count = models.PositiveIntegerField(
+        default=0,
+        help_text="Approximate word count for this scene"
+    )
+    is_written = models.BooleanField(
+        default=False,
+        help_text="Have you actually written this scene yet?"
+    )
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['sequence_order']
+
+    def __str__(self):
+        chapter_info = f"{self.chapter.chapter_number}" if self.chapter else "Unassigned"
+        return f"[Ch.{chapter_info}] {self.title}"
+
+    def save(self, *args, **kwargs):
+        # If chronological_order isn't set, default it to sequence_order
+        if self.chronological_order == 0 and self.sequence_order > 0:
+            self.chronological_order = self.sequence_order
+        super().save(*args, **kwargs)
+
+
+class CharacterRelationship(models.Model):
+    """
+    Tracks relationships between characters and how they evolve over time.
+    """
+    RELATIONSHIP_TYPES = [
+        ('ally', 'Ally/Friend'),
+        ('enemy', 'Enemy/Rival'),
+        ('romantic', 'Romantic'),
+        ('family', 'Family'),
+        ('mentor', 'Mentor/Student'),
+        ('business', 'Business/Professional'),
+        ('neutral', 'Neutral/Acquaintance'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='relationships')
+    character_a = models.ForeignKey(
+        Character,
+        on_delete=models.CASCADE,
+        related_name='relationships_as_a'
+    )
+    character_b = models.ForeignKey(
+        Character,
+        on_delete=models.CASCADE,
+        related_name='relationships_as_b'
+    )
+    relationship_type = models.CharField(max_length=20, choices=RELATIONSHIP_TYPES)
+    description = models.TextField(
+        blank=True,
+        help_text="Describe the nature of this relationship"
+    )
+    strength = models.PositiveIntegerField(
+        default=5,
+        validators=[MinValueValidator(1), MaxValueValidator(10)],
+        help_text="Strength/intensity of relationship (1-10)"
+    )
+    starts_at_event = models.ForeignKey(
+        Event,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='relationships_starting',
+        help_text="When does this relationship begin or become significant?"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ['character_a', 'character_b']
+
+    def __str__(self):
+        return f"{self.character_a.name} → {self.character_b.name} ({self.get_relationship_type_display()})"
