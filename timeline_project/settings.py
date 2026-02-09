@@ -73,12 +73,16 @@ WSGI_APPLICATION = 'timeline_project.wsgi.application'
 DATABASE_URL = config('DATABASE_URL', default=None)
 
 if DATABASE_URL:
-    # Production/Heroku - Use PostgreSQL
+    # Production/Heroku - Use PostgreSQL with SSL
     DATABASES = {
         'default': dj_database_url.config(
             default=DATABASE_URL,
             conn_max_age=600,
         )
+    }
+    # Ensure SSL is required for Neon PostgreSQL
+    DATABASES['default']['OPTIONS'] = {
+        'sslmode': 'require',
     }
 else:
     # Local development - Use SQLite
