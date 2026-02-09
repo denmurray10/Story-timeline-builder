@@ -11,76 +11,13 @@ Timeline Builder{% endblock %} {% block content %}
             <div class="card-body">
                 <form method="post">
                     {% csrf_token %}
-                    <div class="row">
-                        <!-- LEFT COLUMN: all fields except characters/tags -->
-                        <div class="col-md-8">
-                            {% for field in form %} {% if field.name !=
-                            'characters' and field.name != 'tags' %}
-                            <div class="mb-3">
-                                <label
-                                    for="{{ field.id_for_label }}"
-                                    class="form-label"
-                                >
-                                    {{ field.label }} {% if field.field.required
-                                    %}
-                                    <span class="text-danger">*</span>
-                                    {% endif %}
-                                </label>
-                                {{ field }} {% if field.help_text %}
-                                <small class="form-text text-muted">
-                                    {{ field.help_text|safe }}
-                                </small>
-                                {% endif %} {% if field.errors %}
-                                <div class="text-danger">
-                                    {% for error in field.errors %}
-                                    <small>{{ error }}</small>
-                                    {% endfor %}
-                                </div>
-                                {% endif %}
-                            </div>
-                            {% endif %} {% endfor %}
-                        </div>
 
-                        <!-- RIGHT COLUMN: characters + tags -->
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <label class="form-label"
-                                    >Characters Involved</label
-                                >
-                                {{ form.characters }} {% if
-                                form.characters.help_text %}
-                                <small class="form-text text-muted">
-                                    {{ form.characters.help_text|safe }}
-                                </small>
-                                {% endif %} {% if form.characters.errors %}
-                                <div class="text-danger">
-                                    {% for error in form.characters.errors %}
-                                    <small>{{ error }}</small>
-                                    {% endfor %}
-                                </div>
-                                {% endif %}
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Tags</label>
-                                {{ form.tags }} {% if form.tags.help_text %}
-                                <small class="form-text text-muted">
-                                    {{ form.tags.help_text|safe }}
-                                </small>
-                                {% endif %} {% if form.tags.errors %}
-                                <div class="text-danger">
-                                    {% for error in form.tags.errors %}
-                                    <small>{{ error }}</small>
-                                    {% endfor %}
-                                </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Render the form as a simple table to avoid any loop logic -->
+                    {{ form.as_p }}
 
                     <div class="d-flex justify-content-between mt-3">
                         <a
-                            href="{% if event %}{% url 'event_detail' event.pk %}{% else %}{% url 'timeline_view' %}{% endif %}"
+                            href="{% url 'timeline_view' %}"
                             class="btn btn-secondary"
                         >
                             <i class="bi bi-x-circle"></i> Cancel
