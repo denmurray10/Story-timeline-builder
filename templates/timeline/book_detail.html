@@ -96,8 +96,8 @@ Timeline Builder{% endblock %} {% block content %}
     </div>
     <div class="card-body">
         {% for chapter in chapters %}
-        <div class="list-group-item border-0 mb-2 shadow-sm rounded-3">
-            <div class="d-flex justify-content-between align-items-start">
+        <div class="mb-2 shadow-sm rounded-3">
+            <div class="d-flex justify-content-between align-items-start p-3">
                 <div>
                     <h6 class="mb-1">
                         Chapter {{ chapter.chapter_number }}: {{ chapter.title
@@ -131,6 +131,7 @@ Timeline Builder{% endblock %} {% block content %}
                 </div>
             </div>
         </div>
+
         {% empty %}
         <p class="text-muted text-center mb-0">
             No chapters yet.
