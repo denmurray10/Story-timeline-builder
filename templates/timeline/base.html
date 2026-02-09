@@ -19,44 +19,29 @@
 
         <!-- Custom CSS -->
         <style>
-            /* Novelcrafter-inspired Light Theme */
+            /* Novelcrafter-inspired Theme */
             :root {
-                /* Backgrounds */
-                --bg-body: #f8fafc; /* Very light cool grey */
-                --bg-surface: #ffffff; /* Pure white for cards */
-                --bg-sidebar: #ffffff; /* White sidebar */
-                --bg-input: #ffffff;
+                --bg-body: #0f1115; /* Very dark background */
+                --bg-surface: #181b21; /* Panel/Card background */
+                --bg-input: #22262e; /* Input field background */
 
-                /* Accents - The "Blurple" */
-                --accent: #4f46e5; /* Indigo-600 */
-                --accent-hover: #4338ca; /* Indigo-700 */
-                --accent-subtle: #eef2ff; /* Indigo-50 */
+                --accent: #6366f1; /* Indigo/Blurple accent similar to their branding */
+                --accent-hover: #4f46e5;
 
-                /* Text */
-                --text-heading: #0f172a; /* Slate-900 (Almost black) */
-                --text-body: #334155; /* Slate-700 */
-                --text-muted: #64748b; /* Slate-500 */
-                --text-light: #94a3b8; /* Slate-400 */
+                --text-heading: #f3f4f6;
+                --text-body: #d1d5db;
+                --text-muted: #9ca3af;
 
-                /* Borders */
-                --border-color: #e2e8f0; /* Slate-200 */
-                --border-hover: #cbd5e1; /* Slate-300 */
+                --border-color: #2e323b;
 
-                /* Utility Colors */
-                --success: #10b981; /* Emerald-500 */
-                --warning: #f59e0b; /* Amber-500 */
-                --danger: #ef4444; /* Red-500 */
+                --success: #22c55e;
+                --warning: #eab308;
+                --danger: #ef4444;
 
-                /* Variables */
                 --radius: 8px;
-                --radius-sm: 6px;
-                --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
                 --shadow:
-                    0 4px 6px -1px rgba(0, 0, 0, 0.05),
-                    0 2px 4px -1px rgba(0, 0, 0, 0.03);
-                --shadow-lg:
-                    0 10px 15px -3px rgba(0, 0, 0, 0.05),
-                    0 4px 6px -2px rgba(0, 0, 0, 0.025);
+                    0 4px 6px -1px rgba(0, 0, 0, 0.3),
+                    0 2px 4px -1px rgba(0, 0, 0, 0.15);
             }
 
             body {
@@ -67,16 +52,14 @@
                     sans-serif;
                 background-color: var(--bg-body);
                 color: var(--text-body);
-                line-height: 1.5;
-                -webkit-font-smoothing: antialiased;
+                line-height: 1.6;
             }
 
             /* NAVBAR */
             .navbar {
                 background-color: var(--bg-surface) !important;
                 border-bottom: 1px solid var(--border-color);
-                padding: 0.75rem 1.5rem;
-                box-shadow: var(--shadow-sm);
+                padding: 0.75rem 1rem;
             }
 
             .navbar-brand {
@@ -93,51 +76,48 @@
             .navbar-dark .navbar-nav .nav-link {
                 color: var(--text-muted);
                 font-weight: 500;
-                font-size: 0.95rem;
             }
 
             .navbar-dark .navbar-nav .nav-link:hover,
             .navbar-dark .navbar-nav .nav-link.active {
-                color: var(--accent);
+                color: var(--text-heading);
             }
 
             /* SIDEBAR */
             .sidebar {
-                background-color: var(--bg-sidebar);
+                background-color: var(--bg-surface);
                 border-right: 1px solid var(--border-color);
                 padding-top: 1.5rem;
             }
 
             .sidebar .nav-link {
                 color: var(--text-muted);
-                padding: 0.6rem 1.5rem;
-                margin: 0.2rem 0.8rem;
-                border-radius: var(--radius-sm);
-                border-left: none;
+                padding: 0.75rem 1.5rem;
+                border-left: 3px solid transparent;
+                border-radius: 0;
+                margin-bottom: 2px;
                 font-weight: 500;
-                transition: all 0.15s ease;
             }
 
             .sidebar .nav-link:hover {
                 color: var(--text-heading);
-                background-color: #f1f5f9; /* Slate-100 */
+                background-color: rgba(255, 255, 255, 0.03);
             }
 
             .sidebar .nav-link.active {
                 color: var(--accent);
-                background-color: var(--accent-subtle);
-                font-weight: 600;
+                background-color: rgba(99, 102, 241, 0.1);
+                border-left-color: var(--accent);
             }
 
             .sidebar .nav-link i {
-                margin-right: 10px;
-                color: inherit;
-                opacity: 0.8;
+                margin-right: 12px;
+                font-size: 1.1em;
             }
 
             /* MAIN CONTENT */
             .main-content {
-                padding: 2.5rem;
+                padding: 2rem;
             }
 
             h1,
@@ -147,15 +127,8 @@
             h5,
             h6 {
                 color: var(--text-heading);
-                font-weight: 700;
-                letter-spacing: -0.02em;
-            }
-
-            h1 {
-                font-size: 1.875rem;
-            }
-            h4 {
-                font-size: 1.25rem;
+                font-weight: 600;
+                letter-spacing: -0.01em;
             }
 
             /* CARDS */
@@ -163,42 +136,32 @@
                 background-color: var(--bg-surface);
                 border: 1px solid var(--border-color);
                 border-radius: var(--radius);
-                box-shadow: var(--shadow-sm);
-                margin-bottom: 1.5rem;
-                transition: box-shadow 0.2s ease;
-            }
-
-            .card:hover {
                 box-shadow: var(--shadow);
+                margin-bottom: 1.5rem;
             }
 
             .card-header {
-                background-color: var(--bg-surface);
+                background-color: transparent;
                 border-bottom: 1px solid var(--border-color);
-                padding: 1rem 1.5rem;
+                padding: 1rem 1.25rem;
                 font-weight: 600;
                 color: var(--text-heading);
-                border-top-left-radius: var(--radius);
-                border-top-right-radius: var(--radius);
             }
 
             .card-body {
-                padding: 1.5rem;
+                padding: 1.25rem;
             }
 
             .card-footer {
-                background-color: #f8fafc;
+                background-color: transparent;
                 border-top: 1px solid var(--border-color);
-                padding: 0.75rem 1.5rem;
             }
 
             /* BUTTONS */
             .btn {
-                border-radius: var(--radius-sm);
+                border-radius: 6px;
                 font-weight: 500;
                 padding: 0.5rem 1rem;
-                font-size: 0.95rem;
-                box-shadow: var(--shadow-sm);
                 transition: all 0.2s;
             }
 
@@ -211,44 +174,41 @@
             .btn-primary:hover {
                 background-color: var(--accent-hover);
                 border-color: var(--accent-hover);
-                box-shadow: var(--shadow);
             }
 
             .btn-secondary {
-                background-color: white;
+                background-color: var(--bg-input);
                 border-color: var(--border-color);
                 color: var(--text-body);
             }
 
             .btn-secondary:hover {
-                background-color: #f8fafc;
-                border-color: var(--border-hover);
+                background-color: #2d333b;
+                border-color: #3f4451;
                 color: var(--text-heading);
             }
 
             .btn-outline-secondary {
                 border-color: var(--border-color);
                 color: var(--text-muted);
-                background: transparent;
-                box-shadow: none;
             }
 
             .btn-outline-secondary:hover {
-                background-color: #f8fafc;
+                background-color: var(--bg-input);
                 color: var(--text-heading);
-                border-color: var(--border-hover);
+                border-color: var(--text-muted);
             }
 
             .btn-danger {
-                background-color: #fee2e2;
-                color: #b91c1c;
-                border: 1px solid #fecaca;
-                box-shadow: none;
+                background-color: rgba(239, 68, 68, 0.1);
+                color: #fca5a5;
+                border: 1px solid rgba(239, 68, 68, 0.2);
             }
 
             .btn-danger:hover {
-                background-color: #fecaca;
-                color: #991b1b;
+                background-color: rgba(239, 68, 68, 0.2);
+                color: #fca5a5;
+                border-color: rgba(239, 68, 68, 0.3);
             }
 
             /* FORMS */
@@ -257,136 +217,105 @@
                 background-color: var(--bg-input);
                 border: 1px solid var(--border-color);
                 color: var(--text-heading);
-                border-radius: var(--radius-sm);
-                padding: 0.6rem 0.8rem;
-                font-size: 0.95rem;
-                box-shadow: var(--shadow-sm);
+                border-radius: 6px;
+                padding: 0.6rem 1rem;
             }
 
             .form-control:focus,
             .form-select:focus {
-                background-color: white;
+                background-color: var(--bg-input);
                 border-color: var(--accent);
                 color: var(--text-heading);
-                box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+                box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
             }
 
-            .form-label {
-                color: var(--text-heading);
-                font-weight: 500;
-                font-size: 0.9rem;
-                margin-bottom: 0.4rem;
+            .form-control::placeholder {
+                color: #52525b;
             }
 
             /* BADGES & TAGS */
             .badge {
-                font-weight: 600;
-                padding: 0.35em 0.8em;
-                border-radius: 9999px;
+                font-weight: 500;
+                padding: 0.35em 0.65em;
             }
 
             .bg-secondary {
-                background-color: #f1f5f9 !important; /* Slate-100 */
+                background-color: var(--bg-input) !important;
                 color: var(--text-body);
                 border: 1px solid var(--border-color);
             }
 
-            .bg-success {
-                background-color: #d1fae5 !important;
-                color: #065f46;
-            }
-
-            .bg-warning {
-                background-color: #fef3c7 !important;
-                color: #92400e;
-            }
-
             .character-badge {
-                box-shadow: var(--shadow-sm);
-                border: 2px solid white;
-                font-weight: 600;
-                color: white;
-                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+                border: 1px solid rgba(255, 255, 255, 0.1);
             }
 
             .tag-badge {
-                background-color: white;
+                background-color: var(--bg-input);
                 border: 1px solid var(--border-color);
                 color: var(--text-muted);
-                font-size: 0.75rem;
-                font-weight: 600;
-                box-shadow: var(--shadow-sm);
             }
 
             /* PROGRESS BARS */
             .progress {
-                background-color: #f1f5f9;
-                border-radius: 999px;
+                background-color: var(--bg-input);
+                border-radius: 4px;
                 height: 8px;
-                box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
             }
 
             .progress-bar-custom {
-                height: 1.25rem;
-                border-radius: 6px;
-                background-color: #f1f5f9;
+                height: 1.2rem;
+                border-radius: 4px;
+                background-color: var(--bg-input);
             }
 
             .progress-bar {
                 background-color: var(--accent);
-                border-radius: 999px;
             }
 
             /* LIST GROUPS */
             .list-group-item {
+                background-color: transparent;
                 border-color: var(--border-color);
                 color: var(--text-body);
-                padding: 1rem 1.25rem;
             }
 
             .list-group-item-action:hover {
-                background-color: #f8fafc;
+                background-color: rgba(255, 255, 255, 0.03);
                 color: var(--text-heading);
             }
 
             /* EVENT CARDS SPECIFIC */
             .event-card {
-                background-color: white;
+                background-color: var(--bg-surface);
                 border: 1px solid var(--border-color);
                 border-left-width: 4px;
-                transition: all 0.2s ease;
             }
 
             .event-card:hover {
-                border-color: var(--accent-hover);
-                border-left-color: var(--accent);
-                box-shadow: var(--shadow-lg);
-                transform: translateY(-2px);
+                border-color: var(--accent); /* Highlight on hover */
+                transform: translateY(-1px);
             }
 
-            /* LINKS */
+            /* TEXT UTILITIES */
+            .text-muted {
+                color: #6b7280 !important;
+            }
+
             a {
                 color: var(--accent);
                 text-decoration: none;
-                font-weight: 500;
             }
 
             a:hover {
                 color: var(--accent-hover);
+                text-decoration: underline;
             }
 
             /* STATS CARDS */
             .stats-card {
                 border-left: none;
                 border-top: 3px solid var(--accent);
-                background: white;
-            }
-
-            .stats-card i {
-                color: var(--accent);
-                background-color: var(--accent-subtle);
-                padding: 10px;
-                border-radius: 8px;
             }
         </style>
 
