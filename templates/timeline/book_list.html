@@ -29,9 +29,7 @@ Builder{% endblock %} {% block content %}
                 {% endif %}
                 <div class="mb-3">
                     <small class="text-muted">
-                        <i class="bi bi-list-ol"></i> {{ book.chapter_count }}
-                        chapters | <i class="bi bi-calendar-event"></i> {{
-                        book.event_count }} events
+                        <i class="bi bi-list-ol"></i> {{ book.chapter_count }} chapters | <i class="bi bi-calendar-event"></i> {{ book.event_count }} events
                     </small>
                 </div>
                 <div class="progress progress-bar-custom mb-3">
@@ -47,8 +45,7 @@ Builder{% endblock %} {% block content %}
                     </div>
                 </div>
                 <small class="text-muted">
-                    {{ book.current_word_count|floatformat:0 }} / {{
-                    book.word_count_target|floatformat:0 }} words
+                    {{ book.current_word_count|floatformat:0 }} / {{ book.word_count_target|floatformat:0 }} words
                 </small>
             </div>
             <div class="card-footer bg-transparent">
