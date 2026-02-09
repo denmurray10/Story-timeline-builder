@@ -1,0 +1,84 @@
+{% extends 'timeline/base.html' %} {% block title %}Characters - Story Timeline
+Builder{% endblock %} {% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-people"></i> Characters</h1>
+    <a href="{% url 'character_create' %}" class="btn btn-primary">
+        <i class="bi bi-person-plus"></i> Add Character
+    </a>
+</div>
+
+{% if characters %}
+<div class="row">
+    {% for character in characters %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div
+                        class="character-badge"
+                        style="background-color: {{ character.color_code }}; width: 40px; height: 40px; border-radius: 50%;"
+                    ></div>
+                    <h5 class="ms-3 mb-0">
+                        <a
+                            href="{% url 'character_detail' character.pk %}"
+                            class="text-decoration-none"
+                        >
+                            {{ character.name }}
+                        </a>
+                    </h5>
+                </div>
+                {% if character.nickname %}
+                <p class="text-muted small">aka "{{ character.nickname }}"</p>
+                {% endif %}
+                <p class="mb-2">
+                    <span class="badge bg-secondary"
+                        >{{ character.get_role_display }}</span
+                    >
+                    {% if not character.is_active %}
+                    <span class="badge bg-warning">Inactive</span>
+                    {% endif %}
+                </p>
+                {% if character.description %}
+                <p class="card-text small">
+                    {{ character.description|truncatewords:20 }}
+                </p>
+                {% endif %}
+                <div class="mt-3">
+                    <small class="text-muted">
+                        <i class="bi bi-calendar-event"></i> {{
+                        character.event_count }} events
+                    </small>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent">
+                <a
+                    href="{% url 'character_detail' character.pk %}"
+                    class="btn btn-sm btn-outline-primary"
+                >
+                    <i class="bi bi-eye"></i> View
+                </a>
+                <a
+                    href="{% url 'character_edit' character.pk %}"
+                    class="btn btn-sm btn-outline-secondary"
+                >
+                    <i class="bi bi-pencil"></i> Edit
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card">
+    <div class="card-body text-center py-5">
+        <i class="bi bi-people display-1 text-muted"></i>
+        <h3 class="mt-3">No Characters Yet</h3>
+        <p class="text-muted">
+            Create your first character to populate your story timeline.
+        </p>
+        <a href="{% url 'character_create' %}" class="btn btn-primary">
+            <i class="bi bi-person-plus"></i> Create First Character
+        </a>
+    </div>
+</div>
+{% endif %} {% endblock %}
