@@ -1,0 +1,53 @@
+"""
+URL patterns for the timeline app.
+"""
+from django.urls import path
+from django.contrib.auth import views as auth_views
+from . import views
+
+urlpatterns = [
+    # Authentication
+    path('login/', auth_views.LoginView.as_view(template_name='timeline/login.html'), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('register/', views.register, name='register'),
+    
+    # Home/Dashboard
+    path('', views.home, name='timeline_home'),
+    path('dashboard/', views.dashboard, name='dashboard'),
+    
+    # Books
+    path('books/', views.book_list, name='book_list'),
+    path('books/create/', views.book_create, name='book_create'),
+    path('books/<int:pk>/', views.book_detail, name='book_detail'),
+    path('books/<int:pk>/edit/', views.book_edit, name='book_edit'),
+    path('books/<int:pk>/delete/', views.book_delete, name='book_delete'),
+    
+    # Chapters
+    path('books/<int:book_pk>/chapters/create/', views.chapter_create, name='chapter_create'),
+    path('chapters/<int:pk>/edit/', views.chapter_edit, name='chapter_edit'),
+    path('chapters/<int:pk>/delete/', views.chapter_delete, name='chapter_delete'),
+    
+    # Characters
+    path('characters/', views.character_list, name='character_list'),
+    path('characters/create/', views.character_create, name='character_create'),
+    path('characters/<int:pk>/', views.character_detail, name='character_detail'),
+    path('characters/<int:pk>/edit/', views.character_edit, name='character_edit'),
+    path('characters/<int:pk>/delete/', views.character_delete, name='character_delete'),
+    
+    # Events (Timeline)
+    path('timeline/', views.timeline_view, name='timeline_view'),
+    path('events/create/', views.event_create, name='event_create'),
+    path('events/<int:pk>/', views.event_detail, name='event_detail'),
+    path('events/<int:pk>/edit/', views.event_edit, name='event_edit'),
+    path('events/<int:pk>/delete/', views.event_delete, name='event_delete'),
+    path('events/<int:pk>/reorder/', views.event_reorder, name='event_reorder'),
+    
+    # Tags
+    path('tags/', views.tag_list, name='tag_list'),
+    path('tags/create/', views.tag_create, name='tag_create'),
+    path('tags/<int:pk>/edit/', views.tag_edit, name='tag_edit'),
+    path('tags/<int:pk>/delete/', views.tag_delete, name='tag_delete'),
+    
+    # API endpoints for AJAX (we'll use these later for drag-and-drop)
+    path('api/events/reorder/', views.api_event_reorder, name='api_event_reorder'),
+]
