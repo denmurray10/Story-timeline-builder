@@ -1,0 +1,85 @@
+{% extends 'timeline/base.html' %} {% block title %}Books - Story Timeline
+Builder{% endblock %} {% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-book"></i> Books</h1>
+    <a href="{% url 'book_create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Add Book
+    </a>
+</div>
+
+{% if books %}
+<div class="row">
+    {% for book in books %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <a
+                        href="{% url 'book_detail' book.pk %}"
+                        class="text-decoration-none"
+                    >
+                        Book {{ book.series_order }}: {{ book.title }}
+                    </a>
+                </h5>
+                <p class="text-muted">
+                    <span class="badge bg-secondary">{{ book.status }}</span>
+                </p>
+                {% if book.description %}
+                <p class="card-text">{{ book.description|truncatewords:20 }}</p>
+                {% endif %}
+                <div class="mb-3">
+                    <small class="text-muted">
+                        <i class="bi bi-list-ol"></i> {{ book.chapter_count }}
+                        chapters | <i class="bi bi-calendar-event"></i> {{
+                        book.event_count }} events
+                    </small>
+                </div>
+                <div class="progress progress-bar-custom mb-3">
+                    <div
+                        class="progress-bar"
+                        role="progressbar"
+                        style="width: {{ book.progress_percentage }}%"
+                        aria-valuenow="{{ book.progress_percentage }}"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                    >
+                        {{ book.progress_percentage|floatformat:1 }}%
+                    </div>
+                </div>
+                <small class="text-muted">
+                    {{ book.current_word_count|floatformat:0 }} / {{
+                    book.word_count_target|floatformat:0 }} words
+                </small>
+            </div>
+            <div class="card-footer bg-transparent">
+                <a
+                    href="{% url 'book_detail' book.pk %}"
+                    class="btn btn-sm btn-outline-primary"
+                >
+                    <i class="bi bi-eye"></i> View
+                </a>
+                <a
+                    href="{% url 'book_edit' book.pk %}"
+                    class="btn btn-sm btn-outline-secondary"
+                >
+                    <i class="bi bi-pencil"></i> Edit
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card">
+    <div class="card-body text-center py-5">
+        <i class="bi bi-inbox display-1 text-muted"></i>
+        <h3 class="mt-3">No Books Yet</h3>
+        <p class="text-muted">
+            Create your first book to start building your story timeline.
+        </p>
+        <a href="{% url 'book_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Create First Book
+        </a>
+    </div>
+</div>
+{% endif %} {% endblock %}
