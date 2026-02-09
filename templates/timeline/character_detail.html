@@ -1,0 +1,174 @@
+{% extends 'timeline/base.html' %} {% block title %}{{ character.name }} - Story
+Timeline Builder{% endblock %} {% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center">
+        <div
+            class="character-badge"
+            style="background-color: {{ character.color_code }}; width: 60px; height: 60px; border-radius: 50%;"
+        ></div>
+        <div class="ms-3">
+            <h1 class="mb-0">{{ character.name }}</h1>
+            {% if character.nickname %}
+            <p class="text-muted mb-0">aka "{{ character.nickname }}"</p>
+            {% endif %}
+        </div>
+    </div>
+    <div>
+        <a
+            href="{% url 'character_edit' character.pk %}"
+            class="btn btn-secondary"
+        >
+            <i class="bi bi-pencil"></i> Edit
+        </a>
+        <a
+            href="{% url 'character_delete' character.pk %}"
+            class="btn btn-danger"
+        >
+            <i class="bi bi-trash"></i> Delete
+        </a>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-person-badge"></i> Character Details
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p>
+                            <strong>Role:</strong>
+                            <span class="badge bg-secondary"
+                                >{{ character.get_role_display }}</span
+                            >
+                        </p>
+                        <p>
+                            <strong>Status:</strong>
+                            {% if character.is_active %}
+                            <span class="badge bg-success">Active</span>
+                            {% else %}
+                            <span class="badge bg-warning">Inactive</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p>
+                            <strong>Introduction:</strong>
+                            {% if character.introduction_book %} {{
+                            character.introduction_book.title }} {% if
+                            character.introduction_chapter %} - Ch. {{
+                            character.introduction_chapter.chapter_number }}{%
+                            endif %} {% else %} Not set {% endif %}
+                        </p>
+                        <p>
+                            <strong>Color Code:</strong>
+                            <span
+                                class="character-badge"
+                                style="background-color: {{ character.color_code }};"
+                                >{{ character.color_code }}</span
+                            >
+                        </p>
+                    </div>
+                </div>
+
+                {% if character.description %}
+                <hr />
+                <h6>Description</h6>
+                <p>{{ character.description }}</p>
+                {% endif %} {% if character.motivation %}
+                <hr />
+                <h6>Motivation</h6>
+                <p>{{ character.motivation }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- POV Events -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-eye"></i> POV Events ({{ pov_events.count }})
+            </div>
+            <div class="card-body">
+                {% if pov_events %} {% for event in pov_events %}
+                <div
+                    class="event-card card mb-2"
+                    style="border-left-color: {{ character.color_code }};"
+                >
+                    <div class="card-body py-2">
+                        <h6 class="mb-1">
+                            <a
+                                href="{% url 'event_detail' event.pk %}"
+                                class="text-decoration-none"
+                            >
+                                {{ event.title }}
+                            </a>
+                        </h6>
+                        <small class="text-muted">
+                            {% if event.book %}{{ event.book.title }}{% endif %}
+                            {% if event.chapter %} - Ch. {{
+                            event.chapter.chapter_number }}{% endif %}
+                        </small>
+                    </div>
+                </div>
+                {% endfor %} {% else %}
+                <p class="text-muted text-center">
+                    No POV events for this character yet.
+                </p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- All Events -->
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-calendar-event"></i> All Appearances ({{
+                events.count }})
+            </div>
+            <div class="card-body">
+                {% if events %} {% for event in events %}
+                <div class="event-card card mb-2">
+                    <div class="card-body py-2">
+                        <h6 class="mb-1">
+                            <a
+                                href="{% url 'event_detail' event.pk %}"
+                                class="text-decoration-none"
+                            >
+                                {{ event.title }}
+                            </a>
+                        </h6>
+                        <small class="text-muted">
+                            {% if event.book %}{{ event.book.title }}{% endif %}
+                            {% if event.chapter %} - Ch. {{
+                            event.chapter.chapter_number }}{% endif %} {% if
+                            event.pov_character %} | POV: {{
+                            event.pov_character.name }}{% endif %}
+                        </small>
+                    </div>
+                </div>
+                {% endfor %} {% else %}
+                <p class="text-muted text-center">
+                    This character hasn't appeared in any events yet.
+                </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card mb-3">
+            <div class="card-body text-center">
+                <h3>{{ events.count }}</h3>
+                <p class="text-muted mb-0">Total Appearances</p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body text-center">
+                <h3>{{ pov_events.count }}</h3>
+                <p class="text-muted mb-0">POV Events</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
