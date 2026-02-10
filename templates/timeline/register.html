@@ -1,4 +1,4 @@
-={% extends "timeline/base.html" %}
+{% extends "timeline/base.html" %}
 
 {% block title %}Create your account - Story Timeline Builder{% endblock %}
 
@@ -54,10 +54,14 @@
     /* Rounded, full-width inputs inside auth card */
     .auth-card .form-control,
     .auth-card input,
-    .auth-card select {
-        border-radius: 10px !important;
+    .auth-card select,
+    .auth-card textarea {
+        border-radius: 5px !important;
         width: 100%;
         box-sizing: border-box;
+        border: 1px solid rgba(0, 0, 0, 0.16) !important;
+        padding: 5px 5px 5px 15px !important;
+        font-size: 14px !important;
     }
 </style>
 {% endblock %}
