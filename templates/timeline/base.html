@@ -380,8 +380,9 @@
     <body>
         <nav class="navbar navbar-expand-lg navbar-dark">
             <div class="container-fluid">
-                <a class="navbar-brand" href="{% url 'timeline_home' %}">
-                    <i class="bi bi-book"></i> Story Timeline Builder
+                <a class="navbar-brand d-flex align-items-center" href="{% url 'timeline_home' %}">
+                    <img src="{% static 'img/logo.png' %}" alt="Story Timeline Builder Logo" style="height: 40px; width: auto; margin-right: 10px;">
+                    <span class="fw-bold" style="font-size: 1.3rem;">Story Timeline Builder</span>
                 </a>
                 <button
                     class="navbar-toggler"

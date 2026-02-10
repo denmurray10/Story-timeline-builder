@@ -1,196 +1,401 @@
-{% extends 'timeline/base.html' %} {% block title %}Dashboard - Story Timeline
-Builder{% endblock %} {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-1">
-    <h1><i class="bi bi-speedometer2"></i> Dashboard</h1>
-</div>
-<p class="text-muted mb-4">
-    Overview of your books, characters, and scenes at a glance.
-</p>
+{% extends 'timeline/base.html' %}
+{% load static %}
 
-<!-- Stats Cards -->
-<div class="row mb-4">
-    <div class="col-md-3">
-        <div class="card stats-card">
-            <div class="card-body text-center">
-                <i class="bi bi-book display-5 mb-2"></i>
-                <h3 class="mt-1 mb-0">{{ books.count }}</h3>
-                <p class="text-muted mb-0">Books</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card stats-card">
-            <div class="card-body text-center">
-                <i class="bi bi-people display-5 mb-2"></i>
-                <h3 class="mt-1 mb-0">{{ character_count }}</h3>
-                <p class="text-muted mb-0">Characters</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card stats-card">
-            <div class="card-body text-center">
-                <i class="bi bi-calendar-event display-5 mb-2"></i>
-                <h3 class="mt-1 mb-0">{{ total_events }}</h3>
-                <p class="text-muted mb-0">Total Events</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card stats-card">
-            <div class="card-body text-center">
-                <i class="bi bi-check-circle display-5 mb-2"></i>
-                <h3 class="mt-1 mb-0">{{ events_written }}</h3>
-                <p class="text-muted mb-0">Events Written</p>
-            </div>
-        </div>
-    </div>
-</div>
+{% block title %}Dashboard - Story Timeline Builder{% endblock %}
 
-<div class="row">
-    <!-- Books overview -->
-    <div class="col-lg-8">
-        <div class="card">
-            <div
-                class="card-header d-flex justify-content-between align-items-center"
-            >
-                <span><i class="bi bi-book"></i> Your Books</span>
-                <a
-                    href="{% url 'book_create' %}"
-                    class="btn btn-sm btn-primary"
-                >
-                    <i class="bi bi-plus"></i> Add Book
-                </a>
+
+{% block extra_css %}
+<style>
+    /* Hide main navbar on dashboard to match mock */
+    .navbar {
+        display: none !important;
+    }
+
+    /* Light background matching mock */
+    .main-content {
+        background-color: #f4f1ee;
+        padding-top: 32px !important;
+    }
+
+    /* So sidebar sits on same background tone */
+    .sidebar {
+        background-color: #f4f1ee;
+        border-right: none;
+    }
+    .sidebar .nav-link {
+        border-radius: 999px;
+    }
+
+    .dashboard-wrapper {
+        max-width: 1100px;
+        margin: 0 auto 40px auto;
+    }
+
+    .dash-header-row {
+        margin-bottom: 18px;
+    }
+
+    .dash-logo {
+        height: 44px;
+        width: auto;
+    }
+
+    .dash-hello {
+        font-size: 0.95rem;
+        color: #6b7280;
+    }
+
+    .dash-card {
+        background-color: #ffffff;
+        border-radius: 18px;
+        border: none;
+        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.05);
+    }
+
+    .dash-card-header {
+        font-weight: 600;
+        font-size: 0.95rem;
+        margin-bottom: 6px;
+    }
+
+    .dash-card-sub {
+        font-size: 0.8rem;
+        color: #6b7280;
+    }
+
+    .dash-pill-card {
+        border-radius: 20px;
+    }
+
+    .dash-stat-icon {
+        font-size: 1.6rem;
+        margin-bottom: 4px;
+    }
+
+    .dash-stat-label {
+        font-size: 0.8rem;
+        color: #6b7280;
+    }
+
+    .dash-stat-value {
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .dash-list {
+        list-style: none;
+        padding-left: 0;
+        margin-bottom: 0;
+        font-size: 0.85rem;
+    }
+
+    .dash-list li + li {
+        margin-top: 6px;
+    }
+
+    .dash-muted {
+        color: #6b7280;
+        font-size: 0.8rem;
+    }
+
+    .dash-book-mini {
+        border-radius: 18px;
+        background-color: #ffffff;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+        padding: 12px 14px;
+        margin-bottom: 12px;
+    }
+
+    .dash-book-title {
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 2px;
+    }
+
+    .dash-status-pill {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 0.7rem;
+        background-color: #111827;
+        color: #f9fafb;
+    }
+
+    .dash-progress-bg {
+        height: 6px;
+        border-radius: 999px;
+        background-color: #e5e7eb;
+        overflow: hidden;
+    }
+
+    .dash-progress-fill {
+        height: 100%;
+        border-radius: 999px;
+        background-color: #111827;
+    }
+
+    .dash-quick-btn {
+        border-radius: 999px;
+        width: 100%;
+        text-align: left;
+        justify-content: flex-start;
+        font-size: 0.9rem;
+    }
+
+    .dash-ai-input {
+        border-radius: 999px;
+        border: 1px solid #d1d5db;
+        padding: 0.6rem 1rem;
+        width: 100%;
+        font-size: 0.9rem;
+    }
+
+    .dash-ai-input:focus {
+        outline: none;
+        border-color: #111827;
+        box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.2);
+    }
+
+    .dash-ai-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 999px;
+        border: 1px solid #d1d5db;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    @media (max-width: 991px) {
+        .dashboard-wrapper {
+            max-width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+
+    <!-- Custom header row: logo left, greeting right -->
+    <div class="d-flex justify-content-between align-items-center dash-header-row">
+        <div class="d-flex align-items-center">
+            <img src="{% static 'img/logo-horizontal.png' %}" alt="Story Timeline Builder" class="dash-logo">
+        </div>
+        <div class="dash-hello">
+            Hello, {{ user.first_name|default:user.username }}
+        </div>
+    </div>
+
+    <!-- Row label "Dashboard" like in mock -->
+    <h2 class="mb-3">Dashboard</h2>
+
+    <!-- Row 1: Today's Focus + Recent Activity + Your Books (first) -->
+    <div class="row g-3 mb-3">
+        <!-- Today’s Focus -->
+        <div class="col-lg-6">
+            <div class="dash-card dash-pill-card p-3">
+                <div class="dash-card-header">Today’s Focus</div>
+                <p class="dash-card-sub mb-2">
+                    1–3 suggested tasks pulled from unwritten events or empty chapters.
+                </p>
+                <ul class="dash-list">
+                    <li>• Add a new event to your current chapter.</li>
+                    <li>• Flesh out a POV character arc that has few scenes.</li>
+                    <li>• Fill gaps between distant timeline events.</li>
+                </ul>
             </div>
-            <div class="card-body">
-                {% if books %} {% for book in books %}
-                <div class="card mb-3 border-0 shadow-sm">
-                    <div class="card-body">
-                        <div
-                            class="d-flex justify-content-between align-items-start"
-                        >
-                            <div class="me-3 flex-grow-1">
-                                <h5 class="card-title mb-1">
-                                    <a
-                                        href="{% url 'book_detail' book.pk %}"
-                                        class="text-decoration-none"
-                                    >
-                                        Book {{ book.series_order }}:
-                                        {{book.title }}
-                                    </a>
-                                </h5>
-                                <p class="text-muted mb-2 small">
-                                    <span
-                                        class="badge bg-secondary text-uppercase small"
-                                        >{{ book.status }}</span
-                                    >
-                                    <span class="ms-2"
-                                        >{{ book.chapter_count }} chapters</span
-                                    >
-                                    <span class="ms-2"
-                                        >{{ book.event_count }} events</span
-                                    >
-                                </p>
-                                {% if book.description %}
-                                <p class="mb-2 small text-muted">
-                                    {{ book.description|truncatewords:20 }}
-                                </p>
-                                {% endif %}
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="col-lg-3">
+            <div class="dash-card p-3 h-100">
+                <div class="dash-card-header">Recent Activity</div>
+                <ul class="dash-list">
+                    {% if recent_events %}
+                        {% for event in recent_events|slice:":5" %}
+                            <li>
+                                <strong>{{ event.title }}</strong>
+                                <span class="dash-muted">
+                                    · {{ event.updated_at|timesince }} ago
+                                </span>
+                            </li>
+                        {% endfor %}
+                    {% else %}
+                        <li class="dash-muted">No recent events yet.</li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Your Books (right column) -->
+        <div class="col-lg-3">
+            {% for book in books|slice:":2" %}
+                <div class="dash-book-mini">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <div class="dash-book-title">
+                            Book {{ book.series_order }}: {{ book.title }}
+                        </div>
+                        <span class="dash-status-pill">
+                            {{ book.status|default:"Drafting" }}
+                        </span>
+                    </div>
+                    <div class="dash-muted mb-1">
+                        Chapters {{ book.chapter_count|default:"0" }}
+                    </div>
+                    <div class="dash-progress-bg mb-1">
+                        <div class="dash-progress-fill" style="width: {{ book.progress_percentage }}%;"></div>
+                    </div>
+                    <div class="dash-muted">
+                        Word Count: {{ book.current_word_count|floatformat:0 }}/{{ book.word_count_target|floatformat:0 }}
+                    </div>
+                </div>
+            {% empty %}
+                <div class="dash-card p-3">
+                    <div class="dash-card-header">Your Books</div>
+                    <p class="dash-muted mb-2">
+                        You haven’t created any books yet.
+                    </p>
+                    <a href="{% url 'book_create' %}" class="btn btn-dark btn-sm w-100">
+                        New Book
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Row 2: Stats strip -->
+    <div class="row g-3 mb-3">
+        <div class="col-lg-6">
+            <div class="dash-card dash-pill-card p-3">
+                <div class="row text-center">
+                    <div class="col-3">
+                        <div class="dash-stat-icon">
+                            <i class="bi bi-book"></i>
+                        </div>
+                        <div class="dash-stat-value">{{ books.count }}</div>
+                        <div class="dash-stat-label">Books</div>
+                    </div>
+                    <div class="col-3">
+                        <div class="dash-stat-icon">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <div class="dash-stat-value">{{ character_count }}</div>
+                        <div class="dash-stat-label">Characters</div>
+                    </div>
+                    <div class="col-3">
+                        <div class="dash-stat-icon">
+                            <i class="bi bi-calendar-event"></i>
+                        </div>
+                        <div class="dash-stat-value">{{ total_events }}</div>
+                        <div class="dash-stat-label">Total Events</div>
+                    </div>
+                    <div class="col-3">
+                        <div class="dash-stat-icon">
+                            <i class="bi bi-journal-text"></i>
+                        </div>
+                        <div class="dash-stat-value">{{ events_written }}</div>
+                        <div class="dash-stat-label">Chapters (written)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 3: World at a Glance + Quick Actions + more Books -->
+    <div class="row g-3 mb-3">
+        <!-- World at a Glance -->
+        <div class="col-lg-6">
+            <div class="dash-card dash-pill-card p-3 mb-3">
+                <div class="dash-card-header mb-2">World at a Glance</div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="p-3" style="background-color:#f5f5f5; border-radius:14px;">
+                            <div class="dash-card-header mb-1" style="font-size:0.9rem;">Top overview</div>
+                            <div class="dash-muted">
+                                Books: {{ books.count }}<br>
+                                Characters: {{ character_count }}<br>
+                                Events: {{ total_events }}
                             </div>
                         </div>
-                        <div class="mt-2">
-                            <div class="progress progress-bar-custom mb-1">
-                                <div
-                                    class="progress-bar"
-                                    role="progressbar"
-                                    style="width: {{ book.progress_percentage }}%"
-                                    aria-valuenow="{{ book.progress_percentage }}"
-                                    aria-valuemin="0"
-                                    aria-valuemax="100"
-                                ></div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3" style="background-color:#f5f5f5; border-radius:14px;">
+                            <div class="dash-card-header mb-1" style="font-size:0.9rem;">Gaps & Opportunities</div>
+                            <div class="dash-muted">
+                                Use the timeline to spot chapters with no scenes,
+                                and characters who haven’t appeared recently.
                             </div>
-                            <small class="text-muted">
-                                {{ book.current_word_count|floatformat:0 }} / {{ book.word_count_target|floatformat:0 }} words ({{ book.progress_percentage|floatformat:1 }}%)
-                            </small>
                         </div>
                     </div>
                 </div>
-                {% endfor %} {% else %}
-                <p class="text-muted text-center py-4 mb-0">
-                    <i class="bi bi-inbox display-5 d-block mb-2"></i>
-                    No books yet.
-                    <a href="{% url 'book_create' %}">Create your first book</a>
-                    to get started.
-                </p>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-
-    <!-- Recent activity + quick actions -->
-    <div class="col-lg-4">
-        <div class="card mb-3">
-            <div class="card-header">
-                <i class="bi bi-clock-history"></i> Recent Events
-            </div>
-            <div class="card-body">
-                {% if recent_events %}
-                <div class="list-group">
-                    {% for event in recent_events %}
-                    <a
-                        href="{% url 'event_detail' event.pk %}"
-                        class="list-group-item list-group-item-action border-0 mb-1 rounded-3 shadow-sm"
-                    >
-                        <div class="d-flex w-100 justify-content-between">
-                            <h6 class="mb-1">{{ event.title }}</h6>
-                            <small class="text-muted"
-                                >{{ event.updated_at|timesince }} ago</small
-                            >
-                        </div>
-                        <p class="mb-1 small text-muted">
-                            {% if event.book %}{{ event.book.title }}{% endif %}
-                            {% if event.chapter %} – Ch. {{
-                            event.chapter.chapter_number }}{% endif %}
-                        </p>
-                    </a>
-                    {% endfor %}
-                </div>
-                {% else %}
-                <p class="text-muted mb-0 text-center">No recent events yet.</p>
-                {% endif %}
             </div>
         </div>
 
-        <div class="card">
-            <div class="card-header">
-                <i class="bi bi-lightning-charge"></i> Quick Actions
-            </div>
-            <div class="card-body">
+        <!-- Quick Actions -->
+        <div class="col-lg-3">
+            <div class="dash-card p-3 h-100">
+                <div class="dash-card-header mb-2">Quick Actions</div>
                 <div class="d-grid gap-2">
-                    <a href="{% url 'event_create' %}" class="btn btn-primary">
-                        <i class="bi bi-plus-circle"></i> New Event
+                    <a href="{% url 'event_create' %}" class="btn btn-light dash-quick-btn">
+                        New Event
                     </a>
-                    <a
-                        href="{% url 'character_create' %}"
-                        class="btn btn-outline-secondary"
-                    >
-                        <i class="bi bi-person-plus"></i> New Character
+                    <a href="{% url 'character_create' %}" class="btn btn-light dash-quick-btn">
+                        New Character
                     </a>
-                    <a
-                        href="{% url 'book_create' %}"
-                        class="btn btn-outline-secondary"
-                    >
-                        <i class="bi bi-book"></i> New Book
+                    <a href="{% url 'book_create' %}" class="btn btn-light dash-quick-btn">
+                        New Book
                     </a>
-                    <a
-                        href="{% url 'timeline_view' %}"
-                        class="btn btn-secondary"
-                    >
-                        <i class="bi bi-clock-history"></i> View Timeline
+                    <a href="{% url 'timeline_view' %}" class="btn btn-light dash-quick-btn">
+                        View Timeline
                     </a>
                 </div>
             </div>
         </div>
+
+        <!-- Your Books (extra) -->
+        <div class="col-lg-3">
+            {% for book in books|slice:"2:4" %}
+                <div class="dash-book-mini">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <div class="dash-book-title">
+                            Book {{ book.series_order }}: {{ book.title }}
+                        </div>
+                        <span class="dash-status-pill">
+                            {{ book.status|default:"Drafting" }}
+                        </span>
+                    </div>
+                    <div class="dash-muted mb-1">
+                        Chapters {{ book.chapter_count|default:"0" }}
+                    </div>
+                    <div class="dash-progress-bg mb-1">
+                        <div class="dash-progress-fill" style="width: {{ book.progress_percentage }}%;"></div>
+                    </div>
+                    <div class="dash-muted">
+                        Word Count: {{ book.current_word_count|floatformat:0 }}/{{ book.word_count_target|floatformat:0 }}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
     </div>
+
+    <!-- Row 4: AI Support -->
+    <div class="row g-3 mb-3">
+        <div class="col-12">
+            <div class="dash-card dash-pill-card p-3">
+                <div class="dash-card-header mb-1">AI Support</div>
+                <p class="dash-muted mb-3">
+                    Let me know how I can help you with your story today.
+                </p>
+                <div class="d-flex align-items-center gap-2">
+                    <input type="text" class="dash-ai-input" placeholder="I need help with…">
+                    <div class="dash-ai-icon">
+                        <i class="bi bi-chat-dots"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 {% endblock %}
