@@ -42,7 +42,7 @@
 
     .dash-hello {
         font-size: 0.95rem;
-        color: #6b7280;
+        color: #000000;
     }
 
     .dash-card {
@@ -179,11 +179,29 @@
 
     <!-- Custom header row: logo left, greeting right -->
     <div class="d-flex justify-content-between align-items-center dash-header-row">
-        <div class="d-flex align-items-center">
-            <img src="{% static 'img/logo-horizontal.png' %}" alt="Story Timeline Builder" class="dash-logo">
-        </div>
-        <div class="dash-hello">
-            Hello, {{ user.first_name|default:user.username }}
+        <!-- Logo removed as requested -->
+        <div></div>
+        <div class="dash-hello ms-auto">
+            <div class="dropdown">
+                <a class="dropdown-toggle d-flex align-items-center fw-bold" href="#" id="dashboardUserDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Hello, {{ user.first_name|default:user.username }}
+                    <i class="bi bi-chevron-down ms-2"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dashboardUserDropdown">
+                    <li>
+                        <a class="dropdown-item" href="{% url 'account' %}">
+                            <i class="bi bi-gear"></i> Account
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider" /></li>
+                    <li>
+                        <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="dropdown-item">Logout</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 
