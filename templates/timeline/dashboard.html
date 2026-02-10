@@ -3,7 +3,6 @@
 
 {% block title %}Dashboard - Story Timeline Builder{% endblock %}
 
-
 {% block extra_css %}
 <style>
     /* Hide main navbar on dashboard to match mock */
@@ -177,13 +176,17 @@
 {% block content %}
 <div class="dashboard-wrapper">
 
-    <!-- Custom header row: logo left, greeting right -->
+    <!-- Custom header row: logo left (empty), greeting right -->
     <div class="d-flex justify-content-between align-items-center dash-header-row">
-        <!-- Logo removed as requested -->
         <div></div>
         <div class="dash-hello ms-auto">
             <div class="dropdown">
-                <a class="dropdown-toggle d-flex align-items-center fw-bold" href="#" id="dashboardUserDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <a class="dropdown-toggle d-flex align-items-center fw-bold"
+                   href="#"
+                   id="dashboardUserDropdown"
+                   role="button"
+                   data-bs-toggle="dropdown"
+                   aria-expanded="false">
                     Hello, {{ user.first_name|default:user.username }}
                     <i class="bi bi-chevron-down ms-2"></i>
                 </a>
@@ -205,13 +208,16 @@
         </div>
     </div>
 
-    <!-- Row label "Dashboard" like in mock -->
+    <!-- Page title -->
     <h2 class="mb-3">Dashboard</h2>
 
-    <!-- Row 1: Today's Focus + Recent Activity + Your Books (first) -->
+    <!-- MAIN 3-COLUMN AREA: left / middle / right -->
     <div class="row g-3 mb-3">
-        <!-- Today’s Focus -->
-        <div class="col-lg-6">
+
+        <!-- LEFT COLUMN (stack: Today’s Focus, Stats, World at a Glance) -->
+        <div class="col-lg-6 d-flex flex-column gap-3">
+
+            <!-- Today’s Focus -->
             <div class="dash-card dash-pill-card p-3">
                 <div class="dash-card-header">Today’s Focus</div>
                 <p class="dash-card-sub mb-2">
@@ -223,11 +229,74 @@
                     <li>• Fill gaps between distant timeline events.</li>
                 </ul>
             </div>
+
+            <!-- Stats strip -->
+            <div class="dash-card dash-pill-card p-3">
+                <div class="row text-center">
+                    <div class="col-3">
+                        <div class="dash-stat-icon">
+                            <i class="bi bi-book"></i>
+                        </div>
+                        <div class="dash-stat-value">{{ books.count }}</div>
+                        <div class="dash-stat-label">Books</div>
+                    </div>
+                    <div class="col-3">
+                        <div class="dash-stat-icon">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <div class="dash-stat-value">{{ character_count }}</div>
+                        <div class="dash-stat-label">Characters</div>
+                    </div>
+                    <div class="col-3">
+                        <div class="dash-stat-icon">
+                            <i class="bi bi-calendar-event"></i>
+                        </div>
+                        <div class="dash-stat-value">{{ total_events }}</div>
+                        <div class="dash-stat-label">Total Events</div>
+                    </div>
+                    <div class="col-3">
+                        <div class="dash-stat-icon">
+                            <i class="bi bi-journal-text"></i>
+                        </div>
+                        <div class="dash-stat-value">{{ events_written }}</div>
+                        <div class="dash-stat-label">Chapters (written)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- World at a Glance -->
+            <div class="dash-card dash-pill-card p-3">
+                <div class="dash-card-header mb-2">World at a Glance</div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="p-3" style="background-color:#f5f5f5; border-radius:14px;">
+                            <div class="dash-card-header mb-1" style="font-size:0.9rem;">Top overview</div>
+                            <div class="dash-muted">
+                                Books: {{ books.count }}<br>
+                                Characters: {{ character_count }}<br>
+                                Events: {{ total_events }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3" style="background-color:#f5f5f5; border-radius:14px;">
+                            <div class="dash-card-header mb-1" style="font-size:0.9rem;">Gaps &amp; Opportunities</div>
+                            <div class="dash-muted">
+                                Use the timeline to spot chapters with no scenes,
+                                and characters who haven’t appeared recently.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
-        <!-- Recent Activity -->
-        <div class="col-lg-3">
-            <div class="dash-card p-3 h-100">
+        <!-- MIDDLE COLUMN (stack: Recent Activity, Quick Actions) -->
+        <div class="col-lg-3 d-flex flex-column gap-3">
+
+            <!-- Recent Activity -->
+            <div class="dash-card p-3">
                 <div class="dash-card-header">Recent Activity</div>
                 <ul class="dash-list">
                     <li>
@@ -264,120 +333,9 @@
                     </li>
                 </ul>
             </div>
-        </div>
 
-        <!-- Your Books (right column) -->
-        <div class="col-lg-3">
-            {% for book in books|slice:":2" %}
-                <div class="dash-book-mini">
-                    <div class="d-flex align-items-center mb-1">
-                        <img src="{% static 'img/book-cover.png' %}" alt="Book Cover" style="height: 48px; width: auto; margin-right: 12px; border-radius: 6px;">
-                        <div class="flex-grow-1">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="dash-book-title">
-                                    Book {{ book.series_order }}: {{ book.title }}
-                                </div>
-                                <span class="dash-status-pill">
-                                    {{ book.status|default:"Drafting" }}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="dash-muted mb-1">
-                        Chapters {{ book.chapter_count|default:"0" }}
-                    </div>
-                    <div class="dash-progress-bg mb-1">
-                        <div class="dash-progress-fill" style="width: {{ book.progress_percentage }}%;"></div>
-                    </div>
-                    <div class="dash-muted">
-                        Word Count: {{ book.current_word_count|floatformat:0 }}/{{ book.word_count_target|floatformat:0 }}
-                    </div>
-                </div>
-            {% empty %}
-                <div class="dash-card p-3">
-                    <div class="dash-card-header">Your Books</div>
-                    <p class="dash-muted mb-2">
-                        You haven’t created any books yet.
-                    </p>
-                    <a href="{% url 'book_create' %}" class="btn btn-dark btn-sm w-100">
-                        New Book
-                    </a>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-
-    <!-- Row 2: Stats strip -->
-    <div class="row g-3 mb-3">
-        <div class="col-lg-6">
-            <div class="dash-card dash-pill-card p-3">
-                <div class="row text-center">
-                    <div class="col-3">
-                        <div class="dash-stat-icon">
-                            <i class="bi bi-book"></i>
-                        </div>
-                        <div class="dash-stat-value">{{ books.count }}</div>
-                        <div class="dash-stat-label">Books</div>
-                    </div>
-                    <div class="col-3">
-                        <div class="dash-stat-icon">
-                            <i class="bi bi-people"></i>
-                        </div>
-                        <div class="dash-stat-value">{{ character_count }}</div>
-                        <div class="dash-stat-label">Characters</div>
-                    </div>
-                    <div class="col-3">
-                        <div class="dash-stat-icon">
-                            <i class="bi bi-calendar-event"></i>
-                        </div>
-                        <div class="dash-stat-value">{{ total_events }}</div>
-                        <div class="dash-stat-label">Total Events</div>
-                    </div>
-                    <div class="col-3">
-                        <div class="dash-stat-icon">
-                            <i class="bi bi-journal-text"></i>
-                        </div>
-                        <div class="dash-stat-value">{{ events_written }}</div>
-                        <div class="dash-stat-label">Chapters (written)</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Row 3: World at a Glance + Quick Actions + more Books -->
-    <div class="row g-3 mb-3">
-        <!-- World at a Glance -->
-        <div class="col-lg-6">
-            <div class="dash-card dash-pill-card p-3 mb-3">
-                <div class="dash-card-header mb-2">World at a Glance</div>
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <div class="p-3" style="background-color:#f5f5f5; border-radius:14px;">
-                            <div class="dash-card-header mb-1" style="font-size:0.9rem;">Top overview</div>
-                            <div class="dash-muted">
-                                Books: {{ books.count }}<br>
-                                Characters: {{ character_count }}<br>
-                                Events: {{ total_events }}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="p-3" style="background-color:#f5f5f5; border-radius:14px;">
-                            <div class="dash-card-header mb-1" style="font-size:0.9rem;">Gaps & Opportunities</div>
-                            <div class="dash-muted">
-                                Use the timeline to spot chapters with no scenes,
-                                and characters who haven’t appeared recently.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="col-lg-3">
-            <div class="dash-card p-3 h-100">
+            <!-- Quick Actions -->
+            <div class="dash-card p-3">
                 <div class="dash-card-header mb-2">Quick Actions</div>
                 <div class="d-grid gap-2">
                     <a href="{% url 'event_create' %}" class="btn btn-light dash-quick-btn">
@@ -394,35 +352,56 @@
                     </a>
                 </div>
             </div>
+
         </div>
 
-        <!-- Your Books (extra) -->
-        <div class="col-lg-3">
-            {% for book in books|slice:"2:4" %}
-                <div class="dash-book-mini">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <div class="dash-book-title">
-                            Book {{ book.series_order }}: {{ book.title }}
+        <!-- RIGHT COLUMN (stack: Your Books) -->
+        <div class="col-lg-3 d-flex flex-column gap-3">
+            {% if books %}
+                {% for book in books|slice:":4" %}
+                    <div class="dash-book-mini">
+                        <div class="d-flex align-items-center mb-1">
+                            <img src="{% static 'img/book-cover.png' %}"
+                                 alt="Book Cover"
+                                 style="height: 48px; width: auto; margin-right: 12px; border-radius: 6px;">
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="dash-book-title">
+                                        Book {{ book.series_order }}: {{ book.title }}
+                                    </div>
+                                    <span class="dash-status-pill">
+                                        {{ book.status|default:"Drafting" }}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
-                        <span class="dash-status-pill">
-                            {{ book.status|default:"Drafting" }}
-                        </span>
+                        <div class="dash-muted mb-1">
+                            Chapters {{ book.chapter_count|default:"0" }}
+                        </div>
+                        <div class="dash-progress-bg mb-1">
+                            <div class="dash-progress-fill" style="width: {{ book.progress_percentage }}%;"></div>
+                        </div>
+                        <div class="dash-muted">
+                            Word Count: {{ book.current_word_count|floatformat:0 }}/{{ book.word_count_target|floatformat:0 }}
+                        </div>
                     </div>
-                    <div class="dash-muted mb-1">
-                        Chapters {{ book.chapter_count|default:"0" }}
-                    </div>
-                    <div class="dash-progress-bg mb-1">
-                        <div class="dash-progress-fill" style="width: {{ book.progress_percentage }}%;"></div>
-                    </div>
-                    <div class="dash-muted">
-                        Word Count: {{ book.current_word_count|floatformat:0 }}/{{ book.word_count_target|floatformat:0 }}
-                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="dash-card p-3">
+                    <div class="dash-card-header">Your Books</div>
+                    <p class="dash-muted mb-2">
+                        You haven’t created any books yet.
+                    </p>
+                    <a href="{% url 'book_create' %}" class="btn btn-dark btn-sm w-100">
+                        New Book
+                    </a>
                 </div>
-            {% endfor %}
+            {% endif %}
         </div>
+
     </div>
 
-    <!-- Row 4: AI Support -->
+    <!-- AI Support (full width) -->
     <div class="row g-3 mb-3">
         <div class="col-12">
             <div class="dash-card dash-pill-card p-3">
