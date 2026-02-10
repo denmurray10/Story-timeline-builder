@@ -250,13 +250,18 @@
         <div class="col-lg-3">
             {% for book in books|slice:":2" %}
                 <div class="dash-book-mini">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <div class="dash-book-title">
-                            Book {{ book.series_order }}: {{ book.title }}
+                    <div class="d-flex align-items-center mb-1">
+                        <img src="{% static 'img/book-cover.png' %}" alt="Book Cover" style="height: 48px; width: auto; margin-right: 12px; border-radius: 6px;">
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="dash-book-title">
+                                    Book {{ book.series_order }}: {{ book.title }}
+                                </div>
+                                <span class="dash-status-pill">
+                                    {{ book.status|default:"Drafting" }}
+                                </span>
+                            </div>
                         </div>
-                        <span class="dash-status-pill">
-                            {{ book.status|default:"Drafting" }}
-                        </span>
                     </div>
                     <div class="dash-muted mb-1">
                         Chapters {{ book.chapter_count|default:"0" }}
