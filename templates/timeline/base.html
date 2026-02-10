@@ -124,6 +124,10 @@
                 margin-top: 40px!important;
             }
 
+            .dropdown-toggle {
+                color: black !important;
+            }
+
             .navbar-dark .navbar-nav .nav-link {
                 color: var(--text-muted);
                 font-weight: 500;
@@ -415,8 +419,9 @@
                                 role="button"
                                 data-bs-toggle="dropdown"
                                 aria-expanded="false"
+                                style="color: #000 !important;"
                             >
-                                <i class="bi bi-person-circle"></i> Hello, {{ user.first_name }}
+                                <i class="bi bi-person-circle"></i> Hello, {{ user.first_name }} <i class="bi bi-caret-down-fill"></i>
                             </a>
                             <ul
                                 class="dropdown-menu dropdown-menu-end"
