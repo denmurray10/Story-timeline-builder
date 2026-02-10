@@ -50,4 +50,5 @@ urlpatterns = [
     
     # API endpoints for AJAX (we'll use these later for drag-and-drop)
     path('api/events/reorder/', views.api_event_reorder, name='api_event_reorder'),
+    path('account/', views.account, name='account'),
 ]

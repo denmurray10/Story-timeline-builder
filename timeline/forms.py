@@ -173,3 +173,9 @@ class TagForm(forms.ModelForm):
             "color": forms.TextInput(attrs={"class": "form-control", "type": "color"}),
             "description": forms.Textarea(attrs={"rows": 2, "class": "form-control"}),
         }
+
+
+class UserAccountForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'username', 'email']

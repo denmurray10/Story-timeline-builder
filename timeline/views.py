@@ -12,9 +12,22 @@ import json
 
 from .models import Book, Chapter, Character, Event, Tag, CharacterRelationship
 from .forms import (
-    UserRegisterForm, BookForm, ChapterForm, CharacterForm,
-    EventForm, TagForm
+    UserRegisterForm, BookForm, ChapterForm, CharacterForm, UserAccountForm
 )
+# ============== Authentication Views ==============
+
+@login_required
+def account(request):
+    """View and edit user account details."""
+    if request.method == 'POST':
+        form = UserAccountForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Account details updated successfully!')
+            return redirect('account')
+    else:
+        form = UserAccountForm(instance=request.user)
+    return render(request, 'timeline/account.html', {'form': form})
 
 
 # ============== Authentication Views ==============
