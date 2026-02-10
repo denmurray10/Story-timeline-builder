@@ -142,16 +142,20 @@
                 border-right: 1px solid var(--border-color);
                 min-height: calc(100vh - 56px);
                 padding-top: 1.4rem;
+            
             }
 
             .main-content {
                 min-height: calc(100vh - 56px);
                 padding: 2.4rem 2.6rem 3rem;
+                margin-left:-60px;
+               
             }
 
             @media (max-width: 767px) {
                 .main-content {
                     padding: 1.5rem 1.2rem 2rem;
+                
                 }
             }
 
@@ -174,8 +178,8 @@
             }
 
             .sidebar .nav-link.active {
-                background-color: var(--accent-soft);
-                color: var(--accent);
+                background-color: #fff;
+                color: #000;
             }
 
             /* CARDS & PANELS */
@@ -461,7 +465,7 @@
                 {% if user.is_authenticated %}
                 <div class="col-md-2 d-none d-md-block sidebar">
                     <div class="sidebar-logo text-center my-4">
-                        <img src="{% static 'img/logo.png' %}" alt="Story Timeline Builder Logo" style="height: 200px; width: auto; margin-bottom: 8px;">  
+                        <img src="{% static 'img/logo.png' %}" alt="Story Timeline Builder Logo" style="height: 200px; width: auto; margin-bottom: -30px; margin-left: -60px;">  
                     </div>
                     <nav class="nav flex-column">
                         <a
