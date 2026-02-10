@@ -381,8 +381,7 @@
         <nav class="navbar navbar-expand-lg navbar-dark">
             <div class="container-fluid">
                 <a class="navbar-brand d-flex align-items-center" href="{% url 'timeline_home' %}">
-                    <img src="{% static 'img/logo.png' %}" alt="Story Timeline Builder Logo" style="height: 40px; width: auto; margin-right: 10px;">
-                    <span class="fw-bold" style="font-size: 1.3rem;">Story Timeline Builder</span>
+                    <img src="{% static 'img/logo.png' %}" alt="Story Timeline Builder Logo" style="height: 200px; width: auto; margin-right: 10px;">    
                 </a>
                 <button
                     class="navbar-toggler"
@@ -461,6 +460,10 @@
             <div class="row">
                 {% if user.is_authenticated %}
                 <div class="col-md-2 d-none d-md-block sidebar">
+                    <div class="sidebar-logo text-center my-4">
+                        <img src="{% static 'img/logo.png' %}" alt="Story Timeline Builder Logo" style="height: 64px; width: auto; margin-bottom: 8px;">
+                        <div class="fw-bold" style="font-size: 1.2rem; line-height: 1.1;">Story<br>Timeline<br>Builder</div>
+                    </div>
                     <nav class="nav flex-column">
                         <a
                             class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
