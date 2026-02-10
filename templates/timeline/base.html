@@ -120,6 +120,10 @@
                 margin-right: 6px;
             }
 
+            .dashboard-wrapper {
+                margin-top: 40px!important;
+            }
+
             .navbar-dark .navbar-nav .nav-link {
                 color: var(--text-muted);
                 font-weight: 500;
@@ -137,14 +141,15 @@
                 border-right: 1px solid var(--border-color);
                 min-height: calc(100vh - 56px);
                 padding-top: 1.4rem;
+                padding-left: 50px;
+                padding-right: 20px;
             
             }
 
             .main-content {
                 min-height: calc(100vh - 56px);
                 padding: 2.4rem 2.6rem 3rem;
-                margin-left:-60px;
-               
+                
             }
 
             @media (max-width: 767px) {
@@ -460,7 +465,7 @@
                 {% if user.is_authenticated %}
                 <div class="col-md-2 d-none d-md-block sidebar">
                     <div class="sidebar-logo text-center my-4">
-                        <img src="{% static 'img/logo.png' %}" alt="Story Timeline Builder Logo" style="height: 200px; width: auto; margin-bottom: -30px; margin-left: -60px;">  
+                        <img src="{% static 'img/logo.png' %}" alt="Story Timeline Builder Logo" style="height: 200px; width: auto; margin-bottom: -30px; margin-left: -60px; margin-top: -70px;">  
                     </div>
                     <nav class="nav flex-column">
                         <a
