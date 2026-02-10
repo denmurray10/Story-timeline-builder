@@ -230,18 +230,38 @@
             <div class="dash-card p-3 h-100">
                 <div class="dash-card-header">Recent Activity</div>
                 <ul class="dash-list">
-                    {% if recent_events %}
-                        {% for event in recent_events|slice:":5" %}
-                            <li>
-                                <strong>{{ event.title }}</strong>
-                                <span class="dash-muted">
-                                    · {{ event.updated_at|timesince }} ago
-                                </span>
-                            </li>
-                        {% endfor %}
-                    {% else %}
-                        <li class="dash-muted">No recent events yet.</li>
-                    {% endif %}
+                    <li>
+                        <strong>Added new character: Aria</strong>
+                        <span class="dash-muted">· 5 minutes ago</span>
+                    </li>
+                    <li>
+                        <strong>Updated event: Battle of Dawn</strong>
+                        <span class="dash-muted">· 2 hours ago</span>
+                    </li>
+                    <li>
+                        <strong>Created timeline: Book II</strong>
+                        <span class="dash-muted">· 1 day ago</span>
+                    </li>
+                    <li>
+                        <strong>Edited tag: Prophecy</strong>
+                        <span class="dash-muted">· 3 days ago</span>
+                    </li>
+                    <li>
+                        <strong>Commented on event: The Great Escape</strong>
+                        <span class="dash-muted">· 5 days ago</span>
+                    </li>
+                    <li>
+                        <strong>Deleted character: Old King</strong>
+                        <span class="dash-muted">· 1 week ago</span>
+                    </li>
+                    <li>
+                        <strong>Added tag: Magic System</strong>
+                        <span class="dash-muted">· 2 weeks ago</span>
+                    </li>
+                    <li>
+                        <strong>Restored timeline: Book I</strong>
+                        <span class="dash-muted">· 3 weeks ago</span>
+                    </li>
                 </ul>
             </div>
         </div>
