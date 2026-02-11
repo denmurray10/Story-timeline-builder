@@ -13,6 +13,7 @@ from django.db.models import Count, Sum, Q
 from django.views.decorators.http import require_POST
 import json
 import re
+import time
 import threading
 from django.utils import timezone
 import google.generativeai as genai
@@ -335,6 +336,12 @@ def book_import(request):
 def run_background_book_import(book_id, content, user_id):
     """Heavy lifting AI analysis run in a background thread."""
     from django.contrib.auth.models import User
+    import django
+    django.db.connections.close_all()
+    
+    new_chapters = 0
+    new_events = 0
+    skipped_batches = 0
     
     try:
         book = Book.objects.get(id=book_id)
@@ -351,21 +358,24 @@ def run_background_book_import(book_id, content, user_id):
         char_map = {}
         if char_data:
             for char_info in char_data.get('characters', []):
-                name = char_info.get('name')
-                if name:
-                    char = Character.objects.create(
-                        user=user,
-                        name=name,
-                        role=char_info.get('role', 'supporting')[:100],
-                        description=char_info.get('description', ''),
-                        goals=char_info.get('goals', ''),
-                        traits=char_info.get('traits', '')
-                    )
-                    char_map[name.lower()] = char
+                try:
+                    name = char_info.get('name')
+                    if name:
+                        char = Character.objects.create(
+                            user=user,
+                            name=name,
+                            role=char_info.get('role', 'supporting')[:100],
+                            description=char_info.get('description', ''),
+                            goals=char_info.get('goals', ''),
+                            traits=char_info.get('traits', '')
+                        )
+                        char_map[name.lower()] = char
+                except Exception as e:
+                    print(f"Error creating character: {e}")
 
         # 4. Chapter Splitting
         book.import_progress = 25
-        book.import_status_message = "Splitting manuscript into chapters..."
+        book.import_status_message = f"Splitting manuscript into chapters... ({len(char_map)} characters found)"
         book.save()
         
         chapter_regex = re.compile(
@@ -384,61 +394,88 @@ def run_background_book_import(book_id, content, user_id):
                     chunks.append(chunk_text)
         
         if not chunks or len(chunks) < 2:
-            chunks = [content[i:i+15000] for i in range(0, len(content), 15000)]
+            chunks = [content[i:i+12000] for i in range(0, len(content), 12000)]
 
-        # 5. Iterative Content Parsing
+        # 5. Iterative Content Parsing — smaller batches for reliability
         total_chunks = len(chunks)
-        new_chapters = 0
-        new_events = 0
+        batch_size = 2  # Reduced from 4 to avoid token limits
         
-        batch_size = 4
         for i in range(0, len(chunks), batch_size):
+            batch_num = (i // batch_size) + 1
+            total_batches = (total_chunks + batch_size - 1) // batch_size
             progress_chunk = int(25 + ((i / total_chunks) * 70))
             book.import_progress = progress_chunk
-            book.import_status_message = f"Analyzing chapters {new_chapters + 1}-{min(new_chapters + batch_size, total_chunks)} of {total_chunks}..."
+            book.import_status_message = f"Analyzing batch {batch_num}/{total_batches}... ({new_chapters} chapters, {new_events} events so far)"
             book.save()
             
-            batch = chunks[i:i+batch_size]
-            batch_text = "\n\n--- SECTION BOUNDARY ---\n\n".join(batch)
-            
-            ai_data = analyze_book_content_batch_with_ai(batch_text)
-            if ai_data:
-                for chap_info in ai_data.get('chapters', []):
-                    chapter = Chapter.objects.create(
-                        book=book,
-                        chapter_number=chap_info.get('number', new_chapters + 1),
-                        title=chap_info.get('title', f"Chapter {new_chapters + 1}"),
-                        description=chap_info.get('summary', '')
-                    )
-                    new_chapters += 1
+            try:
+                batch = chunks[i:i+batch_size]
+                # Truncate each chunk to 10000 chars to stay within token limits
+                batch = [chunk[:10000] for chunk in batch]
+                batch_text = "\n\n--- SECTION BOUNDARY ---\n\n".join(batch)
+                
+                ai_data = analyze_book_content_batch_with_ai(batch_text)
+                if not ai_data:
+                    skipped_batches += 1
+                    print(f"Batch {batch_num} returned no data, skipping.")
+                    continue
                     
-                    for event_info in ai_data.get('events', []):
-                        if event_info.get('chapter_number') == chapter.chapter_number:
-                            pov_name = event_info.get('pov_character', '').lower()
-                            pov_char = char_map.get(pov_name)
-                            
-                            event = Event.objects.create(
-                                user=user,
-                                book=book,
-                                chapter=chapter,
-                                title=event_info.get('title', f"Event {new_events + 1}"),
-                                description=event_info.get('summary', ''),
-                                pov_character=pov_char,
-                                emotional_tone=event_info.get('tone', 'neutral')[:100],
-                                story_beat=event_info.get('beat', '')[:100],
-                                tension_level=event_info.get('tension', 5),
-                                sequence_order=new_events + 1
-                            )
-                            
-                            for c_name in event_info.get('involved_characters', []):
-                                c_obj = char_map.get(c_name.lower())
-                                if c_obj:
-                                    event.characters.add(c_obj)
-                            new_events += 1
+                for chap_info in ai_data.get('chapters', []):
+                    try:
+                        chapter = Chapter.objects.create(
+                            book=book,
+                            chapter_number=chap_info.get('number', new_chapters + 1),
+                            title=chap_info.get('title', f"Chapter {new_chapters + 1}")[:200],
+                            description=chap_info.get('summary', '')[:5000]
+                        )
+                        new_chapters += 1
+                        
+                        for event_info in ai_data.get('events', []):
+                            if event_info.get('chapter_number') == chapter.chapter_number:
+                                try:
+                                    pov_name = event_info.get('pov_character', '').lower()
+                                    pov_char = char_map.get(pov_name)
+                                    
+                                    tension = event_info.get('tension', 5)
+                                    if not isinstance(tension, int) or tension < 1:
+                                        tension = 5
+                                    if tension > 10:
+                                        tension = 10
+                                    
+                                    event = Event.objects.create(
+                                        user=user,
+                                        book=book,
+                                        chapter=chapter,
+                                        title=event_info.get('title', f"Event {new_events + 1}")[:200],
+                                        description=event_info.get('summary', '')[:5000],
+                                        pov_character=pov_char,
+                                        emotional_tone=event_info.get('tone', 'neutral')[:100],
+                                        story_beat=event_info.get('beat', '')[:100],
+                                        tension_level=tension,
+                                        sequence_order=new_events + 1
+                                    )
+                                    
+                                    for c_name in event_info.get('involved_characters', []):
+                                        c_obj = char_map.get(c_name.lower())
+                                        if c_obj:
+                                            event.characters.add(c_obj)
+                                    new_events += 1
+                                except Exception as e:
+                                    print(f"Error creating event: {e}")
+                    except Exception as e:
+                        print(f"Error creating chapter: {e}")
+                        
+            except Exception as e:
+                skipped_batches += 1
+                print(f"Batch {batch_num} failed: {e}")
+                continue
 
         # 6. Mark as Live
         book.import_progress = 100
-        book.import_status_message = "Import complete!"
+        status_parts = [f"{new_chapters} chapters, {new_events} events imported"]
+        if skipped_batches > 0:
+            status_parts.append(f"{skipped_batches} batch(es) skipped due to errors")
+        book.import_status_message = "Import complete! " + ", ".join(status_parts)
         book.status = 'drafting'
         book.save()
         
@@ -446,7 +483,9 @@ def run_background_book_import(book_id, content, user_id):
         print(f"Error in background import: {e}")
         try:
             book = Book.objects.get(id=book_id)
-            book.import_status_message = f"Error: {str(e)}"
+            book.import_status_message = f"Error: {str(e)[:200]}. Imported {new_chapters} chapters, {new_events} events before failure."
+            book.status = 'drafting'  # Allow user to see partial results
+            book.import_progress = 100
             book.save()
         except:
             pass
@@ -675,37 +714,42 @@ def extract_text_from_file(file):
         print(f"Error processing file: {e}")
     return text
 
-def _call_ai_json(prompt, system_message="You are a professional literary analyst. Always respond with valid JSON."):
-    """Helper to call AI and return parsed JSON."""
+def _call_ai_json(prompt, system_message="You are a professional literary analyst. Always respond with valid JSON.", max_retries=3):
+    """Helper to call AI and return parsed JSON with retry logic."""
     if not settings.DEEPSEEK_API_KEY and not settings.GEMINI_API_KEY:
         return None
-    try:
-        if settings.DEEPSEEK_API_KEY:
-            client = OpenAI(api_key=settings.DEEPSEEK_API_KEY, base_url="https://api.deepseek.com")
-            response = client.chat.completions.create(
-                model="deepseek-chat",
-                messages=[
-                    {"role": "system", "content": system_message},
-                    {"role": "user", "content": prompt},
-                ],
-                stream=False
-            )
-            content = response.choices[0].message.content
-        else:
-            genai.configure(api_key=settings.GEMINI_API_KEY)
-            model = genai.GenerativeModel('gemini-1.5-flash')
-            response = model.generate_content(f"{system_message}\n\nTask:\n{prompt}")
-            content = response.text
+    
+    for attempt in range(max_retries):
+        try:
+            if settings.DEEPSEEK_API_KEY:
+                client = OpenAI(api_key=settings.DEEPSEEK_API_KEY, base_url="https://api.deepseek.com")
+                response = client.chat.completions.create(
+                    model="deepseek-chat",
+                    messages=[
+                        {"role": "system", "content": system_message},
+                        {"role": "user", "content": prompt},
+                    ],
+                    stream=False
+                )
+                content = response.choices[0].message.content
+            else:
+                genai.configure(api_key=settings.GEMINI_API_KEY)
+                model = genai.GenerativeModel('gemini-1.5-flash')
+                response = model.generate_content(f"{system_message}\n\nTask:\n{prompt}")
+                content = response.text
 
-        if "```json" in content:
-            content = content.split("```json")[1].split("```")[0].strip()
-        elif "```" in content:
-            content = content.split("```")[1].split("```")[0].strip()
-        
-        return json.loads(content)
-    except Exception as e:
-        print(f"AI Call Error: {e}")
-        return None
+            if "```json" in content:
+                content = content.split("```json")[1].split("```")[0].strip()
+            elif "```" in content:
+                content = content.split("```")[1].split("```")[0].strip()
+            
+            return json.loads(content)
+        except Exception as e:
+            print(f"AI Call Error (attempt {attempt + 1}/{max_retries}): {e}")
+            if attempt < max_retries - 1:
+                time.sleep(2 ** attempt)  # Exponential backoff: 1s, 2s, 4s
+            else:
+                return None
 
 def analyze_characters_with_ai(text):
     """Initial pass to identify characters and roles from a large chunk of text."""
