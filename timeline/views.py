@@ -19,10 +19,10 @@ import google.generativeai as genai
 from openai import OpenAI
 from django.conf import settings
 
-from .models import Book, Chapter, Character, Event, Tag, CharacterRelationship, AIFocusTask, ActivityLog
+from .models import Book, Chapter, Character, Event, Tag, CharacterRelationship, AIFocusTask, ActivityLog, WorldEntry
 from .forms import (
     UserRegisterForm, BookForm, ChapterForm, CharacterForm, 
-    EventForm, TagForm, UserAccountForm, CharacterRelationshipForm
+    EventForm, TagForm, UserAccountForm, CharacterRelationshipForm, WorldEntryForm
 )
 # ============== Authentication Views ==============
 
@@ -1351,3 +1351,71 @@ def api_character_deep_dive(request):
         })
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+# ============== World Builder Wiki Views ==============
+
+@login_required
+def world_list(request):
+    """List all world-building entries, with optional category filter."""
+    category = request.GET.get('category', '')
+    entries = WorldEntry.objects.filter(user=request.user)
+    if category:
+        entries = entries.filter(category=category)
+    
+    categories = WorldEntry.CATEGORY_CHOICES
+    return render(request, 'timeline/world_list.html', {
+        'entries': entries,
+        'categories': categories,
+        'active_category': category,
+    })
+
+
+@login_required
+def world_create(request):
+    """Create a new world-building entry."""
+    if request.method == 'POST':
+        form = WorldEntryForm(request.POST, request.FILES, user=request.user)
+        if form.is_valid():
+            entry = form.save(commit=False)
+            entry.user = request.user
+            entry.save()
+            messages.success(request, f"Created world entry: {entry.title}")
+            return redirect('world_detail', pk=entry.pk)
+    else:
+        form = WorldEntryForm(user=request.user)
+    return render(request, 'timeline/world_form.html', {'form': form, 'is_edit': False})
+
+
+@login_required
+def world_detail(request, pk):
+    """View a single world-building entry."""
+    entry = get_object_or_404(WorldEntry, pk=pk, user=request.user)
+    return render(request, 'timeline/world_detail.html', {'entry': entry})
+
+
+@login_required
+def world_edit(request, pk):
+    """Edit an existing world-building entry."""
+    entry = get_object_or_404(WorldEntry, pk=pk, user=request.user)
+    if request.method == 'POST':
+        form = WorldEntryForm(request.POST, request.FILES, instance=entry, user=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Updated: {entry.title}")
+            return redirect('world_detail', pk=entry.pk)
+    else:
+        form = WorldEntryForm(instance=entry, user=request.user)
+    return render(request, 'timeline/world_form.html', {'form': form, 'is_edit': True, 'entry': entry})
+
+
+@login_required
+def world_delete(request, pk):
+    """Delete a world-building entry."""
+    entry = get_object_or_404(WorldEntry, pk=pk, user=request.user)
+    if request.method == 'POST':
+        title = entry.title
+        entry.delete()
+        messages.success(request, f"Deleted: {title}")
+        return redirect('world_list')
+    return render(request, 'timeline/world_delete.html', {'entry': entry})

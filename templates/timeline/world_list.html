@@ -1,0 +1,92 @@
+{% extends 'timeline/base.html' %}
+
+{% block title %}World Wiki - Story Timeline Builder{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="fw-bold mb-1"><i class="bi bi-globe-americas me-2"></i>World Wiki</h1>
+        <p class="text-muted mb-0">Organize your world-building: locations, lore, factions, and more.</p>
+    </div>
+    <a href="{% url 'world_create' %}" class="btn btn-primary rounded-pill px-4 shadow-sm">
+        <i class="bi bi-plus-lg me-1"></i> New Entry
+    </a>
+</div>
+
+<!-- Category Filter Tabs -->
+<ul class="nav nav-pills mb-4 gap-2 flex-wrap">
+    <li class="nav-item">
+        <a class="nav-link rounded-pill {% if not active_category %}active{% endif %}"
+            href="{% url 'world_list' %}">All</a>
+    </li>
+    {% for cat_val, cat_label in categories %}
+    <li class="nav-item">
+        <a class="nav-link rounded-pill {% if active_category == cat_val %}active{% endif %}"
+            href="{% url 'world_list' %}?category={{ cat_val }}">{{ cat_label }}</a>
+    </li>
+    {% endfor %}
+</ul>
+
+<!-- Entries Grid -->
+<div class="row g-4">
+    {% for entry in entries %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card dash-card shadow-sm border-0 rounded-4 h-100 overflow-hidden world-entry-card">
+            {% if entry.image %}
+            <img src="{{ entry.image.url }}" class="card-img-top" alt="{{ entry.title }}"
+                style="height: 160px; object-fit: cover;">
+            {% else %}
+            <div class="card-img-top d-flex align-items-center justify-content-center"
+                style="height: 120px; background: linear-gradient(135deg, #667eea, #764ba2);">
+                <i class="bi bi-{{ entry.category|default:'globe' }} text-white" style="font-size: 2.5rem;"></i>
+            </div>
+            {% endif %}
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <span class="badge bg-primary-subtle text-primary rounded-pill">{{ entry.get_category_display
+                        }}</span>
+                    {% if entry.book %}
+                    <span class="badge bg-secondary-subtle text-dark rounded-pill small">{{ entry.book.title }}</span>
+                    {% endif %}
+                </div>
+                <h5 class="card-title fw-bold mb-2">{{ entry.title }}</h5>
+                <p class="card-text text-muted small">{{ entry.content|truncatewords:25 }}</p>
+            </div>
+            <div class="card-footer bg-white border-0 d-flex justify-content-between align-items-center px-3 pb-3">
+                <a href="{% url 'world_detail' entry.pk %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                    <i class="bi bi-eye me-1"></i> View
+                </a>
+                <div class="btn-group btn-group-sm">
+                    <a href="{% url 'world_edit' entry.pk %}" class="btn btn-outline-secondary"><i
+                            class="bi bi-pencil"></i></a>
+                    <a href="{% url 'world_delete' entry.pk %}" class="btn btn-outline-danger"><i
+                            class="bi bi-trash"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="text-center py-5">
+            <i class="bi bi-globe-americas text-muted" style="font-size: 4rem;"></i>
+            <h4 class="mt-3 text-muted">No world entries yet</h4>
+            <p class="text-muted">Start building your world by creating your first entry.</p>
+            <a href="{% url 'world_create' %}" class="btn btn-primary rounded-pill mt-2 px-4">
+                <i class="bi bi-plus-lg me-1"></i> Create First Entry
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+    .world-entry-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .world-entry-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12) !important;
+    }
+</style>
+{% endblock %}

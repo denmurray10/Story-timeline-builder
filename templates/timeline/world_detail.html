@@ -1,0 +1,86 @@
+{% extends 'timeline/base.html' %}
+
+{% block title %}{{ entry.title }} - World Wiki{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a href="{% url 'world_list' %}" class="text-decoration-none">World Wiki</a>
+                </li>
+                <li class="breadcrumb-item"><a href="{% url 'world_list' %}?category={{ entry.category }}"
+                        class="text-decoration-none">{{ entry.get_category_display }}</a></li>
+                <li class="breadcrumb-item active">{{ entry.title }}</li>
+            </ol>
+        </nav>
+        <h1 class="fw-bold mb-0">{{ entry.title }}</h1>
+    </div>
+    <div class="btn-group shadow-sm">
+        <a href="{% url 'world_edit' entry.pk %}" class="btn btn-outline-secondary">
+            <i class="bi bi-pencil"></i> Edit
+        </a>
+        <a href="{% url 'world_delete' entry.pk %}" class="btn btn-outline-danger">
+            <i class="bi bi-trash"></i> Delete
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+            {% if entry.image %}
+            <img src="{{ entry.image.url }}" class="card-img-top rounded-top-4" alt="{{ entry.title }}"
+                style="max-height: 350px; object-fit: cover;">
+            {% endif %}
+            <div class="card-body p-4 p-md-5">
+                <div class="world-content">
+                    {{ entry.content|linebreaks }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-header bg-light border-0 py-3">
+                <h6 class="mb-0 fw-bold"><i class="bi bi-info-circle me-2"></i>Details</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <span class="small text-muted d-block">Category</span>
+                    <span class="badge bg-primary-subtle text-primary rounded-pill mt-1">{{ entry.get_category_display
+                        }}</span>
+                </div>
+                {% if entry.book %}
+                <div class="mb-3">
+                    <span class="small text-muted d-block">Linked Book</span>
+                    <a href="{% url 'book_detail' entry.book.pk %}" class="text-decoration-none fw-medium">
+                        {{ entry.book.title }}
+                    </a>
+                </div>
+                {% endif %}
+                <div class="mb-3">
+                    <span class="small text-muted d-block">Created</span>
+                    <span class="small">{{ entry.created_at|date:"M d, Y" }}</span>
+                </div>
+                <div>
+                    <span class="small text-muted d-block">Last Updated</span>
+                    <span class="small">{{ entry.updated_at|date:"M d, Y H:i" }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .world-content {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: #2c3e50;
+    }
+
+    .breadcrumb-item a {
+        color: var(--accent);
+    }
+</style>
+{% endblock %}

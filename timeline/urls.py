@@ -65,6 +65,13 @@ urlpatterns = [
     path('tags/<int:pk>/edit/', views.tag_edit, name='tag_edit'),
     path('tags/<int:pk>/delete/', views.tag_delete, name='tag_delete'),
     
+    # World Wiki
+    path('world/', views.world_list, name='world_list'),
+    path('world/create/', views.world_create, name='world_create'),
+    path('world/<int:pk>/', views.world_detail, name='world_detail'),
+    path('world/<int:pk>/edit/', views.world_edit, name='world_edit'),
+    path('world/<int:pk>/delete/', views.world_delete, name='world_delete'),
+    
     # API endpoints for AJAX (we'll use these later for drag-and-drop)
     path('api/events/reorder/', views.api_event_reorder, name='api_event_reorder'),
     path('api/ai/consultant/', views.api_ai_consultant, name='api_ai_consultant'),

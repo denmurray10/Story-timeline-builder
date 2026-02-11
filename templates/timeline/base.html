@@ -484,6 +484,10 @@
                         href="{% url 'tag_list' %}">
                         <i class="bi bi-tags"></i> Tags
                     </a>
+                    <a class="nav-link {% if 'world' in request.resolver_match.url_name %}active{% endif %}"
+                        href="{% url 'world_list' %}">
+                        <i class="bi bi-globe-americas"></i> World Wiki
+                    </a>
                     <hr class="my-3" />
                     <a class="nav-link" href="{% url 'event_create' %}">
                         <i class="bi bi-plus-circle"></i> New Event

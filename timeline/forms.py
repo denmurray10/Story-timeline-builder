@@ -4,7 +4,7 @@ Forms for the Timeline app.
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Book, Chapter, Character, Event, Tag, CharacterRelationship
+from .models import Book, Chapter, Character, Event, Tag, CharacterRelationship, WorldEntry
 
 
 class UserRegisterForm(UserCreationForm):
@@ -234,3 +234,25 @@ class CharacterRelationshipForm(forms.ModelForm):
             self.fields["character_a"].queryset = Character.objects.filter(user=user)
             self.fields["character_b"].queryset = Character.objects.filter(user=user)
             self.fields["starts_at_event"].queryset = Event.objects.filter(user=user)
+
+
+class WorldEntryForm(forms.ModelForm):
+    """Form for creating/editing world-building wiki entries."""
+
+    class Meta:
+        model = WorldEntry
+        fields = ["title", "category", "book", "content", "image"]
+        widgets = {
+            "title": forms.TextInput(attrs={"class": "form-control"}),
+            "category": forms.Select(attrs={"class": "form-control"}),
+            "book": forms.Select(attrs={"class": "form-control"}),
+            "content": forms.Textarea(attrs={"rows": 8, "class": "form-control"}),
+            "image": forms.FileInput(attrs={"class": "form-control"}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user", None)
+        super().__init__(*args, **kwargs)
+        self.fields["book"].required = False
+        if user:
+            self.fields["book"].queryset = Book.objects.filter(user=user)

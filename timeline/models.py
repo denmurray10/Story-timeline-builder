@@ -467,3 +467,35 @@ class ActivityLog(models.Model):
 
     def __str__(self):
         return f"{self.action.capitalize()} {self.model_name}: {self.object_name}"
+
+
+class WorldEntry(models.Model):
+    """
+    A world-building wiki entry for locations, lore, factions, rules, items, etc.
+    """
+    CATEGORY_CHOICES = [
+        ('location', 'Location'),
+        ('lore', 'Lore'),
+        ('faction', 'Faction'),
+        ('rule', 'Rule/Magic System'),
+        ('item', 'Item/Artifact'),
+        ('culture', 'Culture/Society'),
+        ('creature', 'Creature/Species'),
+        ('other', 'Other'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='world_entries')
+    book = models.ForeignKey(Book, on_delete=models.SET_NULL, null=True, blank=True, related_name='world_entries')
+    title = models.CharField(max_length=200)
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='location')
+    content = models.TextField(help_text="Detailed description of this world element.")
+    image = models.ImageField(upload_to='world_images/', blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['category', 'title']
+        verbose_name_plural = "World Entries"
+
+    def __str__(self):
+        return f"{self.get_category_display()}: {self.title}"
