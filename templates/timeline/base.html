@@ -162,7 +162,7 @@
 
     .page-container {
         max-width: 1100px;
-        margin: 0 auto;
+        margin: 50px auto 0;
         width: 100%;
     }
 
@@ -448,9 +448,17 @@
                         href="{% url 'character_list' %}">
                         <i class="bi bi-people"></i> Characters
                     </a>
+                    <a class="nav-link {% if 'relationship' in request.resolver_match.url_name %}active{% endif %}"
+                        href="{% url 'relationship_map' %}">
+                        <i class="bi bi-diagram-3"></i> Relationship Map
+                    </a>
                     <a class="nav-link {% if 'tag' in request.resolver_match.url_name %}active{% endif %}"
                         href="{% url 'tag_list' %}">
                         <i class="bi bi-tags"></i> Tags
+                    </a>
+                    <a class="nav-link {% if request.resolver_match.url_name == 'product_statement' %}active{% endif %}"
+                        href="{% url 'product_statement' %}">
+                        <i class="bi bi-file-earmark-text"></i> Product Spec
                     </a>
                     <hr class="my-3" />
                     <a class="nav-link" href="{% url 'event_create' %}">

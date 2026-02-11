@@ -1,0 +1,75 @@
+{% extends 'timeline/base.html' %}
+
+{% block title %}Manage Relationships - Story Timeline Builder{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-list"></i> Character Relationships</h1>
+    <div>
+        <a href="{% url 'relationship_map' %}" class="btn btn-outline-primary">
+            <i class="bi bi-diagram-3"></i> View Map
+        </a>
+        <a href="{% url 'relationship_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus"></i> Add Relationship
+        </a>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+        {% if relationships %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Character A</th>
+                        <th>Connection</th>
+                        <th>Character B</th>
+                        <th>Strength</th>
+                        <th>Starts At</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rel in relationships %}
+                    <tr>
+                        <td>
+                            <strong>{{ rel.character_a.name }}</strong>
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary">{{ rel.get_relationship_type_display }}</span>
+                        </td>
+                        <td>
+                            <strong>{{ rel.character_b.name }}</strong>
+                        </td>
+                        <td>
+                            <div class="progress" style="height: 10px; width: 100px;">
+                                <div class="progress-bar bg-info" style="width: {{ rel.strength }}0%"></div>
+                            </div>
+                        </td>
+                        <td>
+                            <small class="text-muted">{{ rel.starts_at_event.title|default:"Series Start" }}</small>
+                        </td>
+                        <td class="text-end">
+                            <a href="{% url 'relationship_edit' rel.pk %}" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="{% url 'relationship_delete' rel.pk %}" class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-people fs-1 text-muted mb-3 d-block"></i>
+            <p class="text-muted">No relationships defined yet.</p>
+            <a href="{% url 'relationship_create' %}" class="btn btn-dark">Create Your First Connection</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

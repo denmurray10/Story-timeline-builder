@@ -1,0 +1,215 @@
+{% extends 'timeline/base.html' %}
+{% load static %}
+
+{% block title %}Relationship Map - Story Timeline Builder{% endblock %}
+
+{% block extra_css %}
+<style>
+    #relationship-network {
+        width: 100%;
+        height: 600px;
+        background-color: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .map-controls {
+        background: #fff;
+        padding: 15px;
+        border-radius: var(--radius);
+        margin-bottom: 20px;
+        border: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .info-panel {
+        background: #fff;
+        padding: 20px;
+        border-radius: var(--radius);
+        border: 1px solid var(--border-color);
+        height: 600px;
+        overflow-y: auto;
+    }
+
+    .legend {
+        font-size: 0.85rem;
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .legend-color {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-diagram-3"></i> Relationship Map</h1>
+    <div>
+        <a href="{% url 'relationship_list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-list"></i> Manage Relationships
+        </a>
+        <a href="{% url 'relationship_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus"></i> Add Relationship
+        </a>
+    </div>
+</div>
+
+<div class="map-controls shadow-sm">
+    <div class="legend">
+        <div class="legend-item">
+            <div class="legend-color" style="background: #6366f1;"></div> Protagonist
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #ef4444;"></div> Antagonist
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #10b981;"></div> Supporting
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #94a3b8;"></div> Other
+        </div>
+    </div>
+    <div class="text-muted small">
+        <i class="bi bi-info-circle"></i> Drag to move, scroll to zoom. Click node for details.
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-9">
+        <div id="relationship-network"></div>
+    </div>
+    <div class="col-lg-3">
+        <div class="info-panel shadow-sm" id="selection-details">
+            <div class="text-center text-muted py-5">
+                <i class="bi bi-cursor-fill fs-1 d-block mb-3"></i>
+                <p>Click a character node to see details</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Vis.js via CDN -->
+<script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const container = document.getElementById('relationship-network');
+        const detailsPanel = document.getElementById('selection-details');
+
+        // Fetch data from API
+        fetch('{% url "api_relationship_data" %}')
+            .then(response => response.json())
+            .then(data => {
+                if (data.nodes.length === 0) {
+                    container.innerHTML = `
+                        <div class="d-flex flex-column align-items-center justify-content-center h-100 text-muted">
+                            <i class="bi bi-people fs-1 mb-3"></i>
+                            <p>No characters found to map.</p>
+                            <a href="{% url 'character_create' %}" class="btn btn-sm btn-dark">Create Character</a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const options = {
+                    nodes: {
+                        shape: 'dot',
+                        size: 25,
+                        font: {
+                            size: 14,
+                            color: '#1f2937'
+                        },
+                        borderWidth: 2,
+                        shadow: true
+                    },
+                    edges: {
+                        width: 2,
+                        color: { inherit: 'from' },
+                        smooth: {
+                            type: 'continuous'
+                        },
+                        font: {
+                            size: 10,
+                            align: 'middle'
+                        },
+                        arrows: {
+                            to: { enabled: true, scaleFactor: 0.5 }
+                        }
+                    },
+                    physics: {
+                        stabilization: true,
+                        barnesHut: {
+                            gravitationalConstant: -2000,
+                            springLength: 200
+                        }
+                    },
+                    interaction: {
+                        hover: true,
+                        tooltipDelay: 200
+                    }
+                };
+
+                const network = new vis.Network(container, data, options);
+
+                // Handle clicks for details
+                network.on("click", function (params) {
+                    if (params.nodes.length > 0) {
+                        const nodeId = params.nodes[0];
+                        const char = data.nodes.find(n => n.id === nodeId);
+
+                        detailsPanel.innerHTML = `
+                            <h4 class="mb-3">${char.label}</h4>
+                            <div class="mb-3">
+                                <span class="badge" style="background-color: ${char.color}">
+                                    Character
+                                </span>
+                            </div>
+                            <p class="text-muted small">${char.description || 'No description available.'}</p>
+                            <hr>
+                            <h6>Connections</h6>
+                            <ul class="list-unstyled small">
+                                ${data.edges.filter(e => e.from === nodeId || e.to === nodeId).map(e => {
+                            const otherId = e.from === nodeId ? e.to : e.from;
+                            const otherChar = data.nodes.find(n => n.id === otherId);
+                            return `<li class="mb-2">• <strong>${e.label}</strong> with ${otherChar.label}</li>`;
+                        }).join('') || 'None identified.'}
+                            </ul>
+                            <div class="mt-4">
+                                <a href="/characters/${nodeId}/edit/" class="btn btn-sm btn-outline-primary w-100">
+                                    <i class="bi bi-pencil"></i> Full Profile
+                                </a>
+                            </div>
+                        `;
+                    } else {
+                        detailsPanel.innerHTML = `
+                            <div class="text-center text-muted py-5">
+                                <i class="bi bi-cursor-fill fs-1 d-block mb-3"></i>
+                                <p>Click a character node to see details</p>
+                            </div>
+                        `;
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching relationship data:', error);
+                container.innerHTML = '<div class="alert alert-danger m-3">Failed to load relationship data.</div>';
+            });
+    });
+</script>
+{% endblock %}

@@ -147,6 +147,58 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        cursor: pointer;
+        background-color: #fff;
+        transition: all 0.2s;
+    }
+
+    .dash-ai-icon:hover {
+        background-color: #f3f4f6;
+        border-color: #111827;
+    }
+
+    .dash-ai-response-container {
+        display: none;
+        margin-top: 15px;
+        padding: 15px;
+        background-color: #f9fafb;
+        border-radius: 14px;
+        border: 1px solid #e5e7eb;
+        font-size: 0.9rem;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    .ai-loading-dots span {
+        animation: blink 1.4s infinite both;
+        height: 6px;
+        width: 6px;
+        background-color: #6366f1;
+        border-radius: 50%;
+        display: inline-block;
+        margin: 0 2px;
+    }
+
+    .ai-loading-dots span:nth-child(2) {
+        animation-delay: .2s;
+    }
+
+    .ai-loading-dots span:nth-child(3) {
+        animation-delay: .4s;
+    }
+
+    @keyframes blink {
+        0% {
+            opacity: .2;
+        }
+
+        20% {
+            opacity: 1;
+        }
+
+        100% {
+            opacity: .2;
+        }
     }
 
     .draggable-card {
@@ -368,8 +420,15 @@
             </div>
             <p class="dash-muted mb-3">How can I help you with your story today?</p>
             <div class="d-flex align-items-center gap-2">
-                <input type="text" class="dash-ai-input" placeholder="I need help with…">
-                <div class="dash-ai-icon"><i class="bi bi-chat-dots"></i></div>
+                <input type="text" class="dash-ai-input" id="ai-query" placeholder="I need help with…">
+                <div class="dash-ai-icon" id="ai-submit"><i class="bi bi-chat-dots"></i></div>
+            </div>
+
+            <div id="ai-response-area" class="dash-ai-response-container">
+                <div id="ai-loading" style="display: none;" class="text-center py-2">
+                    <div class="ai-loading-dots"><span></span><span></span><span></span></div>
+                </div>
+                <div id="ai-text" class="markdown-content"></div>
             </div>
         </div>
     </div>
@@ -441,6 +500,56 @@
                 localStorage.removeItem('dashboard-layout');
                 window.location.reload();
             }
+        });
+
+        // AI Consultant Logic
+        const aiInput = document.getElementById('ai-query');
+        const aiSubmit = document.getElementById('ai-submit');
+        const aiResponseArea = document.getElementById('ai-response-area');
+        const aiLoading = document.getElementById('ai-loading');
+        const aiText = document.getElementById('ai-text');
+
+        function submitAIQuery() {
+            const query = aiInput.value.trim();
+            if (!query) return;
+
+            // UI State
+            aiResponseArea.style.display = 'block';
+            aiLoading.style.display = 'block';
+            aiText.innerHTML = '';
+            aiInput.disabled = true;
+
+            fetch('{% url "api_ai_consultant" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ query: query })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    aiLoading.style.display = 'none';
+                    aiInput.disabled = false;
+
+                    if (data.status === 'success') {
+                        // Simple formatting for now - we could add a markdown renderer if needed
+                        aiText.innerHTML = data.response.replace(/\n/g, '<br>');
+                    } else {
+                        aiText.innerHTML = `<span class="text-danger">Error: ${data.message}</span>`;
+                    }
+                })
+                .catch(error => {
+                    aiLoading.style.display = 'none';
+                    aiInput.disabled = false;
+                    aiText.innerHTML = `<span class="text-danger">Failed to connect to AI consultant.</span>`;
+                    console.error('Error:', error);
+                });
+        }
+
+        aiSubmit.addEventListener('click', submitAIQuery);
+        aiInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') submitAIQuery();
         });
     });
 </script>

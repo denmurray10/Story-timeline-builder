@@ -8,12 +8,15 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.db.models import Count, Sum, Q
 from django.views.decorators.http import require_POST
+from django.utils import timezone
 import json
+import google.generativeai as genai
+from django.conf import settings
 
 from .models import Book, Chapter, Character, Event, Tag, CharacterRelationship
 from .forms import (
     UserRegisterForm, BookForm, ChapterForm, CharacterForm, 
-    EventForm, TagForm, UserAccountForm
+    EventForm, TagForm, UserAccountForm, CharacterRelationshipForm
 )
 # ============== Authentication Views ==============
 
@@ -79,6 +82,11 @@ def dashboard(request):
         'recent_events': recent_events,
     }
     return render(request, 'timeline/dashboard.html', context)
+
+
+def product_statement(request):
+    """View the product specification/statement."""
+    return render(request, 'timeline/statement.html')
 
 
 # ============== Book Views ==============
@@ -149,6 +157,132 @@ def book_delete(request, pk):
         messages.success(request, f'Book "{book_title}" deleted successfully!')
         return redirect('book_list')
     return render(request, 'timeline/book_confirm_delete.html', {'book': book})
+
+
+@login_required
+def export_story_bible(request, pk):
+    """View to export a professional Story Bible for a book."""
+    book = get_object_or_404(Book, pk=pk, user=request.user)
+    
+    # Gather data
+    characters = Character.objects.filter(user=request.user).order_by('role', 'name')
+    events = Event.objects.filter(book=book, user=request.user).order_by('chronological_order', 'sequence_order')
+    tags = Tag.objects.filter(user=request.user).order_by('category', 'name')
+    
+    context = {
+        'book': book,
+        'characters': characters,
+        'events': events,
+        'tags': tags,
+        'now': timezone.now(),
+    }
+    return render(request, 'timeline/story_bible_export.html', context)
+
+
+
+@login_required
+def relationship_list(request):
+    """List all character relationships."""
+    relationships = CharacterRelationship.objects.filter(user=request.user)
+    return render(request, 'timeline/relationship_list.html', {'relationships': relationships})
+
+
+@login_required
+def relationship_create(request):
+    """Create a new character relationship."""
+    if request.method == 'POST':
+        form = CharacterRelationshipForm(request.POST, user=request.user)
+        if form.is_valid():
+            rel = form.save(commit=False)
+            rel.user = request.user
+            rel.save()
+            messages.success(request, 'Relationship created successfully!')
+            return redirect('relationship_list')
+    else:
+        form = CharacterRelationshipForm(user=request.user)
+    return render(request, 'timeline/relationship_form.html', {'form': form, 'action': 'Create'})
+
+
+@login_required
+def relationship_edit(request, pk):
+    """Edit an existing relationship."""
+    rel = get_object_or_404(CharacterRelationship, pk=pk, user=request.user)
+    if request.method == 'POST':
+        form = CharacterRelationshipForm(request.POST, instance=rel, user=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Relationship updated successfully!')
+            return redirect('relationship_list')
+    else:
+        form = CharacterRelationshipForm(instance=rel, user=request.user)
+    return render(request, 'timeline/relationship_form.html', {'form': form, 'action': 'Edit', 'relationship': rel})
+
+
+@login_required
+def relationship_delete(request, pk):
+    """Delete a relationship."""
+    rel = get_object_or_404(CharacterRelationship, pk=pk, user=request.user)
+    if request.method == 'POST':
+        rel.delete()
+        messages.success(request, 'Relationship deleted.')
+        return redirect('relationship_list')
+    return render(request, 'timeline/relationship_confirm_delete.html', {'relationship': rel})
+
+
+@login_required
+def relationship_map(request):
+    """View the interactive relationship graph."""
+    return render(request, 'timeline/relationship_map.html')
+
+
+@login_required
+def api_relationship_data(request):
+    """API endpoint for the relationship graph data."""
+    characters = Character.objects.filter(user=request.user, is_active=True)
+    relationships = CharacterRelationship.objects.filter(user=request.user)
+    
+    nodes = []
+    for char in characters:
+        # Determine color based on role
+        color = char.color_code
+        if not color:
+            if char.role == 'protagonist': color = '#6366f1' # Indigo
+            elif char.role == 'antagonist': color = '#ef4444' # Red
+            else: color = '#94a3b8' # Gray
+            
+        nodes.append({
+            'id': char.id,
+            'label': char.name,
+            'title': f"{char.name} ({char.get_role_display()})",
+            'color': color,
+            'description': char.description[:100] + "..." if char.description else ""
+        })
+        
+    edges = []
+    for rel in relationships:
+        # Map strength to width
+        width = max(1, rel.strength / 2)
+        
+        # Style based on type
+        color = '#94a3b8' # Default
+        if rel.relationship_type == 'romantic': color = '#f43f5e'
+        elif rel.relationship_type == 'enemy': color = '#b91c1c'
+        elif rel.relationship_type == 'ally': color = '#059669'
+        
+        edges.append({
+            'from': rel.character_a.id,
+            'to': rel.character_b.id,
+            'label': rel.get_relationship_type_display(),
+            'title': rel.description,
+            'width': width,
+            'color': color,
+            'arrows': 'to' # Or none if mutual
+        })
+        
+    return JsonResponse({
+        'nodes': nodes,
+        'edges': edges
+    })
 
 
 # ============== Chapter Views ==============
@@ -477,3 +611,62 @@ def api_event_reorder(request):
         return JsonResponse({'status': 'success', 'message': 'Event reordered successfully'})
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+
+@login_required
+@require_POST
+def api_ai_consultant(request):
+    """
+    API endpoint for the AI Story Consultant.
+    Pulls story context and sends it to Gemini.
+    """
+    if not settings.GEMINI_API_KEY:
+        return JsonResponse({
+            'status': 'error', 
+            'message': 'AI features are not configured (Missing API Key).'
+        }, status=503)
+
+    try:
+        data = json.loads(request.body)
+        user_query = data.get('query', '').strip()
+        
+        if not user_query:
+            return JsonResponse({'status': 'error', 'message': 'No query provided'}, status=400)
+
+        # 1. Build Story Context
+        # Gather all books, characters, and recent events for this user
+        books = Book.objects.filter(user=request.user)
+        characters = Character.objects.filter(user=request.user)
+        recent_events = Event.objects.filter(user=request.user).order_by('-updated_at')[:10]
+        
+        context = "You are a professional Story Consultant. Here is the context of the user's story:\n\n"
+        
+        context += "BOOKS:\n"
+        for b in books:
+            context += f"- {b.title} (Status: {b.get_status_display()}, Progress: {b.progress_percentage}%)\n"
+            
+        context += "\nCHARACTERS:\n"
+        for c in characters:
+            context += f"- {c.name} ({c.get_role_display()}): {c.description[:200]}...\n"
+            
+        context += "\nRECENT EVENTS:\n"
+        for e in recent_events:
+            context += f"- {e.title}: {e.description[:100]}...\n"
+
+        context += f"\nUSER QUESTION: {user_query}\n"
+        context += "\nPlease provide creative, helpful, and insightful feedback based on this context. Keep it concise."
+
+        # 2. Call Gemini
+        genai.configure(api_key=settings.GEMINI_API_KEY)
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        
+        response = model.generate_content(context)
+        ai_response = response.text
+
+        return JsonResponse({
+            'status': 'success', 
+            'response': ai_response
+        })
+        
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)

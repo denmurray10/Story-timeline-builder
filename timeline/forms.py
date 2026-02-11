@@ -193,3 +193,34 @@ class UserAccountForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'username', 'email']
+
+
+class CharacterRelationshipForm(forms.ModelForm):
+    """Form for creating/editing character relationships."""
+
+    class Meta:
+        model = CharacterRelationship
+        fields = [
+            "character_a",
+            "character_b",
+            "relationship_type",
+            "description",
+            "strength",
+            "starts_at_event",
+        ]
+        widgets = {
+            "character_a": forms.Select(attrs={"class": "form-control"}),
+            "character_b": forms.Select(attrs={"class": "form-control"}),
+            "relationship_type": forms.Select(attrs={"class": "form-control"}),
+            "description": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
+            "strength": forms.NumberInput(attrs={"class": "form-control", "min": "1", "max": "10"}),
+            "starts_at_event": forms.Select(attrs={"class": "form-control"}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user", None)
+        super().__init__(*args, **kwargs)
+        if user:
+            self.fields["character_a"].queryset = Character.objects.filter(user=user)
+            self.fields["character_b"].queryset = Character.objects.filter(user=user)
+            self.fields["starts_at_event"].queryset = Event.objects.filter(user=user)

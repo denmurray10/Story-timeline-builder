@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Bible - {{ book.title }}</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,700&family=Inter:wght@400;600&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #111827;
+            --secondary: #4b5563;
+            --accent: #6366f1;
+            --border: #e5e7eb;
+            --bg-muted: #f9fafb;
+        }
+
+        @page {
+            margin: 2cm;
+            size: A4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: #1f2937;
+            background: white;
+            padding: 0;
+        }
+
+        .export-wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        /* Cover Page */
+        .cover-page {
+            height: 25cm;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+            page-break-after: always;
+        }
+
+        .cover-badge {
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            font-size: 0.8rem;
+            color: var(--secondary);
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .author {
+            font-size: 1.5rem;
+            color: var(--secondary);
+            margin-bottom: 4rem;
+        }
+
+        /* Section Headings */
+        h2 {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.75rem;
+            margin-top: 3rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary);
+            color: var(--primary);
+            page-break-after: avoid;
+        }
+
+        h3 {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.25rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+            text-align: justify;
+        }
+
+        /* Character Grid */
+        .character-card {
+            background: var(--bg-muted);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            page-break-inside: avoid;
+        }
+
+        .char-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .char-role {
+            font-size: 0.75rem;
+            background: var(--primary);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        /* Timeline Items */
+        .timeline-item {
+            border-left: 2px solid var(--border);
+            padding-left: 20px;
+            margin-bottom: 2rem;
+            position: relative;
+            page-break-inside: avoid;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -7px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+        }
+
+        .tl-meta {
+            font-size: 0.8rem;
+            color: var(--secondary);
+            margin-bottom: 4px;
+        }
+
+        /* Print Instructions (Screen Only) */
+        .print-btn-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .btn-print {
+            padding: 10px 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+        }
+
+        @media print {
+            .print-btn-container {
+                display: none;
+            }
+
+            .export-wrapper {
+                padding: 0;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="print-btn-container">
+        <button class="btn-print" onclick="window.print()">Print to PDF/DOCX</button>
+    </div>
+
+    <div class="export-wrapper">
+        <!-- Cover -->
+        <div class="cover-page">
+            <div class="cover-badge">Complete Story Bible</div>
+            <h1>{{ book.title }}</h1>
+            <div class="author">by {{ book.user.get_full_name|default:book.user.username }}</div>
+            <div class="tl-meta">Generated on {{ now|date:"d F Y" }}</div>
+        </div>
+
+        <!-- Overview -->
+        <section>
+            <h2>Book Overview</h2>
+            <p><strong>Series Order:</strong> Book {{ book.series_order }}</p>
+            <p><strong>Status:</strong> {{ book.get_status_display }}</p>
+            <p><strong>Word Count:</strong> {{ book.current_word_count }} / {{ book.word_count_target }}</p>
+            <p><strong>Description:</strong></p>
+            <p>{{ book.description|default:"No description provided." }}</p>
+        </section>
+
+        <!-- Characters -->
+        <section>
+            <h2>Dramatis Personae</h2>
+            {% for char in characters %}
+            <div class="character-card">
+                <div class="char-header">
+                    <h3>{{ char.name }}</h3>
+                    <span class="char-role">{{ char.get_role_display }}</span>
+                </div>
+                <p><strong>Motivation:</strong> {{ char.motivation|default:"Not specified." }}</p>
+                <p><strong>Description:</strong> {{ char.description|default:"No physical description provided." }}</p>
+            </div>
+            {% empty %}
+            <p>No characters recorded for this book.</p>
+            {% endfor %}
+        </section>
+
+        <!-- Timeline -->
+        <section>
+            <h2>Chronological Timeline</h2>
+            {% for event in events %}
+            <div class="timeline-item">
+                <div class="tl-meta">
+                    {% if event.story_date %}{{ event.story_date }} • {% endif %}
+                    Chapter {{ event.chapter.chapter_number|default:"Unassigned" }} •
+                    POV: {{ event.pov_character.name|default:"Omniscient" }}
+                </div>
+                <h3>{{ event.title }}</h3>
+                <p>{{ event.description|default:"No summary available." }}</p>
+
+                {% if event.content_html %}
+                <div
+                    style="font-size: 0.9rem; color: #4b5563; font-style: italic; border-top: 1px dotted #e5e7eb; padding-top: 10px;">
+                    {{ event.content_html|safe|truncatewords_html:100 }}
+                </div>
+                {% endif %}
+            </div>
+            {% empty %}
+            <p>No events recorded for this timeline.</p>
+            {% endfor %}
+        </section>
+
+        <!-- World Building -->
+        <section>
+            <h2>World Building & Themes</h2>
+            {% for tag in tags %}
+            <div style="margin-bottom: 1.5rem;">
+                <h3 style="margin-top: 1rem; border-left: 3px solid {{ tag.color }}; padding-left: 10px;">{{ tag.name }}
+                    ({{ tag.get_category_display }})</h3>
+                <p>{{ tag.description|default:"No detailed notes." }}</p>
+            </div>
+            {% empty %}
+            <p>No world-building tags recorded.</p>
+            {% endfor %}
+        </section>
+
+        <footer style="margin-top: 5rem; text-align: center; font-size: 0.75rem; color: var(--secondary);">
+            Generated by Story Timeline Builder
+        </footer>
+    </div>
+
+</body>
+
+</html>

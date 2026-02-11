@@ -5,6 +5,9 @@ Timeline Builder{% endblock %} {% block content %}
         <i class="bi bi-book"></i> Book {{ book.series_order }}: {{ book.title}}
     </h1>
     <div>
+        <a href="{% url 'book_export' book.pk %}" class="btn btn-outline-dark me-2">
+            <i class="bi bi-file-earmark-pdf"></i> Export Story Bible
+        </a>
         <a href="{% url 'book_edit' book.pk %}" class="btn btn-secondary">
             <i class="bi bi-pencil"></i> Edit
         </a>

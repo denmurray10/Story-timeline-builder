@@ -18,9 +18,11 @@ urlpatterns = [
     # Books
     path('books/', views.book_list, name='book_list'),
     path('books/create/', views.book_create, name='book_create'),
+    path('book/new/', views.book_create, name='book_create'),
     path('books/<int:pk>/', views.book_detail, name='book_detail'),
-    path('books/<int:pk>/edit/', views.book_edit, name='book_edit'),
-    path('books/<int:pk>/delete/', views.book_delete, name='book_delete'),
+    path('book/<int:pk>/edit/', views.book_edit, name='book_edit'),
+    path('book/<int:pk>/delete/', views.book_delete, name='book_delete'),
+    path('book/<int:pk>/export/', views.export_story_bible, name='book_export'),
     
     # Chapters
     path('books/<int:book_pk>/chapters/create/', views.chapter_create, name='chapter_create'),
@@ -42,6 +44,14 @@ urlpatterns = [
     path('events/<int:pk>/delete/', views.event_delete, name='event_delete'),
     path('events/<int:pk>/reorder/', views.event_reorder, name='event_reorder'),
     
+    # Relationship Views
+    path('relationships/', views.relationship_list, name='relationship_list'),
+    path('relationships/map/', views.relationship_map, name='relationship_map'),
+    path('relationships/new/', views.relationship_create, name='relationship_create'),
+    path('relationships/<int:pk>/edit/', views.relationship_edit, name='relationship_edit'),
+    path('relationships/<int:pk>/delete/', views.relationship_delete, name='relationship_delete'),
+    path('api/relationships/data/', views.api_relationship_data, name='api_relationship_data'),
+    
     # Tags
     path('tags/', views.tag_list, name='tag_list'),
     path('tags/create/', views.tag_create, name='tag_create'),
@@ -50,5 +60,7 @@ urlpatterns = [
     
     # API endpoints for AJAX (we'll use these later for drag-and-drop)
     path('api/events/reorder/', views.api_event_reorder, name='api_event_reorder'),
+    path('api/ai/consultant/', views.api_ai_consultant, name='api_ai_consultant'),
     path('account/', views.account, name='account'),
+    path('statement/', views.product_statement, name='product_statement'),
 ]
