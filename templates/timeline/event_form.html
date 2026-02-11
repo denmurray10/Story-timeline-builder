@@ -13,14 +13,22 @@
         min-height: calc(100vh - 160px);
     }
 
-    .editor-pane {
+    .writing-column {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .title-box {
         background: #fff;
         border-radius: 16px;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
-        display: flex;
-        flex-direction: column;
-        padding: 3rem;
+        padding: 1.5rem 2rem;
         border: 1px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
     }
 
     .metadata-pane {
@@ -29,24 +37,78 @@
         height: min-content;
     }
 
+    /* Editor wrapper — holds the side toolbar + editor */
+    .editor-wrapper {
+        position: relative;
+    }
+
+    /* Side toolbar */
+    .side-toolbar {
+        position: absolute;
+        left: -48px;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        background: #1e293b;
+        padding: 6px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        z-index: 10;
+        transition: top 0.15s ease-out;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .side-toolbar.visible {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .side-toolbar button {
+        border: none;
+        background: none;
+        color: #94a3b8;
+        font-size: 0.85rem;
+        padding: 7px 8px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.15s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+    }
+
+    .side-toolbar button:hover {
+        background-color: #334155;
+        color: #f1f5f9;
+    }
+
+    .side-toolbar button.is-active {
+        background-color: #6366f1;
+        color: white;
+    }
+
+    /* TipTap Editor */
     .ProseMirror {
-        min-height: 600px;
+        min-height: 550px;
         outline: none;
         font-family: 'Inter', sans-serif;
         line-height: 1.8;
         font-size: 1.15rem;
         color: #1e293b;
-        padding: 1.5rem;
-        background: #fdfdfd;
-        border-radius: 12px;
+        padding: 2rem;
+        background: #fff;
+        border-radius: 16px;
         border: 1px solid #f1f5f9;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
         transition: border-color 0.2s, box-shadow 0.2s;
     }
 
     .ProseMirror:focus {
         border-color: #cbd5e1;
         box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.05);
-        background: #fff;
     }
 
     .ProseMirror p {
@@ -62,46 +124,6 @@
         font-style: italic;
     }
 
-    .bubble-menu {
-        display: flex;
-        background-color: #1e293b;
-        padding: 0.4rem;
-        border-radius: 12px;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        gap: 0.25rem;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .bubble-menu button {
-        border: none;
-        background: none;
-        color: #f1f5f9;
-        font-size: 0.9rem;
-        padding: 0.5rem 0.8rem;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.2s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .bubble-menu button:hover {
-        background-color: #334155;
-        color: white;
-    }
-
-    .bubble-menu button.is-active {
-        background-color: #6366f1;
-        color: white;
-    }
-
-    .editor-header {
-        border-bottom: 2px solid #f8fafc;
-        margin-bottom: 2.5rem;
-        padding-bottom: 2rem;
-    }
-
     .word-count-badge {
         font-size: 0.8rem;
         background: #f8fafc;
@@ -111,16 +133,23 @@
         font-weight: 600;
         letter-spacing: 0.025em;
         border: 1px solid #f1f5f9;
+        white-space: nowrap;
     }
 
     .scene-title-input {
-        font-size: 2.25rem !important;
+        font-size: 1.75rem !important;
         font-weight: 700 !important;
         border: none !important;
         padding: 0 !important;
         background: transparent !important;
         box-shadow: none !important;
         color: #0f172a !important;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .scene-title-input:focus {
+        outline: none !important;
     }
 
     .scene-title-input::placeholder {
@@ -132,8 +161,8 @@
             grid-template-columns: 1fr;
         }
 
-        .editor-pane {
-            padding: 2rem;
+        .side-toolbar {
+            left: -42px;
         }
     }
 </style>
@@ -144,7 +173,7 @@
     {% csrf_token %}
 
     {% if form.errors %}
-    <div class="alert alert-danger shadow-sm mb-5 border-0 rounded-4 p-4">
+    <div class="alert alert-danger shadow-sm mb-4 border-0 rounded-4 p-4">
         <h6 class="fw-bold mb-3 d-flex align-items-center">
             <i class="bi bi-exclamation-octagon-fill me-2 fs-5"></i>
             Check the following details:
@@ -164,35 +193,34 @@
     {{ form.word_count }}
 
     <div class="editor-layout">
-        <div class="editor-pane">
-            <div class="editor-header">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <div class="flex-grow-1 me-4">
-                        <input type="text" name="title" id="id_title" value="{{ form.title.value|default:'' }}"
-                            class="form-control scene-title-input" placeholder="Scene Title..." required>
-                    </div>
-                    <div class="d-flex align-items-center gap-3">
-                        <span class="word-count-badge" id="word-count">0 words</span>
-                        <button type="submit" class="btn btn-primary px-5 py-2 fw-bold rounded-pill shadow-sm">
-                            <i class="bi bi-journal-check me-2"></i> Save Scene
-                        </button>
-                    </div>
+        <div class="writing-column">
+            <!-- Title Box -->
+            <div class="title-box">
+                <input type="text" name="title" id="id_title" value="{{ form.title.value|default:'' }}"
+                    class="form-control scene-title-input" placeholder="Scene Title..." required>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="word-count-badge" id="word-count">0 words</span>
+                    <button type="submit" class="btn btn-primary px-4 py-2 fw-bold rounded-pill shadow-sm"
+                        style="white-space: nowrap;">
+                        <i class="bi bi-journal-check me-2"></i> Save
+                    </button>
                 </div>
-                {% if form.title.errors %}
-                <div class="text-danger small">{{ form.title.errors|join:", " }}</div>
-                {% endif %}
             </div>
 
-            <div id="bubble-menu" class="bubble-menu" style="visibility: hidden;">
-                <button type="button" data-action="bold" title="Bold"><i class="bi bi-type-bold"></i></button>
-                <button type="button" data-action="italic" title="Italic"><i class="bi bi-type-italic"></i></button>
-                <button type="button" data-action="h2" title="Heading"><span class="fw-bold">H2</span></button>
-                <button type="button" data-action="bullet" title="List"><i class="bi bi-list-ul"></i></button>
+            <!-- Editor with side toolbar -->
+            <div class="editor-wrapper">
+                <div id="side-toolbar" class="side-toolbar">
+                    <button type="button" data-action="bold" title="Bold"><i class="bi bi-type-bold"></i></button>
+                    <button type="button" data-action="italic" title="Italic"><i class="bi bi-type-italic"></i></button>
+                    <button type="button" data-action="h2" title="Heading"><span class="fw-bold"
+                            style="font-size: 0.7rem;">H2</span></button>
+                    <button type="button" data-action="bullet" title="List"><i class="bi bi-list-ul"></i></button>
+                </div>
+                <div id="editor"></div>
             </div>
-
-            <div id="editor"></div>
         </div>
 
+        <!-- Sidebar Metadata Pane -->
         <div class="metadata-pane">
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
                 <div class="card-header bg-white py-4 px-4 border-0">
@@ -318,13 +346,14 @@
 <script type="module">
     import { Editor } from 'https://esm.sh/@tiptap/core'
     import StarterKit from 'https://esm.sh/@tiptap/starter-kit'
-    import BubbleMenu from 'https://esm.sh/@tiptap/extension-bubble-menu'
     import Placeholder from 'https://esm.sh/@tiptap/extension-placeholder'
 
     const jsonInput = document.querySelector('input[name="content_json"]');
     const htmlInput = document.querySelector('input[name="content_html"]');
     const wordCountInput = document.querySelector('input[name="word_count"]');
     const wordCountDisplay = document.getElementById('word-count');
+    const sideToolbar = document.getElementById('side-toolbar');
+    const editorWrapper = document.querySelector('.editor-wrapper');
 
     let initialContent = '';
     try {
@@ -337,14 +366,25 @@
         console.warn('Initial content parse failed', e);
     }
 
+    function positionToolbar(editor) {
+        // Get the current cursor position in the DOM
+        const { view } = editor;
+        const { from } = view.state.selection;
+        const coords = view.coordsAtPos(from);
+        const wrapperRect = editorWrapper.getBoundingClientRect();
+
+        // Position the toolbar vertically aligned with the current line
+        const toolbarHeight = sideToolbar.offsetHeight;
+        const relativeTop = coords.top - wrapperRect.top - (toolbarHeight / 2) + 10;
+
+        sideToolbar.style.top = Math.max(8, relativeTop) + 'px';
+        sideToolbar.classList.add('visible');
+    }
+
     const editor = new Editor({
         element: document.getElementById('editor'),
         extensions: [
             StarterKit,
-            BubbleMenu.configure({
-                element: document.getElementById('bubble-menu'),
-                tippyOptions: { duration: 100 },
-            }),
             Placeholder.configure({
                 placeholder: 'Every story starts with a single word. Begin your scene here...',
             })
@@ -361,10 +401,24 @@
             if (wordCountInput) wordCountInput.value = words;
             if (wordCountDisplay) wordCountDisplay.innerText = `${words} words`;
 
+            positionToolbar(editor);
             updateMenuState(editor);
         },
         onSelectionUpdate({ editor }) {
+            positionToolbar(editor);
             updateMenuState(editor);
+        },
+        onFocus({ editor }) {
+            positionToolbar(editor);
+            sideToolbar.classList.add('visible');
+        },
+        onBlur() {
+            // Small delay so button clicks register before hiding
+            setTimeout(() => {
+                if (!sideToolbar.matches(':hover')) {
+                    sideToolbar.classList.remove('visible');
+                }
+            }, 200);
         },
         onCreate({ editor }) {
             const text = editor.getText();
@@ -374,10 +428,11 @@
         }
     });
 
-    const menuButtons = document.querySelectorAll('#bubble-menu button');
+    // Toolbar button actions
+    const menuButtons = document.querySelectorAll('#side-toolbar button');
     menuButtons.forEach(btn => {
-        btn.onclick = (e) => {
-            e.preventDefault();
+        btn.onmousedown = (e) => {
+            e.preventDefault(); // Prevent editor blur
             const action = btn.getAttribute('data-action');
             if (action === 'bold') editor.chain().focus().toggleBold().run();
             if (action === 'italic') editor.chain().focus().toggleItalic().run();

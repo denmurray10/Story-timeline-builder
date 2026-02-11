@@ -152,7 +152,6 @@ class EventForm(forms.ModelForm):
             "tension_level": forms.NumberInput(attrs={"class": "form-control", "min": "1", "max": "10"}),
             "tags": forms.CheckboxSelectMultiple(),
             "notes": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
-            "word_count": forms.NumberInput(attrs={"class": "form-control"}),
             "is_written": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
 
