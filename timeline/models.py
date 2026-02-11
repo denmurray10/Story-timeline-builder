@@ -76,6 +76,12 @@ class Chapter(models.Model):
     description = models.TextField(blank=True)
     word_count = models.PositiveIntegerField(default=0)
     is_complete = models.BooleanField(default=False)
+    chapter_file = models.FileField(
+        upload_to='chapters/',
+        null=True,
+        blank=True,
+        help_text="Upload your chapter manuscript (.docx or .txt) to automatically calculate word count."
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

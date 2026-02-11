@@ -61,11 +61,12 @@ class ChapterForm(forms.ModelForm):
 
     class Meta:
         model = Chapter
-        fields = ["chapter_number", "title", "description", "word_count", "is_complete"]
+        fields = ["chapter_number", "title", "description", "chapter_file", "word_count", "is_complete"]
         widgets = {
             "title": forms.TextInput(attrs={"class": "form-control"}),
             "chapter_number": forms.NumberInput(attrs={"class": "form-control"}),
             "description": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
+            "chapter_file": forms.FileInput(attrs={"class": "form-control"}),
             "word_count": forms.NumberInput(attrs={"class": "form-control"}),
             "is_complete": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }

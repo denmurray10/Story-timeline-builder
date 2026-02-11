@@ -5,6 +5,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
 from django.contrib import messages
+import docx2txt
+import io
+import os
 from django.http import JsonResponse
 from django.db.models import Count, Sum, Q
 from django.views.decorators.http import require_POST
@@ -273,13 +276,35 @@ def api_relationship_data(request):
             'title': rel.description,
             'width': width,
             'color': color,
-            'arrows': 'to' # Or none if mutual
+        'arrows': 'to' # Or none if mutual
         })
         
-    return JsonResponse({
+    data = {
         'nodes': nodes,
         'edges': edges
-    })
+    }
+    return JsonResponse(data)
+
+
+def get_file_word_count(file):
+    """Calculate word count from an uploaded file (.docx or .txt)."""
+    filename = file.name.lower()
+    text = ""
+    
+    try:
+        if filename.endswith('.docx'):
+            text = docx2txt.process(file)
+        elif filename.endswith('.txt'):
+            # Reset file pointer if already read
+            file.seek(0)
+            text = file.read().decode('utf-8', errors='ignore')
+    except Exception as e:
+        print(f"Error processing file: {e}")
+    
+    if text:
+        # Simple word count by split
+        return len(text.split())
+    return 0
 
 
 # ============== Chapter Views ==============
@@ -289,12 +314,17 @@ def chapter_create(request, book_pk):
     """Create a new chapter in a book."""
     book = get_object_or_404(Book, pk=book_pk, user=request.user)
     if request.method == 'POST':
-        form = ChapterForm(request.POST)
+        form = ChapterForm(request.POST, request.FILES)
         if form.is_valid():
             chapter = form.save(commit=False)
             chapter.book = book
+            
+            # Auto-calculate word count if a file is uploaded
+            if 'chapter_file' in request.FILES:
+                chapter.word_count = get_file_word_count(request.FILES['chapter_file'])
+            
             chapter.save()
-            messages.success(request, f'Chapter "{chapter.title}" created successfully!')
+            messages.success(request, f'Chapter "{chapter.title}" created successfully! (Word count: {chapter.word_count})')
             return redirect('book_detail', pk=book.pk)
     else:
         # Auto-suggest next chapter number
@@ -314,10 +344,14 @@ def chapter_edit(request, pk):
     """Edit an existing chapter."""
     chapter = get_object_or_404(Chapter, pk=pk, book__user=request.user)
     if request.method == 'POST':
-        form = ChapterForm(request.POST, instance=chapter)
+        form = ChapterForm(request.POST, request.FILES, instance=chapter)
         if form.is_valid():
+            # Check if a new file was uploaded
+            if 'chapter_file' in request.FILES:
+                chapter.word_count = get_file_word_count(request.FILES['chapter_file'])
+            
             form.save()
-            messages.success(request, f'Chapter "{chapter.title}" updated successfully!')
+            messages.success(request, f'Chapter "{chapter.title}" updated successfully! (Word count: {chapter.word_count})')
             return redirect('book_detail', pk=chapter.book.pk)
     else:
         form = ChapterForm(instance=chapter)
