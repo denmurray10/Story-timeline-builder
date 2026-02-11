@@ -248,7 +248,7 @@ def book_list(request):
 def book_detail(request, pk):
     """Detail view for a single book."""
     book = get_object_or_404(Book, pk=pk, user=request.user)
-    chapters = book.chapters.all().annotate(event_count=Count('events'))
+    chapters = book.chapters.all().annotate(event_count=Count('events')).order_by('chapter_number')
     events = book.events.all().order_by('sequence_order')
     
     context = {
@@ -469,9 +469,10 @@ def run_background_book_import(book_id, content, user_id):
             book.save()
             
             try:
-                batch = chunks[i:i+batch_size]
-                # Truncate each chunk to 10000 chars to stay within token limits
-                batch = [chunk[:10000] for chunk in batch]
+                # Keep original full chunks for content storage
+                original_batch = chunks[i:i+batch_size]
+                # Truncate for AI analysis only
+                batch = [chunk[:10000] for chunk in original_batch]
                 batch_text = "\n\n--- SECTION BOUNDARY ---\n\n".join(batch)
                 
                 ai_data = analyze_book_content_batch_with_ai(batch_text)
@@ -480,13 +481,23 @@ def run_background_book_import(book_id, content, user_id):
                     print(f"Batch {batch_num} returned no data, skipping.")
                     continue
                     
-                for chap_info in ai_data.get('chapters', []):
+                ai_chapters = ai_data.get('chapters', [])
+                for idx, chap_info in enumerate(ai_chapters):
                     try:
+                        # Map chapter content from the original chunk if available
+                        chapter_content = ''
+                        if idx < len(original_batch):
+                            chapter_content = original_batch[idx]
+                        elif len(original_batch) == 1:
+                            chapter_content = original_batch[0]
+                        
                         chapter = Chapter.objects.create(
                             book=book,
                             chapter_number=chap_info.get('number', new_chapters + 1),
                             title=chap_info.get('title', f"Chapter {new_chapters + 1}")[:200],
-                            description=chap_info.get('summary', '')[:5000]
+                            description=chap_info.get('summary', '')[:5000],
+                            content=chapter_content,
+                            word_count=len(chapter_content.split()) if chapter_content else 0
                         )
                         new_chapters += 1
                         
@@ -931,6 +942,42 @@ Generate 3-6 scenes depending on chapter complexity."""
     if data:
         return JsonResponse({'status': 'success', 'outline': data})
     return JsonResponse({'status': 'error', 'message': 'AI could not generate an outline. Please try again.'})
+
+
+@login_required
+@require_POST
+def api_chapter_summary(request, pk):
+    """Generate an AI summary for a chapter from its content."""
+    chapter = get_object_or_404(Chapter, pk=pk, book__user=request.user)
+    
+    if not chapter.content:
+        return JsonResponse({'status': 'error', 'message': 'No chapter content available to summarize.'})
+    
+    prompt = f"""
+    Write a concise but comprehensive summary of the following chapter from a novel.
+    The summary should capture the key plot points, character developments, 
+    and any important revelations or turning points.
+    Keep it to 2-4 paragraphs.
+
+    Book: {chapter.book.title}
+    Chapter {chapter.chapter_number}: {chapter.title}
+
+    Chapter Content:
+    {chapter.content[:15000]}
+
+    Return ONLY a JSON object:
+    {{
+        "summary": "Your summary text here..."
+    }}
+    """
+    
+    data = _call_ai_json(prompt, system_message="You are a professional literary analyst. Write clear, engaging chapter summaries. Always respond with valid JSON.")
+    
+    if data and data.get('summary'):
+        chapter.description = data['summary']
+        chapter.save()
+        return JsonResponse({'status': 'success', 'summary': data['summary']})
+    return JsonResponse({'status': 'error', 'message': 'AI could not generate a summary. Please try again.'})
 
 
 # ============== Chapter Views ==============

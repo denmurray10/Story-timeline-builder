@@ -34,6 +34,7 @@ urlpatterns = [
     path('chapters/<int:pk>/edit/', views.chapter_edit, name='chapter_edit'),
     path('chapters/<int:pk>/delete/', views.chapter_delete, name='chapter_delete'),
     path('api/chapters/<int:pk>/scene-outline/', views.api_scene_outline, name='api_scene_outline'),
+    path('api/chapters/<int:pk>/summary/', views.api_chapter_summary, name='api_chapter_summary'),
     
     # Characters
     path('characters/', views.character_list, name='character_list'),
