@@ -11,9 +11,10 @@ import os
 from django.http import JsonResponse
 from django.db.models import Count, Sum, Q
 from django.views.decorators.http import require_POST
-from django.utils import timezone
 import json
 import re
+import threading
+from django.utils import timezone
 import google.generativeai as genai
 from openai import OpenAI
 from django.conf import settings
@@ -289,12 +290,12 @@ def book_edit(request, pk):
 
 @login_required
 def book_import(request):
-    """Import a book with real-time progress tracking."""
+    """Start a book import process in the background."""
     if request.method == 'POST' and request.FILES.get('book_file'):
         book_file = request.FILES['book_file']
         title = request.POST.get('title', 'Imported Book')
         
-        # 1. Create the Book in 'importing' state
+        # 1. Create the Book
         last_book = Book.objects.filter(user=request.user).order_by('-series_order').first()
         series_order = (last_book.series_order + 1) if last_book else 1
         
@@ -307,17 +308,38 @@ def book_import(request):
             import_status_message="Extracting manuscript text..."
         )
         
-        # If AJAX, return the book ID so the frontend can start polling
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return JsonResponse({'status': 'success', 'book_id': book.id})
-            
-        # 2. Extract Text
+        # 2. Extract text immediately (before request context/file is lost)
         content = extract_text_from_file(book_file)
         if not content:
             book.delete()
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'status': 'error', 'message': 'Could not extract text.'})
             messages.error(request, "Could not extract text from file.")
             return redirect('book_list')
 
+        # 3. Start background thread
+        thread = threading.Thread(
+            target=run_background_book_import,
+            args=(book.id, content, request.user.id)
+        )
+        thread.start()
+
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'status': 'success', 'book_id': book.id})
+            
+        return redirect('book_list')
+
+    return render(request, 'timeline/book_import.html')
+
+
+def run_background_book_import(book_id, content, user_id):
+    """Heavy lifting AI analysis run in a background thread."""
+    from django.contrib.auth.models import User
+    
+    try:
+        book = Book.objects.get(id=book_id)
+        user = User.objects.get(id=user_id)
+        
         # 3. Global Character Pass
         book.import_progress = 15
         book.import_status_message = "Deep-scanning manuscript for characters..."
@@ -332,7 +354,7 @@ def book_import(request):
                 name = char_info.get('name')
                 if name:
                     char = Character.objects.create(
-                        user=request.user,
+                        user=user,
                         name=name,
                         role=char_info.get('role', 'supporting')[:100],
                         description=char_info.get('description', ''),
@@ -371,7 +393,6 @@ def book_import(request):
         
         batch_size = 4
         for i in range(0, len(chunks), batch_size):
-            # Calculate progress (25% to 95%)
             progress_chunk = int(25 + ((i / total_chunks) * 70))
             book.import_progress = progress_chunk
             book.import_status_message = f"Analyzing chapters {new_chapters + 1}-{min(new_chapters + batch_size, total_chunks)} of {total_chunks}..."
@@ -397,7 +418,7 @@ def book_import(request):
                             pov_char = char_map.get(pov_name)
                             
                             event = Event.objects.create(
-                                user=request.user,
+                                user=user,
                                 book=book,
                                 chapter=chapter,
                                 title=event_info.get('title', f"Event {new_events + 1}"),
@@ -420,21 +441,34 @@ def book_import(request):
         book.import_status_message = "Import complete!"
         book.status = 'drafting'
         book.save()
-
-        messages.success(request, f"Successfully imported '{title}'!")
-        return redirect('book_list')
-
-    return render(request, 'timeline/book_import.html')
+        
+    except Exception as e:
+        print(f"Error in background import: {e}")
+        try:
+            book = Book.objects.get(id=book_id)
+            book.import_status_message = f"Error: {str(e)}"
+            book.save()
+        except:
+            pass
 
 
 @login_required
 def api_book_progress(request, pk):
-    """API endpoint to get the import progress of a book."""
+    """API endpoint to get the import progress of a book with stall detection."""
     book = get_object_or_404(Book, pk=pk, user=request.user)
+    
+    is_stalled = False
+    if book.status == 'importing':
+        # If no update in 5 minutes, consider it stalled
+        time_diff = timezone.now() - book.last_import_update
+        if time_diff.total_seconds() > 300:
+            is_stalled = True
+            
     return JsonResponse({
         'status': book.status,
         'progress': book.import_progress,
-        'message': book.import_status_message
+        'message': book.import_status_message,
+        'is_stalled': is_stalled
     })
 
 
@@ -732,6 +766,62 @@ def analyze_book_content_batch_with_ai(text):
 def analyze_book_content_with_ai(text):
     """Legacy compatibility: calls the batch analyzer for a single block."""
     return analyze_book_content_batch_with_ai(text)
+
+
+# ============== AI Scene Outline ==============
+
+@login_required
+@require_POST
+def api_scene_outline(request, pk):
+    """Generate an AI scene outline for a chapter."""
+    chapter = get_object_or_404(Chapter, pk=pk, book__user=request.user)
+    
+    # Gather context
+    events = chapter.events.all().order_by('sequence_order')
+    characters = set()
+    for ev in events:
+        for c in ev.characters.all():
+            characters.add(c.name)
+        if ev.pov_character:
+            characters.add(ev.pov_character.name)
+    
+    context_parts = [f"Book: {chapter.book.title}", f"Chapter {chapter.chapter_number}: {chapter.title}"]
+    if chapter.description:
+        context_parts.append(f"Summary: {chapter.description}")
+    if chapter.content:
+        context_parts.append(f"Content (first 5000 chars): {chapter.content[:5000]}")
+    if characters:
+        context_parts.append(f"Characters present: {', '.join(characters)}")
+    if events.exists():
+        event_list = [f"- {e.title}: {e.description[:100]}" for e in events[:20]]
+        context_parts.append("Events:\n" + "\n".join(event_list))
+    
+    prompt = "\n".join(context_parts) + """
+
+Based on the above chapter information, generate a detailed scene outline. Return valid JSON with this structure:
+{
+    "scenes": [
+        {
+            "scene_number": 1,
+            "title": "Scene title",
+            "setting": "Where/when this scene takes place",
+            "characters": ["Character names involved"],
+            "objective": "What this scene accomplishes for the story",
+            "beats": ["Beat 1: description", "Beat 2: description"],
+            "emotional_arc": "How the emotional tone shifts in this scene",
+            "tension_level": 5
+        }
+    ],
+    "pacing_notes": "Overall chapter pacing advice",
+    "chapter_arc": "How this chapter contributes to the larger story arc"
+}
+Generate 3-6 scenes depending on chapter complexity."""
+
+    data = _call_ai_json(prompt, system_message="You are a professional story structure analyst. Generate detailed scene outlines. Always respond with valid JSON.")
+    
+    if data:
+        return JsonResponse({'status': 'success', 'outline': data})
+    return JsonResponse({'status': 'error', 'message': 'AI could not generate an outline. Please try again.'})
 
 
 # ============== Chapter Views ==============

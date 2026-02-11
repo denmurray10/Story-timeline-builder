@@ -132,6 +132,15 @@
                                 progressFill.style.width = `${progressData.progress}%`;
                                 uiBar.style.width = `${progressData.progress}%`;
 
+                                if (progressData.is_stalled) {
+                                    clearInterval(pollInterval);
+                                    statusText.innerHTML = `<i class="bi bi-exclamation-octagon text-danger me-2"></i> <strong>Import Stalled:</strong> The server may have restarted. You can safely refresh this page to check latest status or retry.`;
+                                    statusText.classList.replace('alert-info', 'alert-danger');
+                                    btn.classList.replace('btn-primary', 'btn-danger');
+                                    text.innerText = 'Import Stalled - Refresh Page';
+                                    return;
+                                }
+
                                 if (progressData.status === 'drafting' || progressData.progress === 100) {
                                     clearInterval(pollInterval);
                                     text.innerText = 'Import Complete!';

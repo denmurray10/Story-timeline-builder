@@ -40,6 +40,7 @@ class Book(models.Model):
     )
     import_progress = models.PositiveIntegerField(default=0)
     import_status_message = models.CharField(max_length=255, blank=True, default='')
+    last_import_update = models.DateTimeField(auto_now=True)
     started_date = models.DateField(null=True, blank=True)
     completed_date = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
