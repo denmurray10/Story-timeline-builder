@@ -158,7 +158,12 @@
     .main-content {
         min-height: calc(100vh - 56px);
         padding: 2.4rem 2.6rem 3rem;
+    }
 
+    .page-container {
+        max-width: 1100px;
+        margin: 0 auto;
+        width: 100%;
     }
 
     @media (max-width: 767px) {
@@ -466,37 +471,39 @@
                 </div>
                 {% endfor %} {% endif %}
 
-                {% if user.is_authenticated %}
-                <!-- Universal greeting header -->
-                <div class="d-flex justify-content-end align-items-center mb-3">
-                    <div class="dropdown">
-                        <a class="dropdown-toggle d-flex align-items-center fw-bold text-decoration-none" href="#"
-                            id="baseGreetingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"
-                            style="color: #000;">
-                            Hello, {{ user.first_name|default:user.username }}
-                            <i class="bi bi-chevron-down ms-2"></i>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="baseGreetingDropdown">
-                            <li>
-                                <a class="dropdown-item" href="{% url 'account' %}">
-                                    <i class="bi bi-gear"></i> Account
-                                </a>
-                            </li>
-                            <li>
-                                <hr class="dropdown-divider" />
-                            </li>
-                            <li>
-                                <form action="{% url 'logout' %}" method="post" style="display:inline;">
-                                    {% csrf_token %}
-                                    <button type="submit" class="dropdown-item">Logout</button>
-                                </form>
-                            </li>
-                        </ul>
+                <div class="page-container">
+                    {% if user.is_authenticated %}
+                    <!-- Universal greeting header -->
+                    <div class="d-flex justify-content-end align-items-center mb-3">
+                        <div class="dropdown">
+                            <a class="dropdown-toggle d-flex align-items-center fw-bold text-decoration-none" href="#"
+                                id="baseGreetingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"
+                                style="color: #000;">
+                                Hello, {{ user.first_name|default:user.username }}
+                                <i class="bi bi-chevron-down ms-2"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="baseGreetingDropdown">
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'account' %}">
+                                        <i class="bi bi-gear"></i> Account
+                                    </a>
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider" />
+                                </li>
+                                <li>
+                                    <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item">Logout</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
-                </div>
-                {% endif %}
+                    {% endif %}
 
-                {% block content %}{% endblock %}
+                    {% block content %}{% endblock %}
+                </div>
             </div>
         </div>
     </div>
