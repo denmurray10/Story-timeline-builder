@@ -80,7 +80,7 @@
         border-radius: 18px;
         background-color: #ffffff;
         box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
-        padding: 12px 14px;
+        padding: 16px 18px;
         margin-bottom: 12px;
     }
 
@@ -636,7 +636,7 @@
             {% if books %}
             {% for book in books|slice:":4" %}
             <div class="dash-book-mini">
-                <div class="d-flex align-items-center mb-1">
+                <div class="d-flex align-items-center mb-2">
                     {% if book.image %}
                     <img src="{{ book.image.url }}" alt="{{ book.title }} Cover"
                         style="height: 48px; width: 36px; object-fit: cover; margin-right: 12px; border-radius: 6px;">
@@ -651,8 +651,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="dash-muted mb-1">Chapters {{ book.chapter_count|default:"0" }}</div>
-                <div class="dash-progress-bg mb-1">
+                <div class="dash-muted mb-2">Chapters {{ book.chapter_count|default:"0" }}</div>
+                <div class="dash-progress-bg mb-2">
                     <div class="dash-progress-fill js-progress-bar" data-width="{{ book.progress_percentage }}%">
                     </div>
                 </div>

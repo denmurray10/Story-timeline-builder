@@ -53,8 +53,8 @@
 
                 <!-- Book Info (right) -->
                 <div class="col-7 d-flex flex-column">
-                    <div class="card-body py-2 px-3 flex-grow-1">
-                        <div class="d-flex justify-content-between align-items-start mb-1">
+                    <div class="card-body pt-3 pb-2 px-3 flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
                             <h6 class="card-title fw-bold mb-0 lh-sm">
                                 {% if book.status == 'importing' %}
                                 <span class="text-muted">{{ book.title }}</span>
@@ -64,8 +64,9 @@
                                 </a>
                                 {% endif %}
                             </h6>
-                            <span class="badge rounded-pill ms-2 flex-shrink-0 {% if book.status == 'importing' %}bg-info{% elif book.status == 'drafting' %}bg-warning text-dark{% elif book.status == 'complete' %}bg-success{% else %}bg-secondary{% endif %}"
-                                  style="font-size: 0.65rem;">
+                            <span
+                                class="badge rounded-pill ms-2 flex-shrink-0 {% if book.status == 'importing' %}bg-info{% elif book.status == 'drafting' %}bg-warning text-dark{% elif book.status == 'complete' %}bg-success{% else %}bg-secondary{% endif %}"
+                                style="font-size: 0.65rem;">
                                 {{ book.get_status_display }}
                             </span>
                         </div>
@@ -73,18 +74,19 @@
                         {% if book.series_order %}
                         <small class="text-muted" style="font-size: 0.7rem;">Book {{ book.series_order }}</small>
                         {% endif %}
-
                         {% if book.description %}
-                        <p class="card-text text-muted mt-1 mb-1" style="font-size: 1rem;">{{ book.description|truncatewords:15 }}</p>
+                        <p class="card-text text-muted mt-2 mb-2" style="font-size: 1rem;">
+                            {{ book.description|truncatewords:15 }}
+                        </p>
                         {% endif %}
 
-                        <div class="d-flex gap-3 text-muted mb-1" style="font-size: 0.7rem;">
+                        <div class="d-flex gap-3 text-muted mb-2" style="font-size: 0.7rem;">
                             <span><i class="bi bi-list-ol me-1"></i>{{ book.chapter_count }} ch</span>
                             <span><i class="bi bi-people me-1"></i>{{ book.character_count }} char</span>
                             <span><i class="bi bi-calendar-event me-1"></i>{{ book.event_count }} ev</span>
                         </div>
 
-                        <div class="progress rounded-pill mb-1" style="height: 5px;">
+                        <div class="progress rounded-pill mb-2" style="height: 5px;">
                             <div class="progress-bar js-progress-bar rounded-pill" role="progressbar"
                                 data-width="{{ book.progress_percentage }}%"
                                 aria-valuenow="{{ book.progress_percentage }}" aria-valuemin="0" aria-valuemax="100"
@@ -93,7 +95,8 @@
                         </div>
                         <div class="d-flex justify-content-between">
                             <small class="text-muted" style="font-size: 0.65rem;">
-                                {{ book.current_word_count|floatformat:0 }} / {{ book.word_count_target|floatformat:0 }} w
+                                {{ book.current_word_count|floatformat:0 }} / {{ book.word_count_target|floatformat:0 }}
+                                w
                             </small>
                             <small class="fw-semibold" style="font-size: 0.65rem; color: #667eea;">
                                 {{ book.progress_percentage|floatformat:0 }}%
