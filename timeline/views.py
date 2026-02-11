@@ -774,7 +774,7 @@ def extract_text_from_file(file):
         print(f"Error processing file: {e}")
     return text
 
-def _call_ai_json(prompt, system_message="You are a professional literary analyst. Always respond with valid JSON.", max_retries=3):
+def _call_ai_json(prompt, system_message="You are a professional literary analyst. Always respond with valid JSON.", max_retries=3, deepseek_model="deepseek-chat"):
     """Helper to call AI and return parsed JSON with retry logic."""
     if not settings.DEEPSEEK_API_KEY and not settings.GEMINI_API_KEY:
         return None
@@ -784,7 +784,7 @@ def _call_ai_json(prompt, system_message="You are a professional literary analys
             if settings.DEEPSEEK_API_KEY:
                 client = OpenAI(api_key=settings.DEEPSEEK_API_KEY, base_url="https://api.deepseek.com")
                 response = client.chat.completions.create(
-                    model="deepseek-chat",
+                    model=deepseek_model,
                     messages=[
                         {"role": "system", "content": system_message},
                         {"role": "user", "content": prompt},
@@ -837,7 +837,7 @@ def analyze_characters_with_ai(text):
     Text Content:
     {text}
     """
-    return _call_ai_json(prompt)
+    return _call_ai_json(prompt, deepseek_model="deepseek-reasoner")
 
 def analyze_book_content_batch_with_ai(text):
     """Analyze a batch of chapters to extract summaries and events."""
@@ -870,7 +870,7 @@ def analyze_book_content_batch_with_ai(text):
     Text Content:
     {text}
     """
-    return _call_ai_json(prompt)
+    return _call_ai_json(prompt, deepseek_model="deepseek-reasoner")
 
 def analyze_book_content_with_ai(text):
     """Legacy compatibility: calls the batch analyzer for a single block."""
