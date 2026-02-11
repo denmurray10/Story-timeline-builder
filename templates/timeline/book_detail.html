@@ -61,8 +61,9 @@ Timeline Builder{% endblock %} {% block content %}
                     </div>
 
                     <div class="progress progress-bar-custom mt-2">
-                        <div class="progress-bar" role="progressbar" style="width: {{ book.progress_percentage }}%"
-                            aria-valuenow="{{ book.progress_percentage }}" aria-valuemin="0" aria-valuemax="100">
+                        <div class="progress-bar js-progress-bar" role="progressbar"
+                            data-width="{{ book.progress_percentage }}%" aria-valuenow="{{ book.progress_percentage }}"
+                            aria-valuemin="0" aria-valuemax="100">
                             {{ book.current_word_count|floatformat:0 }} / {{ book.word_count_target|floatformat:0 }}
                             words ({{ book.progress_percentage|floatformat:1 }}%)
                         </div>
@@ -161,4 +162,15 @@ Timeline Builder{% endblock %} {% block content %}
         </div>
     </div>
 
+    {% endblock %}
+
+    {% block extra_js %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.js-progress-bar').forEach(bar => {
+                const width = bar.getAttribute('data-width');
+                if (width) bar.style.width = width;
+            });
+        });
+    </script>
     {% endblock %}

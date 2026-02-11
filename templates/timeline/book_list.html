@@ -38,8 +38,9 @@ Builder{% endblock %} {% block content %}
                     </small>
                 </div>
                 <div class="progress progress-bar-custom mb-3">
-                    <div class="progress-bar" role="progressbar" style="width: {{ book.progress_percentage }}%"
-                        aria-valuenow="{{ book.progress_percentage }}" aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress-bar js-progress-bar" role="progressbar"
+                        data-width="{{ book.progress_percentage }}%" aria-valuenow="{{ book.progress_percentage }}"
+                        aria-valuemin="0" aria-valuemax="100">
                         {{ book.progress_percentage|floatformat:1 }}%
                     </div>
                 </div>
@@ -72,4 +73,16 @@ Builder{% endblock %} {% block content %}
         </a>
     </div>
 </div>
-{% endif %} {% endblock %}
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.js-progress-bar').forEach(bar => {
+            const width = bar.getAttribute('data-width');
+            if (width) bar.style.width = width;
+        });
+    });
+</script>
+{% endblock %}
