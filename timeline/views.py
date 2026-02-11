@@ -111,7 +111,7 @@ def book_detail(request, pk):
 def book_create(request):
     """Create a new book."""
     if request.method == 'POST':
-        form = BookForm(request.POST)
+        form = BookForm(request.POST, request.FILES)
         if form.is_valid():
             book = form.save(commit=False)
             book.user = request.user
@@ -128,7 +128,7 @@ def book_edit(request, pk):
     """Edit an existing book."""
     book = get_object_or_404(Book, pk=pk, user=request.user)
     if request.method == 'POST':
-        form = BookForm(request.POST, instance=book)
+        form = BookForm(request.POST, request.FILES, instance=book)
         if form.is_valid():
             form.save()
             messages.success(request, f'Book "{book.title}" updated successfully!')

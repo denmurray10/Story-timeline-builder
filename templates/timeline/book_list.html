@@ -1,4 +1,4 @@
-{% extends 'timeline/base.html' %} {% block title %}Books - Story Timeline
+{% extends 'timeline/base.html' %} {% load static %} {% block title %}Books - Story Timeline
 Builder{% endblock %} {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1><i class="bi bi-book"></i> Books</h1>
@@ -12,12 +12,16 @@ Builder{% endblock %} {% block content %}
     {% for book in books %}
     <div class="col-md-6 col-lg-4 mb-4">
         <div class="card h-100">
+            {% if book.image %}
+            <img src="{{ book.image.url }}" class="card-img-top" alt="{{ book.title }} Cover"
+                style="height: 200px; object-fit: cover;">
+            {% else %}
+            <img src="{% static 'img/book-cover.png' %}" class="card-img-top" alt="No Cover"
+                style="height: 200px; object-fit: cover;">
+            {% endif %}
             <div class="card-body">
                 <h5 class="card-title">
-                    <a
-                        href="{% url 'book_detail' book.pk %}"
-                        class="text-decoration-none"
-                    >
+                    <a href="{% url 'book_detail' book.pk %}" class="text-decoration-none">
                         Book {{ book.series_order }}: {{ book.title }}
                     </a>
                 </h5>
@@ -29,18 +33,13 @@ Builder{% endblock %} {% block content %}
                 {% endif %}
                 <div class="mb-3">
                     <small class="text-muted">
-                        <i class="bi bi-list-ol"></i> {{ book.chapter_count }} chapters | <i class="bi bi-calendar-event"></i> {{ book.event_count }} events
+                        <i class="bi bi-list-ol"></i> {{ book.chapter_count }} chapters | <i
+                            class="bi bi-calendar-event"></i> {{ book.event_count }} events
                     </small>
                 </div>
                 <div class="progress progress-bar-custom mb-3">
-                    <div
-                        class="progress-bar"
-                        role="progressbar"
-                        style="width: {{ book.progress_percentage }}%"
-                        aria-valuenow="{{ book.progress_percentage }}"
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                    >
+                    <div class="progress-bar" role="progressbar" style="width: {{ book.progress_percentage }}%"
+                        aria-valuenow="{{ book.progress_percentage }}" aria-valuemin="0" aria-valuemax="100">
                         {{ book.progress_percentage|floatformat:1 }}%
                     </div>
                 </div>
@@ -49,16 +48,10 @@ Builder{% endblock %} {% block content %}
                 </small>
             </div>
             <div class="card-footer bg-transparent">
-                <a
-                    href="{% url 'book_detail' book.pk %}"
-                    class="btn btn-sm btn-outline-primary"
-                >
+                <a href="{% url 'book_detail' book.pk %}" class="btn btn-sm btn-outline-primary">
                     <i class="bi bi-eye"></i> View
                 </a>
-                <a
-                    href="{% url 'book_edit' book.pk %}"
-                    class="btn btn-sm btn-outline-secondary"
-                >
+                <a href="{% url 'book_edit' book.pk %}" class="btn btn-sm btn-outline-secondary">
                     <i class="bi bi-pencil"></i> Edit
                 </a>
             </div>

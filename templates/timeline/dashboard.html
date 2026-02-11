@@ -21,6 +21,7 @@
         background-color: #f4f1ee;
         border-right: none;
     }
+
     .sidebar .nav-link {
         border-radius: 999px;
     }
@@ -88,7 +89,7 @@
         font-size: 0.85rem;
     }
 
-    .dash-list li + li {
+    .dash-list li+li {
         margin-top: 6px;
     }
 
@@ -155,6 +156,11 @@
         box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.2);
     }
 
+    /* Draggable styles */
+    .draggable-zone {
+        min-height: 100px;
+    }
+
     .dash-ai-icon {
         width: 34px;
         height: 34px;
@@ -163,6 +169,30 @@
         display: flex;
         align-items: center;
         justify-content: center;
+    }
+
+    .draggable-card {
+        cursor: grab;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .draggable-card:active {
+        cursor: grabbing;
+    }
+
+    .sortable-ghost {
+        opacity: 0.4;
+        border: 2px dashed #6366f1 !important;
+    }
+
+    .drag-handle {
+        cursor: grab;
+        color: #d1d5db;
+        margin-right: 8px;
+    }
+
+    .draggable-card:hover .drag-handle {
+        color: #6366f1;
     }
 
     @media (max-width: 991px) {
@@ -181,12 +211,8 @@
         <div></div>
         <div class="dash-hello ms-auto">
             <div class="dropdown">
-                <a class="dropdown-toggle d-flex align-items-center fw-bold"
-                   href="#"
-                   id="dashboardUserDropdown"
-                   role="button"
-                   data-bs-toggle="dropdown"
-                   aria-expanded="false">
+                <a class="dropdown-toggle d-flex align-items-center fw-bold" href="#" id="dashboardUserDropdown"
+                    role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     Hello, {{ user.first_name|default:user.username }}
                     <i class="bi bi-chevron-down ms-2"></i>
                 </a>
@@ -196,7 +222,9 @@
                             <i class="bi bi-gear"></i> Account
                         </a>
                     </li>
-                    <li><hr class="dropdown-divider" /></li>
+                    <li>
+                        <hr class="dropdown-divider" />
+                    </li>
                     <li>
                         <form action="{% url 'logout' %}" method="post" style="display:inline;">
                             {% csrf_token %}
@@ -209,17 +237,25 @@
     </div>
 
     <!-- Page title -->
-    <h2 class="mb-3">Dashboard</h2>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">Dashboard</h2>
+        <button id="reset-layout" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-arrow-counterclockwise"></i> Reset Layout
+        </button>
+    </div>
 
     <!-- MAIN 3-COLUMN AREA: left / middle / right -->
     <div class="row g-3 mb-3">
 
-        <!-- LEFT COLUMN (stack: Today’s Focus, Stats, World at a Glance) -->
-        <div class="col-lg-6 d-flex flex-column gap-3">
+        <!-- LEFT COLUMN -->
+        <div class="col-lg-6 draggable-zone" id="col-left">
 
             <!-- Today’s Focus -->
-            <div class="dash-card dash-pill-card p-3">
-                <div class="dash-card-header">Today’s Focus</div>
+            <div class="dash-card dash-pill-card p-3 draggable-card mb-3" id="card-focus">
+                <div class="dash-card-header d-flex align-items-center">
+                    <i class="bi bi-grip-vertical drag-handle"></i>
+                    Today’s Focus
+                </div>
                 <p class="dash-card-sub mb-2">
                     1–3 suggested tasks pulled from unwritten events or empty chapters.
                 </p>
@@ -231,7 +267,11 @@
             </div>
 
             <!-- Stats strip -->
-            <div class="dash-card dash-pill-card p-3">
+            <div class="dash-card dash-pill-card p-3 draggable-card mb-3" id="card-stats">
+                <div class="dash-card-header d-flex align-items-center">
+                    <i class="bi bi-grip-vertical drag-handle"></i>
+                    Stats
+                </div>
                 <div class="row text-center">
                     <div class="col-3">
                         <div class="dash-stat-icon">
@@ -259,14 +299,17 @@
                             <i class="bi bi-journal-text"></i>
                         </div>
                         <div class="dash-stat-value">{{ events_written }}</div>
-                        <div class="dash-stat-label">Chapters (written)</div>
+                        <div class="dash-stat-label">Chapters</div>
                     </div>
                 </div>
             </div>
 
             <!-- World at a Glance -->
-            <div class="dash-card dash-pill-card p-3">
-                <div class="dash-card-header mb-2">World at a Glance</div>
+            <div class="dash-card dash-pill-card p-3 draggable-card mb-3" id="card-world-glance">
+                <div class="dash-card-header d-flex align-items-center mb-2">
+                    <i class="bi bi-grip-vertical drag-handle"></i>
+                    World at a Glance
+                </div>
                 <div class="row g-3">
                     <div class="col-md-6">
                         <div class="p-3" style="background-color:#f5f5f5; border-radius:14px;">
@@ -282,8 +325,7 @@
                         <div class="p-3" style="background-color:#f5f5f5; border-radius:14px;">
                             <div class="dash-card-header mb-1" style="font-size:0.9rem;">Gaps &amp; Opportunities</div>
                             <div class="dash-muted">
-                                Use the timeline to spot chapters with no scenes,
-                                and characters who haven’t appeared recently.
+                                Use the timeline to spot chapters with no scenes...
                             </div>
                         </div>
                     </div>
@@ -292,132 +334,166 @@
 
         </div>
 
-        <!-- MIDDLE COLUMN (stack: Recent Activity, Quick Actions) -->
-        <div class="col-lg-3 d-flex flex-column gap-3">
+        <!-- MIDDLE COLUMN -->
+        <div class="col-lg-3 draggable-zone" id="col-middle">
 
             <!-- Recent Activity -->
-            <div class="dash-card p-3">
-                <div class="dash-card-header">Recent Activity</div>
+            <div class="dash-card p-3 draggable-card mb-3" id="card-recent">
+                <div class="dash-card-header d-flex align-items-center">
+                    <i class="bi bi-grip-vertical drag-handle"></i>
+                    Recent Activity
+                </div>
                 <ul class="dash-list">
-                    <li>
-                        <strong>Added new character: Aria</strong>
-                        <span class="dash-muted">· 5 minutes ago</span>
-                    </li>
-                    <li>
-                        <strong>Updated event: Battle of Dawn</strong>
-                        <span class="dash-muted">· 2 hours ago</span>
-                    </li>
-                    <li>
-                        <strong>Created timeline: Book II</strong>
-                        <span class="dash-muted">· 1 day ago</span>
-                    </li>
-                    <li>
-                        <strong>Edited tag: Prophecy</strong>
-                        <span class="dash-muted">· 3 days ago</span>
-                    </li>
-                    <li>
-                        <strong>Commented on event: The Great Escape</strong>
-                        <span class="dash-muted">· 5 days ago</span>
-                    </li>
-                    <li>
-                        <strong>Deleted character: Old King</strong>
-                        <span class="dash-muted">· 1 week ago</span>
-                    </li>
-                    <li>
-                        <strong>Added tag: Magic System</strong>
-                        <span class="dash-muted">· 2 weeks ago</span>
-                    </li>
-                    <li>
-                        <strong>Restored timeline: Book I</strong>
-                        <span class="dash-muted">· 3 weeks ago</span>
-                    </li>
+                    <li><strong>Added character: Aria</strong> <span class="dash-muted">· 5m</span></li>
+                    <li><strong>Updated: Battle of Dawn</strong> <span class="dash-muted">· 2h</span></li>
+                    <li><strong>Created timeline: Book II</strong> <span class="dash-muted">· 1d</span></li>
+                    <li><strong>Edited tag: Prophecy</strong> <span class="dash-muted">· 3d</span></li>
+                    <li><strong>Deleted character: Old King</strong> <span class="dash-muted">· 1w</span></li>
                 </ul>
             </div>
 
             <!-- Quick Actions -->
-            <div class="dash-card p-3">
-                <div class="dash-card-header mb-2">Quick Actions</div>
+            <div class="dash-card p-3 draggable-card mb-3" id="card-quick-actions">
+                <div class="dash-card-header d-flex align-items-center mb-2">
+                    <i class="bi bi-grip-vertical drag-handle"></i>
+                    Quick Actions
+                </div>
                 <div class="d-grid gap-2">
-                    <a href="{% url 'event_create' %}" class="btn btn-light dash-quick-btn">
-                        New Event
-                    </a>
-                    <a href="{% url 'character_create' %}" class="btn btn-light dash-quick-btn">
-                        New Character
-                    </a>
-                    <a href="{% url 'book_create' %}" class="btn btn-light dash-quick-btn">
-                        New Book
-                    </a>
-                    <a href="{% url 'timeline_view' %}" class="btn btn-light dash-quick-btn">
-                        View Timeline
-                    </a>
+                    <a href="{% url 'event_create' %}" class="btn btn-light dash-quick-btn">New Event</a>
+                    <a href="{% url 'character_create' %}" class="btn btn-light dash-quick-btn">New Character</a>
+                    <a href="{% url 'book_create' %}" class="btn btn-light dash-quick-btn">New Book</a>
                 </div>
             </div>
 
         </div>
 
-        <!-- RIGHT COLUMN (stack: Your Books) -->
-        <div class="col-lg-3 d-flex flex-column gap-3">
-            {% if books %}
+        <!-- RIGHT COLUMN -->
+        <div class="col-lg-3 draggable-zone" id="col-right">
+            <div class="draggable-card mb-3" id="card-books">
+                <div class="dash-card-header d-flex align-items-center mb-2">
+                    <i class="bi bi-grip-vertical drag-handle"></i>
+                    Your Books
+                </div>
+                {% if books %}
                 {% for book in books|slice:":4" %}
-                    <div class="dash-book-mini">
-                        <div class="d-flex align-items-center mb-1">
-                            <img src="{% static 'img/book-cover.png' %}"
-                                 alt="Book Cover"
-                                 style="height: 48px; width: auto; margin-right: 12px; border-radius: 6px;">
-                            <div class="flex-grow-1">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="dash-book-title">
-                                        Book {{ book.series_order }}: {{ book.title }}
-                                    </div>
-                                    <span class="dash-status-pill">
-                                        {{ book.status|default:"Drafting" }}
-                                    </span>
-                                </div>
+                <div class="dash-book-mini">
+                    <div class="d-flex align-items-center mb-1">
+                        {% if book.image %}
+                        <img src="{{ book.image.url }}" alt="{{ book.title }} Cover"
+                            style="height: 48px; width: 36px; object-fit: cover; margin-right: 12px; border-radius: 6px;">
+                        {% else %}
+                        <img src="{% static 'img/book-cover.png' %}" alt="No Cover"
+                            style="height: 48px; width: 36px; object-fit: cover; margin-right: 12px; border-radius: 6px;">
+                        {% endif %}
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="dash-book-title">Book {{ book.series_order }}: {{ book.title }}</div>
+                                <span class="dash-status-pill">{{ book.status|default:"Drafting" }}</span>
                             </div>
                         </div>
-                        <div class="dash-muted mb-1">
-                            Chapters {{ book.chapter_count|default:"0" }}
-                        </div>
-                        <div class="dash-progress-bg mb-1">
-                            <div class="dash-progress-fill" style="width: {{ book.progress_percentage }}%;"></div>
-                        </div>
-                        <div class="dash-muted">
-                            Word Count: {{ book.current_word_count|floatformat:0 }}/{{ book.word_count_target|floatformat:0 }}
+                    </div>
+                    <div class="dash-muted mb-1">Chapters {{ book.chapter_count|default:"0" }}</div>
+                    <div class="dash-progress-bg mb-1">
+                        <div class="dash-progress-fill js-progress-bar" data-width="{{ book.progress_percentage }}%">
                         </div>
                     </div>
-                {% endfor %}
-            {% else %}
-                <div class="dash-card p-3">
-                    <div class="dash-card-header">Your Books</div>
-                    <p class="dash-muted mb-2">
-                        You haven’t created any books yet.
-                    </p>
-                    <a href="{% url 'book_create' %}" class="btn btn-dark btn-sm w-100">
-                        New Book
-                    </a>
                 </div>
-            {% endif %}
+                {% endfor %}
+                {% else %}
+                <div class="dash-card p-3">
+                    <p class="dash-muted mb-2">No books yet.</p>
+                    <a href="{% url 'book_create' %}" class="btn btn-dark btn-sm w-100">New Book</a>
+                </div>
+                {% endif %}
+            </div>
         </div>
 
     </div>
 
-    <!-- AI Support (full width) -->
+    <!-- AI Support -->
     <div class="row g-3 mb-3">
-        <div class="col-12">
-            <div class="dash-card dash-pill-card p-3">
-                <div class="dash-card-header mb-1">AI Support</div>
-                <p class="dash-muted mb-3">
-                    Let me know how I can help you with your story today.
-                </p>
+        <div class="col-12 draggable-zone" id="col-bottom">
+            <div class="dash-card dash-pill-card p-3 draggable-card" id="card-ai">
+                <div class="dash-card-header d-flex align-items-center mb-1">
+                    <i class="bi bi-grip-vertical drag-handle"></i>
+                    AI Support
+                </div>
+                <p class="dash-muted mb-3">How can I help you with your story today?</p>
                 <div class="d-flex align-items-center gap-2">
                     <input type="text" class="dash-ai-input" placeholder="I need help with…">
-                    <div class="dash-ai-icon">
-                        <i class="bi bi-chat-dots"></i>
-                    </div>
+                    <div class="dash-ai-icon"><i class="bi bi-chat-dots"></i></div>
                 </div>
             </div>
         </div>
     </div>
 
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialize Progress Bars
+        document.querySelectorAll('.js-progress-bar').forEach(bar => {
+            const width = bar.getAttribute('data-width');
+            if (width) bar.style.width = width;
+        });
+
+        const columns = ['col-left', 'col-middle', 'col-right', 'col-bottom'];
+        const sortables = [];
+
+        // Function to save the order to localStorage
+        function saveLayout() {
+            const layout = {};
+            columns.forEach(colId => {
+                const col = document.getElementById(colId);
+                layout[colId] = Array.from(col.children).map(child => child.id);
+            });
+            localStorage.setItem('dashboard-layout', JSON.stringify(layout));
+        }
+
+        // Function to load and apply the saved order
+        function loadLayout() {
+            const savedLayout = localStorage.getItem('dashboard-layout');
+            if (savedLayout) {
+                const layout = JSON.parse(savedLayout);
+                Object.keys(layout).forEach(colId => {
+                    const col = document.getElementById(colId);
+                    if (col) {
+                        layout[colId].forEach(cardId => {
+                            const card = document.getElementById(cardId);
+                            if (card) col.appendChild(card);
+                        });
+                    }
+                });
+            }
+        }
+
+        // Initialize Sortable for each column
+        columns.forEach(colId => {
+            const el = document.getElementById(colId);
+            if (el) {
+                sortables.push(new Sortable(el, {
+                    group: 'dashboard',
+                    animation: 250,
+                    ghostClass: 'sortable-ghost',
+                    handle: '.drag-handle',
+                    onEnd: saveLayout
+                }));
+            }
+        });
+
+        // Load existing layout
+        loadLayout();
+
+        // Reset functionality
+        document.getElementById('reset-layout').addEventListener('click', () => {
+            if (confirm('Are you sure you want to reset your dashboard layout?')) {
+                localStorage.removeItem('dashboard-layout');
+                window.location.reload();
+            }
+        });
+    });
+</script>
 {% endblock %}
