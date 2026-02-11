@@ -1,558 +1,526 @@
 {% load static %}
 
-        <!-- Bootstrap CSS & Icons -->
-        <link
-            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-            rel="stylesheet"
-            integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
-            crossorigin="anonymous"
-        />
-        <link
-            rel="stylesheet"
-            href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
-        />
-
-        <link rel="stylesheet" href="{% static 'css/main.css' %}">
-
-        <style>
-            /* Novelcrafter-inspired pastel light theme */
-
-            :root {
-                /* Backgrounds */
-                --bg-body: #f5f7fb; /* soft off-white */
-                --bg-surface: #ffffff; /* cards, panels */
-                --bg-sidebar: #fbfcff; /* sidebar panel */
-                --bg-input: #ffffff;
-
-                /* Primary accent (blurple) */
-                --accent: #6366f1; /* indigo-500/600 */
-                --accent-soft: #eef2ff; /* very light indigo */
-
-                /* Supporting pastels */
-                --pastel-blue: #e0f2fe; /* light blue */
-                --pastel-green: #dcfce7; /* light green */
-                --pastel-amber: #fef3c7; /* light amber */
-                --pastel-red: #fee2e2; /* light red */
-
-                /* Text */
-                --text-heading: #0f172a; /* slate-900 */
-                --text-body: #334155; /* slate-700 */
-                --text-muted: #64748b; /* slate-500 */
-                --text-subtle: #94a3b8; /* slate-400 */
-
-                /* Borders & shadows */
-                --border-color: #e2e8f0;
-                --border-strong: #cbd5e1;
-                --radius: 10px;
-                --radius-sm: 7px;
-                --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
-                --shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
-
-                /* Status colors */
-                --success: #16a34a;
-                --warning: #f59e0b;
-                --danger: #ef4444;
-            }
-
-            body {
-                font-family:
-                    "Inter",
-                    system-ui,
-                    -apple-system,
-                    BlinkMacSystemFont,
-                    "Segoe UI",
-                    sans-serif;
-                background-color: #f4f1ee;
-                color: var(--text-body);
-                -webkit-font-smoothing: antialiased;
-            }
-
-            /* TYPOGRAPHY */
-
-            h1,
-            h2,
-            h3,
-            h4,
-            h5,
-            h6 {
-                font-family:
-                    "DM Sans",
-                    system-ui,
-                    -apple-system,
-                    sans-serif;
-                color: var(--text-heading);
-                letter-spacing: -0.02em;
-            }
-
-            h1 {
-                font-size: 1.9rem;
-                font-weight: 700;
-            }
-
-            h4 {
-                font-size: 1.2rem;
-                font-weight: 600;
-            }
-
-            .text-muted {
-                color: var(--text-muted) !important;
-            }
-
-            /* NAVBAR */
-
-            .navbar {
-                background-color: var(--bg-surface) !important;
-                border-bottom: 1px solid var(--border-color);
-                box-shadow: var(--shadow-sm);
-                padding-block: 0.7rem;
-            }
-
-            .navbar-brand {
-                font-family: "DM Sans", system-ui, sans-serif;
-                font-weight: 700;
-                font-size: 1.35rem;
-                letter-spacing: -0.03em;
-                color: var(--text-heading) !important;
-            }
-
-            .navbar-brand i {
-                color: var(--accent);
-                margin-right: 6px;
-            }
-
-            .dashboard-wrapper {
-                margin-top: 40px!important;
-            }
-
-            .dropdown-toggle {
-                color: black !important;
-            }
-
-            .navbar-dark .navbar-nav .nav-link {
-                color: var(--text-muted);
-                font-weight: 500;
-                font-size: 0.95rem;
-            }
-
-            /* LAYOUT */
-
-            .container-fluid {
-                padding-top: 10px;
-            }
-
-            .sidebar {
-                background-color: var(--bg-sidebar);
-                border-right: 1px solid var(--border-color);
-                min-height: calc(100vh - 56px);
-                padding-top: 1.4rem;
-                padding-left: 50px;
-                padding-right: 20px;
-            
-            }
-
-            .main-content {
-                min-height: calc(100vh - 56px);
-                padding: 2.4rem 2.6rem 3rem;
-                
-            }
-
-            @media (max-width: 767px) {
-                .main-content {
-                    padding: 1.5rem 1.2rem 2rem;
-                
-                }
-            }
-
-            /* SIDEBAR NAV */
-
-            .sidebar .nav-link {
-                color: var(--text-muted);
-                padding: 0.55rem 1.4rem;
-                margin: 0.15rem 0.9rem;
-                border-radius: 999px;
-                font-size: 0.92rem;
-                font-weight: 500;
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-            }
-
-            .sidebar .nav-link i {
-                font-size: 1rem;
-            }
-
-            .sidebar .nav-link.active {
-                background-color: #fff;
-                color: #000;
-            }
-
-            /* CARDS & PANELS */
-
-            .card {
-                background-color: var(--bg-surface);
-                border-radius: var(--radius);
-                border: 1px solid var(--border-color);
-                box-shadow: var(--shadow-sm);
-                margin-bottom: 1.5rem;
-            }
-
-            .card-header {
-                background: linear-gradient(to right, #f9fafb, #eef2ff);
-                border-bottom: 1px solid var(--border-color);
-                border-top-left-radius: var(--radius);
-                border-top-right-radius: var(--radius);
-                padding: 0.9rem 1.4rem;
-                font-weight: 600;
-                color: var(--text-heading);
-            }
-
-            .card-body {
-                padding: 1.3rem 1.4rem 1.4rem;
-            }
-
-            .card-footer {
-                background-color: #f8fafc;
-                border-top: 1px solid var(--border-color);
-                padding: 0.75rem 1.4rem;
-            }
-
-            /* DASHBOARD STAT CARDS */
-
-            .stats-card {
-                border-top: 3px solid var(--accent);
-            }
-
-            .stats-card i {
-                color: var(--accent);
-                background-color: var(--accent-soft);
-                padding: 10px;
-                border-radius: 12px;
-            }
-
-            /* BUTTONS */
-
-            .btn {
-                border-radius: var(--radius-sm);
-                font-weight: 500;
-                font-size: 0.95rem;
-                padding: 0.45rem 0.95rem;
-                box-shadow: var(--shadow-sm);
-            }
-
-            .btn-primary {
-                background: linear-gradient(135deg, var(--accent), #818cf8);
-                border-color: var(--accent);
-                color: #ffffff;
-            }
-
-            .btn-secondary {
-                background-color: #ffffff;
-                border-color: var(--border-color);
-                color: var(--text-body);
-            }
-
-            .btn-outline-secondary {
-                border-color: var(--border-color);
-                color: var(--text-muted);
-                background: transparent;
-                box-shadow: none;
-            }
-
-            .btn-danger {
-                background-color: var(--pastel-red);
-                border-color: #fecaca;
-                color: #b91c1c;
-                box-shadow: none;
-            }
-
-            /* FORMS */
-
-            .form-control,
-            .form-select {
-                background-color: var(--bg-input);
-                border: 1px solid var(--border-color);
-                border-radius: var(--radius-sm);
-                color: var(--text-body);
-                font-size: 0.94rem;
-                padding: 0.55rem 0.75rem;
-            }
-
-            .form-control:focus,
-            .form-select:focus {
-                border-color: var(--accent);
-                box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18);
-                background-color: #ffffff;
-                color: var(--text-heading);
-            }
-
-            .form-check-input {
-                border-color: var(--border-color);
-            }
-
-            .form-check-input:checked {
-                background-color: var(--accent);
-                border-color: var(--accent);
-            }
-
-            /* BADGES & TAGS */
-
-            .badge {
-                border-radius: 999px;
-                font-weight: 600;
-                padding-inline: 0.7em;
-            }
-
-            .bg-secondary {
-                background-color: #eef2ff !important;
-                color: var(--accent);
-            }
-
-            .bg-success {
-                background-color: var(--pastel-green) !important;
-                color: #166534;
-            }
-
-            .bg-warning {
-                background-color: var(--pastel-amber) !important;
-                color: #92400e;
-            }
-
-            .character-badge {
-                background-color: var(--pastel-blue);
-                color: var(--text-heading);
-                font-weight: 600;
-            }
-
-            .tag-badge {
-                background-color: #ffffff;
-                border: 1px solid var(--border-color);
-                color: var(--text-muted);
-            }
-
-            /* PROGRESS BARS */
-
-            .progress {
-                background-color: #e5e7eb;
-                border-radius: 999px;
-                height: 8px;
-                overflow: hidden;
-            }
-
-            .progress-bar-custom {
-                height: 1.2rem;
-                border-radius: 999px;
-                background-color: #f1f5f9;
-            }
-
-            .progress-bar {
-                background: linear-gradient(90deg, var(--accent), #818cf8);
-            }
-
-            /* EVENT CARDS */
-
-            .event-card {
-                border-left: 4px solid var(--accent);
-                border-radius: var(--radius);
-            }
-
-            /* ALERTS / MESSAGES */
-
-            .alert {
-                border-radius: var(--radius-sm);
-                border-color: var(--border-color);
-            }
-
-            .alert-success {
-                background-color: var(--pastel-green);
-                color: #166534;
-                border-color: #bbf7d0;
-            }
-
-            .alert-danger {
-                background-color: var(--pastel-red);
-                color: #991b1b;
-                border-color: #fecaca;
-            }
-
-            /* FOOTER */
-
-            .footer {
-                background-color: #ffffff;
-                border-top: 1px solid var(--border-color);
-                color: var(--text-subtle);
-            }
-        </style>
-
-        {% block extra_css %}{% endblock %}
-    </head>
-    <body>
-        <nav class="navbar navbar-expand-lg navbar-dark">
-            <div class="container-fluid">
-                <a class="navbar-brand d-flex align-items-center" href="{% url 'timeline_home' %}">
-                    <img src="{% static 'img/logo.png' %}" alt="Story Timeline Builder Logo" style="height: 200px; width: auto; margin-right: 10px;">    
-                </a>
-                <button
-                    class="navbar-toggler"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#navbarNav"
-                    aria-controls="navbarNav"
-                    aria-expanded="false"
-                    aria-label="Toggle navigation"
-                >
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">
-                        {% if user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'dashboard' %}">
-                                <i class="bi bi-speedometer2"></i> Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a
-                                class="nav-link dropdown-toggle"
-                                href="#"
-                                id="userDropdown"
-                                role="button"
-                                data-bs-toggle="dropdown"
-                                aria-expanded="false"
-                                style="color: #000 !important;"
-                            >
-                                <i class="bi bi-person-circle"></i> Hello, {{ user.first_name }} <i class="bi bi-caret-down-fill"></i>
-                            </a>
-                            <ul
-                                class="dropdown-menu dropdown-menu-end"
-                                aria-labelledby="userDropdown"
-                            >
-                                <li>
-                                    <a
-                                        class="dropdown-item"
-                                        href="{% url 'dashboard' %}"
-                                        >Dashboard</a
-                                    >
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'account' %}">
-                                        <i class="bi bi-gear"></i> Account
-                                    </a>
-                                </li>
-                                <li><hr class="dropdown-divider" /></li>
-                                <li>
-                                    <form action="{% url 'logout' %}" method="post" style="display:inline;">
-                                        {% csrf_token %}
-                                        <button type="submit" class="dropdown-item">Logout</button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </li>
-                        {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'login' %}"
-                                >Login</a
-                            >
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'register' %}"
-                                >Register</a
-                            >
-                        </li>
-                        {% endif %}
-                    </ul>
-                </div>
-            </div>
-        </nav>
-
+<!-- Bootstrap CSS & Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+
+<link rel="stylesheet" href="{% static 'css/main.css' %}">
+
+<style>
+    /* Novelcrafter-inspired pastel light theme */
+
+    :root {
+        /* Backgrounds */
+        --bg-body: #f5f7fb;
+        /* soft off-white */
+        --bg-surface: #ffffff;
+        /* cards, panels */
+        --bg-sidebar: #fbfcff;
+        /* sidebar panel */
+        --bg-input: #ffffff;
+
+        /* Primary accent (blurple) */
+        --accent: #6366f1;
+        /* indigo-500/600 */
+        --accent-soft: #eef2ff;
+        /* very light indigo */
+
+        /* Supporting pastels */
+        --pastel-blue: #e0f2fe;
+        /* light blue */
+        --pastel-green: #dcfce7;
+        /* light green */
+        --pastel-amber: #fef3c7;
+        /* light amber */
+        --pastel-red: #fee2e2;
+        /* light red */
+
+        /* Text */
+        --text-heading: #0f172a;
+        /* slate-900 */
+        --text-body: #334155;
+        /* slate-700 */
+        --text-muted: #64748b;
+        /* slate-500 */
+        --text-subtle: #94a3b8;
+        /* slate-400 */
+
+        /* Borders & shadows */
+        --border-color: #e2e8f0;
+        --border-strong: #cbd5e1;
+        --radius: 10px;
+        --radius-sm: 7px;
+        --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
+        --shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+
+        /* Status colors */
+        --success: #16a34a;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+    }
+
+    body {
+        font-family:
+            "Inter",
+            system-ui,
+            -apple-system,
+            BlinkMacSystemFont,
+            "Segoe UI",
+            sans-serif;
+        background-color: #f4f1ee;
+        color: var(--text-body);
+        -webkit-font-smoothing: antialiased;
+    }
+
+    /* TYPOGRAPHY */
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        font-family:
+            "DM Sans",
+            system-ui,
+            -apple-system,
+            sans-serif;
+        color: var(--text-heading);
+        letter-spacing: -0.02em;
+    }
+
+    h1 {
+        font-size: 1.9rem;
+        font-weight: 700;
+    }
+
+    h4 {
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+
+    .text-muted {
+        color: var(--text-muted) !important;
+    }
+
+    /* NAVBAR */
+
+    .navbar {
+        background-color: var(--bg-surface) !important;
+        border-bottom: 1px solid var(--border-color);
+        box-shadow: var(--shadow-sm);
+        padding-block: 0.7rem;
+    }
+
+    .navbar-brand {
+        font-family: "DM Sans", system-ui, sans-serif;
+        font-weight: 700;
+        font-size: 1.35rem;
+        letter-spacing: -0.03em;
+        color: var(--text-heading) !important;
+    }
+
+    .navbar-brand i {
+        color: var(--accent);
+        margin-right: 6px;
+    }
+
+    .dashboard-wrapper {
+        margin-top: 40px !important;
+    }
+
+    .dropdown-toggle {
+        color: black !important;
+    }
+
+    .navbar-dark .navbar-nav .nav-link {
+        color: var(--text-muted);
+        font-weight: 500;
+        font-size: 0.95rem;
+    }
+
+    /* LAYOUT */
+
+    .container-fluid {
+        padding-top: 10px;
+    }
+
+    .sidebar {
+        background-color: #f4f1ee;
+        border-right: none;
+        min-height: calc(100vh - 56px);
+        padding-top: 1.4rem;
+        padding-left: 50px;
+        padding-right: 20px;
+    }
+
+    .main-content {
+        min-height: calc(100vh - 56px);
+        padding: 2.4rem 2.6rem 3rem;
+
+    }
+
+    @media (max-width: 767px) {
+        .main-content {
+            padding: 1.5rem 1.2rem 2rem;
+
+        }
+    }
+
+    /* SIDEBAR NAV */
+
+    .sidebar .nav-link {
+        color: var(--text-muted);
+        padding: 0.55rem 1.4rem;
+        margin: 0.15rem 0.9rem;
+        border-radius: 999px;
+        font-size: 0.92rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .sidebar .nav-link i {
+        font-size: 1rem;
+    }
+
+    .sidebar .nav-link.active {
+        background-color: #fff;
+        color: #000;
+    }
+
+    /* CARDS & PANELS */
+
+    .card {
+        background-color: var(--bg-surface);
+        border-radius: var(--radius);
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 1.5rem;
+    }
+
+    .card-header {
+        background: linear-gradient(to right, #f9fafb, #eef2ff);
+        border-bottom: 1px solid var(--border-color);
+        border-top-left-radius: var(--radius);
+        border-top-right-radius: var(--radius);
+        padding: 0.9rem 1.4rem;
+        font-weight: 600;
+        color: var(--text-heading);
+    }
+
+    .card-body {
+        padding: 1.3rem 1.4rem 1.4rem;
+    }
+
+    .card-footer {
+        background-color: #f8fafc;
+        border-top: 1px solid var(--border-color);
+        padding: 0.75rem 1.4rem;
+    }
+
+    /* DASHBOARD STAT CARDS */
+
+    .stats-card {
+        border-top: 3px solid var(--accent);
+    }
+
+    .stats-card i {
+        color: var(--accent);
+        background-color: var(--accent-soft);
+        padding: 10px;
+        border-radius: 12px;
+    }
+
+    /* BUTTONS */
+
+    .btn {
+        border-radius: var(--radius-sm);
+        font-weight: 500;
+        font-size: 0.95rem;
+        padding: 0.45rem 0.95rem;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--accent), #818cf8);
+        border-color: var(--accent);
+        color: #ffffff;
+    }
+
+    .btn-secondary {
+        background-color: #ffffff;
+        border-color: var(--border-color);
+        color: var(--text-body);
+    }
+
+    .btn-outline-secondary {
+        border-color: var(--border-color);
+        color: var(--text-muted);
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .btn-danger {
+        background-color: var(--pastel-red);
+        border-color: #fecaca;
+        color: #b91c1c;
+        box-shadow: none;
+    }
+
+    /* FORMS */
+
+    .form-control,
+    .form-select {
+        background-color: var(--bg-input);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        color: var(--text-body);
+        font-size: 0.94rem;
+        padding: 0.55rem 0.75rem;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18);
+        background-color: #ffffff;
+        color: var(--text-heading);
+    }
+
+    .form-check-input {
+        border-color: var(--border-color);
+    }
+
+    .form-check-input:checked {
+        background-color: var(--accent);
+        border-color: var(--accent);
+    }
+
+    /* BADGES & TAGS */
+
+    .badge {
+        border-radius: 999px;
+        font-weight: 600;
+        padding-inline: 0.7em;
+    }
+
+    .bg-secondary {
+        background-color: #eef2ff !important;
+        color: var(--accent);
+    }
+
+    .bg-success {
+        background-color: var(--pastel-green) !important;
+        color: #166534;
+    }
+
+    .bg-warning {
+        background-color: var(--pastel-amber) !important;
+        color: #92400e;
+    }
+
+    .character-badge {
+        background-color: var(--pastel-blue);
+        color: var(--text-heading);
+        font-weight: 600;
+    }
+
+    .tag-badge {
+        background-color: #ffffff;
+        border: 1px solid var(--border-color);
+        color: var(--text-muted);
+    }
+
+    /* PROGRESS BARS */
+
+    .progress {
+        background-color: #e5e7eb;
+        border-radius: 999px;
+        height: 8px;
+        overflow: hidden;
+    }
+
+    .progress-bar-custom {
+        height: 1.2rem;
+        border-radius: 999px;
+        background-color: #f1f5f9;
+    }
+
+    .progress-bar {
+        background: linear-gradient(90deg, var(--accent), #818cf8);
+    }
+
+    /* EVENT CARDS */
+
+    .event-card {
+        border-left: 4px solid var(--accent);
+        border-radius: var(--radius);
+    }
+
+    /* ALERTS / MESSAGES */
+
+    .alert {
+        border-radius: var(--radius-sm);
+        border-color: var(--border-color);
+    }
+
+    .alert-success {
+        background-color: var(--pastel-green);
+        color: #166534;
+        border-color: #bbf7d0;
+    }
+
+    .alert-danger {
+        background-color: var(--pastel-red);
+        color: #991b1b;
+        border-color: #fecaca;
+    }
+
+    /* FOOTER */
+
+    .footer {
+        background-color: #ffffff;
+        border-top: 1px solid var(--border-color);
+        color: var(--text-subtle);
+    }
+</style>
+
+{% block extra_css %}{% endblock %}
+</head>
+
+<body>
+    {% if not user.is_authenticated %}
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container-fluid">
-            <div class="row">
+            <a class="navbar-brand d-flex align-items-center" href="{% url 'timeline_home' %}">
+                <img src="{% static 'img/logo.png' %}" alt="Story Timeline Builder Logo"
+                    style="height: 200px; width: auto; margin-right: 10px;">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'register' %}">Register</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+
+    <div class="container-fluid">
+        <div class="row">
+            {% if user.is_authenticated %}
+            <div class="col-md-2 d-none d-md-block sidebar">
+                <div class="sidebar-logo text-center my-4">
+                    <img src="{% static 'img/logo.png' %}" alt="Story Timeline Builder Logo"
+                        style="height: 200px; width: auto; margin-bottom: -30px; margin-left: -60px; margin-top: -70px;">
+                </div>
+                <nav class="nav flex-column">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
+                        href="{% url 'dashboard' %}">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                    <a class="nav-link {% if 'timeline' in request.resolver_match.url_name %}active{% endif %}"
+                        href="{% url 'timeline_view' %}">
+                        <i class="bi bi-clock-history"></i> Timeline
+                    </a>
+                    <a class="nav-link {% if 'book' in request.resolver_match.url_name %}active{% endif %}"
+                        href="{% url 'book_list' %}">
+                        <i class="bi bi-book"></i> Books
+                    </a>
+                    <a class="nav-link {% if 'character' in request.resolver_match.url_name %}active{% endif %}"
+                        href="{% url 'character_list' %}">
+                        <i class="bi bi-people"></i> Characters
+                    </a>
+                    <a class="nav-link {% if 'tag' in request.resolver_match.url_name %}active{% endif %}"
+                        href="{% url 'tag_list' %}">
+                        <i class="bi bi-tags"></i> Tags
+                    </a>
+                    <hr class="my-3" />
+                    <a class="nav-link" href="{% url 'event_create' %}">
+                        <i class="bi bi-plus-circle"></i> New Event
+                    </a>
+                    <a class="nav-link" href="{% url 'character_create' %}">
+                        <i class="bi bi-person-plus"></i> New Character
+                    </a>
+                </nav>
+            </div>
+            {% endif %}
+
+            <div class="col-md-{% if user.is_authenticated %}10{% else %}12{% endif %} main-content">
+                {% if messages %} {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %} {% endif %}
+
                 {% if user.is_authenticated %}
-                <div class="col-md-2 d-none d-md-block sidebar">
-                    <div class="sidebar-logo text-center my-4">
-                        <img src="{% static 'img/logo.png' %}" alt="Story Timeline Builder Logo" style="height: 200px; width: auto; margin-bottom: -30px; margin-left: -60px; margin-top: -70px;">  
+                <!-- Universal greeting header -->
+                <div class="d-flex justify-content-end align-items-center mb-3">
+                    <div class="dropdown">
+                        <a class="dropdown-toggle d-flex align-items-center fw-bold text-decoration-none" href="#"
+                            id="baseUserDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"
+                            style="color: #000;">
+                            <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                        </a>
+                        <span class="mx-2 text-muted">•</span>
+                        <a class="dropdown-toggle d-flex align-items-center fw-bold text-decoration-none" href="#"
+                            id="baseGreetingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"
+                            style="color: #000;">
+                            Hello, {{ user.first_name|default:user.username }}
+                            <i class="bi bi-chevron-down ms-2"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="baseGreetingDropdown">
+                            <li>
+                                <a class="dropdown-item" href="{% url 'account' %}">
+                                    <i class="bi bi-gear"></i> Account
+                                </a>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider" />
+                            </li>
+                            <li>
+                                <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="dropdown-item">Logout</button>
+                                </form>
+                            </li>
+                        </ul>
                     </div>
-                    <nav class="nav flex-column">
-                        <a
-                            class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
-                            href="{% url 'dashboard' %}"
-                        >
-                            <i class="bi bi-speedometer2"></i> Dashboard
-                        </a>
-                        <a
-                            class="nav-link {% if 'timeline' in request.resolver_match.url_name %}active{% endif %}"
-                            href="{% url 'timeline_view' %}"
-                        >
-                            <i class="bi bi-clock-history"></i> Timeline
-                        </a>
-                        <a
-                            class="nav-link {% if 'book' in request.resolver_match.url_name %}active{% endif %}"
-                            href="{% url 'book_list' %}"
-                        >
-                            <i class="bi bi-book"></i> Books
-                        </a>
-                        <a
-                            class="nav-link {% if 'character' in request.resolver_match.url_name %}active{% endif %}"
-                            href="{% url 'character_list' %}"
-                        >
-                            <i class="bi bi-people"></i> Characters
-                        </a>
-                        <a
-                            class="nav-link {% if 'tag' in request.resolver_match.url_name %}active{% endif %}"
-                            href="{% url 'tag_list' %}"
-                        >
-                            <i class="bi bi-tags"></i> Tags
-                        </a>
-                        <hr class="my-3" />
-                        <a class="nav-link" href="{% url 'event_create' %}">
-                            <i class="bi bi-plus-circle"></i> New Event
-                        </a>
-                        <a class="nav-link" href="{% url 'character_create' %}">
-                            <i class="bi bi-person-plus"></i> New Character
-                        </a>
-                    </nav>
                 </div>
                 {% endif %}
 
-                <div
-                    class="col-md-{% if user.is_authenticated %}10{% else %}12{% endif %} main-content"
-                >
-                    {% if messages %} {% for message in messages %}
-                    <div
-                        class="alert alert-{{ message.tags }} alert-dismissible fade show"
-                        role="alert"
-                    >
-                        {{ message }}
-                        <button
-                            type="button"
-                            class="btn-close"
-                            data-bs-dismiss="alert"
-                            aria-label="Close"
-                        ></button>
-                    </div>
-                    {% endfor %} {% endif %} {% block content %}{% endblock %}
-                </div>
+                {% block content %}{% endblock %}
             </div>
         </div>
+    </div>
 
-        <footer class="footer text-center py-3 mt-4">
-            <div class="container">
-                <small>&copy; 2026 Story Timeline Builder</small>
-            </div>
-        </footer>
+    <footer class="footer text-center py-3 mt-4">
+        <div class="container">
+            <small>&copy; 2026 Story Timeline Builder</small>
+        </div>
+    </footer>
 
-        <!-- JS: Bootstrap + jQuery (optional for AJAX) -->
-        <script
-            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-            crossorigin="anonymous"
-        ></script>
-        <script
-            src="https://code.jquery.com/jquery-3.7.1.min.js"
-            integrity="sha256-3gJwYp4gkL8JdTjqDTu7kGKuX3s8mE7Cqc3hF3j4U7E="
-            crossorigin="anonymous"
-        ></script>
+    <!-- JS: Bootstrap + jQuery (optional for AJAX) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-3gJwYp4gkL8JdTjqDTu7kGKuX3s8mE7Cqc3hF3j4U7E=" crossorigin="anonymous"></script>
 
-        {% block extra_js %}{% endblock %}
-    </body>
+    {% block extra_js %}{% endblock %}
+</body>
+
 </html>
