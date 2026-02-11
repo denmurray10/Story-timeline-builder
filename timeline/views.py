@@ -238,7 +238,8 @@ def book_list(request):
     """List all books for the current user."""
     books = Book.objects.filter(user=request.user).annotate(
         chapter_count=Count('chapters'),
-        event_count=Count('events')
+        event_count=Count('events'),
+        character_count=Count('events__characters', distinct=True)
     )
     return render(request, 'timeline/book_list.html', {'books': books})
 

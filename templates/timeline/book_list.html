@@ -1,5 +1,9 @@
-{% extends 'timeline/base.html' %} {% load static %} {% block title %}Books - Story Timeline
-Builder{% endblock %} {% block content %}
+{% extends 'timeline/base.html' %}
+{% load static %}
+
+{% block title %}Books - Story Timeline Builder{% endblock %}
+
+{% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1><i class="bi bi-book"></i> Books</h1>
     <div>
@@ -60,9 +64,8 @@ Builder{% endblock %} {% block content %}
                                 </a>
                                 {% endif %}
                             </h6>
-                            <span
-                                class="badge rounded-pill ms-2 flex-shrink-0 {% if book.status == 'importing' %}bg-info{% elif book.status == 'drafting' %}bg-warning text-dark{% elif book.status == 'complete' %}bg-success{% else %}bg-secondary{% endif %}"
-                                style="font-size: 0.65rem;">
+                            <span class="badge rounded-pill ms-2 flex-shrink-0 {% if book.status == 'importing' %}bg-info{% elif book.status == 'drafting' %}bg-warning text-dark{% elif book.status == 'complete' %}bg-success{% else %}bg-secondary{% endif %}"
+                                  style="font-size: 0.65rem;">
                                 {{ book.get_status_display }}
                             </span>
                         </div>
@@ -72,12 +75,12 @@ Builder{% endblock %} {% block content %}
                         {% endif %}
 
                         {% if book.description %}
-                        <p class="card-text text-muted mt-1 mb-1" style="font-size: 0.75rem;">{{
-                            book.description|truncatewords:15 }}</p>
+                        <p class="card-text text-muted mt-1 mb-1" style="font-size: 1rem;">{{ book.description|truncatewords:15 }}</p>
                         {% endif %}
 
                         <div class="d-flex gap-3 text-muted mb-1" style="font-size: 0.7rem;">
                             <span><i class="bi bi-list-ol me-1"></i>{{ book.chapter_count }} ch</span>
+                            <span><i class="bi bi-people me-1"></i>{{ book.character_count }} char</span>
                             <span><i class="bi bi-calendar-event me-1"></i>{{ book.event_count }} ev</span>
                         </div>
 
@@ -90,8 +93,7 @@ Builder{% endblock %} {% block content %}
                         </div>
                         <div class="d-flex justify-content-between">
                             <small class="text-muted" style="font-size: 0.65rem;">
-                                {{ book.current_word_count|floatformat:0 }} / {{ book.word_count_target|floatformat:0 }}
-                                w
+                                {{ book.current_word_count|floatformat:0 }} / {{ book.word_count_target|floatformat:0 }} w
                             </small>
                             <small class="fw-semibold" style="font-size: 0.65rem; color: #667eea;">
                                 {{ book.progress_percentage|floatformat:0 }}%
@@ -159,34 +161,27 @@ Builder{% endblock %} {% block content %}
         // Background Import Polling for Notification
         const importingBooks = document.querySelectorAll('.book-processing');
         if (importingBooks.length > 0) {
-            console.log(`Found ${importingBooks.length} books currently importing. Monitoring for completion...`);
-
             importingBooks.forEach(card => {
                 const bookId = card.id.replace('book-', '');
-
                 const checkStatus = setInterval(() => {
-                    fetch(`/api/books/${bookId}/progress/`)
+                    fetch(\`/api/books/\${bookId}/progress/\`)
                         .then(res => res.json())
                         .then(data => {
                             if (data.status === 'drafting') {
                                 clearInterval(checkStatus);
-
-                                // Show a notification (using a simple alert for now, could be a Toast)
                                 if ("Notification" in window && Notification.permission === "granted") {
                                     new Notification("Import Complete!", {
-                                        body: `Your book has been successfully analyzed. Refresh the page to view it.`
+                                        body: \`Your book has been successfully analyzed. Refresh the page to view it.\`
                                     });
                                 } else {
-                                    alert(`Success! Book analysis is complete. The page will now reload.`);
+                                    alert(\`Success! Book analysis is complete. The page will now reload.\`);
                                 }
                                 location.reload();
                             }
                         })
                         .catch(err => console.error('Background polling error:', err));
-                }, 10000); // Check every 10 seconds
+                }, 10000);
             });
-
-            // Ask for notification permission
             if ("Notification" in window && Notification.permission === "default") {
                 Notification.requestPermission();
             }
