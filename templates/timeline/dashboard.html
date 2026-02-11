@@ -348,6 +348,39 @@
                             <div
                                 class="list-group-item border-0 d-flex justify-content-between align-items-center px-0">
                                 <div>
+                                    <h6 class="mb-0 fw-semibold">Character Spotlight</h6>
+                                    <small class="text-muted">A daily random deep dive into a character.</small>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input widget-toggle" type="checkbox"
+                                        data-card-id="card-character-spotlight" checked>
+                                </div>
+                            </div>
+                            <div
+                                class="list-group-item border-0 d-flex justify-content-between align-items-center px-0">
+                                <div>
+                                    <h6 class="mb-0 fw-semibold">Relationship Sparkline</h6>
+                                    <small class="text-muted">Quick view of your key character dynamics.</small>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input widget-toggle" type="checkbox"
+                                        data-card-id="card-relationship-sparkline" checked>
+                                </div>
+                            </div>
+                            <div
+                                class="list-group-item border-0 d-flex justify-content-between align-items-center px-0">
+                                <div>
+                                    <h6 class="mb-0 fw-semibold">Inspiration Mood Board</h6>
+                                    <small class="text-muted">Random themes and motivations for ideas.</small>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input widget-toggle" type="checkbox"
+                                        data-card-id="card-mood-board" checked>
+                                </div>
+                            </div>
+                            <div
+                                class="list-group-item border-0 d-flex justify-content-between align-items-center px-0">
+                                <div>
                                     <h6 class="mb-0 fw-semibold">World at a Glance</h6>
                                     <small class="text-muted">Overview of your story bible.</small>
                                 </div>
@@ -508,6 +541,76 @@
             </ul>
         </div>
 
+        <!-- Character Spotlight -->
+        {% if spotlight_character %}
+        <div class="dash-card p-3 draggable-card mb-3" id="card-character-spotlight">
+            <div class="dash-card-header d-flex align-items-center mb-2">
+                <i class="bi bi-grip-vertical drag-handle"></i>
+                Character Spotlight
+            </div>
+            <div class="d-flex align-items-center mb-3">
+                <div class="me-3">
+                    {% if spotlight_character.profile_pic_url %}
+                    <img src="{{ spotlight_character.profile_pic_url }}" class="rounded-circle shadow-sm"
+                        style="width: 54px; height: 54px; object-fit: cover;">
+                    {% else %}
+                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center border"
+                        style="width: 54px; height: 54px; font-size: 1.2rem; color: #6b7280;">
+                        {{ spotlight_character.name|first }}
+                    </div>
+                    {% endif %}
+                </div>
+                <div>
+                    <h6 class="mb-0 fw-bold">{{ spotlight_character.name }}</h6>
+                    <small class="text-muted">{{ spotlight_character.get_role_display }}</small>
+                </div>
+            </div>
+            <div id="spotlight-response-area" class="p-2 bg-light rounded-3 mb-2 small"
+                style="display:none; min-height: 40px;">
+                <div id="spotlight-loading" style="display:none;" class="text-center py-1">
+                    <div class="ai-loading-dots"><span></span><span></span><span></span></div>
+                </div>
+                <div id="spotlight-text" class="fst-italic text-secondary"></div>
+            </div>
+            <button class="btn btn-sm btn-outline-dark w-100 rounded-pill" id="btn-character-deep-dive"
+                data-char-id="{{ spotlight_character.id }}">
+                <i class="bi bi-magic"></i> Deep Dive
+            </button>
+        </div>
+        {% endif %}
+
+        <!-- Relationship Map Sparkline -->
+        <div class="dash-card p-3 draggable-card mb-3" id="card-relationship-sparkline">
+            <div class="dash-card-header d-flex align-items-center mb-2">
+                <i class="bi bi-grip-vertical drag-handle"></i>
+                Character Dynamics
+            </div>
+            <ul class="dash-list">
+                {% for rel in top_relationships %}
+                <li class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="d-flex align-items-center">
+                        <div class="me-2 fw-semibold" style="font-size: 0.8rem;">
+                            {{ rel.character_a.name }} <i class="bi bi-arrow-left-right mx-1 text-muted"></i> {{
+                            rel.character_b.name }}
+                        </div>
+                    </div>
+                    <span class="badge rounded-pill bg-light text-dark border" style="font-size: 0.65rem;">
+                        {{ rel.get_relationship_type_display }}
+                    </span>
+                </li>
+                {% empty %}
+                <li class="dash-muted">No relationships tracked yet.</li>
+                {% endfor %}
+            </ul>
+            {% if top_relationships %}
+            <div class="mt-2 pt-2 border-top">
+                <a href="{% url 'relationship_map' %}" class="dash-muted text-decoration-none">
+                    <i class="bi bi-diagram-3 me-1"></i> View relationship map
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
         <!-- Quick Actions -->
         <div class="dash-card p-3 draggable-card mb-3" id="card-quick-actions">
             <div class="dash-card-header d-flex align-items-center mb-2">
@@ -569,6 +672,40 @@
 <!-- AI Support -->
 <div class="row g-3 mb-3">
     <div class="col-12 draggable-zone" id="col-bottom">
+
+        <!-- Inspiration Mood Board -->
+        <div class="dash-card dash-pill-card p-3 draggable-card mb-3" id="card-mood-board">
+            <div class="dash-card-header d-flex align-items-center mb-2">
+                <i class="bi bi-grip-vertical drag-handle"></i>
+                Inspiration Mood Board
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                {% for element in mood_elements %}
+                {% if element.type == 'tag' %}
+                <div class="p-2 rounded-3 border"
+                    style="background-color: {{ element.color }}15; border-color: {{ element.color }}; flex: 1 1 auto;">
+                    <span class="badge" style="background-color: {{ element.color }};">Theme/Loc</span>
+                    <div class="mt-1 fw-bold" style="font-size: 0.9rem;">{{ element.content }}</div>
+                </div>
+                {% elif element.type == 'event' %}
+                <div class="p-2 rounded-3 border bg-white"
+                    style="border-style: dashed; flex: 1 1 auto; border-color: #6366f1;">
+                    <span class="badge bg-primary">Key Event</span>
+                    <div class="mt-1 fw-bold" style="font-size: 0.9rem;">{{ element.content }}</div>
+                </div>
+                {% elif element.type == 'motivation' %}
+                <div class="p-2 rounded-3 border bg-light shadow-sm" style="flex: 2 1 100%;">
+                    <span class="badge bg-secondary">Motivation: {{ element.char }}</span>
+                    <div class="mt-1 fst-italic" style="font-size: 0.85rem;">"{{ element.content|truncatechars:100 }}"
+                    </div>
+                </div>
+                {% endif %}
+                {% empty %}
+                <div class="dash-muted">Add more characters, events, or tags to see inspiration here.</div>
+                {% endfor %}
+            </div>
+        </div>
+
         <div class="dash-card dash-pill-card p-3 draggable-card" id="card-ai">
             <div class="dash-card-header d-flex align-items-center mb-1">
                 <i class="bi bi-grip-vertical drag-handle"></i>
@@ -747,6 +884,48 @@
         aiInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') submitAIQuery();
         });
+
+        // Character Spotlight Deep Dive
+        const spotlightBtn = document.getElementById('btn-character-deep-dive');
+        const spotlightArea = document.getElementById('spotlight-response-area');
+        const spotlightLoading = document.getElementById('spotlight-loading');
+        const spotlightText = document.getElementById('spotlight-text');
+
+        if (spotlightBtn) {
+            spotlightBtn.addEventListener('click', function () {
+                const charId = this.dataset.charId;
+
+                spotlightArea.style.display = 'block';
+                spotlightLoading.style.display = 'block';
+                spotlightText.innerText = '';
+                spotlightBtn.disabled = true;
+
+                fetch('{% url "api_character_deep_dive" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({ character_id: charId })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        spotlightLoading.style.display = 'none';
+                        spotlightBtn.disabled = false;
+                        if (data.status === 'success') {
+                            spotlightText.innerText = data.response;
+                        } else {
+                            spotlightText.innerHTML = `<span class="text-danger small">Error generating deep dive.</span>`;
+                        }
+                    })
+                    .catch(error => {
+                        spotlightLoading.style.display = 'none';
+                        spotlightBtn.disabled = false;
+                        spotlightText.innerHTML = `<span class="text-danger small">Connection failed.</span>`;
+                        console.error('Error:', error);
+                    });
+            });
+        }
 
         // Toggle Focus Tasks
         document.querySelectorAll('.focus-task-item').forEach(item => {

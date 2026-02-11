@@ -91,6 +91,39 @@ def dashboard(request):
         # Auto-sense if tasks have been completed
         auto_sense_focus_tasks(request.user, focus_tasks)
     
+    # Character Spotlight (Daily Random)
+    import random
+    spotlight_character = None
+    if characters.exists():
+        # Use date as seed for daily consistency
+        seed_value = int(today.strftime('%Y%m%d'))
+        random.seed(seed_value)
+        spotlight_character = random.choice(list(characters))
+        # Reset seed to avoid affecting other random calls
+        random.seed()
+    
+    # Relationship Sparkline (Latest/Strongest)
+    top_relationships = CharacterRelationship.objects.filter(user=request.user).order_by('-strength')[:4]
+    
+    # Inspiration Mood Board (Random Elements)
+    import random
+    mood_elements = []
+    
+    # 1. Random Tag (Theme or Location)
+    random_tag = Tag.objects.filter(user=request.user).order_by('?').first()
+    if random_tag:
+        mood_elements.append({'type': 'tag', 'content': random_tag.name, 'color': random_tag.color})
+    
+    # 2. Random Key Event
+    random_event = Event.objects.filter(user=request.user, tension_level__gte=7).order_by('?').first()
+    if random_event:
+        mood_elements.append({'type': 'event', 'content': random_event.title})
+        
+    # 3. Random Character Motivation
+    random_char_motivation = Character.objects.filter(user=request.user).exclude(motivation='').order_by('?').first()
+    if random_char_motivation:
+        mood_elements.append({'type': 'motivation', 'content': random_char_motivation.motivation, 'char': random_char_motivation.name})
+
     context = {
         'books': books,
         'character_count': characters.count(),
@@ -98,6 +131,9 @@ def dashboard(request):
         'events_written': events_written,
         'recent_activity': recent_activity,
         'focus_tasks': focus_tasks,
+        'spotlight_character': spotlight_character,
+        'top_relationships': top_relationships,
+        'mood_elements': mood_elements,
     }
     return render(request, 'timeline/dashboard.html', context)
 
@@ -1036,5 +1072,56 @@ def api_ai_consultant(request):
             'response': ai_response
         })
         
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+@login_required
+@require_POST
+def api_character_deep_dive(request):
+    """Generate a deep-dive writing prompt for a character."""
+    try:
+        data = json.loads(request.body)
+        char_id = data.get('character_id')
+        character = get_object_or_404(Character, id=char_id, user=request.user)
+
+        prompt = f"""
+        You are a professional Creative Writing Coach.
+        The user wants to do a "Deep Dive" into their character: {character.name}.
+        
+        CHARACTER DETAILS:
+        Role: {character.get_role_display()}
+        Description: {character.description}
+        Motivation: {character.motivation}
+        Goals: {character.goals}
+        Traits: {character.traits}
+        
+        Please generate ONE thought-provoking, insightful deep-dive question or writing prompt that will help the author understand this character's internal world or backstory better. 
+        Focus on emotion, conflict, or hidden secrets. 
+        Keep it to a single paragraph.
+        """
+
+        # Call AI Provider
+        if settings.DEEPSEEK_API_KEY:
+            client = OpenAI(api_key=settings.DEEPSEEK_API_KEY, base_url="https://api.deepseek.com")
+            response = client.chat.completions.create(
+                model="deepseek-chat",
+                messages=[
+                    {"role": "system", "content": "You are a professional Creative Writing Coach."},
+                    {"role": "user", "content": prompt},
+                ],
+                stream=False
+            )
+            ai_response = response.choices[0].message.content
+        else:
+            genai.configure(api_key=settings.GEMINI_API_KEY)
+            model = genai.GenerativeModel('gemini-3-flash-preview')
+            response = model.generate_content(prompt)
+            ai_response = response.text
+
+        return JsonResponse({
+            'status': 'success', 
+            'response': ai_response
+        })
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
