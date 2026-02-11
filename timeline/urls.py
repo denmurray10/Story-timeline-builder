@@ -54,6 +54,7 @@ urlpatterns = [
     path('relationships/<int:pk>/edit/', views.relationship_edit, name='relationship_edit'),
     path('relationships/<int:pk>/delete/', views.relationship_delete, name='relationship_delete'),
     path('api/relationships/data/', views.api_relationship_data, name='api_relationship_data'),
+    path('api/relationships/manage/', views.api_manage_relationship, name='api_manage_relationship'),
     
     # Tags
     path('tags/', views.tag_list, name='tag_list'),

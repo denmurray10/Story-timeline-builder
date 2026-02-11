@@ -59,11 +59,12 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1><i class="bi bi-diagram-3"></i> Relationship Map</h1>
     <div>
+        <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#relationshipModal"
+            id="btn-quick-add">
+            <i class="bi bi-plus-circle"></i> Quick Link
+        </button>
         <a href="{% url 'relationship_list' %}" class="btn btn-outline-secondary">
-            <i class="bi bi-list"></i> Manage Relationships
-        </a>
-        <a href="{% url 'relationship_create' %}" class="btn btn-primary">
-            <i class="bi bi-plus"></i> Add Relationship
+            <i class="bi bi-list"></i> Manage
         </a>
     </div>
 </div>
@@ -77,14 +78,17 @@
             <div class="legend-color" style="background: #ef4444;"></div> Antagonist
         </div>
         <div class="legend-item">
-            <div class="legend-color" style="background: #10b981;"></div> Supporting
+            <div class="legend-color" style="background: #10b981;"></div> Ally
         </div>
         <div class="legend-item">
-            <div class="legend-color" style="background: #94a3b8;"></div> Other
+            <div class="legend-color" style="background: #f43f5e;"></div> Romantic
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #b91c1c;"></div> Enemy
         </div>
     </div>
     <div class="text-muted small">
-        <i class="bi bi-info-circle"></i> Drag to move, scroll to zoom. Click node for details.
+        <i class="bi bi-info-circle"></i> <b>Tip:</b> Click a relationship line (edge) to edit the connection.
     </div>
 </div>
 
@@ -96,7 +100,76 @@
         <div class="info-panel shadow-sm" id="selection-details">
             <div class="text-center text-muted py-5">
                 <i class="bi bi-cursor-fill fs-1 d-block mb-3"></i>
-                <p>Click a character node to see details</p>
+                <p>Click a character node or relationship line for details</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Relationship Edit/Create Modal -->
+<div class="modal fade" id="relationshipModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content shadow">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title" id="relModalTitle">Manage Relationship</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="relationship-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="id" id="rel-id">
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Character A</label>
+                            <select name="character_a" id="rel-char-a" class="form-select" required>
+                                {% for char in characters %}
+                                <option value="{{ char.id }}">{{ char.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Character B</label>
+                            <select name="character_b" id="rel-char-b" class="form-select" required>
+                                {% for char in characters %}
+                                <option value="{{ char.id }}">{{ char.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Type</label>
+                        <select name="relationship_type" id="rel-type" class="form-select">
+                            <option value="friend">Friend</option>
+                            <option value="ally">Ally</option>
+                            <option value="enemy">Enemy</option>
+                            <option value="romantic">Romantic</option>
+                            <option value="family">Family</option>
+                            <option value="professional">Professional</option>
+                            <option value="rival">Rival</option>
+                            <option value="mentor">Mentor</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Description</label>
+                        <textarea name="description" id="rel-desc" class="form-control" rows="2"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Strength (1-10)</label>
+                        <input type="range" name="strength" id="rel-strength" class="form-range" min="1" max="10"
+                            step="1">
+                        <div class="text-center small text-muted" id="strength-val">5</div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-sm btn-outline-danger me-auto" id="btn-rel-delete"
+                    style="display:none;">Delete</button>
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-sm btn-dark" id="btn-rel-save">Save changes</button>
             </div>
         </div>
     </div>
@@ -167,12 +240,53 @@
 
                 const network = new vis.Network(container, data, options);
 
-                // Handle clicks for details
+                const relModal = new bootstrap.Modal(document.getElementById('relationshipModal'));
+                const relModalTitle = document.getElementById('relModalTitle');
+                const relForm = document.getElementById('relationship-form');
+                const relIdInput = document.getElementById('rel-id');
+                const relCharA = document.getElementById('rel-char-a');
+                const relCharB = document.getElementById('rel-char-b');
+                const relType = document.getElementById('rel-type');
+                const relDesc = document.getElementById('rel-desc');
+                const relStrength = document.getElementById('rel-strength');
+                const strengthVal = document.getElementById('strength-val');
+                const btnSave = document.getElementById('btn-rel-save');
+                const btnDelete = document.getElementById('btn-rel-delete');
+                const btnQuickAdd = document.getElementById('btn-quick-add');
+
+                // Update strength value display
+                relStrength.oninput = function () {
+                    strengthVal.innerText = this.value;
+                }
+
+                function openModal(relData = null) {
+                    relForm.reset();
+                    if (relData) {
+                        relModalTitle.innerText = "Edit Relationship";
+                        relIdInput.value = relData.id;
+                        relCharA.value = relData.from;
+                        relCharB.value = relData.to;
+                        relType.value = relData.type_key || 'friend'; // fallback
+                        relDesc.value = relData.title || "";
+                        relStrength.value = relData.strength || 5;
+                        strengthVal.innerText = relStrength.value;
+                        btnDelete.style.display = 'block';
+                    } else {
+                        relModalTitle.innerText = "New Relationship";
+                        relIdInput.value = "";
+                        btnDelete.style.display = 'none';
+                        strengthVal.innerText = "5";
+                    }
+                    relModal.show();
+                }
+
+                btnQuickAdd.onclick = () => openModal();
+
+                // Handle clicks for details and editing
                 network.on("click", function (params) {
                     if (params.nodes.length > 0) {
                         const nodeId = params.nodes[0];
                         const char = data.nodes.find(n => n.id === nodeId);
-
                         detailsPanel.innerHTML = `
                             <h4 class="mb-3">${char.label}</h4>
                             <div class="mb-3">
@@ -196,15 +310,96 @@
                                 </a>
                             </div>
                         `;
+                    } else if (params.edges.length > 0) {
+                        const edgeId = params.edges[0];
+                        const edge = data.edges.find(e => e.id === edgeId);
+
+                        detailsPanel.innerHTML = `
+                            <h6>Relationship Edit</h6>
+                            <div class="mb-3 p-3 bg-light rounded border text-center">
+                                <div class="fw-bold mb-1">${edge.label}</div>
+                                <div class="small text-muted">Click below to manage this connection</div>
+                            </div>
+                            <button class="btn btn-sm btn-dark w-100" id="btn-edit-active-edge">
+                                <i class="bi bi-pencil-square"></i> Open Editor
+                            </button>
+                        `;
+
+                        document.getElementById('btn-edit-active-edge').onclick = function () {
+                            // Map the edge type back to keys (approximation if not precise in API)
+                            const type_key = edge.label.toLowerCase();
+                            openModal({ ...edge, type_key: type_key, strength: edge.width * 2 });
+                        };
                     } else {
                         detailsPanel.innerHTML = `
                             <div class="text-center text-muted py-5">
                                 <i class="bi bi-cursor-fill fs-1 d-block mb-3"></i>
-                                <p>Click a character node to see details</p>
+                                <p>Click a character node or relationship line for details</p>
                             </div>
                         `;
                     }
                 });
+
+                // AJAX Save
+                btnSave.onclick = function () {
+                    const formData = {
+                        id: relIdInput.value,
+                        character_a: relCharA.value,
+                        character_b: relCharB.value,
+                        relationship_type: relType.value,
+                        description: relDesc.value,
+                        strength: relStrength.value,
+                        action: 'save'
+                    };
+
+                    btnSave.disabled = true;
+                    fetch('{% url "api_manage_relationship" %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: JSON.stringify(formData)
+                    })
+                        .then(response => response.json())
+                        .then(result => {
+                            if (result.status === 'success') {
+                                location.reload(); // Quickest way to refresh the complex map
+                            } else {
+                                alert("Error: " + JSON.stringify(result.errors || result.message));
+                                btnSave.disabled = false;
+                            }
+                        })
+                        .catch(e => {
+                            console.error(e);
+                            btnSave.disabled = false;
+                        });
+                };
+
+                // AJAX Delete
+                btnDelete.onclick = function () {
+                    if (!confirm("Are you sure you want to remove this connection?")) return;
+
+                    const formData = {
+                        id: relIdInput.value,
+                        action: 'delete'
+                    };
+
+                    fetch('{% url "api_manage_relationship" %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: JSON.stringify(formData)
+                    })
+                        .then(response => response.json())
+                        .then(result => {
+                            if (result.status === 'success') {
+                                location.reload();
+                            }
+                        });
+                };
             })
             .catch(error => {
                 console.error('Error fetching relationship data:', error);

@@ -474,7 +474,8 @@ def relationship_delete(request, pk):
 @login_required
 def relationship_map(request):
     """View the interactive relationship graph."""
-    return render(request, 'timeline/relationship_map.html')
+    characters = Character.objects.filter(user=request.user, is_active=True)
+    return render(request, 'timeline/relationship_map.html', {'characters': characters})
 
 
 @login_required
@@ -514,13 +515,14 @@ def api_relationship_data(request):
         elif rel.relationship_type == 'ally': color = '#059669'
         
         edges.append({
+            'id': rel.id,
             'from': rel.character_a.id,
             'to': rel.character_b.id,
             'label': rel.get_relationship_type_display(),
             'title': rel.description,
             'width': width,
             'color': color,
-        'arrows': 'to' # Or none if mutual
+            'arrows': 'to' # Or none if mutual
         })
         
     data = {
@@ -528,6 +530,43 @@ def api_relationship_data(request):
         'edges': edges
     }
     return JsonResponse(data)
+
+
+@login_required
+@require_POST
+def api_manage_relationship(request):
+    """AJAX view to create, update, or delete relationships."""
+    try:
+        data = json.loads(request.body)
+        rel_id = data.get('id')
+        action = data.get('action', 'save') # 'save' or 'delete'
+
+        if action == 'delete' and rel_id:
+            rel = get_object_or_404(CharacterRelationship, id=rel_id, user=request.user)
+            rel.delete()
+            return JsonResponse({'status': 'success', 'message': 'Relationship deleted'})
+
+        # Handle Create/Update
+        if rel_id:
+            rel = get_object_or_404(CharacterRelationship, id=rel_id, user=request.user)
+            form = CharacterRelationshipForm(data, instance=rel, user=request.user)
+        else:
+            form = CharacterRelationshipForm(data, user=request.user)
+
+        if form.is_valid():
+            rel = form.save(commit=False)
+            rel.user = request.user
+            rel.save()
+            return JsonResponse({
+                'status': 'success', 
+                'message': 'Relationship saved',
+                'id': rel.id
+            })
+        else:
+            return JsonResponse({'status': 'error', 'errors': form.errors}, status=400)
+
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
 
 # ============== Helper Functions ==============
