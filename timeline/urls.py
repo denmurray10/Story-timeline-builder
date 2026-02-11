@@ -65,8 +65,5 @@ urlpatterns = [
     path('api/events/reorder/', views.api_event_reorder, name='api_event_reorder'),
     path('api/ai/consultant/', views.api_ai_consultant, name='api_ai_consultant'),
     path('api/ai/focus-tasks/<int:pk>/toggle/', views.api_toggle_focus_task, name='api_toggle_focus_task'),
-    path('api/deadlines/create/', views.api_deadline_create, name='api_deadline_create'),
-    path('api/deadlines/<int:pk>/toggle/', views.api_deadline_toggle, name='api_deadline_toggle'),
-    path('api/ai/plot-holes/', views.api_plot_holes, name='api_plot_holes'),
     path('account/', views.account, name='account'),
 ]

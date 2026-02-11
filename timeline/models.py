@@ -460,34 +460,3 @@ class ActivityLog(models.Model):
 
     def __str__(self):
         return f"{self.action.capitalize()} {self.model_name}: {self.object_name}"
-
-
-class WritingDeadline(models.Model):
-    """Personal writing deadlines and milestones."""
-    STATUS_CHOICES = [
-        ('pending', 'Pending'),
-        ('completed', 'Completed'),
-        ('overdue', 'Overdue'),
-    ]
-    
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='deadlines')
-    title = models.CharField(max_length=200)
-    due_date = models.DateField()
-    is_completed = models.BooleanField(default=False)
-    book = models.ForeignKey(Book, on_delete=models.SET_NULL, null=True, blank=True, related_name='deadlines')
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ['due_date']
-
-    def __str__(self):
-        return f"{self.title} (due {self.due_date})"
-
-    @property
-    def status(self):
-        if self.is_completed:
-            return 'completed'
-        from datetime import date
-        if self.due_date < date.today():
-            return 'overdue'
-        return 'pending'
