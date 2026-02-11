@@ -62,5 +62,4 @@ urlpatterns = [
     path('api/events/reorder/', views.api_event_reorder, name='api_event_reorder'),
     path('api/ai/consultant/', views.api_ai_consultant, name='api_ai_consultant'),
     path('account/', views.account, name='account'),
-    path('statement/', views.product_statement, name='product_statement'),
 ]

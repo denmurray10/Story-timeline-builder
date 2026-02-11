@@ -84,11 +84,6 @@ def dashboard(request):
     return render(request, 'timeline/dashboard.html', context)
 
 
-def product_statement(request):
-    """View the product specification/statement."""
-    return render(request, 'timeline/statement.html')
-
-
 # ============== Book Views ==============
 
 @login_required
@@ -255,6 +250,8 @@ def api_relationship_data(request):
             'label': char.name,
             'title': f"{char.name} ({char.get_role_display()})",
             'color': color,
+            'image': char.profile_pic_url if char.profile_pic_url else "",
+            'shape': 'circularImage' if char.profile_pic_url else 'dot',
             'description': char.description[:100] + "..." if char.description else ""
         })
         
@@ -376,7 +373,7 @@ def character_detail(request, pk):
 def character_create(request):
     """Create a new character."""
     if request.method == 'POST':
-        form = CharacterForm(request.POST, user=request.user)
+        form = CharacterForm(request.POST, request.FILES, user=request.user)
         if form.is_valid():
             character = form.save(commit=False)
             character.user = request.user
@@ -393,7 +390,7 @@ def character_edit(request, pk):
     """Edit an existing character."""
     character = get_object_or_404(Character, pk=pk, user=request.user)
     if request.method == 'POST':
-        form = CharacterForm(request.POST, instance=character, user=request.user)
+        form = CharacterForm(request.POST, request.FILES, instance=character, user=request.user)
         if form.is_valid():
             form.save()
             messages.success(request, f'Character "{character.name}" updated successfully!')

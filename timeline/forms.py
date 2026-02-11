@@ -86,6 +86,8 @@ class CharacterForm(forms.ModelForm):
             "introduction_book",
             "introduction_chapter",
             "is_active",
+            "profile_image",
+            "avatar_id",
         ]
         widgets = {
             "name": forms.TextInput(attrs={"class": "form-control"}),
@@ -97,6 +99,8 @@ class CharacterForm(forms.ModelForm):
             "introduction_book": forms.Select(attrs={"class": "form-control"}),
             "introduction_chapter": forms.Select(attrs={"class": "form-control"}),
             "is_active": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+            "profile_image": forms.FileInput(attrs={"class": "form-control"}),
+            "avatar_id": forms.HiddenInput(),
         }
 
     def __init__(self, *args, **kwargs):

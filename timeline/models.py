@@ -135,8 +135,34 @@ class Character(models.Model):
         default=True,
         help_text="Is this character still active in the current narrative?"
     )
+    profile_image = models.ImageField(
+        upload_to='character_profiles/',
+        null=True,
+        blank=True,
+        help_text="Upload a custom profile picture"
+    )
+    avatar_id = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+        help_text="ID of the selected cartoon avatar"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def profile_pic_url(self):
+        """Returns the URL of the profile picture or a fallback avatar."""
+        if self.profile_image:
+            return self.profile_image.url
+        
+        if self.avatar_id:
+            # Check if it's one of our predefined SVGs
+            from django.templatetags.static import static
+            return static(f'img/avatars/{self.avatar_id}.svg')
+            
+        # Default fallback logic
+        return None
 
     class Meta:
         ordering = ['name']
