@@ -468,6 +468,10 @@
                         href="{% url 'book_list' %}">
                         <i class="bi bi-book"></i> Books
                     </a>
+                    <a class="nav-link {% if 'chapter' in request.resolver_match.url_name %}active{% endif %}"
+                        href="{% url 'chapter_list' %}">
+                        <i class="bi bi-list-ol"></i> Chapters
+                    </a>
                     <a class="nav-link {% if 'character' in request.resolver_match.url_name %}active{% endif %}"
                         href="{% url 'character_list' %}">
                         <i class="bi bi-people"></i> Characters

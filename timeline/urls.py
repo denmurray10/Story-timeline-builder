@@ -27,6 +27,7 @@ urlpatterns = [
     path('api/books/<int:pk>/progress/', views.api_book_progress, name='api_book_progress'),
     
     # Chapters
+    path('chapters/', views.chapter_list, name='chapter_list'),
     path('books/<int:book_pk>/chapters/create/', views.chapter_create, name='chapter_create'),
     path('books/<int:book_pk>/chapters/upload/', views.chapter_bulk_upload, name='chapter_bulk_upload'),
     path('chapters/<int:pk>/', views.chapter_detail, name='chapter_detail'),

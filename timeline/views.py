@@ -737,6 +737,13 @@ def analyze_book_content_with_ai(text):
 # ============== Chapter Views ==============
 
 @login_required
+def chapter_list(request):
+    """View to list all chapters grouped by book."""
+    books = Book.objects.filter(user=request.user).prefetch_related('chapters').order_by('-series_order')
+    return render(request, 'timeline/chapter_list.html', {'books': books})
+
+
+@login_required
 def chapter_create(request, book_pk):
     """Create a new chapter in a book."""
     book = get_object_or_404(Book, pk=book_pk, user=request.user)
