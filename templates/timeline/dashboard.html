@@ -189,10 +189,13 @@
         cursor: grab;
         color: #d1d5db;
         margin-right: 8px;
+        opacity: 0;
+        transition: opacity 0.2s ease, color 0.2s ease;
     }
 
     .draggable-card:hover .drag-handle {
         color: #6366f1;
+        opacity: 1;
     }
 
     @media (max-width: 991px) {
