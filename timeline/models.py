@@ -113,6 +113,11 @@ class Character(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='characters')
     name = models.CharField(max_length=100)
     nickname = models.CharField(max_length=100, blank=True)
+    aliases = models.CharField(
+        max_length=500,
+        blank=True,
+        help_text="Comma-separated alternate names (e.g. 'Mum, Mrs. Smith, Sarah')"
+    )
     role = models.CharField(max_length=100, choices=ROLE_CHOICES, default='supporting')
     description = models.TextField(
         blank=True,

@@ -355,21 +355,80 @@ def run_background_book_import(book_id, content, user_id):
         char_context = content[:80000]
         char_data = analyze_characters_with_ai(char_context)
         
+        # Pre-populate char_map with ALL existing characters for this user
+        # Map both primary names AND aliases to the same character object
         char_map = {}
+        for existing_char in Character.objects.filter(user=user):
+            char_map[existing_char.name.lower()] = existing_char
+            if existing_char.nickname:
+                char_map[existing_char.nickname.lower()] = existing_char
+            if existing_char.aliases:
+                for alias in existing_char.aliases.split(','):
+                    alias = alias.strip().lower()
+                    if alias:
+                        char_map[alias] = existing_char
+        
         if char_data:
             for char_info in char_data.get('characters', []):
                 try:
                     name = char_info.get('name')
-                    if name:
+                    if not name:
+                        continue
+                    
+                    # Check if character already exists (case-insensitive, including aliases)
+                    existing = char_map.get(name.lower())
+                    
+                    # Also check if any of the AI-detected aliases match an existing character
+                    ai_aliases = char_info.get('aliases', [])
+                    if not existing and ai_aliases:
+                        for ai_alias in ai_aliases:
+                            existing = char_map.get(ai_alias.lower().strip())
+                            if existing:
+                                break
+                    
+                    if existing:
+                        # Update sparse fields on the existing character if AI provided richer data
+                        updated = False
+                        if not existing.description and char_info.get('description'):
+                            existing.description = char_info['description']
+                            updated = True
+                        if not existing.goals and char_info.get('goals'):
+                            existing.goals = char_info['goals']
+                            updated = True
+                        if not existing.traits and char_info.get('traits'):
+                            existing.traits = char_info['traits']
+                            updated = True
+                        # Merge new aliases into existing ones
+                        if ai_aliases:
+                            current_aliases = set(
+                                a.strip().lower() for a in (existing.aliases or '').split(',') if a.strip()
+                            )
+                            for a in ai_aliases:
+                                current_aliases.add(a.strip().lower())
+                            # Remove the primary name from aliases if present
+                            current_aliases.discard(existing.name.lower())
+                            if current_aliases:
+                                existing.aliases = ', '.join(sorted(current_aliases))
+                                updated = True
+                        if updated:
+                            existing.save()
+                        # Register this name in char_map too (in case AI used a different name)
+                        char_map[name.lower()] = existing
+                    else:
+                        aliases_str = ', '.join(ai_aliases) if ai_aliases else ''
                         char = Character.objects.create(
                             user=user,
                             name=name,
+                            aliases=aliases_str,
                             role=char_info.get('role', 'supporting')[:100],
                             description=char_info.get('description', ''),
                             goals=char_info.get('goals', ''),
                             traits=char_info.get('traits', '')
                         )
                         char_map[name.lower()] = char
+                        # Also register all aliases in the map
+                        for a in ai_aliases:
+                            char_map[a.strip().lower()] = char
                 except Exception as e:
                     print(f"Error creating character: {e}")
 
@@ -755,8 +814,13 @@ def analyze_characters_with_ai(text):
     """Initial pass to identify characters and roles from a large chunk of text."""
     prompt = f"""
     Identify all significant characters in the following text. 
+    IMPORTANT: Characters may be referred to by multiple names, titles, or family terms 
+    (e.g. "Mum", "Sarah", "Mrs. Smith" might all be the same person). 
+    Merge these into a SINGLE character entry and list all alternate names as aliases.
+    
     For each character, provide:
-    - Name
+    - Name (use their most common/full name as the primary name)
+    - Aliases (list of OTHER names they go by: nicknames, titles, family terms like "Mum", "Dad", etc.)
     - Role (protagonist, antagonist, or supporting)
     - Short description
     - Primary goals (what they want)
@@ -765,7 +829,7 @@ def analyze_characters_with_ai(text):
     Return ONLY a JSON object:
     {{
       "characters": [
-        {{ "name": "...", "role": "...", "description": "...", "goals": "...", "traits": "..." }}
+        {{ "name": "Sarah Smith", "aliases": ["Mum", "Mrs. Smith"], "role": "...", "description": "...", "goals": "...", "traits": "..." }}
       ]
     }}
 

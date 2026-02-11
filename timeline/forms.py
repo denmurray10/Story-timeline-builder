@@ -81,6 +81,7 @@ class CharacterForm(forms.ModelForm):
         fields = [
             "name",
             "nickname",
+            "aliases",
             "role",
             "description",
             "motivation",
@@ -96,6 +97,7 @@ class CharacterForm(forms.ModelForm):
         widgets = {
             "name": forms.TextInput(attrs={"class": "form-control"}),
             "nickname": forms.TextInput(attrs={"class": "form-control"}),
+            "aliases": forms.TextInput(attrs={"class": "form-control", "placeholder": "e.g. Mum, Mrs. Smith, Sarah"}),
             "role": forms.Select(attrs={"class": "form-control"}),
             "description": forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
             "motivation": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
