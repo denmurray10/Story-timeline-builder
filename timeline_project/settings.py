@@ -30,6 +30,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
+    # Third-party
+    'cloudinary_storage',
+    'cloudinary',
+    
     # Your apps
     'timeline',
 ]
@@ -138,8 +142,20 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media files (User uploads)
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+CLOUDINARY_URL = config('CLOUDINARY_URL', default=None)
+
+if CLOUDINARY_URL:
+    # Production/Heroku - Use Cloudinary for media storage
+    import cloudinary
+    cloudinary.config(
+        cloudinary_url=CLOUDINARY_URL
+    )
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    MEDIA_URL = '/media/'
+else:
+    # Local development - Use local filesystem
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = BASE_DIR / 'media'
 
 
 # Default primary key field type
