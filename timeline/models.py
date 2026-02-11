@@ -14,6 +14,7 @@ class Book(models.Model):
     Represents a book in your series.
     Each book contains multiple chapters and is owned by a user.
     """
+    image = models.ImageField(upload_to='book_covers/', null=True, blank=True, help_text="Upload a cover image for this book.")
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='books')
     title = models.CharField(max_length=200)
     series_order = models.PositiveIntegerField(

@@ -42,6 +42,7 @@ class BookForm(forms.ModelForm):
             "status",
             "started_date",
             "completed_date",
+            "image",
         ]
         widgets = {
             "description": forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
