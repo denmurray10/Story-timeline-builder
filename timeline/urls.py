@@ -24,6 +24,7 @@ urlpatterns = [
     path('book/<int:pk>/edit/', views.book_edit, name='book_edit'),
     path('book/<int:pk>/delete/', views.book_delete, name='book_delete'),
     path('book/<int:pk>/export/', views.export_story_bible, name='book_export'),
+    path('api/books/<int:pk>/progress/', views.api_book_progress, name='api_book_progress'),
     
     # Chapters
     path('books/<int:book_pk>/chapters/create/', views.chapter_create, name='chapter_create'),

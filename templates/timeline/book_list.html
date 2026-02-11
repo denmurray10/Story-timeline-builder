@@ -16,7 +16,18 @@ Builder{% endblock %} {% block content %}
 <div class="row">
     {% for book in books %}
     <div class="col-md-6 col-lg-4 mb-4">
-        <div class="card h-100">
+        <div class="card h-100 book-card {% if book.status == 'importing' %}book-processing{% endif %}"
+            id="book-{{ book.pk }}">
+            {% if book.status == 'importing' %}
+            <div class="book-overlay">
+                <div class="text-center text-white">
+                    <div class="spinner-border mb-2" role="status"></div>
+                    <div class="fw-bold">Import in Progress...</div>
+                    <small>Please wait while AI analyzes your book.</small>
+                </div>
+            </div>
+            {% endif %}
+
             {% if book.image %}
             <img src="{{ book.image.url }}" class="card-img-top" alt="{{ book.title }} Cover"
                 style="height: 200px; object-fit: cover;">
@@ -26,12 +37,18 @@ Builder{% endblock %} {% block content %}
             {% endif %}
             <div class="card-body">
                 <h5 class="card-title">
+                    {% if book.status == 'importing' %}
+                    <span class="text-muted">Book {{ book.series_order }}: {{ book.title }}</span>
+                    {% else %}
                     <a href="{% url 'book_detail' book.pk %}" class="text-decoration-none">
                         Book {{ book.series_order }}: {{ book.title }}
                     </a>
+                    {% endif %}
                 </h5>
                 <p class="text-muted">
-                    <span class="badge bg-secondary">{{ book.status }}</span>
+                    <span class="badge {% if book.status == 'importing' %}bg-info{% else %}bg-secondary{% endif %}">
+                        {{ book.get_status_display }}
+                    </span>
                 </p>
                 {% if book.description %}
                 <p class="card-text">{{ book.description|truncatewords:20 }}</p>
@@ -54,12 +71,21 @@ Builder{% endblock %} {% block content %}
                 </small>
             </div>
             <div class="card-footer bg-transparent">
+                {% if book.status == 'importing' %}
+                <button class="btn btn-sm btn-outline-secondary" disabled>
+                    <i class="bi bi-eye"></i> View
+                </button>
+                <button class="btn btn-sm btn-outline-secondary" disabled>
+                    <i class="bi bi-pencil"></i> Edit
+                </button>
+                {% else %}
                 <a href="{% url 'book_detail' book.pk %}" class="btn btn-sm btn-outline-primary">
                     <i class="bi bi-eye"></i> View
                 </a>
                 <a href="{% url 'book_edit' book.pk %}" class="btn btn-sm btn-outline-secondary">
                     <i class="bi bi-pencil"></i> Edit
                 </a>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -84,10 +110,47 @@ Builder{% endblock %} {% block content %}
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        // Init progress bars
         document.querySelectorAll('.js-progress-bar').forEach(bar => {
             const width = bar.getAttribute('data-width');
             if (width) bar.style.width = width;
         });
+
+        // Background Import Polling for Notification
+        const importingBooks = document.querySelectorAll('.book-processing');
+        if (importingBooks.length > 0) {
+            console.log(`Found ${importingBooks.length} books currently importing. Monitoring for completion...`);
+
+            importingBooks.forEach(card => {
+                const bookId = card.id.replace('book-', '');
+
+                const checkStatus = setInterval(() => {
+                    fetch(`/api/books/${bookId}/progress/`)
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.status === 'drafting') {
+                                clearInterval(checkStatus);
+
+                                // Show a notification (using a simple alert for now, could be a Toast)
+                                if ("Notification" in window && Notification.permission === "granted") {
+                                    new Notification("Import Complete!", {
+                                        body: `Your book has been successfully analyzed. Refresh the page to view it.`
+                                    });
+                                } else {
+                                    alert(`Success! Book analysis is complete. The page will now reload.`);
+                                }
+                                location.reload();
+                            }
+                        })
+                        .catch(err => console.error('Background polling error:', err));
+                }, 10000); // Check every 10 seconds
+            });
+
+            // Ask for notification permission
+            if ("Notification" in window && Notification.permission === "default") {
+                Notification.requestPermission();
+            }
+        }
     });
 </script>
 {% endblock %}

@@ -18,6 +18,17 @@
                         chapters, and timeline events for you.
                     </p>
 
+                    <div id="safetyWarning" class="alert alert-warning border-0 rounded-4 mb-4 text-start"
+                        style="display: none;">
+                        <div class="d-flex">
+                            <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+                            <div>
+                                <strong>Important:</strong> Do not refresh or leave this page while the analysis is
+                                running. Closing this tab may corrupt the import process.
+                            </div>
+                        </div>
+                    </div>
+
                     <form method="post" enctype="multipart/form-data" id="importForm">
                         {% csrf_token %}
 
@@ -35,28 +46,36 @@
                             </div>
                         </div>
 
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg rounded-pill py-3" id="submitBtn">
+                        <div class="d-grid shadow-sm rounded-pill">
+                            <button type="submit"
+                                class="btn btn-primary btn-lg rounded-pill py-3 position-relative overflow-hidden"
+                                id="submitBtn">
                                 <span id="btnText">Start AI Analysis</span>
                                 <div id="btnLoading" class="spinner-border spinner-border-sm ms-2" role="status"
                                     style="display: none;">
                                     <span class="visually-hidden">Loading...</span>
                                 </div>
+                                <div id="progressBarFill"
+                                    class="position-absolute top-0 start-0 h-100 bg-white opacity-25"
+                                    style="width: 0%; transition: width 0.5s ease;"></div>
                             </button>
                         </div>
                     </form>
 
                     <div id="loadingMessage" class="mt-4" style="display: none;">
-                        <div class="alert alert-info border-0 shadow-sm rounded-4">
-                            <p class="mb-1"><i class="bi bi-robot me-2"></i> Our AI is reading your book...</p>
-                            <small class="text-muted">This can take up to 60 seconds depending on the file size.</small>
+                        <div class="alert alert-info border-0 shadow-sm rounded-4 text-start">
+                            <p class="mb-1" id="statusMessage"><i class="bi bi-robot me-2"></i> Initializing...</p>
+                            <div class="progress mt-2" style="height: 10px; border-radius: 5px;">
+                                <div id="uiProgressBar" class="progress-bar progress-bar-striped progress-bar-animated"
+                                    role="progressbar" style="width: 5%"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="mt-4 text-center">
-                <a href="{% url 'book_list' %}" class="btn btn-link text-decoration-none text-muted">
+                <a href="{% url 'book_list' %}" class="btn btn-link text-decoration-none text-muted" id="backBtn">
                     <i class="bi bi-arrow-left me-1"></i> Back to Library
                 </a>
             </div>
@@ -65,16 +84,76 @@
 </div>
 
 <script>
-    document.getElementById('importForm').addEventListener('submit', function () {
+    document.getElementById('importForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const form = e.target;
+        const formData = new FormData(form);
         const btn = document.getElementById('submitBtn');
         const text = document.getElementById('btnText');
         const loading = document.getElementById('btnLoading');
         const msg = document.getElementById('loadingMessage');
+        const warning = document.getElementById('safetyWarning');
+        const backBtn = document.getElementById('backBtn');
+        const progressFill = document.getElementById('progressBarFill');
+        const uiBar = document.getElementById('uiProgressBar');
+        const statusText = document.getElementById('statusMessage');
 
+        // Disable UI
         btn.disabled = true;
-        text.innerText = 'Analyzing Manuscript...';
+        backBtn.classList.add('disabled');
+        text.innerText = 'Initializing...';
         loading.style.display = 'inline-block';
         msg.style.display = 'block';
+        warning.style.display = 'block';
+
+        // Submit via AJAX
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const bookId = data.book_id;
+
+                    // Start Polling
+                    const pollInterval = setInterval(() => {
+                        fetch(`/api/books/${bookId}/progress/`)
+                            .then(res => res.json())
+                            .then(progressData => {
+                                // Update UI
+                                text.innerText = `${progressData.message} (${progressData.progress}%)`;
+                                statusText.innerHTML = `<i class="bi bi-robot me-2"></i> ${progressData.message}`;
+                                progressFill.style.width = `${progressData.progress}%`;
+                                uiBar.style.width = `${progressData.progress}%`;
+
+                                if (progressData.status === 'drafting' || progressData.progress === 100) {
+                                    clearInterval(pollInterval);
+                                    text.innerText = 'Import Complete!';
+                                    setTimeout(() => {
+                                        window.location.href = "{% url 'book_list' %}";
+                                    }, 1500);
+                                }
+                            })
+                            .catch(err => {
+                                console.error('Polling error:', err);
+                            });
+                    }, 2000);
+                } else {
+                    alert('Error starting import: ' + (data.message || 'Unknown error'));
+                    location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('A network error occurred. Please try again.');
+                location.reload();
+            });
     });
 </script>
 {% endblock %}

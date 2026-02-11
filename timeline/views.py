@@ -289,12 +289,12 @@ def book_edit(request, pk):
 
 @login_required
 def book_import(request):
-    """Import a book from a file and analyze with AI."""
+    """Import a book with real-time progress tracking."""
     if request.method == 'POST' and request.FILES.get('book_file'):
         book_file = request.FILES['book_file']
         title = request.POST.get('title', 'Imported Book')
         
-        # 1. Create the Book
+        # 1. Create the Book in 'importing' state
         last_book = Book.objects.filter(user=request.user).order_by('-series_order').first()
         series_order = (last_book.series_order + 1) if last_book else 1
         
@@ -302,91 +302,140 @@ def book_import(request):
             user=request.user, 
             title=title, 
             series_order=series_order,
-            status='drafting'
+            status='importing',
+            import_progress=5,
+            import_status_message="Extracting manuscript text..."
         )
         
+        # If AJAX, return the book ID so the frontend can start polling
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'status': 'success', 'book_id': book.id})
+            
         # 2. Extract Text
         content = extract_text_from_file(book_file)
-        
         if not content:
+            book.delete()
             messages.error(request, "Could not extract text from file.")
             return redirect('book_list')
 
-        # 3. Call AI to analyze (limit for context window)
-        analysis_text = content[:20000] # Take first 20k chars
+        # 3. Global Character Pass
+        book.import_progress = 15
+        book.import_status_message = "Deep-scanning manuscript for characters..."
+        book.save()
         
-        messages.info(request, "AI is analyzing your book. This may take a moment...")
-        ai_data = analyze_book_content_with_ai(analysis_text)
+        char_context = content[:80000]
+        char_data = analyze_characters_with_ai(char_context)
         
-        if ai_data:
-            # 4. Create Characters
-            char_map = {}
-            new_chars = 0
-            for char_info in ai_data.get('characters', []):
+        char_map = {}
+        if char_data:
+            for char_info in char_data.get('characters', []):
                 name = char_info.get('name')
                 if name:
                     char = Character.objects.create(
                         user=request.user,
                         name=name,
-                        role=char_info.get('role', 'supporting'),
+                        role=char_info.get('role', 'supporting')[:100],
                         description=char_info.get('description', ''),
                         goals=char_info.get('goals', ''),
                         traits=char_info.get('traits', '')
                     )
                     char_map[name.lower()] = char
-                    new_chars += 1
-            
-            # 5. Create Chapters
-            new_chapters = 0
-            for chap_info in ai_data.get('chapters', []):
-                Chapter.objects.create(
-                    book=book,
-                    chapter_number=chap_info.get('number', new_chapters + 1),
-                    title=chap_info.get('title', f"Chapter {new_chapters + 1}"),
-                    description=chap_info.get('summary', '')
-                )
-                new_chapters += 1
-            
-            # 6. Create Events
-            new_events = 0
-            for event_info in ai_data.get('events', []):
-                pov_name = event_info.get('pov_character', '').lower()
-                pov_char = char_map.get(pov_name)
-                
-                # Deduce chapter link if possible
-                chap_num = event_info.get('chapter_number')
-                chapter = None
-                if chap_num:
-                    chapter = Chapter.objects.filter(book=book, chapter_number=chap_num).first()
 
-                event = Event.objects.create(
-                    user=request.user,
-                    book=book,
-                    chapter=chapter,
-                    title=event_info.get('title', f"Event {new_events + 1}"),
-                    description=event_info.get('summary', ''),
-                    pov_character=pov_char,
-                    emotional_tone=event_info.get('tone', 'neutral'),
-                    story_beat=event_info.get('beat', ''),
-                    tension_level=event_info.get('tension', 5),
-                    sequence_order=new_events + 1
-                )
-                
-                # Link involved characters
-                for c_name in event_info.get('involved_characters', []):
-                    c_obj = char_map.get(c_name.lower())
-                    if c_obj:
-                        event.characters.add(c_obj)
-                
-                new_events += 1
+        # 4. Chapter Splitting
+        book.import_progress = 25
+        book.import_status_message = "Splitting manuscript into chapters..."
+        book.save()
+        
+        chapter_regex = re.compile(
+            r'(?:^|\n)(?:(?:Chapter|Section|Part|Book)\s+|[0-9]+[\.\-\s]+|[#*]{1,3}\s+)(?:[0-9A-Za-z]+)', 
+            re.IGNORECASE
+        )
+        chapters_found = list(chapter_regex.finditer(content))
+        
+        chunks = []
+        if chapters_found:
+            for i in range(len(chapters_found)):
+                start = chapters_found[i].start()
+                end = chapters_found[i+1].start() if i+1 < len(chapters_found) else len(content)
+                chunk_text = content[start:end].strip()
+                if len(chunk_text) > 100:
+                    chunks.append(chunk_text)
+        
+        if not chunks or len(chunks) < 2:
+            chunks = [content[i:i+15000] for i in range(0, len(content), 15000)]
 
-            messages.success(request, f"Successfully imported '{title}'! Created {new_chars} characters, {new_chapters} chapters, and {new_events} events.")
-            return redirect('book_detail', pk=book.pk)
-        else:
-            messages.warning(request, "Book created, but AI analysis failed to extract details.")
-            return redirect('book_detail', pk=book.pk)
+        # 5. Iterative Content Parsing
+        total_chunks = len(chunks)
+        new_chapters = 0
+        new_events = 0
+        
+        batch_size = 4
+        for i in range(0, len(chunks), batch_size):
+            # Calculate progress (25% to 95%)
+            progress_chunk = int(25 + ((i / total_chunks) * 70))
+            book.import_progress = progress_chunk
+            book.import_status_message = f"Analyzing chapters {new_chapters + 1}-{min(new_chapters + batch_size, total_chunks)} of {total_chunks}..."
+            book.save()
+            
+            batch = chunks[i:i+batch_size]
+            batch_text = "\n\n--- SECTION BOUNDARY ---\n\n".join(batch)
+            
+            ai_data = analyze_book_content_batch_with_ai(batch_text)
+            if ai_data:
+                for chap_info in ai_data.get('chapters', []):
+                    chapter = Chapter.objects.create(
+                        book=book,
+                        chapter_number=chap_info.get('number', new_chapters + 1),
+                        title=chap_info.get('title', f"Chapter {new_chapters + 1}"),
+                        description=chap_info.get('summary', '')
+                    )
+                    new_chapters += 1
+                    
+                    for event_info in ai_data.get('events', []):
+                        if event_info.get('chapter_number') == chapter.chapter_number:
+                            pov_name = event_info.get('pov_character', '').lower()
+                            pov_char = char_map.get(pov_name)
+                            
+                            event = Event.objects.create(
+                                user=request.user,
+                                book=book,
+                                chapter=chapter,
+                                title=event_info.get('title', f"Event {new_events + 1}"),
+                                description=event_info.get('summary', ''),
+                                pov_character=pov_char,
+                                emotional_tone=event_info.get('tone', 'neutral')[:100],
+                                story_beat=event_info.get('beat', '')[:100],
+                                tension_level=event_info.get('tension', 5),
+                                sequence_order=new_events + 1
+                            )
+                            
+                            for c_name in event_info.get('involved_characters', []):
+                                c_obj = char_map.get(c_name.lower())
+                                if c_obj:
+                                    event.characters.add(c_obj)
+                            new_events += 1
+
+        # 6. Mark as Live
+        book.import_progress = 100
+        book.import_status_message = "Import complete!"
+        book.status = 'drafting'
+        book.save()
+
+        messages.success(request, f"Successfully imported '{title}'!")
+        return redirect('book_list')
 
     return render(request, 'timeline/book_import.html')
+
+
+@login_required
+def api_book_progress(request, pk):
+    """API endpoint to get the import progress of a book."""
+    book = get_object_or_404(Book, pk=pk, user=request.user)
+    return JsonResponse({
+        'status': book.status,
+        'progress': book.import_progress,
+        'message': book.import_status_message
+    })
 
 
 @login_required
@@ -592,35 +641,17 @@ def extract_text_from_file(file):
         print(f"Error processing file: {e}")
     return text
 
-def analyze_book_content_with_ai(text):
-    """Calls AI to extract characters, chapters, and events as JSON."""
+def _call_ai_json(prompt, system_message="You are a professional literary analyst. Always respond with valid JSON."):
+    """Helper to call AI and return parsed JSON."""
     if not settings.DEEPSEEK_API_KEY and not settings.GEMINI_API_KEY:
         return None
-
-    prompt = f"""
-    Analyze the following book content and identify:
-    1. Characters (name, role, description, goals, traits)
-    2. Chapters (number, title, summary)
-    3. Key Scenes/Events (title, summary, pov_character, tone, beat, tension level 1-10, involved characters)
-
-    Return the result ONLY as a JSON object with this structure:
-    {{
-      "characters": [{{ "name": "...", "role": "protagonist/antagonist/supporting", "description": "...", "goals": "...", "traits": "..." }}],
-      "chapters": [{{ "number": 1, "title": "...", "summary": "..." }}],
-      "events": [{{ "title": "...", "summary": "...", "pov_character": "...", "tone": "tension/action/reflective/emotional/humorous/dark/neutral", "beat": "exposition/inciting/rising/climax/falling/resolution/setup/payoff", "tension": 7, "involved_characters": ["Name1", "Name2"], "order": 1 }}]
-    }}
-
-    Content:
-    {text}
-    """
-
     try:
         if settings.DEEPSEEK_API_KEY:
             client = OpenAI(api_key=settings.DEEPSEEK_API_KEY, base_url="https://api.deepseek.com")
             response = client.chat.completions.create(
                 model="deepseek-chat",
                 messages=[
-                    {"role": "system", "content": "You are a professional literary analyst. Always respond with valid JSON."},
+                    {"role": "system", "content": system_message},
                     {"role": "user", "content": prompt},
                 ],
                 stream=False
@@ -628,11 +659,10 @@ def analyze_book_content_with_ai(text):
             content = response.choices[0].message.content
         else:
             genai.configure(api_key=settings.GEMINI_API_KEY)
-            model = genai.GenerativeModel('gemini-3-flash-preview')
-            response = model.generate_content(prompt)
+            model = genai.GenerativeModel('gemini-1.5-flash')
+            response = model.generate_content(f"{system_message}\n\nTask:\n{prompt}")
             content = response.text
 
-        # Clean JSON response
         if "```json" in content:
             content = content.split("```json")[1].split("```")[0].strip()
         elif "```" in content:
@@ -640,8 +670,68 @@ def analyze_book_content_with_ai(text):
         
         return json.loads(content)
     except Exception as e:
-        print(f"AI Analysis Error: {e}")
+        print(f"AI Call Error: {e}")
         return None
+
+def analyze_characters_with_ai(text):
+    """Initial pass to identify characters and roles from a large chunk of text."""
+    prompt = f"""
+    Identify all significant characters in the following text. 
+    For each character, provide:
+    - Name
+    - Role (protagonist, antagonist, or supporting)
+    - Short description
+    - Primary goals (what they want)
+    - Personality traits
+
+    Return ONLY a JSON object:
+    {{
+      "characters": [
+        {{ "name": "...", "role": "...", "description": "...", "goals": "...", "traits": "..." }}
+      ]
+    }}
+
+    Text Content:
+    {text}
+    """
+    return _call_ai_json(prompt)
+
+def analyze_book_content_batch_with_ai(text):
+    """Analyze a batch of chapters to extract summaries and events."""
+    prompt = f"""
+    Analyze the following chapters and extract:
+    1. Chapter details (number, title, summary)
+    2. Key Events (title, summary, pov_character, tone, beat, tension level 1-10, involved characters)
+
+    The events MUST be linked to a specific chapter_number.
+
+    Return ONLY a JSON object:
+    {{
+      "chapters": [
+        {{ "number": 1, "title": "...", "summary": "..." }}
+      ],
+      "events": [
+        {{ 
+          "chapter_number": 1, 
+          "title": "...", 
+          "summary": "...", 
+          "pov_character": "...", 
+          "tone": "...", 
+          "beat": "...", 
+          "tension": 7, 
+          "involved_characters": ["Name1", "Name2"] 
+        }}
+      ]
+    }}
+
+    Text Content:
+    {text}
+    """
+    return _call_ai_json(prompt)
+
+def analyze_book_content_with_ai(text):
+    """Legacy compatibility: calls the batch analyzer for a single block."""
+    return analyze_book_content_batch_with_ai(text)
 
 
 # ============== Chapter Views ==============

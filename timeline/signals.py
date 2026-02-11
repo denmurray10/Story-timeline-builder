@@ -53,11 +53,12 @@ def log_delete_activity(sender, instance, **kwargs):
         user = instance.book.user
     
     if user:
-        object_name = str(instance)
         if hasattr(instance, 'title'):
             object_name = instance.title
         elif hasattr(instance, 'name'):
             object_name = instance.name
+        else:
+            object_name = str(instance)
             
         ActivityLog.objects.create(
             user=user,

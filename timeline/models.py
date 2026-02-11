@@ -27,8 +27,9 @@ class Book(models.Model):
     )
     current_word_count = models.PositiveIntegerField(default=0)
     status = models.CharField(
-        max_length=20,
+        max_length=100,
         choices=[
+            ('importing', 'Import in Progress'),
             ('planning', 'Planning'),
             ('drafting', 'Drafting'),
             ('editing', 'Editing'),
@@ -37,6 +38,8 @@ class Book(models.Model):
         ],
         default='planning'
     )
+    import_progress = models.PositiveIntegerField(default=0)
+    import_status_message = models.CharField(max_length=255, blank=True, default='')
     started_date = models.DateField(null=True, blank=True)
     completed_date = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -109,7 +112,7 @@ class Character(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='characters')
     name = models.CharField(max_length=100)
     nickname = models.CharField(max_length=100, blank=True)
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='supporting')
+    role = models.CharField(max_length=100, choices=ROLE_CHOICES, default='supporting')
     description = models.TextField(
         blank=True,
         help_text="Physical description, personality, background"
@@ -201,7 +204,7 @@ class Tag(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tags')
     name = models.CharField(max_length=50)
-    category = models.CharField(max_length=20, choices=TAG_CATEGORIES, default='other')
+    category = models.CharField(max_length=100, choices=TAG_CATEGORIES, default='other')
     color = models.CharField(
         max_length=7,
         default='#95a5a6',
@@ -315,12 +318,12 @@ class Event(models.Model):
         help_text="All characters involved in this event"
     )
     emotional_tone = models.CharField(
-        max_length=20,
+        max_length=100,
         choices=EMOTIONAL_TONE_CHOICES,
         default='neutral'
     )
     story_beat = models.CharField(
-        max_length=20,
+        max_length=100,
         choices=STORY_BEAT_CHOICES,
         blank=True
     )
@@ -355,7 +358,10 @@ class Event(models.Model):
         ordering = ['sequence_order']
 
     def __str__(self):
-        chapter_info = f"{self.chapter.chapter_number}" if self.chapter else "Unassigned"
+        try:
+            chapter_info = f"{self.chapter.chapter_number}" if self.chapter else "Unassigned"
+        except (Chapter.DoesNotExist, AttributeError):
+            chapter_info = "Deleted"
         return f"[Ch.{chapter_info}] {self.title}"
 
     def save(self, *args, **kwargs):
@@ -394,7 +400,7 @@ class CharacterRelationship(models.Model):
         on_delete=models.CASCADE,
         related_name='relationships_as_b'
     )
-    relationship_type = models.CharField(max_length=20, choices=RELATIONSHIP_TYPES)
+    relationship_type = models.CharField(max_length=100, choices=RELATIONSHIP_TYPES)
     description = models.TextField(
         blank=True,
         help_text="Describe the nature of this relationship"
