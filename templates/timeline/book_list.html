@@ -13,10 +13,10 @@ Builder{% endblock %} {% block content %}
 </div>
 
 {% if books %}
-<div class="row">
+<div class="row g-4">
     {% for book in books %}
-    <div class="col-md-6 col-lg-4 mb-4">
-        <div class="card h-100 book-card {% if book.status == 'importing' %}book-processing{% endif %}"
+    <div class="col-sm-6 col-md-6 col-lg-4 col-xl-4 mb-2">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden book-card h-100 {% if book.status == 'importing' %}book-processing{% endif %}"
             id="book-{{ book.pk }}">
             {% if book.status == 'importing' %}
             <div class="book-overlay">
@@ -28,69 +28,109 @@ Builder{% endblock %} {% block content %}
             </div>
             {% endif %}
 
-            {% if book.image %}
-            <img src="{{ book.image.url }}" class="card-img-top" alt="{{ book.title }} Cover"
-                style="height: 200px; object-fit: cover;">
-            {% else %}
-            <img src="{% static 'img/book-cover.png' %}" class="card-img-top" alt="No Cover"
-                style="height: 200px; object-fit: cover;">
-            {% endif %}
-            <div class="card-body">
-                <h5 class="card-title">
-                    {% if book.status == 'importing' %}
-                    <span class="text-muted">Book {{ book.series_order }}: {{ book.title }}</span>
+            <div class="row g-0 h-100">
+                <!-- Book Cover (left) -->
+                <div class="col-5">
+                    {% if book.image %}
+                    <img src="{{ book.image.url }}" alt="{{ book.title }} Cover" class="h-100 w-100"
+                        style="object-fit: cover; min-height: 180px;">
                     {% else %}
-                    <a href="{% url 'book_detail' book.pk %}" class="text-decoration-none">
-                        Book {{ book.series_order }}: {{ book.title }}
-                    </a>
+                    <div class="h-100 w-100 d-flex align-items-center justify-content-center"
+                        style="min-height: 180px; background: linear-gradient(160deg, #667eea 0%, #764ba2 100%);">
+                        <div class="text-center text-white px-2">
+                            <i class="bi bi-book" style="font-size: 2rem;"></i>
+                            <div class="small mt-1 fw-semibold" style="font-size: 0.65rem; line-height: 1.2;">
+                                {{ book.title|truncatewords:3 }}
+                            </div>
+                        </div>
+                    </div>
                     {% endif %}
-                </h5>
-                <p class="text-muted">
-                    <span class="badge {% if book.status == 'importing' %}bg-info{% else %}bg-secondary{% endif %}">
-                        {{ book.get_status_display }}
-                    </span>
-                </p>
-                {% if book.description %}
-                <p class="card-text">{{ book.description|truncatewords:20 }}</p>
-                {% endif %}
-                <div class="mb-3">
-                    <small class="text-muted">
-                        <i class="bi bi-list-ol"></i> {{ book.chapter_count }} chapters | <i
-                            class="bi bi-calendar-event"></i> {{ book.event_count }} events
-                    </small>
                 </div>
-                <div class="progress progress-bar-custom mb-3">
-                    <div class="progress-bar js-progress-bar" role="progressbar"
-                        data-width="{{ book.progress_percentage }}%" aria-valuenow="{{ book.progress_percentage }}"
-                        aria-valuemin="0" aria-valuemax="100">
-                        {{ book.progress_percentage|floatformat:1 }}%
+
+                <!-- Book Info (right) -->
+                <div class="col-7 d-flex flex-column">
+                    <div class="card-body py-2 px-3 flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-start mb-1">
+                            <h6 class="card-title fw-bold mb-0 lh-sm">
+                                {% if book.status == 'importing' %}
+                                <span class="text-muted">{{ book.title }}</span>
+                                {% else %}
+                                <a href="{% url 'book_detail' book.pk %}" class="text-decoration-none text-dark">
+                                    {{ book.title }}
+                                </a>
+                                {% endif %}
+                            </h6>
+                            <span
+                                class="badge rounded-pill ms-2 flex-shrink-0 {% if book.status == 'importing' %}bg-info{% elif book.status == 'drafting' %}bg-warning text-dark{% elif book.status == 'complete' %}bg-success{% else %}bg-secondary{% endif %}"
+                                style="font-size: 0.65rem;">
+                                {{ book.get_status_display }}
+                            </span>
+                        </div>
+
+                        {% if book.series_order %}
+                        <small class="text-muted" style="font-size: 0.7rem;">Book {{ book.series_order }}</small>
+                        {% endif %}
+
+                        {% if book.description %}
+                        <p class="card-text text-muted mt-1 mb-1" style="font-size: 0.75rem;">{{
+                            book.description|truncatewords:15 }}</p>
+                        {% endif %}
+
+                        <div class="d-flex gap-3 text-muted mb-1" style="font-size: 0.7rem;">
+                            <span><i class="bi bi-list-ol me-1"></i>{{ book.chapter_count }} ch</span>
+                            <span><i class="bi bi-calendar-event me-1"></i>{{ book.event_count }} ev</span>
+                        </div>
+
+                        <div class="progress rounded-pill mb-1" style="height: 5px;">
+                            <div class="progress-bar js-progress-bar rounded-pill" role="progressbar"
+                                data-width="{{ book.progress_percentage }}%"
+                                aria-valuenow="{{ book.progress_percentage }}" aria-valuemin="0" aria-valuemax="100"
+                                style="background: linear-gradient(90deg, #667eea, #764ba2);">
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <small class="text-muted" style="font-size: 0.65rem;">
+                                {{ book.current_word_count|floatformat:0 }} / {{ book.word_count_target|floatformat:0 }}
+                                w
+                            </small>
+                            <small class="fw-semibold" style="font-size: 0.65rem; color: #667eea;">
+                                {{ book.progress_percentage|floatformat:0 }}%
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="card-footer bg-transparent border-0 px-3 pb-2 pt-0">
+                        {% if book.status == 'importing' %}
+                        <button class="btn btn-sm btn-outline-secondary rounded-pill px-2" style="font-size: 0.75rem;"
+                            disabled>
+                            <i class="bi bi-hourglass-split"></i> Importing
+                        </button>
+                        {% else %}
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'book_detail' book.pk %}" class="btn btn-sm btn-primary rounded-pill px-2"
+                                style="font-size: 0.75rem;">
+                                <i class="bi bi-eye"></i> View
+                            </a>
+                            <a href="{% url 'book_edit' book.pk %}"
+                                class="btn btn-sm btn-outline-secondary rounded-pill px-2" style="font-size: 0.75rem;">
+                                <i class="bi bi-pencil"></i> Edit
+                            </a>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
-                <small class="text-muted">
-                    {{ book.current_word_count|floatformat:0 }} / {{ book.word_count_target|floatformat:0 }} words
-                </small>
-            </div>
-            <div class="card-footer bg-transparent">
-                {% if book.status == 'importing' %}
-                <button class="btn btn-sm btn-outline-secondary" disabled>
-                    <i class="bi bi-eye"></i> View
-                </button>
-                <button class="btn btn-sm btn-outline-secondary" disabled>
-                    <i class="bi bi-pencil"></i> Edit
-                </button>
-                {% else %}
-                <a href="{% url 'book_detail' book.pk %}" class="btn btn-sm btn-outline-primary">
-                    <i class="bi bi-eye"></i> View
-                </a>
-                <a href="{% url 'book_edit' book.pk %}" class="btn btn-sm btn-outline-secondary">
-                    <i class="bi bi-pencil"></i> Edit
-                </a>
-                {% endif %}
             </div>
         </div>
     </div>
     {% endfor %}
 </div>
+
+<style>
+    .book-card {
+        transition: none;
+    }
+</style>
+
 {% else %}
 <div class="card">
     <div class="card-body text-center py-5">
