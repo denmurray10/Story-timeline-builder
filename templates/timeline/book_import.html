@@ -1,0 +1,80 @@
+{% extends 'timeline/base.html' %}
+{% load static %}
+
+{% block title %}Import Book - Story Timeline Builder{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card dash-card shadow-lg border-0">
+                <div class="card-body p-5 text-center">
+                    <div class="mb-4">
+                        <i class="bi bi-file-earmark-arrow-up text-primary" style="font-size: 3rem;"></i>
+                    </div>
+                    <h2 class="fw-bold mb-3">AI Book Import</h2>
+                    <p class="text-muted mb-5">
+                        Upload your manuscript (.docx or .txt) and our AI will automatically detect characters,
+                        chapters, and timeline events for you.
+                    </p>
+
+                    <form method="post" enctype="multipart/form-data" id="importForm">
+                        {% csrf_token %}
+
+                        <div class="mb-4 text-start">
+                            <label for="title" class="form-label fw-bold">Book Title</label>
+                            <input type="text" name="title" id="title" class="form-control form-control-lg"
+                                placeholder="Enter book title..." required>
+                        </div>
+
+                        <div class="mb-5 text-start">
+                            <label for="book_file" class="form-label fw-bold">Manuscript File</label>
+                            <input type="file" name="book_file" id="book_file" class="form-control" accept=".docx,.txt"
+                                required>
+                            <div class="form-text mt-2">Supports Microsoft Word (.docx) and Plain Text (.txt) files.
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill py-3" id="submitBtn">
+                                <span id="btnText">Start AI Analysis</span>
+                                <div id="btnLoading" class="spinner-border spinner-border-sm ms-2" role="status"
+                                    style="display: none;">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </button>
+                        </div>
+                    </form>
+
+                    <div id="loadingMessage" class="mt-4" style="display: none;">
+                        <div class="alert alert-info border-0 shadow-sm rounded-4">
+                            <p class="mb-1"><i class="bi bi-robot me-2"></i> Our AI is reading your book...</p>
+                            <small class="text-muted">This can take up to 60 seconds depending on the file size.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 text-center">
+                <a href="{% url 'book_list' %}" class="btn btn-link text-decoration-none text-muted">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Library
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('importForm').addEventListener('submit', function () {
+        const btn = document.getElementById('submitBtn');
+        const text = document.getElementById('btnText');
+        const loading = document.getElementById('btnLoading');
+        const msg = document.getElementById('loadingMessage');
+
+        btn.disabled = true;
+        text.innerText = 'Analyzing Manuscript...';
+        loading.style.display = 'inline-block';
+        msg.style.display = 'block';
+    });
+</script>
+{% endblock %}

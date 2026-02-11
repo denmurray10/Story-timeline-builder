@@ -18,6 +18,7 @@ urlpatterns = [
     # Books
     path('books/', views.book_list, name='book_list'),
     path('books/create/', views.book_create, name='book_create'),
+    path('books/import/', views.book_import, name='book_import'),
     path('book/new/', views.book_create, name='book_create'),
     path('books/<int:pk>/', views.book_detail, name='book_detail'),
     path('book/<int:pk>/edit/', views.book_edit, name='book_edit'),
@@ -26,6 +27,8 @@ urlpatterns = [
     
     # Chapters
     path('books/<int:book_pk>/chapters/create/', views.chapter_create, name='chapter_create'),
+    path('books/<int:book_pk>/chapters/upload/', views.chapter_bulk_upload, name='chapter_bulk_upload'),
+    path('chapters/<int:pk>/', views.chapter_detail, name='chapter_detail'),
     path('chapters/<int:pk>/edit/', views.chapter_edit, name='chapter_edit'),
     path('chapters/<int:pk>/delete/', views.chapter_delete, name='chapter_delete'),
     
@@ -61,5 +64,6 @@ urlpatterns = [
     # API endpoints for AJAX (we'll use these later for drag-and-drop)
     path('api/events/reorder/', views.api_event_reorder, name='api_event_reorder'),
     path('api/ai/consultant/', views.api_ai_consultant, name='api_ai_consultant'),
+    path('api/ai/focus-tasks/<int:pk>/toggle/', views.api_toggle_focus_task, name='api_toggle_focus_task'),
     path('account/', views.account, name='account'),
 ]

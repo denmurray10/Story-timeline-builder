@@ -1,0 +1,226 @@
+{% extends 'timeline/base.html' %}
+
+{% block title %}Bulk Upload Chapters - Story Timeline Builder{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+            <div class="card-header bg-dark text-white p-4">
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary rounded-circle p-3 me-3">
+                        <i class="bi bi-cloud-upload fs-4"></i>
+                    </div>
+                    <div>
+                        <h4 class="mb-0">Add Chapters to {{ book.title }}</h4>
+                        <p class="mb-0 text-white-50 small">Upload files or paste text to build your book</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body p-4 p-md-5">
+                <!-- Nav Tabs -->
+                <ul class="nav nav-pills nav-justified mb-4 bg-light p-2 rounded-3" id="uploadTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active fw-bold py-3" id="file-tab" data-bs-toggle="tab"
+                            data-bs-target="#file-panel" type="button" role="tab">
+                            <i class="bi bi-files me-2"></i>Bulk File Upload
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-bold py-3" id="paste-tab" data-bs-toggle="tab"
+                            data-bs-target="#paste-panel" type="button" role="tab">
+                            <i class="bi bi-clipboard-pulse me-2"></i>Quick Paste
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="uploadTabsContent">
+                    <!-- File Upload Panel -->
+                    <div class="tab-pane fade show active" id="file-panel" role="tabpanel">
+                        <div class="alert alert-info border-0 bg-light-blue shadow-sm mb-4">
+                            <h6 class="alert-heading small fw-bold">Multi-File Upload:</h6>
+                            <p class="mb-0 small">Select multiple <strong>.docx</strong> or <strong>.txt</strong> files.
+                                We'll auto-number them and calculate word counts.</p>
+                        </div>
+
+                        <form method="post" enctype="multipart/form-data" id="upload-form">
+                            {% csrf_token %}
+                            <div class="upload-zone p-5 mb-4 border-dashed rounded-4 text-center bg-light position-relative"
+                                id="drop-zone">
+                                <input type="file" name="chapter_files" id="file-input" multiple accept=".docx,.txt"
+                                    class="position-absolute opacity-0 w-100 h-100 start-0 top-0 cursor-pointer"
+                                    style="z-index: 10;">
+                                <div class="upload-icon mb-3">
+                                    <i class="bi bi-cloud-arrow-up fs-1 text-primary"></i>
+                                </div>
+                                <h5 class="mb-2">Drag & Drop Manuscripts Here</h5>
+                                <p class="text-muted small mb-0">Accepts multiple .docx and .txt files</p>
+                            </div>
+
+                            <div id="file-list" class="mb-4 d-none">
+                                <h6 class="mb-3 small fw-bold text-uppercase text-muted"><i
+                                        class="bi bi-check-circle-fill me-2 text-success"></i>Files Ready to Upload:
+                                </h6>
+                                <ul class="list-group list-group-flush rounded-3 border shadow-sm" id="files-container">
+                                </ul>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a href="{% url 'book_detail' book.pk %}"
+                                    class="btn btn-link text-decoration-none text-muted">
+                                    <i class="bi bi-arrow-left me-1"></i>Back
+                                </a>
+                                <button type="submit" class="btn btn-primary px-5 py-2 fw-bold shadow-sm"
+                                    id="submit-btn" disabled>
+                                    Create Chapters <span id="file-count-badge"
+                                        class="badge bg-white text-primary ms-2 d-none">0</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Paste Panel -->
+                    <div class="tab-pane fade" id="paste-panel" role="tabpanel">
+                        <div class="alert alert-info border-0 bg-light-blue shadow-sm mb-4">
+                            <h6 class="alert-heading small fw-bold">Manual Paste:</h6>
+                            <p class="mb-0 small">Great for quickly adding a single chapter by pasting the text
+                                directly.</p>
+                        </div>
+
+                        <form method="post" action="{% url 'chapter_create' book.pk %}">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Chapter Title</label>
+                                <input type="text" name="title" class="form-control"
+                                    placeholder="e.g. The Beginning of the End" required>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold">Chapter Number</label>
+                                    <input type="number" name="chapter_number" class="form-control"
+                                        value="{{ next_chapter_number }}">
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label small fw-bold">Content</label>
+                                <textarea name="content" class="form-control" rows="12"
+                                    placeholder="Paste your chapter content here... Word count will be calculated on save."
+                                    required></textarea>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a href="{% url 'book_detail' book.pk %}"
+                                    class="btn btn-link text-decoration-none text-muted">
+                                    <i class="bi bi-arrow-left me-1"></i>Back
+                                </a>
+                                <button type="submit" class="btn btn-success px-5 py-2 fw-bold shadow-sm">
+                                    <i class="bi bi-plus-lg me-2"></i>Save Chapter
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .nav-pills .nav-link {
+        color: var(--text-muted);
+        transition: all 0.2s ease;
+    }
+
+    .nav-pills .nav-link.active {
+        background-color: #fff !important;
+        color: var(--accent) !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .border-dashed {
+        border: 2px dashed #cbd5e1;
+        transition: all 0.3s ease;
+    }
+
+    .upload-zone:hover,
+    .upload-zone.dragover {
+        border-color: var(--accent);
+        background-color: #f1f5f9 !important;
+    }
+
+    .cursor-pointer {
+        cursor: pointer;
+    }
+
+    .bg-light-blue {
+        background-color: #f0f7ff;
+    }
+</style>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const fileInput = document.getElementById('file-input');
+        const dropZone = document.getElementById('drop-zone');
+        const fileList = document.getElementById('file-list');
+        const filesContainer = document.getElementById('files-container');
+        const submitBtn = document.getElementById('submit-btn');
+        const fileCountBadge = document.getElementById('file-count-badge');
+
+        // Drag and drop handling
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, e => {
+                e.preventDefault();
+                e.stopPropagation();
+            }, false);
+        });
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+        });
+
+        fileInput.addEventListener('change', updateFileList);
+
+        function updateFileList() {
+            const files = fileInput.files;
+            filesContainer.innerHTML = '';
+
+            if (files.length > 0) {
+                fileList.classList.remove('d-none');
+                submitBtn.disabled = false;
+                fileCountBadge.textContent = files.length;
+                fileCountBadge.classList.remove('d-none');
+
+                Array.from(files).forEach((file) => {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item d-flex justify-content-between align-items-center py-2 bg-transparent';
+
+                    let icon = 'bi-file-earmark-text';
+                    if (file.name.endsWith('.docx')) icon = 'bi-file-earmark-word';
+
+                    li.innerHTML = `
+                    <div class="d-flex align-items-center">
+                        <i class="bi ${icon} me-2 text-primary fs-5"></i>
+                        <span class="small fw-medium">${file.name}</span>
+                    </div>
+                    <span class="badge bg-light text-muted border font-monospace small">${(file.size / 1024).toFixed(1)} KB</span>
+                `;
+                    filesContainer.appendChild(li);
+                });
+            } else {
+                fileList.classList.add('d-none');
+                submitBtn.disabled = true;
+                fileCountBadge.classList.add('d-none');
+            }
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}

@@ -82,6 +82,7 @@ class Chapter(models.Model):
         blank=True,
         help_text="Upload your chapter manuscript (.docx or .txt) to automatically calculate word count."
     )
+    content = models.TextField(blank=True, help_text="Paste your chapter content here.")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -116,6 +117,14 @@ class Character(models.Model):
     motivation = models.TextField(
         blank=True,
         help_text="What drives this character?"
+    )
+    goals = models.TextField(
+        blank=True,
+        help_text="Long-term and short-term objectives"
+    )
+    traits = models.TextField(
+        blank=True,
+        help_text="Key personality traits and quirks"
     )
     color_code = models.CharField(
         max_length=7,
@@ -411,3 +420,43 @@ class CharacterRelationship(models.Model):
 
     def __str__(self):
         return f"{self.character_a.name} → {self.character_b.name} ({self.get_relationship_type_display()})"
+
+
+class AIFocusTask(models.Model):
+    """
+    Generated tasks by AI to keep the user focused on the story.
+    Regenerated daily.
+    """
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='focus_tasks')
+    task_text = models.CharField(max_length=500)
+    is_completed = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['id']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.task_text[:50]}"
+
+
+class ActivityLog(models.Model):
+    """
+    Tracks recent activity (creations, edits, deletions) across all models.
+    """
+    ACTION_CHOICES = [
+        ('create', 'Created'),
+        ('update', 'Updated'),
+        ('delete', 'Deleted'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='activity_logs')
+    action = models.CharField(max_length=10, choices=ACTION_CHOICES)
+    model_name = models.CharField(max_length=50)  # e.g., 'Book', 'Character'
+    object_name = models.CharField(max_length=200) # e.g., 'Chapter 1'
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-timestamp']
+
+    def __str__(self):
+        return f"{self.action.capitalize()} {self.model_name}: {self.object_name}"

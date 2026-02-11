@@ -61,12 +61,13 @@ class ChapterForm(forms.ModelForm):
 
     class Meta:
         model = Chapter
-        fields = ["chapter_number", "title", "description", "chapter_file", "word_count", "is_complete"]
+        fields = ["chapter_number", "title", "description", "chapter_file", "content", "word_count", "is_complete"]
         widgets = {
             "title": forms.TextInput(attrs={"class": "form-control"}),
             "chapter_number": forms.NumberInput(attrs={"class": "form-control"}),
             "description": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
             "chapter_file": forms.FileInput(attrs={"class": "form-control"}),
+            "content": forms.Textarea(attrs={"rows": 10, "class": "form-control", "placeholder": "Paste your chapter content here..."}),
             "word_count": forms.NumberInput(attrs={"class": "form-control"}),
             "is_complete": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
@@ -83,6 +84,8 @@ class CharacterForm(forms.ModelForm):
             "role",
             "description",
             "motivation",
+            "goals",
+            "traits",
             "color_code",
             "introduction_book",
             "introduction_chapter",
@@ -96,6 +99,8 @@ class CharacterForm(forms.ModelForm):
             "role": forms.Select(attrs={"class": "form-control"}),
             "description": forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
             "motivation": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
+            "goals": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
+            "traits": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
             "color_code": forms.TextInput(attrs={"class": "form-control", "type": "color"}),
             "introduction_book": forms.Select(attrs={"class": "form-control"}),
             "introduction_chapter": forms.Select(attrs={"class": "form-control"}),

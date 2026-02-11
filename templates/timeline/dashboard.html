@@ -169,6 +169,24 @@
         overflow-y: auto;
     }
 
+    .focus-task-item {
+        cursor: pointer;
+        transition: all 0.2s;
+        padding: 4px 8px;
+        border-radius: 8px;
+    }
+
+    .focus-task-item:hover {
+        background-color: #f1f5f9;
+    }
+
+    .focus-task-text.completed {
+        color: #10b981 !important;
+        /* Green */
+        text-decoration: line-through;
+        opacity: 0.8;
+    }
+
     .ai-loading-dots span {
         animation: blink 1.4s infinite both;
         height: 6px;
@@ -239,9 +257,14 @@
 <!-- Page title -->
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="mb-0">Dashboard</h2>
-    <button id="reset-layout" class="btn btn-sm btn-outline-secondary">
-        <i class="bi bi-arrow-counterclockwise"></i> Reset Layout
-    </button>
+    <div class="d-flex">
+        <a href="{% url 'book_import' %}" class="btn btn-sm btn-outline-primary me-2">
+            <i class="bi bi-robot"></i> Import with AI
+        </a>
+        <button id="reset-layout" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-arrow-counterclockwise"></i> Reset Layout
+        </button>
+    </div>
 </div>
 
 <!-- MAIN 3-COLUMN AREA: left / middle / right -->
@@ -257,12 +280,20 @@
                 Today’s Focus
             </div>
             <p class="dash-card-sub mb-2">
-                1–3 suggested tasks pulled from unwritten events or empty chapters.
+                Click a task once you've finished it.
             </p>
-            <ul class="dash-list">
-                <li>• Add a new event to your current chapter.</li>
-                <li>• Flesh out a POV character arc that has few scenes.</li>
-                <li>• Fill gaps between distant timeline events.</li>
+            <ul class="dash-list" id="focus-tasks-list">
+                {% for task in focus_tasks %}
+                <li class="focus-task-item d-flex align-items-center mb-2" data-task-id="{{ task.id }}">
+                    <i
+                        class="bi {% if task.is_completed %}bi-check-circle-fill text-success{% else %}bi-circle text-muted{% endif %} me-2"></i>
+                    <span class="focus-task-text {% if task.is_completed %}completed{% endif %}">
+                        {{ task.task_text }}
+                    </span>
+                </li>
+                {% empty %}
+                <li class="dash-muted">Generating your focus for today...</li>
+                {% endfor %}
             </ul>
         </div>
 
@@ -344,11 +375,14 @@
                 Recent Activity
             </div>
             <ul class="dash-list">
-                <li><strong>Added character: Aria</strong> <span class="dash-muted">· 5m</span></li>
-                <li><strong>Updated: Battle of Dawn</strong> <span class="dash-muted">· 2h</span></li>
-                <li><strong>Created timeline: Book II</strong> <span class="dash-muted">· 1d</span></li>
-                <li><strong>Edited tag: Prophecy</strong> <span class="dash-muted">· 3d</span></li>
-                <li><strong>Deleted character: Old King</strong> <span class="dash-muted">· 1w</span></li>
+                {% for activity in recent_activity %}
+                <li>
+                    <strong>{{ activity.get_action_display }}: {{ activity.object_name }}</strong>
+                    <span class="dash-muted">({{ activity.model_name }}) · {{ activity.timestamp|timesince }} ago</span>
+                </li>
+                {% empty %}
+                <li class="dash-muted">No recent activity found.</li>
+                {% endfor %}
             </ul>
         </div>
 
@@ -550,6 +584,37 @@
         aiSubmit.addEventListener('click', submitAIQuery);
         aiInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') submitAIQuery();
+        });
+
+        // Toggle Focus Tasks
+        document.querySelectorAll('.focus-task-item').forEach(item => {
+            item.addEventListener('click', function () {
+                const taskId = this.dataset.taskId;
+                const icon = this.querySelector('i');
+                const text = this.querySelector('.focus-task-text');
+
+                fetch(`/api/ai/focus-tasks/${taskId}/toggle/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            if (data.is_completed) {
+                                icon.classList.replace('bi-circle', 'bi-check-circle-fill');
+                                icon.classList.replace('text-muted', 'text-success');
+                                text.classList.add('completed');
+                            } else {
+                                icon.classList.replace('bi-check-circle-fill', 'bi-circle');
+                                icon.classList.replace('text-success', 'text-muted');
+                                text.classList.remove('completed');
+                            }
+                        }
+                    });
+            });
         });
     });
 </script>

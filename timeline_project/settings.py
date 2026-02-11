@@ -155,3 +155,4 @@ LOGOUT_REDIRECT_URL = 'timeline_home'
 
 # AI Integration
 GEMINI_API_KEY = config('GEMINI_API_KEY', default=None)
+DEEPSEEK_API_KEY = config('DEEPSEEK_API_KEY', default=None)

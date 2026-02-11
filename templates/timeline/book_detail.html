@@ -75,105 +75,113 @@ Timeline Builder{% endblock %} {% block content %}
             </div>
         </div>
 
-        <div class="col-lg-4">
-            <div class="card mb-3">
-                <div class="card-body text-center">
-                    <h3>{{ chapters.count }}</h3>
-                    <p class="text-muted mb-0">Chapters</p>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-body text-center">
-                    <h3>{{ events.count }}</h3>
-                    <p class="text-muted mb-0">Events</p>
-                </div>
+    </div> <!-- end col-lg-8 -->
+    <div class="col-lg-4">
+        <div class="card mb-3">
+            <div class="card-body text-center">
+                <h3>{{ chapters.count }}</h3>
+                <p class="text-muted mb-0">Chapters</p>
             </div>
         </div>
-    </div>
+        <div class="card">
+            <div class="card-body text-center">
+                <h3>{{ events.count }}</h3>
+                <p class="text-muted mb-0">Events</p>
+            </div>
+        </div>
+    </div> <!-- end col-lg-4 -->
+</div> <!-- end row -->
 
-    <!-- Chapters -->
-    <div class="card mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <span><i class="bi bi-list-ol"></i> Chapters</span>
+<!-- Chapters -->
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-list-ol"></i> Chapters</span>
+        <div class="btn-group">
             <a href="{% url 'chapter_create' book.pk %}" class="btn btn-sm btn-primary">
-                <i class="bi bi-plus"></i> Add Chapter
+                <i class="bi bi-plus-lg"></i> Add Chapter
+            </a>
+            <a href="{% url 'chapter_bulk_upload' book.pk %}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-cloud-upload"></i> Bulk Upload
             </a>
         </div>
-        <div class="card-body">
-            {% for chapter in chapters %}
-            <div class="mb-2 shadow-sm rounded-3">
-                <div class="d-flex justify-content-between align-items-start p-3">
-                    <div>
-                        <h6 class="mb-1">
-                            Chapter {{ chapter.chapter_number }}: {{ chapter.title
-                            }}
-                        </h6>
-                        {% if chapter.description %}
-                        <p class="mb-1 small text-muted">
-                            {{ chapter.description|truncatewords:15 }}
-                        </p>
-                        {% endif %}
-                        <small class="text-muted">
-                            {{ chapter.word_count }} words · {{ chapter.event_count
-                            }} events {% if chapter.is_complete %} ·
-                            <span class="badge bg-success">Complete</span>
-                            {% endif %}
-                        </small>
-                    </div>
-                    <div>
-                        <a href="{% url 'chapter_edit' chapter.pk %}" class="btn btn-sm btn-outline-secondary">
-                            <i class="bi bi-pencil"></i>
-                        </a>
-                        <a href="{% url 'chapter_delete' chapter.pk %}" class="btn btn-sm btn-outline-danger">
-                            <i class="bi bi-trash"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            {% empty %}
-            <p class="text-muted text-center mb-0">
-                No chapters yet.
-                <a href="{% url 'chapter_create' book.pk %}">Add the first chapter</a>.
-            </p>
-            {% endfor %}
-        </div>
     </div>
-
-    <!-- Events -->
-    <div class="card">
-        <div class="card-header">
-            <i class="bi bi-calendar-event"></i> Events in this Book
-        </div>
-        <div class="card-body">
-            {% for event in events %}
-            <div class="event-card card mb-2">
-                <div class="card-body">
+    <div class="card-body">
+        {% for chapter in chapters %}
+        <div class="mb-2 shadow-sm rounded-3">
+            <div class="d-flex justify-content-between align-items-start p-3">
+                <div>
                     <h6 class="mb-1">
-                        <a href="{% url 'event_detail' event.pk %}" class="text-decoration-none">
-                            {{ event.title }}
+                        <a href="{% url 'chapter_detail' chapter.pk %}"
+                            class="text-decoration-none text-dark hover-accent">
+                            Chapter {{ chapter.chapter_number }}: {{ chapter.title }}
                         </a>
                     </h6>
-                    <p class="mb-1 small">
-                        {{ event.description|truncatewords:20 }}
+                    {% if chapter.description %}
+                    <p class="mb-1 small text-muted">
+                        {{ chapter.description|truncatewords:15 }}
                     </p>
+                    {% endif %}
+                    <small class="text-muted">
+                        {{ chapter.word_count }} words · {{ chapter.event_count
+                        }} events {% if chapter.is_complete %} ·
+                        <span class="badge bg-success">Complete</span>
+                        {% endif %}
+                    </small>
+                </div>
+                <div>
+                    <a href="{% url 'chapter_edit' chapter.pk %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    <a href="{% url 'chapter_delete' chapter.pk %}" class="btn btn-sm btn-outline-danger">
+                        <i class="bi bi-trash"></i>
+                    </a>
                 </div>
             </div>
-            {% empty %}
-            <p class="text-muted text-center mb-0">No events yet.</p>
-            {% endfor %}
         </div>
+
+        {% empty %}
+        <p class="text-muted text-center mb-0">
+            No chapters yet.
+            <a href="{% url 'chapter_create' book.pk %}">Add the first chapter</a>.
+        </p>
+        {% endfor %}
     </div>
+</div>
 
-    {% endblock %}
+<!-- Events -->
+<div class="card">
+    <div class="card-header">
+        <i class="bi bi-calendar-event"></i> Events in this Book
+    </div>
+    <div class="card-body">
+        {% for event in events %}
+        <div class="event-card card mb-2">
+            <div class="card-body">
+                <h6 class="mb-1">
+                    <a href="{% url 'event_detail' event.pk %}" class="text-decoration-none">
+                        {{ event.title }}
+                    </a>
+                </h6>
+                <p class="mb-1 small">
+                    {{ event.description|truncatewords:20 }}
+                </p>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-muted text-center mb-0">No events yet.</p>
+        {% endfor %}
+    </div>
+</div>
 
-    {% block extra_js %}
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('.js-progress-bar').forEach(bar => {
-                const width = bar.getAttribute('data-width');
-                if (width) bar.style.width = width;
-            });
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.js-progress-bar').forEach(bar => {
+            const width = bar.getAttribute('data-width');
+            if (width) bar.style.width = width;
         });
-    </script>
-    {% endblock %}
+    });
+</script>
+{% endblock %}

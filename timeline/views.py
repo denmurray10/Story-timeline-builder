@@ -13,10 +13,12 @@ from django.db.models import Count, Sum, Q
 from django.views.decorators.http import require_POST
 from django.utils import timezone
 import json
+import re
 import google.generativeai as genai
+from openai import OpenAI
 from django.conf import settings
 
-from .models import Book, Chapter, Character, Event, Tag, CharacterRelationship
+from .models import Book, Chapter, Character, Event, Tag, CharacterRelationship, AIFocusTask, ActivityLog
 from .forms import (
     UserRegisterForm, BookForm, ChapterForm, CharacterForm, 
     EventForm, TagForm, UserAccountForm, CharacterRelationshipForm
@@ -74,17 +76,121 @@ def dashboard(request):
     total_events = Event.objects.filter(user=request.user).count()
     events_written = Event.objects.filter(user=request.user, is_written=True).count()
     
-    # Recent events
-    recent_events = Event.objects.filter(user=request.user).order_by('-updated_at')[:5]
+    # Recent activity logs (last 5)
+    recent_activity = ActivityLog.objects.filter(user=request.user).order_by('-timestamp')[:5]
+    
+    # AI Focus Tasks
+    today = timezone.localdate()
+    focus_tasks = AIFocusTask.objects.filter(user=request.user, created_at__date=today)
+    
+    if not focus_tasks.exists():
+        # Generate new tasks if none exist for today
+        generate_daily_focus_tasks(request.user)
+        focus_tasks = AIFocusTask.objects.filter(user=request.user, created_at__date=today)
+    else:
+        # Auto-sense if tasks have been completed
+        auto_sense_focus_tasks(request.user, focus_tasks)
     
     context = {
         'books': books,
         'character_count': characters.count(),
         'total_events': total_events,
         'events_written': events_written,
-        'recent_events': recent_events,
+        'recent_activity': recent_activity,
+        'focus_tasks': focus_tasks,
     }
     return render(request, 'timeline/dashboard.html', context)
+
+
+def generate_daily_focus_tasks(user):
+    """Helper to generate 3 focus tasks for the user using AI."""
+    # 1. Gather context
+    books = Book.objects.filter(user=user)
+    chapters_without_content = Chapter.objects.filter(book__user=user, content='', chapter_file='').count()
+    events_not_written = Event.objects.filter(user=user, is_written=False).count()
+    characters = Character.objects.filter(user=user).count()
+    
+    context = f"The user is writing a story. Stats: {books.count()} books, {characters} characters. "
+    context += f"They have {chapters_without_content} empty chapters and {events_not_written} unwritten events planned."
+    context += "\nGenerate 3 short, actionable writing tasks for today. Return ONLY the tasks as a bulleted list."
+
+    try:
+        if settings.DEEPSEEK_API_KEY:
+            client = OpenAI(api_key=settings.DEEPSEEK_API_KEY, base_url="https://api.deepseek.com")
+            response = client.chat.completions.create(
+                model="deepseek-chat",
+                messages=[
+                    {"role": "system", "content": "You are a helpful story writing coach. Give 3 short daily focus tasks."},
+                    {"role": "user", "content": context},
+                ],
+                stream=False
+            )
+            tasks_text = response.choices[0].message.content
+        elif settings.GEMINI_API_KEY:
+            genai.configure(api_key=settings.GEMINI_API_KEY)
+            model = genai.GenerativeModel('gemini-3-flash-preview')
+            response = model.generate_content(context)
+            tasks_text = response.text
+        else:
+            tasks_text = "- Add a new scene to your current book.\n- Flesh out a secondary character.\n- Review your last chapter."
+
+        # Parse tasks (stripping bullet points like *, -, 1.)
+        import re
+        lines = [re.sub(r'^\d+[\.\)]\s*|^\*\s*|^-\s*', '', line).strip() for line in tasks_text.split('\n') if line.strip()]
+        
+        for text in lines[:3]:
+            if text:
+                AIFocusTask.objects.create(user=user, task_text=text)
+    except Exception as e:
+        print(f"Error generating tasks: {e}")
+        # Fallback
+        for text in ["Write 500 words", "Outline a new scene", "Develop a character trait"]:
+            AIFocusTask.objects.create(user=user, task_text=text)
+
+
+def auto_sense_focus_tasks(user, focus_tasks):
+    """Automatically sense completion based on user activity since task creation."""
+    if not focus_tasks.exists():
+        return
+
+    # Get activity since the earliest task was created today
+    start_time = focus_tasks.order_by('created_at').first().created_at
+    
+    # Check for activity
+    has_new_content = Chapter.objects.filter(book__user=user, updated_at__gte=start_time).exclude(content='', chapter_file='').exists()
+    has_written_events = Event.objects.filter(user=user, updated_at__gte=start_time, is_written=True).exists()
+    has_new_characters = Character.objects.filter(user=user, created_at__gte=start_time).exists()
+    has_new_events = Event.objects.filter(user=user, created_at__gte=start_time).exists()
+
+    for task in focus_tasks:
+        if task.is_completed:
+            continue
+            
+        text = task.task_text.lower()
+        if ("chapter" in text or "write" in text or "content" in text) and has_new_content:
+            task.is_completed = True
+            task.save()
+        elif ("event" in text or "scene" in text) and (has_new_events or has_written_events):
+            task.is_completed = True
+            task.save()
+        elif "character" in text and has_new_characters:
+            task.is_completed = True
+            task.save()
+        elif "flesh out" in text or "develop" in text:
+            # Check for any update activity
+            if has_new_content or has_written_events or has_new_characters:
+                task.is_completed = True
+                task.save()
+
+
+@login_required
+@require_POST
+def api_toggle_focus_task(request, pk):
+    """Toggle completion status of a focus task."""
+    task = get_object_or_404(AIFocusTask, pk=pk, user=request.user)
+    task.is_completed = not task.is_completed
+    task.save()
+    return JsonResponse({'status': 'success', 'is_completed': task.is_completed})
 
 
 # ============== Book Views ==============
@@ -143,6 +249,108 @@ def book_edit(request, pk):
     else:
         form = BookForm(instance=book)
     return render(request, 'timeline/book_form.html', {'form': form, 'action': 'Edit', 'book': book})
+
+
+@login_required
+def book_import(request):
+    """Import a book from a file and analyze with AI."""
+    if request.method == 'POST' and request.FILES.get('book_file'):
+        book_file = request.FILES['book_file']
+        title = request.POST.get('title', 'Imported Book')
+        
+        # 1. Create the Book
+        last_book = Book.objects.filter(user=request.user).order_by('-series_order').first()
+        series_order = (last_book.series_order + 1) if last_book else 1
+        
+        book = Book.objects.create(
+            user=request.user, 
+            title=title, 
+            series_order=series_order,
+            status='drafting'
+        )
+        
+        # 2. Extract Text
+        content = extract_text_from_file(book_file)
+        
+        if not content:
+            messages.error(request, "Could not extract text from file.")
+            return redirect('book_list')
+
+        # 3. Call AI to analyze (limit for context window)
+        analysis_text = content[:20000] # Take first 20k chars
+        
+        messages.info(request, "AI is analyzing your book. This may take a moment...")
+        ai_data = analyze_book_content_with_ai(analysis_text)
+        
+        if ai_data:
+            # 4. Create Characters
+            char_map = {}
+            new_chars = 0
+            for char_info in ai_data.get('characters', []):
+                name = char_info.get('name')
+                if name:
+                    char = Character.objects.create(
+                        user=request.user,
+                        name=name,
+                        role=char_info.get('role', 'supporting'),
+                        description=char_info.get('description', ''),
+                        goals=char_info.get('goals', ''),
+                        traits=char_info.get('traits', '')
+                    )
+                    char_map[name.lower()] = char
+                    new_chars += 1
+            
+            # 5. Create Chapters
+            new_chapters = 0
+            for chap_info in ai_data.get('chapters', []):
+                Chapter.objects.create(
+                    book=book,
+                    chapter_number=chap_info.get('number', new_chapters + 1),
+                    title=chap_info.get('title', f"Chapter {new_chapters + 1}"),
+                    description=chap_info.get('summary', '')
+                )
+                new_chapters += 1
+            
+            # 6. Create Events
+            new_events = 0
+            for event_info in ai_data.get('events', []):
+                pov_name = event_info.get('pov_character', '').lower()
+                pov_char = char_map.get(pov_name)
+                
+                # Deduce chapter link if possible
+                chap_num = event_info.get('chapter_number')
+                chapter = None
+                if chap_num:
+                    chapter = Chapter.objects.filter(book=book, chapter_number=chap_num).first()
+
+                event = Event.objects.create(
+                    user=request.user,
+                    book=book,
+                    chapter=chapter,
+                    title=event_info.get('title', f"Event {new_events + 1}"),
+                    description=event_info.get('summary', ''),
+                    pov_character=pov_char,
+                    emotional_tone=event_info.get('tone', 'neutral'),
+                    story_beat=event_info.get('beat', ''),
+                    tension_level=event_info.get('tension', 5),
+                    sequence_order=new_events + 1
+                )
+                
+                # Link involved characters
+                for c_name in event_info.get('involved_characters', []):
+                    c_obj = char_map.get(c_name.lower())
+                    if c_obj:
+                        event.characters.add(c_obj)
+                
+                new_events += 1
+
+            messages.success(request, f"Successfully imported '{title}'! Created {new_chars} characters, {new_chapters} chapters, and {new_events} events.")
+            return redirect('book_detail', pk=book.pk)
+        else:
+            messages.warning(request, "Book created, but AI analysis failed to extract details.")
+            return redirect('book_detail', pk=book.pk)
+
+    return render(request, 'timeline/book_import.html')
 
 
 @login_required
@@ -286,25 +494,79 @@ def api_relationship_data(request):
     return JsonResponse(data)
 
 
+# ============== Helper Functions ==============
+
 def get_file_word_count(file):
     """Calculate word count from an uploaded file (.docx or .txt)."""
+    text = extract_text_from_file(file)
+    if text:
+        return len(text.split())
+    return 0
+
+def extract_text_from_file(file):
+    """Extract string content from .docx or .txt files."""
     filename = file.name.lower()
     text = ""
-    
     try:
         if filename.endswith('.docx'):
             text = docx2txt.process(file)
         elif filename.endswith('.txt'):
-            # Reset file pointer if already read
             file.seek(0)
             text = file.read().decode('utf-8', errors='ignore')
     except Exception as e:
         print(f"Error processing file: {e}")
-    
-    if text:
-        # Simple word count by split
-        return len(text.split())
-    return 0
+    return text
+
+def analyze_book_content_with_ai(text):
+    """Calls AI to extract characters, chapters, and events as JSON."""
+    if not settings.DEEPSEEK_API_KEY and not settings.GEMINI_API_KEY:
+        return None
+
+    prompt = f"""
+    Analyze the following book content and identify:
+    1. Characters (name, role, description, goals, traits)
+    2. Chapters (number, title, summary)
+    3. Key Scenes/Events (title, summary, pov_character, tone, beat, tension level 1-10, involved characters)
+
+    Return the result ONLY as a JSON object with this structure:
+    {{
+      "characters": [{{ "name": "...", "role": "protagonist/antagonist/supporting", "description": "...", "goals": "...", "traits": "..." }}],
+      "chapters": [{{ "number": 1, "title": "...", "summary": "..." }}],
+      "events": [{{ "title": "...", "summary": "...", "pov_character": "...", "tone": "tension/action/reflective/emotional/humorous/dark/neutral", "beat": "exposition/inciting/rising/climax/falling/resolution/setup/payoff", "tension": 7, "involved_characters": ["Name1", "Name2"], "order": 1 }}]
+    }}
+
+    Content:
+    {text}
+    """
+
+    try:
+        if settings.DEEPSEEK_API_KEY:
+            client = OpenAI(api_key=settings.DEEPSEEK_API_KEY, base_url="https://api.deepseek.com")
+            response = client.chat.completions.create(
+                model="deepseek-chat",
+                messages=[
+                    {"role": "system", "content": "You are a professional literary analyst. Always respond with valid JSON."},
+                    {"role": "user", "content": prompt},
+                ],
+                stream=False
+            )
+            content = response.choices[0].message.content
+        else:
+            genai.configure(api_key=settings.GEMINI_API_KEY)
+            model = genai.GenerativeModel('gemini-3-flash-preview')
+            response = model.generate_content(prompt)
+            content = response.text
+
+        # Clean JSON response
+        if "```json" in content:
+            content = content.split("```json")[1].split("```")[0].strip()
+        elif "```" in content:
+            content = content.split("```")[1].split("```")[0].strip()
+        
+        return json.loads(content)
+    except Exception as e:
+        print(f"AI Analysis Error: {e}")
+        return None
 
 
 # ============== Chapter Views ==============
@@ -319,9 +581,12 @@ def chapter_create(request, book_pk):
             chapter = form.save(commit=False)
             chapter.book = book
             
-            # Auto-calculate word count if a file is uploaded
+            # Auto-calculate word count
             if 'chapter_file' in request.FILES:
                 chapter.word_count = get_file_word_count(request.FILES['chapter_file'])
+            elif chapter.content:
+                # Calculate word count from pasted content
+                chapter.word_count = len(chapter.content.split())
             
             chapter.save()
             messages.success(request, f'Chapter "{chapter.title}" created successfully! (Word count: {chapter.word_count})')
@@ -340,15 +605,28 @@ def chapter_create(request, book_pk):
 
 
 @login_required
+def chapter_detail(request, pk):
+    """View a single chapter's content."""
+    chapter = get_object_or_404(Chapter, pk=pk, book__user=request.user)
+    events = chapter.events.all().order_by('sequence_order')
+    return render(request, 'timeline/chapter_detail.html', {
+        'chapter': chapter,
+        'events': events
+    })
+
+
+@login_required
 def chapter_edit(request, pk):
     """Edit an existing chapter."""
     chapter = get_object_or_404(Chapter, pk=pk, book__user=request.user)
     if request.method == 'POST':
         form = ChapterForm(request.POST, request.FILES, instance=chapter)
         if form.is_valid():
-            # Check if a new file was uploaded
+            # Update word count
             if 'chapter_file' in request.FILES:
                 chapter.word_count = get_file_word_count(request.FILES['chapter_file'])
+            elif 'content' in form.changed_data and chapter.content:
+                chapter.word_count = len(chapter.content.split())
             
             form.save()
             messages.success(request, f'Chapter "{chapter.title}" updated successfully! (Word count: {chapter.word_count})')
@@ -375,6 +653,55 @@ def chapter_delete(request, pk):
         messages.success(request, f'Chapter "{chapter_title}" deleted successfully!')
         return redirect('book_detail', pk=book.pk)
     return render(request, 'timeline/chapter_confirm_delete.html', {'chapter': chapter})
+
+
+@login_required
+def chapter_bulk_upload(request, book_pk):
+    """Bulk upload multiple chapter files."""
+    book = get_object_or_404(Book, pk=book_pk, user=request.user)
+    
+    if request.method == 'POST':
+        files = request.FILES.getlist('chapter_files')
+        if not files:
+            messages.error(request, 'No files were selected.')
+            return redirect('chapter_bulk_upload', book_pk=book.pk)
+            
+        # Get starting chapter number
+        last_chapter = book.chapters.order_by('-chapter_number').first()
+        current_number = (last_chapter.chapter_number + 1) if last_chapter else 1
+        
+        chapters_created = 0
+        for f in files:
+            # Clean up filename for title
+            filename = os.path.splitext(f.name)[0]
+            title = filename.replace('_', ' ').replace('-', ' ').title()
+            
+            # Create chapter
+            chapter = Chapter(
+                book=book,
+                chapter_number=current_number,
+                title=title,
+                chapter_file=f
+            )
+            
+            # Calculate word count
+            chapter.word_count = get_file_word_count(f)
+            chapter.save()
+            
+            current_number += 1
+            chapters_created += 1
+            
+        messages.success(request, f'Successfully uploaded {chapters_created} chapters!')
+        return redirect('book_detail', pk=book.pk)
+        
+    # Get starting chapter number for the "Paste" tab
+    last_chapter = book.chapters.order_by('-chapter_number').first()
+    next_chapter_number = (last_chapter.chapter_number + 1) if last_chapter else 1
+    
+    return render(request, 'timeline/chapter_bulk_upload.html', {
+        'book': book,
+        'next_chapter_number': next_chapter_number
+    })
 
 
 # ============== Character Views ==============
@@ -649,9 +976,9 @@ def api_event_reorder(request):
 def api_ai_consultant(request):
     """
     API endpoint for the AI Story Consultant.
-    Pulls story context and sends it to Gemini.
+    Pulls story context and sends it to DeepSeek (primary) or Gemini.
     """
-    if not settings.GEMINI_API_KEY:
+    if not settings.DEEPSEEK_API_KEY and not settings.GEMINI_API_KEY:
         return JsonResponse({
             'status': 'error', 
             'message': 'AI features are not configured (Missing API Key).'
@@ -665,7 +992,6 @@ def api_ai_consultant(request):
             return JsonResponse({'status': 'error', 'message': 'No query provided'}, status=400)
 
         # 1. Build Story Context
-        # Gather all books, characters, and recent events for this user
         books = Book.objects.filter(user=request.user)
         characters = Character.objects.filter(user=request.user)
         recent_events = Event.objects.filter(user=request.user).order_by('-updated_at')[:10]
@@ -687,12 +1013,23 @@ def api_ai_consultant(request):
         context += f"\nUSER QUESTION: {user_query}\n"
         context += "\nPlease provide creative, helpful, and insightful feedback based on this context. Keep it concise."
 
-        # 2. Call Gemini
-        genai.configure(api_key=settings.GEMINI_API_KEY)
-        model = genai.GenerativeModel('gemini-1.5-flash')
-        
-        response = model.generate_content(context)
-        ai_response = response.text
+        # 2. Call AI Provider
+        if settings.DEEPSEEK_API_KEY:
+            client = OpenAI(api_key=settings.DEEPSEEK_API_KEY, base_url="https://api.deepseek.com")
+            response = client.chat.completions.create(
+                model="deepseek-chat",
+                messages=[
+                    {"role": "system", "content": "You are a professional Story Consultant."},
+                    {"role": "user", "content": context},
+                ],
+                stream=False
+            )
+            ai_response = response.choices[0].message.content
+        else:
+            genai.configure(api_key=settings.GEMINI_API_KEY)
+            model = genai.GenerativeModel('gemini-3-flash-preview')
+            response = model.generate_content(context)
+            ai_response = response.text
 
         return JsonResponse({
             'status': 'success', 
