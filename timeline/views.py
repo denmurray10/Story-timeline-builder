@@ -12,7 +12,8 @@ import json
 
 from .models import Book, Chapter, Character, Event, Tag, CharacterRelationship
 from .forms import (
-    UserRegisterForm, BookForm, ChapterForm, CharacterForm, UserAccountForm
+    UserRegisterForm, BookForm, ChapterForm, CharacterForm, 
+    EventForm, TagForm, UserAccountForm
 )
 # ============== Authentication Views ==============
 

@@ -115,6 +115,8 @@ class EventForm(forms.ModelForm):
         fields = [
             "title",
             "description",
+            "content_json",
+            "content_html",
             "book",
             "chapter",
             "sequence_order",
@@ -133,7 +135,9 @@ class EventForm(forms.ModelForm):
         ]
         widgets = {
             "title": forms.TextInput(attrs={"class": "form-control"}),
-            "description": forms.Textarea(attrs={"rows": 5, "class": "form-control"}),
+            "description": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
+            "content_json": forms.HiddenInput(),
+            "content_html": forms.HiddenInput(),
             "book": forms.Select(attrs={"class": "form-control"}),
             "chapter": forms.Select(attrs={"class": "form-control"}),
             "sequence_order": forms.NumberInput(attrs={"class": "form-control"}),

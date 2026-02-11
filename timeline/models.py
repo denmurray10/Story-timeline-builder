@@ -49,6 +49,14 @@ class Book(models.Model):
     def __str__(self):
         return f"Book {self.series_order}: {self.title}"
 
+    def update_word_count(self):
+        """Aggregate word count from all events in this book."""
+        from django.db.models import Sum
+        total = self.events.aggregate(Sum('word_count'))['word_count__sum'] or 0
+        self.current_word_count = total
+        self.save(update_fields=['current_word_count'])
+        return total
+
     @property
     def progress_percentage(self):
         """Calculate writing progress as a percentage."""
@@ -198,7 +206,18 @@ class Event(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='events')
     title = models.CharField(max_length=200)
     description = models.TextField(
-        help_text="Detailed description of what happens in this event/scene"
+        blank=True,
+        help_text="Brief summary of the scene (optional)"
+    )
+    content_json = models.JSONField(
+        null=True,
+        blank=True,
+        help_text="Rich text content in JSON format"
+    )
+    content_html = models.TextField(
+        null=True,
+        blank=True,
+        help_text="Rich text content in HTML format"
     )
     
     # Book and chapter assignment
@@ -303,6 +322,10 @@ class Event(models.Model):
         if self.chronological_order == 0 and self.sequence_order > 0:
             self.chronological_order = self.sequence_order
         super().save(*args, **kwargs)
+        
+        # Update book's total word count
+        if self.book:
+            self.book.update_word_count()
 
 
 class CharacterRelationship(models.Model):

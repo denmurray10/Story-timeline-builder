@@ -1,7 +1,57 @@
-{% extends 'timeline/base.html' %} {% block title %}{{ event.title }} - Story
-Timeline Builder{% endblock %} {% block content %}
+{% extends 'timeline/base.html' %}
+
+{% block title %}{{ event.title }} - Story Timeline Builder{% endblock %}
+
+{% block extra_css %}
+<style>
+    .scene-content {
+        font-family: 'Inter', sans-serif;
+        line-height: 1.8;
+        font-size: 1.15rem;
+        color: #1a1a1b;
+    }
+
+    .scene-content p {
+        margin-bottom: 1.5rem;
+    }
+
+    .scene-content h2 {
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+
+    /* Fix for badge linting */
+    .character-badge-round {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .character-badge-small {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .tag-badge-solid {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 999px;
+        color: white;
+        font-size: 0.75rem;
+        font-weight: 500;
+        margin-right: 4px;
+        margin-bottom: 4px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1><i class="bi bi-calendar-event"></i> {{ event.title }}</h1>
+    <h1 class="mb-0"><i class="bi bi-calendar-event"></i> {{ event.title }}</h1>
     <div>
         <a href="{% url 'event_edit' event.pk %}" class="btn btn-secondary">
             <i class="bi bi-pencil"></i> Edit
@@ -14,165 +64,186 @@ Timeline Builder{% endblock %} {% block content %}
 
 <div class="row">
     <div class="col-lg-8">
-        <div class="card mb-4">
-            <div class="card-header">
-                <i class="bi bi-file-text"></i> Event Details
+        <!-- Scene Content -->
+        <div class="card mb-4 border-0 shadow-sm">
+            <div class="card-body p-4">
+                {% if event.content_html %}
+                <div class="scene-content">
+                    {{ event.content_html|safe }}
+                </div>
+                {% else %}
+                <div class="py-5 text-center text-muted">
+                    <i class="bi bi-feather display-1 opacity-25"></i>
+                    <p class="mt-3">No scene content written yet.</p>
+                    <a href="{% url 'event_edit' event.pk %}" class="btn btn-sm btn-outline-primary">Start Writing</a>
+                </div>
+                {% endif %}
+
+                {% if event.description %}
+                <div class="mt-5 p-3 bg-light rounded-3 small text-muted">
+                    <strong class="text-uppercase"
+                        style="font-size: 0.7rem; letter-spacing: 0.05rem;">Summary</strong><br>
+                    {{ event.description }}
+                </div>
+                {% endif %}
             </div>
+        </div>
+
+        <!-- Event Details Bar -->
+        <div class="card mb-4 border-0 shadow-sm">
             <div class="card-body">
-                <h5>Description</h5>
-                <p>{{ event.description }}</p>
-
-                <hr />
-
-                <div class="row">
-                    <div class="col-md-6">
-                        <p>
-                            <strong>Book:</strong>
-                            {% if event.book %}
-                            <a href="{% url 'book_detail' event.book.pk %}"
-                                >{{ event.book.title }}</a
-                            >
-                            {% else %} Not assigned {% endif %}
-                        </p>
-                        <p>
-                            <strong>Chapter:</strong>
-                            {% if event.chapter %} Chapter {{
-                            event.chapter.chapter_number }}: {{
-                            event.chapter.title }} {% else %} Not assigned {%
-                            endif %}
-                        </p>
-                        <p>
-                            <strong>Sequence Order:</strong> {{
-                            event.sequence_order }}
-                        </p>
-                        <p>
-                            <strong>Chronological Order:</strong> {{
-                            event.chronological_order }}
-                        </p>
+                <div class="row g-4">
+                    <div class="col-md-6 border-end">
+                        <div class="mb-3">
+                            <label class="small text-muted text-uppercase fw-bold">Context</label>
+                            <div class="mt-1">
+                                <strong>Book:</strong>
+                                {% if event.book %}<a href="{% url 'book_detail' event.book.pk %}">{{ event.book.title
+                                    }}</a>{% else %}N/A{% endif %}
+                            </div>
+                            <div>
+                                <strong>Chapter:</strong>
+                                {% if event.chapter %}Ch.{{ event.chapter.chapter_number }}: {{ event.chapter.title }}{%
+                                else %}N/A{% endif %}
+                            </div>
+                        </div>
+                        <div>
+                            <label class="small text-muted text-uppercase fw-bold">Order</label>
+                            <div class="mt-1">
+                                <strong>Sequence:</strong> {{ event.sequence_order }}
+                            </div>
+                            <div>
+                                <strong>Chronology:</strong> {{ event.chronological_order }}
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-6">
-                        <p>
-                            <strong>Location:</strong> {{
-                            event.location|default:"Not specified" }}
-                        </p>
-                        <p>
-                            <strong>Story Date:</strong> {{
-                            event.story_date|default:"Not specified" }}
-                        </p>
-                        <p>
-                            <strong>Emotional Tone:</strong> {{
-                            event.get_emotional_tone_display }}
-                        </p>
-                        <p>
-                            <strong>Story Beat:</strong> {{
-                            event.get_story_beat_display|default:"Not specified"
-                            }}
-                        </p>
+                        <div class="mb-3">
+                            <label class="small text-muted text-uppercase fw-bold">Setting</label>
+                            <div class="mt-1">
+                                <strong>Location:</strong> {{ event.location|default:"Unknown" }}
+                            </div>
+                            <div>
+                                <strong>Date:</strong> {{ event.story_date|default:"TBD" }}
+                            </div>
+                        </div>
+                        <div>
+                            <label class="small text-muted text-uppercase fw-bold">Tone & Beat</label>
+                            <div class="mt-1">
+                                <strong>Tone:</strong> {{ event.get_emotional_tone_display }}
+                            </div>
+                            <div>
+                                <strong>Beat:</strong> {{ event.get_story_beat_display|default:"General Scene" }}
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                <hr />
-
-                <p>
-                    <strong>Tension Level:</strong>
-                    <span
-                        class="tension-indicator tension-{% if event.tension_level <= 3 %}low{% elif event.tension_level <= 7 %}medium{% else %}high{% endif %}"
-                    ></span>
-                    {{ event.tension_level }}/10
-                </p>
-
-                <p><strong>Word Count:</strong> {{ event.word_count }} words</p>
-
-                <p>
-                    <strong>Status:</strong>
-                    {% if event.is_written %}
-                    <span class="badge bg-success">Written</span>
-                    {% else %}
-                    <span class="badge bg-warning">Not Written</span>
-                    {% endif %}
-                </p>
-
-                {% if event.notes %}
-                <hr />
-                <h6>Notes</h6>
-                <p>{{ event.notes }}</p>
-                {% endif %}
             </div>
         </div>
     </div>
 
     <div class="col-lg-4">
         <!-- POV Character -->
-        <div class="card mb-3">
-            <div class="card-header">
-                <i class="bi bi-eye"></i> POV Character
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0 fw-bold">POV Character</h6>
             </div>
             <div class="card-body">
                 {% if event.pov_character %}
                 <div class="d-flex align-items-center">
-                    <div
-                        class="character-badge"
-                        style="background-color: {{ event.pov_character.color_code }}; width: 40px; height: 40px; border-radius: 50%;"
-                    ></div>
+                    <div class="character-badge-round js-color-apply" data-color="{{ event.pov_character.color_code }}">
+                    </div>
                     <div class="ms-3">
-                        <a
-                            href="{% url 'character_detail' event.pov_character.pk %}"
-                            class="text-decoration-none"
-                        >
+                        <a href="{% url 'character_detail' event.pov_character.pk %}"
+                            class="fw-bold text-decoration-none text-dark">
                             {{ event.pov_character.name }}
                         </a>
+                        <div class="small text-muted">{{ event.pov_character.get_role_display }}</div>
                     </div>
                 </div>
                 {% else %}
-                <p class="text-muted mb-0">No POV character assigned</p>
+                <p class="text-muted small mb-0">No POV character assigned</p>
                 {% endif %}
             </div>
         </div>
 
         <!-- Characters Involved -->
-        <div class="card mb-3">
-            <div class="card-header">
-                <i class="bi bi-people"></i> Characters Involved
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0 fw-bold">Cast in Scene</h6>
             </div>
             <div class="card-body">
-                {% if event.characters.all %} {% for character in
-                event.characters.all %}
+                {% if event.characters.all %}
+                {% for character in event.characters.all %}
                 <div class="d-flex align-items-center mb-2">
-                    <div
-                        class="character-badge"
-                        style="background-color: {{ character.color_code }}; width: 30px; height: 30px; border-radius: 50%;"
-                    ></div>
+                    <div class="character-badge-small js-color-apply" data-color="{{ character.color_code }}"></div>
                     <div class="ms-2">
-                        <a
-                            href="{% url 'character_detail' character.pk %}"
-                            class="text-decoration-none"
-                        >
+                        <a href="{% url 'character_detail' character.pk %}"
+                            class="text-decoration-none text-dark small fw-medium">
                             {{ character.name }}
                         </a>
                     </div>
                 </div>
-                {% endfor %} {% else %}
-                <p class="text-muted mb-0">No characters assigned</p>
+                {% endfor %}
+                {% else %}
+                <p class="text-muted small mb-0">No other characters assigned</p>
                 {% endif %}
             </div>
         </div>
 
         <!-- Tags -->
-        <div class="card">
-            <div class="card-header"><i class="bi bi-tags"></i> Tags</div>
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0 fw-bold">Tags</h6>
+            </div>
             <div class="card-body">
-                {% if event.tags.all %} {% for tag in event.tags.all %}
-                <span
-                    class="tag-badge"
-                    style="background-color: {{ tag.color }};"
-                >
+                {% if event.tags.all %}
+                {% for tag in event.tags.all %}
+                <span class="tag-badge-solid js-color-apply" data-color="{{ tag.color }}">
                     {{ tag.name }}
                 </span>
-                {% endfor %} {% else %}
-                <p class="text-muted mb-0">No tags assigned</p>
+                {% endfor %}
+                {% else %}
+                <p class="text-muted small mb-0">No tags assigned</p>
                 {% endif %}
+            </div>
+        </div>
+
+        <!-- Meta Stats -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="small text-muted">Word Count</span>
+                    <span class="fw-bold">{{ event.word_count }}</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span class="small text-muted">Status</span>
+                    {% if event.is_written %}
+                    <span class="badge bg-success">Drafted</span>
+                    {% else %}
+                    <span class="badge bg-warning text-dark">In Progress</span>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Apply colors from data attributes to avoid CSS linting errors
+        document.querySelectorAll('.js-color-apply').forEach(el => {
+            const color = el.getAttribute('data-color');
+            if (color) {
+                if (el.classList.contains('tag-badge-solid')) {
+                    el.style.backgroundColor = color;
+                } else {
+                    el.style.backgroundColor = color;
+                }
+            }
+        });
+    });
+</script>
 {% endblock %}
