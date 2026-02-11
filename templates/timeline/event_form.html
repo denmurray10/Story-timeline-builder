@@ -42,20 +42,22 @@
         position: relative;
     }
 
-    /* Side toolbar */
+    /* Side toolbar — flush against editor, no right radius */
     .side-toolbar {
         position: absolute;
-        left: -48px;
+        left: 0;
+        transform: translateX(-100%);
         display: flex;
         flex-direction: column;
         gap: 2px;
         background: #1e293b;
         padding: 6px;
-        border-radius: 12px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+        border-radius: 12px 0 0 12px;
+        box-shadow: -4px 4px 16px rgba(0, 0, 0, 0.12);
         border: 1px solid rgba(255, 255, 255, 0.08);
+        border-right: none;
         z-index: 10;
-        transition: top 0.15s ease-out;
+        transition: top 0.15s ease-out, opacity 0.15s ease;
         opacity: 0;
         pointer-events: none;
     }
@@ -70,8 +72,10 @@
         background: none;
         color: #94a3b8;
         font-size: 0.85rem;
-        padding: 7px 8px;
-        border-radius: 8px;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border-radius: 6px;
         cursor: pointer;
         transition: all 0.15s;
         display: flex;
@@ -88,6 +92,12 @@
     .side-toolbar button.is-active {
         background-color: #6366f1;
         color: white;
+    }
+
+    .toolbar-divider {
+        height: 1px;
+        background: #334155;
+        margin: 4px 4px;
     }
 
     /* TipTap Editor */
@@ -210,11 +220,36 @@
             <!-- Editor with side toolbar -->
             <div class="editor-wrapper">
                 <div id="side-toolbar" class="side-toolbar">
-                    <button type="button" data-action="bold" title="Bold"><i class="bi bi-type-bold"></i></button>
-                    <button type="button" data-action="italic" title="Italic"><i class="bi bi-type-italic"></i></button>
+                    <!-- Text style -->
+                    <button type="button" data-action="bold" title="Bold (Ctrl+B)"><i
+                            class="bi bi-type-bold"></i></button>
+                    <button type="button" data-action="italic" title="Italic (Ctrl+I)"><i
+                            class="bi bi-type-italic"></i></button>
+                    <button type="button" data-action="underline" title="Underline (Ctrl+U)"><i
+                            class="bi bi-type-underline"></i></button>
+                    <button type="button" data-action="strike" title="Strikethrough"><i
+                            class="bi bi-type-strikethrough"></i></button>
+                    <div class="toolbar-divider"></div>
+                    <!-- Block types -->
                     <button type="button" data-action="h2" title="Heading"><span class="fw-bold"
                             style="font-size: 0.7rem;">H2</span></button>
-                    <button type="button" data-action="bullet" title="List"><i class="bi bi-list-ul"></i></button>
+                    <button type="button" data-action="h3" title="Sub-heading"><span class="fw-bold"
+                            style="font-size: 0.65rem;">H3</span></button>
+                    <button type="button" data-action="blockquote" title="Blockquote"><i
+                            class="bi bi-chat-quote"></i></button>
+                    <div class="toolbar-divider"></div>
+                    <!-- Lists & structure -->
+                    <button type="button" data-action="bullet" title="Bullet List"><i
+                            class="bi bi-list-ul"></i></button>
+                    <button type="button" data-action="ordered" title="Numbered List"><i
+                            class="bi bi-list-ol"></i></button>
+                    <button type="button" data-action="rule" title="Scene Break"><i class="bi bi-hr"></i></button>
+                    <div class="toolbar-divider"></div>
+                    <!-- Undo / Redo -->
+                    <button type="button" data-action="undo" title="Undo (Ctrl+Z)"><i
+                            class="bi bi-arrow-counterclockwise"></i></button>
+                    <button type="button" data-action="redo" title="Redo (Ctrl+Y)"><i
+                            class="bi bi-arrow-clockwise"></i></button>
                 </div>
                 <div id="editor"></div>
             </div>
@@ -346,6 +381,7 @@
 <script type="module">
     import { Editor } from 'https://esm.sh/@tiptap/core'
     import StarterKit from 'https://esm.sh/@tiptap/starter-kit'
+    import Underline from 'https://esm.sh/@tiptap/extension-underline'
     import Placeholder from 'https://esm.sh/@tiptap/extension-placeholder'
 
     const jsonInput = document.querySelector('input[name="content_json"]');
@@ -367,13 +403,12 @@
     }
 
     function positionToolbar(editor) {
-        // Get the current cursor position in the DOM
         const { view } = editor;
         const { from } = view.state.selection;
         const coords = view.coordsAtPos(from);
         const wrapperRect = editorWrapper.getBoundingClientRect();
 
-        // Position the toolbar vertically aligned with the current line
+        // Center the toolbar vertically on the current cursor line
         const toolbarHeight = sideToolbar.offsetHeight;
         const relativeTop = coords.top - wrapperRect.top - (toolbarHeight / 2) + 10;
 
@@ -385,6 +420,7 @@
         element: document.getElementById('editor'),
         extensions: [
             StarterKit,
+            Underline,
             Placeholder.configure({
                 placeholder: 'Every story starts with a single word. Begin your scene here...',
             })
@@ -413,7 +449,6 @@
             sideToolbar.classList.add('visible');
         },
         onBlur() {
-            // Small delay so button clicks register before hiding
             setTimeout(() => {
                 if (!sideToolbar.matches(':hover')) {
                     sideToolbar.classList.remove('visible');
@@ -432,12 +467,22 @@
     const menuButtons = document.querySelectorAll('#side-toolbar button');
     menuButtons.forEach(btn => {
         btn.onmousedown = (e) => {
-            e.preventDefault(); // Prevent editor blur
+            e.preventDefault();
             const action = btn.getAttribute('data-action');
-            if (action === 'bold') editor.chain().focus().toggleBold().run();
-            if (action === 'italic') editor.chain().focus().toggleItalic().run();
-            if (action === 'h2') editor.chain().focus().toggleHeading({ level: 2 }).run();
-            if (action === 'bullet') editor.chain().focus().toggleBulletList().run();
+            switch (action) {
+                case 'bold': editor.chain().focus().toggleBold().run(); break;
+                case 'italic': editor.chain().focus().toggleItalic().run(); break;
+                case 'underline': editor.chain().focus().toggleUnderline().run(); break;
+                case 'strike': editor.chain().focus().toggleStrike().run(); break;
+                case 'h2': editor.chain().focus().toggleHeading({ level: 2 }).run(); break;
+                case 'h3': editor.chain().focus().toggleHeading({ level: 3 }).run(); break;
+                case 'blockquote': editor.chain().focus().toggleBlockquote().run(); break;
+                case 'bullet': editor.chain().focus().toggleBulletList().run(); break;
+                case 'ordered': editor.chain().focus().toggleOrderedList().run(); break;
+                case 'rule': editor.chain().focus().setHorizontalRule().run(); break;
+                case 'undo': editor.chain().focus().undo().run(); break;
+                case 'redo': editor.chain().focus().redo().run(); break;
+            }
         };
     });
 
@@ -445,10 +490,17 @@
         menuButtons.forEach(btn => {
             const action = btn.getAttribute('data-action');
             let isActive = false;
-            if (action === 'bold') isActive = editor.isActive('bold');
-            if (action === 'italic') isActive = editor.isActive('italic');
-            if (action === 'h2') isActive = editor.isActive('heading', { level: 2 });
-            if (action === 'bullet') isActive = editor.isActive('bulletList');
+            switch (action) {
+                case 'bold': isActive = editor.isActive('bold'); break;
+                case 'italic': isActive = editor.isActive('italic'); break;
+                case 'underline': isActive = editor.isActive('underline'); break;
+                case 'strike': isActive = editor.isActive('strike'); break;
+                case 'h2': isActive = editor.isActive('heading', { level: 2 }); break;
+                case 'h3': isActive = editor.isActive('heading', { level: 3 }); break;
+                case 'blockquote': isActive = editor.isActive('blockquote'); break;
+                case 'bullet': isActive = editor.isActive('bulletList'); break;
+                case 'ordered': isActive = editor.isActive('orderedList'); break;
+            }
             if (isActive) btn.classList.add('is-active');
             else btn.classList.remove('is-active');
         });
