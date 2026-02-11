@@ -368,6 +368,30 @@
     <!-- MIDDLE COLUMN -->
     <div class="col-lg-3 draggable-zone" id="col-middle">
 
+        <!-- Writing Streak 🔥 -->
+        <div class="dash-card p-3 draggable-card mb-3" id="card-streak">
+            <div class="dash-card-header d-flex align-items-center">
+                <i class="bi bi-grip-vertical drag-handle"></i>
+                Writing Streak
+            </div>
+            <div class="text-center py-2">
+                <div style="font-size:2.5rem; font-weight:800; color:#f97316;">
+                    🔥 {{ streak }}
+                </div>
+                <div class="dash-muted">day{{ streak|pluralize }} in a row</div>
+            </div>
+            <div class="d-flex justify-content-center gap-1 mt-2">
+                {% for day in streak_heatmap %}
+                <div title="{{ day.date }}" style="
+                    width:18px; height:18px; border-radius:4px; font-size:8px;
+                    display:flex; align-items:center; justify-content:center;
+                    background:{% if day.count > 3 %}#22c55e{% elif day.count > 0 %}#86efac{% else %}#f3f4f6{% endif %};
+                    color:{% if day.count > 0 %}#fff{% else %}#9ca3af{% endif %};
+                ">{{ day.day }}</div>
+                {% endfor %}
+            </div>
+        </div>
+
         <!-- Recent Activity -->
         <div class="dash-card p-3 draggable-card mb-3" id="card-recent">
             <div class="dash-card-header d-flex align-items-center">
@@ -403,6 +427,57 @@
 
     <!-- RIGHT COLUMN -->
     <div class="col-lg-3 draggable-zone" id="col-right">
+
+        <!-- Series Word Count -->
+        <div class="dash-card p-3 draggable-card mb-3" id="card-series-wc">
+            <div class="dash-card-header d-flex align-items-center">
+                <i class="bi bi-grip-vertical drag-handle"></i>
+                Series Progress
+            </div>
+            <div class="text-center py-2">
+                <div style="font-size:1.6rem; font-weight:700;">
+                    {{ series_total_words|floatformat:0 }}
+                </div>
+                <div class="dash-muted">of {{ series_target_words|floatformat:0 }} words</div>
+            </div>
+            <div class="dash-progress-bg mt-2">
+                <div class="dash-progress-fill js-progress-bar" data-width="{{ series_progress|floatformat:1 }}%"
+                    style="background: linear-gradient(90deg, #6366f1, #8b5cf6);">
+                </div>
+            </div>
+            <div class="text-center mt-1">
+                <small class="dash-muted">{{ series_progress|floatformat:1 }}% complete</small>
+            </div>
+        </div>
+
+        <!-- Character Spotlight -->
+        <div class="dash-card p-3 draggable-card mb-3" id="card-spotlight">
+            <div class="dash-card-header d-flex align-items-center">
+                <i class="bi bi-grip-vertical drag-handle"></i>
+                Character Spotlight ✨
+            </div>
+            {% if spotlight_character %}
+            <div class="text-center py-2">
+                <div
+                    style="width:56px;height:56px;border-radius:50%;background:{{ spotlight_character.color_code }};display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:1.3rem;">
+                    {{ spotlight_character.name|first }}
+                </div>
+                <div class="mt-2 fw-bold">{{ spotlight_character.name }}</div>
+                <span class="badge bg-secondary">{{ spotlight_character.role }}</span>
+                <div class="dash-muted mt-2" style="font-size:0.85rem;">
+                    {{ spotlight_character.description|truncatewords:20 }}
+                </div>
+                <div class="mt-2">
+                    <small><i class="bi bi-calendar-event text-primary"></i> {{ spotlight_character.event_count }}
+                        event{{ spotlight_character.event_count|pluralize }}</small>
+                </div>
+            </div>
+            {% else %}
+            <div class="dash-muted py-3 text-center">Create characters to see today's spotlight.</div>
+            {% endif %}
+        </div>
+
+        <!-- Your Books -->
         <div class="draggable-card mb-3" id="card-books">
             <div class="dash-card-header d-flex align-items-center mb-2">
                 <i class="bi bi-grip-vertical drag-handle"></i>
@@ -444,9 +519,83 @@
 
 </div>
 
-<!-- AI Support -->
+<!-- BOTTOM ROW: Pacing Chart + Plot Holes + Deadlines + AI Support -->
 <div class="row g-3 mb-3">
-    <div class="col-12 draggable-zone" id="col-bottom">
+
+    <!-- Story Pacing Chart -->
+    <div class="col-md-6 draggable-zone">
+        <div class="dash-card dash-pill-card p-3 draggable-card" id="card-pacing">
+            <div class="dash-card-header d-flex align-items-center mb-2">
+                <i class="bi bi-grip-vertical drag-handle"></i>
+                Story Pacing 📊
+            </div>
+            <div style="height:180px;">
+                <canvas id="pacingChart"></canvas>
+            </div>
+            <div class="dash-muted text-center mt-1" style="font-size:0.8rem;">Tension level across your events</div>
+        </div>
+    </div>
+
+    <!-- Plot Hole Detector -->
+    <div class="col-md-6 draggable-zone">
+        <div class="dash-card dash-pill-card p-3 draggable-card" id="card-plot-holes">
+            <div class="dash-card-header d-flex align-items-center mb-2">
+                <i class="bi bi-grip-vertical drag-handle"></i>
+                Plot Hole Detector 🤖
+            </div>
+            <div id="plot-holes-content">
+                <div class="text-center py-3">
+                    <button class="btn btn-outline-primary btn-sm" id="scan-plot-holes">
+                        <i class="bi bi-search"></i> Scan Story
+                    </button>
+                </div>
+            </div>
+            <ul id="plot-holes-list" class="dash-list" style="display:none;"></ul>
+        </div>
+    </div>
+</div>
+
+<!-- Deadlines + AI Support -->
+<div class="row g-3 mb-3">
+
+    <!-- Deadlines -->
+    <div class="col-md-6 draggable-zone">
+        <div class="dash-card dash-pill-card p-3 draggable-card" id="card-deadlines">
+            <div class="dash-card-header d-flex align-items-center mb-2">
+                <i class="bi bi-grip-vertical drag-handle"></i>
+                Deadlines 📅
+            </div>
+            <ul class="dash-list" id="deadlines-list">
+                {% for dl in deadlines %}
+                <li class="d-flex align-items-center justify-content-between mb-2 deadline-item" data-id="{{ dl.id }}">
+                    <div>
+                        <i class="bi bi-circle text-muted me-1 deadline-icon"></i>
+                        <span class="deadline-text">{{ dl.title }}</span>
+                    </div>
+                    <span
+                        class="badge {% if dl.status == 'overdue' %}bg-danger{% elif dl.status == 'pending' %}bg-warning text-dark{% else %}bg-success{% endif %}">
+                        {{ dl.due_date|date:"M j" }}
+                    </span>
+                </li>
+                {% empty %}
+                <li class="dash-muted" id="no-deadlines">No deadlines set.</li>
+                {% endfor %}
+            </ul>
+            <div class="mt-2">
+                <div class="input-group input-group-sm">
+                    <input type="text" id="new-deadline-title" class="form-control"
+                        placeholder="e.g., Finish Chapter 5">
+                    <input type="date" id="new-deadline-date" class="form-control">
+                    <button class="btn btn-outline-primary" id="add-deadline-btn">
+                        <i class="bi bi-plus"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Support -->
+    <div class="col-md-6 draggable-zone" id="col-bottom">
         <div class="dash-card dash-pill-card p-3 draggable-card" id="card-ai">
             <div class="dash-card-header d-flex align-items-center mb-1">
                 <i class="bi bi-grip-vertical drag-handle"></i>
@@ -473,6 +622,7 @@
 
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         // Initialize Progress Bars
@@ -489,7 +639,7 @@
             const layout = {};
             columns.forEach(colId => {
                 const col = document.getElementById(colId);
-                layout[colId] = Array.from(col.children).map(child => child.id);
+                if (col) layout[colId] = Array.from(col.children).map(child => child.id);
             });
             localStorage.setItem('dashboard-layout', JSON.stringify(layout));
         }
@@ -512,20 +662,16 @@
         }
 
         // Initialize Sortable for each column
-        columns.forEach(colId => {
-            const el = document.getElementById(colId);
-            if (el) {
-                sortables.push(new Sortable(el, {
-                    group: 'dashboard',
-                    animation: 250,
-                    ghostClass: 'sortable-ghost',
-                    handle: '.drag-handle',
-                    onEnd: saveLayout
-                }));
-            }
+        document.querySelectorAll('.draggable-zone').forEach(el => {
+            sortables.push(new Sortable(el, {
+                group: 'dashboard',
+                animation: 250,
+                ghostClass: 'sortable-ghost',
+                handle: '.drag-handle',
+                onEnd: saveLayout
+            }));
         });
 
-        // Load existing layout
         loadLayout();
 
         // Reset functionality
@@ -547,7 +693,6 @@
             const query = aiInput.value.trim();
             if (!query) return;
 
-            // UI State
             aiResponseArea.style.display = 'block';
             aiLoading.style.display = 'block';
             aiText.innerHTML = '';
@@ -567,7 +712,6 @@
                     aiInput.disabled = false;
 
                     if (data.status === 'success') {
-                        // Simple formatting for now - we could add a markdown renderer if needed
                         aiText.innerHTML = data.response.replace(/\n/g, '<br>');
                     } else {
                         aiText.innerHTML = `<span class="text-danger">Error: ${data.message}</span>`;
@@ -616,6 +760,164 @@
                     });
             });
         });
+
+        // ========== Story Pacing Chart ==========
+        const pacingData = {{ pacing_data| safe
+    }};
+    const pacingLabels = {{ pacing_labels| safe }};
+    const pacingCtx = document.getElementById('pacingChart');
+
+    if (pacingCtx && pacingData.length > 0) {
+        new Chart(pacingCtx, {
+            type: 'line',
+            data: {
+                labels: pacingLabels.map(l => 'E' + l),
+                datasets: [{
+                    label: 'Tension',
+                    data: pacingData,
+                    borderColor: '#8b5cf6',
+                    backgroundColor: 'rgba(139,92,246,0.15)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 3,
+                    pointBackgroundColor: '#8b5cf6',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        min: 0,
+                        max: 10,
+                        ticks: { stepSize: 2, font: { size: 10 } },
+                        grid: { color: 'rgba(0,0,0,0.05)' }
+                    },
+                    x: {
+                        ticks: { font: { size: 9 } },
+                        grid: { display: false }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => `Tension: ${ctx.raw}/10`
+                        }
+                    }
+                }
+            }
+        });
+    } else if (pacingCtx) {
+        pacingCtx.parentElement.innerHTML = '<div class="dash-muted text-center py-4">Add events with tension levels to see your pacing chart.</div>';
+    }
+
+    // ========== Plot Hole Detector ==========
+    const scanBtn = document.getElementById('scan-plot-holes');
+    if (scanBtn) {
+        scanBtn.addEventListener('click', function () {
+            const content = document.getElementById('plot-holes-content');
+            const list = document.getElementById('plot-holes-list');
+            content.innerHTML = '<div class="text-center py-3"><div class="spinner-border spinner-border-sm text-primary"></div> Scanning...</div>';
+
+            fetch('{% url "api_plot_holes" %}')
+                .then(r => r.json())
+                .then(data => {
+                    content.style.display = 'none';
+                    list.style.display = 'block';
+                    list.innerHTML = '';
+                    data.issues.forEach(issue => {
+                        const colorMap = { warning: '#f59e0b', info: '#3b82f6', success: '#22c55e' };
+                        list.innerHTML += `<li class="mb-2">
+                                <i class="bi ${issue.icon}" style="color:${colorMap[issue.type] || '#6b7280'}"></i>
+                                <span style="font-size:0.88rem;">${issue.text}</span>
+                            </li>`;
+                    });
+                })
+                .catch(() => {
+                    content.innerHTML = '<div class="text-danger text-center py-2">Scan failed.</div>';
+                });
+        });
+    }
+
+    // ========== Deadlines ==========
+    const addDeadlineBtn = document.getElementById('add-deadline-btn');
+    if (addDeadlineBtn) {
+        addDeadlineBtn.addEventListener('click', function () {
+            const title = document.getElementById('new-deadline-title').value.trim();
+            const dueDate = document.getElementById('new-deadline-date').value;
+            if (!title || !dueDate) return;
+
+            fetch('{% url "api_deadline_create" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ title, due_date: dueDate })
+            })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const noDeadlines = document.getElementById('no-deadlines');
+                        if (noDeadlines) noDeadlines.remove();
+
+                        const list = document.getElementById('deadlines-list');
+                        const dateObj = new Date(dueDate + 'T00:00:00');
+                        const formatted = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+                        list.insertAdjacentHTML('beforeend', `
+                            <li class="d-flex align-items-center justify-content-between mb-2 deadline-item" data-id="${data.id}">
+                                <div>
+                                    <i class="bi bi-circle text-muted me-1 deadline-icon"></i>
+                                    <span class="deadline-text">${data.title}</span>
+                                </div>
+                                <span class="badge bg-warning text-dark">${formatted}</span>
+                            </li>
+                        `);
+
+                        // Clear inputs
+                        document.getElementById('new-deadline-title').value = '';
+                        document.getElementById('new-deadline-date').value = '';
+
+                        // Attach toggle handler
+                        attachDeadlineToggle(list.lastElementChild);
+                    }
+                });
+        });
+    }
+
+    function attachDeadlineToggle(item) {
+        item.addEventListener('click', function () {
+            const id = this.dataset.id;
+            const icon = this.querySelector('.deadline-icon');
+            const text = this.querySelector('.deadline-text');
+
+            fetch(`/api/deadlines/${id}/toggle/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.is_completed) {
+                        icon.classList.replace('bi-circle', 'bi-check-circle-fill');
+                        icon.classList.replace('text-muted', 'text-success');
+                        text.style.textDecoration = 'line-through';
+                    } else {
+                        icon.classList.replace('bi-check-circle-fill', 'bi-circle');
+                        icon.classList.replace('text-success', 'text-muted');
+                        text.style.textDecoration = 'none';
+                    }
+                });
+        });
+    }
+
+    // Attach toggle to existing deadlines
+    document.querySelectorAll('.deadline-item').forEach(attachDeadlineToggle);
     });
 </script>
 {% endblock %}

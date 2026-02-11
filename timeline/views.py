@@ -18,7 +18,7 @@ import google.generativeai as genai
 from openai import OpenAI
 from django.conf import settings
 
-from .models import Book, Chapter, Character, Event, Tag, CharacterRelationship, AIFocusTask, ActivityLog
+from .models import Book, Chapter, Character, Event, Tag, CharacterRelationship, AIFocusTask, ActivityLog, WritingDeadline
 from .forms import (
     UserRegisterForm, BookForm, ChapterForm, CharacterForm, 
     EventForm, TagForm, UserAccountForm, CharacterRelationshipForm
@@ -67,6 +67,9 @@ def home(request):
 @login_required
 def dashboard(request):
     """Main dashboard showing overview of all projects."""
+    from datetime import timedelta, date
+    import random
+    
     books = Book.objects.filter(user=request.user).annotate(
         chapter_count=Count('chapters'),
         event_count=Count('events')
@@ -84,12 +87,56 @@ def dashboard(request):
     focus_tasks = AIFocusTask.objects.filter(user=request.user, created_at__date=today)
     
     if not focus_tasks.exists():
-        # Generate new tasks if none exist for today
         generate_daily_focus_tasks(request.user)
         focus_tasks = AIFocusTask.objects.filter(user=request.user, created_at__date=today)
     else:
-        # Auto-sense if tasks have been completed
         auto_sense_focus_tasks(request.user, focus_tasks)
+    
+    # === NEW CARDS ===
+    
+    # 1. Writing Streak 🔥
+    streak = 0
+    check_date = today
+    while True:
+        has_activity = ActivityLog.objects.filter(
+            user=request.user,
+            timestamp__date=check_date
+        ).exists()
+        if has_activity:
+            streak += 1
+            check_date -= timedelta(days=1)
+        else:
+            break
+    
+    # Build heatmap for last 14 days
+    streak_heatmap = []
+    for i in range(13, -1, -1):
+        d = today - timedelta(days=i)
+        count = ActivityLog.objects.filter(user=request.user, timestamp__date=d).count()
+        streak_heatmap.append({'date': d, 'count': count, 'day': d.strftime('%a')[0]})
+    
+    # 2. Series Word Count
+    series_total_words = sum(b.current_word_count for b in books)
+    series_target_words = sum(b.word_count_target for b in books)
+    series_progress = min(100, (series_total_words / series_target_words * 100)) if series_target_words > 0 else 0
+    
+    # 3. Character Spotlight
+    spotlight_character = None
+    active_chars = list(characters)
+    if active_chars:
+        spotlight_character = random.choice(active_chars)
+        spotlight_character.event_count = Event.objects.filter(characters=spotlight_character).count()
+    
+    # 4. Story Pacing Chart (tension data)
+    pacing_data = list(
+        Event.objects.filter(user=request.user)
+        .order_by('book__series_order', 'sequence_order')
+        .values_list('tension_level', flat=True)[:30]
+    )
+    pacing_labels = list(range(1, len(pacing_data) + 1))
+    
+    # 5. Deadlines
+    deadlines = WritingDeadline.objects.filter(user=request.user, is_completed=False).order_by('due_date')[:5]
     
     context = {
         'books': books,
@@ -98,6 +145,16 @@ def dashboard(request):
         'events_written': events_written,
         'recent_activity': recent_activity,
         'focus_tasks': focus_tasks,
+        # New cards
+        'streak': streak,
+        'streak_heatmap': streak_heatmap,
+        'series_total_words': series_total_words,
+        'series_target_words': series_target_words,
+        'series_progress': series_progress,
+        'spotlight_character': spotlight_character,
+        'pacing_data': json.dumps(pacing_data),
+        'pacing_labels': json.dumps(pacing_labels),
+        'deadlines': deadlines,
     }
     return render(request, 'timeline/dashboard.html', context)
 
@@ -193,7 +250,98 @@ def api_toggle_focus_task(request, pk):
     return JsonResponse({'status': 'success', 'is_completed': task.is_completed})
 
 
-# ============== Book Views ==============
+@login_required
+@require_POST
+def api_deadline_create(request):
+    """Create a new writing deadline."""
+    data = json.loads(request.body)
+    title = data.get('title', '')
+    due_date = data.get('due_date', '')
+    book_id = data.get('book_id')
+    
+    if not title or not due_date:
+        return JsonResponse({'status': 'error', 'message': 'Title and due date required.'}, status=400)
+    
+    deadline = WritingDeadline.objects.create(
+        user=request.user,
+        title=title,
+        due_date=due_date,
+        book_id=book_id if book_id else None
+    )
+    return JsonResponse({
+        'status': 'success',
+        'id': deadline.id,
+        'title': deadline.title,
+        'due_date': str(deadline.due_date),
+    })
+
+
+@login_required
+@require_POST
+def api_deadline_toggle(request, pk):
+    """Toggle a deadline as completed."""
+    deadline = get_object_or_404(WritingDeadline, pk=pk, user=request.user)
+    deadline.is_completed = not deadline.is_completed
+    deadline.save()
+    return JsonResponse({'status': 'success', 'is_completed': deadline.is_completed})
+
+
+@login_required
+def api_plot_holes(request):
+    """AI-powered plot hole detection."""
+    books = Book.objects.filter(user=request.user)
+    characters = Character.objects.filter(user=request.user, is_active=True)
+    events = Event.objects.filter(user=request.user).order_by('book__series_order', 'sequence_order')
+    chapters = Chapter.objects.filter(book__user=request.user)
+    
+    # Build issues list
+    issues = []
+    
+    # 1. Chapters with no events
+    for ch in chapters:
+        if not Event.objects.filter(chapter=ch).exists():
+            issues.append({
+                'type': 'warning',
+                'icon': 'bi-exclamation-triangle',
+                'text': f'"{ch.title}" (Book: {ch.book.title}) has no events/scenes attached.'
+            })
+    
+    # 2. Characters with 0 events
+    for char in characters:
+        if Event.objects.filter(characters=char).count() == 0:
+            issues.append({
+                'type': 'info',
+                'icon': 'bi-person-x',
+                'text': f'Character "{char.name}" doesn\'t appear in any events.'
+            })
+    
+    # 3. Books with no chapters
+    for book in books:
+        if book.chapters.count() == 0:
+            issues.append({
+                'type': 'warning',
+                'icon': 'bi-book',
+                'text': f'Book "{book.title}" has no chapters yet.'
+            })
+    
+    # 4. Events with no POV character
+    orphan_events = events.filter(pov_character__isnull=True).count()
+    if orphan_events > 0:
+        issues.append({
+            'type': 'info',
+            'icon': 'bi-eye-slash',
+            'text': f'{orphan_events} event(s) have no POV character assigned.'
+        })
+    
+    if not issues:
+        issues.append({
+            'type': 'success',
+            'icon': 'bi-check-circle',
+            'text': 'No obvious plot holes detected. Your story looks solid!'
+        })
+    
+    return JsonResponse({'status': 'success', 'issues': issues})
+
 
 @login_required
 def book_list(request):
