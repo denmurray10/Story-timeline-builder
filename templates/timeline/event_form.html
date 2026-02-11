@@ -4,22 +4,23 @@
 {% block title %}{{ action }} Event - Story Timeline Builder{% endblock %}
 
 {% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-    /* Premium Editor Styles */
     .editor-layout {
         display: grid;
-        grid-template-columns: 1fr 320px;
-        gap: 2rem;
-        min-height: calc(100vh - 120px);
+        grid-template-columns: 1fr 340px;
+        gap: 2.5rem;
+        min-height: calc(100vh - 160px);
     }
 
     .editor-pane {
         background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
         display: flex;
         flex-direction: column;
-        padding: 2rem;
+        padding: 3rem;
+        border: 1px solid #f1f5f9;
     }
 
     .metadata-pane {
@@ -28,71 +29,111 @@
         height: min-content;
     }
 
-    /* TipTap Styling */
     .ProseMirror {
-        min-height: 500px;
+        min-height: 600px;
         outline: none;
         font-family: 'Inter', sans-serif;
         line-height: 1.8;
-        font-size: 1.1rem;
-        color: #1a1a1b;
+        font-size: 1.15rem;
+        color: #1e293b;
+        padding: 1.5rem;
+        background: #fdfdfd;
+        border-radius: 12px;
+        border: 1px solid #f1f5f9;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .ProseMirror:focus {
+        border-color: #cbd5e1;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.05);
+        background: #fff;
     }
 
     .ProseMirror p {
-        margin-bottom: 1.2em;
+        margin-bottom: 1.5em;
     }
 
-    .ProseMirror h1,
-    .ProseMirror h2 {
-        margin-top: 1.5em;
-        margin-bottom: 0.5em;
+    .ProseMirror p.is-editor-empty:first-child::before {
+        content: attr(data-placeholder);
+        float: left;
+        color: #94a3b8;
+        pointer-events: none;
+        height: 0;
+        font-style: italic;
     }
 
-    /* Bubble Menu Styling */
     .bubble-menu {
         display: flex;
-        background-color: #0d0d0d;
-        padding: 0.2rem;
-        border-radius: 0.5rem;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        background-color: #1e293b;
+        padding: 0.4rem;
+        border-radius: 12px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        gap: 0.25rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .bubble-menu button {
         border: none;
         background: none;
-        color: #fff;
-        font-size: 0.85rem;
-        font-weight: 500;
-        padding: 0.4rem 0.6rem;
-        border-radius: 0.3rem;
+        color: #f1f5f9;
+        font-size: 0.9rem;
+        padding: 0.5rem 0.8rem;
+        border-radius: 8px;
         cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .bubble-menu button:hover {
-        background-color: #333;
+        background-color: #334155;
+        color: white;
     }
 
     .bubble-menu button.is-active {
         background-color: #6366f1;
+        color: white;
     }
 
     .editor-header {
-        border-bottom: 1px solid #f0f0f0;
-        margin-bottom: 1.5rem;
-        padding-bottom: 1rem;
+        border-bottom: 2px solid #f8fafc;
+        margin-bottom: 2.5rem;
+        padding-bottom: 2rem;
     }
 
     .word-count-badge {
-        font-size: 0.75rem;
-        background: #f3f4f6;
-        padding: 4px 10px;
+        font-size: 0.8rem;
+        background: #f8fafc;
+        padding: 8px 16px;
         border-radius: 999px;
-        color: #6b7280;
+        color: #64748b;
+        font-weight: 600;
+        letter-spacing: 0.025em;
+        border: 1px solid #f1f5f9;
+    }
+
+    .scene-title-input {
+        font-size: 2.25rem !important;
+        font-weight: 700 !important;
+        border: none !important;
+        padding: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        color: #0f172a !important;
+    }
+
+    .scene-title-input::placeholder {
+        color: #cbd5e1 !important;
     }
 
     @media (max-width: 992px) {
         .editor-layout {
             grid-template-columns: 1fr;
+        }
+
+        .editor-pane {
+            padding: 2rem;
         }
     }
 </style>
@@ -102,132 +143,168 @@
 <form method="post" id="event-form">
     {% csrf_token %}
 
-    <!-- Hidden fields for TipTap data -->
+    {% if form.errors %}
+    <div class="alert alert-danger shadow-sm mb-5 border-0 rounded-4 p-4">
+        <h6 class="fw-bold mb-3 d-flex align-items-center">
+            <i class="bi bi-exclamation-octagon-fill me-2 fs-5"></i>
+            Check the following details:
+        </h6>
+        <ul class="mb-0 small opacity-75">
+            {% for field, errors in form.errors.items %}
+            {% for error in errors %}
+            <li><strong>{{ field|title }}:</strong> {{ error }}</li>
+            {% endfor %}
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
     {{ form.content_json }}
     {{ form.content_html }}
+    {{ form.word_count }}
 
     <div class="editor-layout">
-        <!-- Main Writing Pane -->
         <div class="editor-pane">
-            <div class="editor-header d-flex justify-content-between align-items-center">
-                <div class="flex-grow-1 me-3">
-                    {{ form.title }}
-                    {% if form.title.errors %}
-                    <div class="text-danger small mt-1">{{ form.title.errors|join:", " }}</div>
-                    {% endif %}
+            <div class="editor-header">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="flex-grow-1 me-4">
+                        <input type="text" name="title" id="id_title" value="{{ form.title.value|default:'' }}"
+                            class="form-control scene-title-input" placeholder="Scene Title..." required>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="word-count-badge" id="word-count">0 words</span>
+                        <button type="submit" class="btn btn-primary px-5 py-2 fw-bold rounded-pill shadow-sm">
+                            <i class="bi bi-journal-check me-2"></i> Save Scene
+                        </button>
+                    </div>
                 </div>
-                <div class="d-flex align-items-center gap-2">
-                    <span class="word-count-badge" id="word-count">0 words</span>
-                    <button type="submit" class="btn btn-primary btn-sm">
-                        <i class="bi bi-save"></i> Save
-                    </button>
-                </div>
+                {% if form.title.errors %}
+                <div class="text-danger small">{{ form.title.errors|join:", " }}</div>
+                {% endif %}
             </div>
 
-            <!-- TipTap Bubble Menu -->
-            <div id="bubble-menu" class="bubble-menu" style="display: none;">
-                <button type="button" @click="editor.chain().focus().toggleBold().run()"
-                    :class="{ 'is-active': editor.isActive('bold') }">
-                    <i class="bi bi-type-bold"></i>
-                </button>
-                <button type="button" @click="editor.chain().focus().toggleItalic().run()"
-                    :class="{ 'is-active': editor.isActive('italic') }">
-                    <i class="bi bi-type-italic"></i>
-                </button>
-                <button type="button" @click="editor.chain().focus().toggleHeading({ level: 2 }).run()"
-                    :class="{ 'is-active': editor.isActive('heading', { level: 2 }) }">
-                    H2
-                </button>
-                <button type="button" @click="editor.chain().focus().toggleBulletList().run()"
-                    :class="{ 'is-active': editor.isActive('bulletList') }">
-                    <i class="bi bi-list-ul"></i>
-                </button>
+            <div id="bubble-menu" class="bubble-menu" style="visibility: hidden;">
+                <button type="button" data-action="bold" title="Bold"><i class="bi bi-type-bold"></i></button>
+                <button type="button" data-action="italic" title="Italic"><i class="bi bi-type-italic"></i></button>
+                <button type="button" data-action="h2" title="Heading"><span class="fw-bold">H2</span></button>
+                <button type="button" data-action="bullet" title="List"><i class="bi bi-list-ul"></i></button>
             </div>
 
-            <!-- Editor Input -->
             <div id="editor"></div>
         </div>
 
-        <!-- Sidebar Metadata Pane -->
         <div class="metadata-pane">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white py-3">
-                    <h6 class="mb-0 fw-bold">Scene Settings</h6>
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-white py-4 px-4 border-0">
+                    <h6 class="mb-0 fw-bold d-flex align-items-center">
+                        <i class="bi bi-gear-fill me-2 text-primary opacity-50"></i>
+                        Scene Bible
+                    </h6>
                 </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold text-uppercase">Summary</label>
+                <div class="card-body px-4 pb-4 pt-0">
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-uppercase text-muted opacity-75">Concept /
+                            Summary</label>
                         {{ form.description }}
                     </div>
 
-                    <div class="row g-2 mb-3">
+                    <div class="row g-3 mb-4">
                         <div class="col-6">
-                            <label class="form-label small fw-bold text-uppercase text-muted">Book</label>
+                            <label class="form-label small fw-bold text-uppercase text-muted opacity-75">Book</label>
                             {{ form.book }}
                         </div>
                         <div class="col-6">
-                            <label class="form-label small fw-bold text-uppercase text-muted">Chapter</label>
+                            <label class="form-label small fw-bold text-uppercase text-muted opacity-75">Chapter</label>
                             {{ form.chapter }}
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold text-uppercase text-muted">POV Character</label>
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-uppercase text-muted opacity-75">POV
+                            Character</label>
                         {{ form.pov_character }}
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold text-uppercase text-muted">Location</label>
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-uppercase text-muted opacity-75">Primary
+                            Setting</label>
                         {{ form.location }}
                     </div>
 
-                    <div class="row g-2 mb-3">
+                    <div class="row g-3 mb-4">
                         <div class="col-6">
-                            <label class="form-label small fw-bold text-uppercase text-muted">Beat</label>
+                            <label class="form-label small fw-bold text-uppercase text-muted opacity-75">Story
+                                Beat</label>
                             {{ form.story_beat }}
                         </div>
                         <div class="col-6">
-                            <label class="form-label small fw-bold text-uppercase text-muted">Tone</label>
+                            <label class="form-label small fw-bold text-uppercase text-muted opacity-75">Emotion</label>
                             {{ form.emotional_tone }}
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold text-uppercase text-muted">Characters Present</label>
-                        <div class="p-2 border rounded"
-                            style="max-height: 150px; overflow-y: auto; font-size: 0.85rem;">
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-uppercase text-muted opacity-75">Tension
+                            Intensity</label>
+                        {{ form.tension_level }}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-uppercase text-muted opacity-75">Characters
+                            Present</label>
+                        <div class="p-3 border rounded-3 bg-light bg-opacity-50"
+                            style="max-height: 150px; overflow-y: auto; font-size: 0.9rem;">
                             {{ form.characters }}
                         </div>
                     </div>
 
-                    <div class="d-grid mt-4">
-                        <a href="{% url 'timeline_view' %}" class="btn btn-outline-secondary btn-sm mb-2">Back to
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-uppercase text-muted opacity-75">Thematic
+                            Tags</label>
+                        <div class="p-3 border rounded-3 bg-light bg-opacity-50"
+                            style="max-height: 150px; overflow-y: auto; font-size: 0.9rem;">
+                            {{ form.tags }}
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'timeline_view' %}" class="btn btn-light text-muted fw-medium border-0">Back to
                             Timeline</a>
                     </div>
                 </div>
             </div>
 
-            <!-- Collapsible Extras -->
-            <div class="card border-0 shadow-sm mt-3">
-                <div class="card-header bg-white" data-bs-toggle="collapse" data-bs-target="#extraSettings"
-                    style="cursor: pointer;">
+            <div class="card border-0 shadow-sm mt-3 rounded-4">
+                <div class="card-header bg-white border-0 py-3 px-4" data-bs-toggle="collapse"
+                    data-bs-target="#extraSettings" style="cursor: pointer;">
                     <div class="d-flex justify-content-between align-items-center">
-                        <span class="small fw-bold text-uppercase">Timeline Info</span>
-                        <i class="bi bi-chevron-down small"></i>
+                        <span class="small fw-bold text-uppercase text-muted">Technical Notes</span>
+                        <i class="bi bi-chevron-down small opacity-50"></i>
                     </div>
                 </div>
                 <div id="extraSettings" class="collapse">
-                    <div class="card-body">
-                        <div class="mb-2">
-                            <label class="small text-muted">Order</label>
-                            {{ form.sequence_order }}
+                    <div class="card-body px-4 pb-4 pt-0">
+                        <div class="mb-4">
+                            {{ form.notes }}
                         </div>
-                        <div class="mb-2">
-                            <label class="small text-muted">Date In-Story</label>
+                        <div class="row g-3 mb-4">
+                            <div class="col-6">
+                                <label class="small text-muted fw-bold">Sequence</label>
+                                {{ form.sequence_order }}
+                            </div>
+                            <div class="col-6">
+                                <label class="small text-muted fw-bold">Chronology</label>
+                                {{ form.chronological_order }}
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="small text-muted fw-bold">World Date</label>
                             {{ form.story_date }}
                         </div>
-                        <div class="mb-2">
-                            {{ form.is_written }} <label class="small">Mark as Draft Complete</label>
+                        <div class="form-check form-switch p-0 d-flex justify-content-between align-items-center">
+                            <label class="form-check-label fw-medium text-muted small"
+                                for="{{ form.is_written.id_for_label }}">Mark as Completed</label>
+                            {{ form.is_written }}
                         </div>
                     </div>
                 </div>
@@ -238,71 +315,95 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://unpkg.com/@tiptap/standalone@latest"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const { Editor } = Tiptap;
-        const StarterKit = Tiptap.StarterKit;
-        const BubbleMenu = Tiptap.BubbleMenu;
+<script type="module">
+    import { Editor } from 'https://esm.sh/@tiptap/core'
+    import StarterKit from 'https://esm.sh/@tiptap/starter-kit'
+    import BubbleMenu from 'https://esm.sh/@tiptap/extension-bubble-menu'
+    import Placeholder from 'https://esm.sh/@tiptap/extension-placeholder'
 
-        const jsonInput = document.querySelector('input[name="content_json"]');
-        const htmlInput = document.querySelector('input[name="content_html"]');
-        const wordCountInput = document.querySelector('input[name="word_count"]');
-        const wordCountDisplay = document.getElementById('word-count');
+    const jsonInput = document.querySelector('input[name="content_json"]');
+    const htmlInput = document.querySelector('input[name="content_html"]');
+    const wordCountInput = document.querySelector('input[name="word_count"]');
+    const wordCountDisplay = document.getElementById('word-count');
 
-        // Initial content
-        let initialContent = '';
-        try {
-            if (jsonInput.value) {
-                initialContent = JSON.parse(jsonInput.value);
-            } else if (htmlInput.value) {
-                initialContent = htmlInput.value;
-            }
-        } catch (e) {
-            console.error('Error parsing content', e);
+    let initialContent = '';
+    try {
+        if (jsonInput && jsonInput.value && jsonInput.value !== 'null' && jsonInput.value !== '') {
+            initialContent = JSON.parse(jsonInput.value);
+        } else if (htmlInput && htmlInput.value) {
+            initialContent = htmlInput.value;
         }
+    } catch (e) {
+        console.warn('Initial content parse failed', e);
+    }
 
-        const editor = new Editor({
-            element: document.querySelector('#editor'),
-            extensions: [
-                StarterKit,
-                BubbleMenu.configure({
-                    element: document.querySelector('#bubble-menu'),
-                }),
-            ],
-            content: initialContent,
-            onUpdate({ editor }) {
-                // Keep hidden fields in sync
-                jsonInput.value = JSON.stringify(editor.getJSON());
-                htmlInput.value = editor.getHTML();
+    const editor = new Editor({
+        element: document.getElementById('editor'),
+        extensions: [
+            StarterKit,
+            BubbleMenu.configure({
+                element: document.getElementById('bubble-menu'),
+                tippyOptions: { duration: 100 },
+            }),
+            Placeholder.configure({
+                placeholder: 'Every story starts with a single word. Begin your scene here...',
+            })
+        ],
+        content: initialContent,
+        onUpdate({ editor }) {
+            const json = editor.getJSON();
+            const html = editor.getHTML();
+            const text = editor.getText();
+            const words = text.trim() ? text.trim().split(/\s+/).length : 0;
 
-                // Update word count
-                const text = editor.getText();
-                const words = text.trim() ? text.trim().split(/\s+/).length : 0;
-                wordCountDisplay.innerText = `${words} words`;
-                if (wordCountInput) wordCountInput.value = words;
-            },
-        });
+            if (jsonInput) jsonInput.value = JSON.stringify(json);
+            if (htmlInput) htmlInput.value = html;
+            if (wordCountInput) wordCountInput.value = words;
+            if (wordCountDisplay) wordCountDisplay.innerText = `${words} words`;
 
-        // Initialize word count
-        const text = editor.getText();
-        const words = text.trim() ? text.trim().split(/\s+/).length : 0;
-        wordCountDisplay.innerText = `${words} words`;
-
-        // Handle form submission
-        document.getElementById('event-form').onsubmit = (e) => {
-            jsonInput.value = JSON.stringify(editor.getJSON());
-            htmlInput.value = editor.getHTML();
-        };
-
-        // Custom Bubble Menu Action mappings
-        window.editor = editor; // for the @click shortcuts in the HTML
+            updateMenuState(editor);
+        },
+        onSelectionUpdate({ editor }) {
+            updateMenuState(editor);
+        },
+        onCreate({ editor }) {
+            const text = editor.getText();
+            const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+            if (wordCountDisplay) wordCountDisplay.innerText = `${words} words`;
+            if (wordCountInput) wordCountInput.value = words;
+        }
     });
 
-    // Simple Alpine-like trigger for TipTap actions
-    function applyAction(action, options = {}) {
-        if (action === 'toggleBold') window.editor.chain().focus().toggleBold().run();
-        if (action === 'toggleItalic') window.editor.chain().focus().toggleItalic().run();
+    const menuButtons = document.querySelectorAll('#bubble-menu button');
+    menuButtons.forEach(btn => {
+        btn.onclick = (e) => {
+            e.preventDefault();
+            const action = btn.getAttribute('data-action');
+            if (action === 'bold') editor.chain().focus().toggleBold().run();
+            if (action === 'italic') editor.chain().focus().toggleItalic().run();
+            if (action === 'h2') editor.chain().focus().toggleHeading({ level: 2 }).run();
+            if (action === 'bullet') editor.chain().focus().toggleBulletList().run();
+        };
+    });
+
+    function updateMenuState(editor) {
+        menuButtons.forEach(btn => {
+            const action = btn.getAttribute('data-action');
+            let isActive = false;
+            if (action === 'bold') isActive = editor.isActive('bold');
+            if (action === 'italic') isActive = editor.isActive('italic');
+            if (action === 'h2') isActive = editor.isActive('heading', { level: 2 });
+            if (action === 'bullet') isActive = editor.isActive('bulletList');
+            if (isActive) btn.classList.add('is-active');
+            else btn.classList.remove('is-active');
+        });
     }
+
+    document.getElementById('event-form').onsubmit = () => {
+        if (jsonInput) jsonInput.value = JSON.stringify(editor.getJSON());
+        if (htmlInput) htmlInput.value = editor.getHTML();
+    };
+
+    window.editorInstance = editor;
 </script>
 {% endblock %}

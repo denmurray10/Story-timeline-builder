@@ -138,6 +138,7 @@ class EventForm(forms.ModelForm):
             "description": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
             "content_json": forms.HiddenInput(),
             "content_html": forms.HiddenInput(),
+            "word_count": forms.HiddenInput(),
             "book": forms.Select(attrs={"class": "form-control"}),
             "chapter": forms.Select(attrs={"class": "form-control"}),
             "sequence_order": forms.NumberInput(attrs={"class": "form-control"}),
@@ -158,6 +159,15 @@ class EventForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
+        # Ensure optional fields don't block submission
+        self.fields["content_json"].required = False
+        self.fields["content_html"].required = False
+        self.fields["word_count"].required = False
+        self.fields["notes"].required = False
+        self.fields["tags"].required = False
+        self.fields["chronological_order"].required = False
+        self.fields["description"].required = False
+        
         if user:
             self.fields["book"].queryset = Book.objects.filter(user=user)
             self.fields["chapter"].queryset = Chapter.objects.filter(book__user=user)
