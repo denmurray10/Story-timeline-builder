@@ -13,6 +13,7 @@ class Post(models.Model):
     updated_on = models.DateTimeField(auto_now=True)
     content = models.TextField()
     created_on = models.DateTimeField(auto_now_add=True)
+    image = models.ImageField(upload_to='blog_posts/', null=True, blank=True)
     status = models.IntegerField(choices=STATUS, default=0)
 
     class Meta:
@@ -20,3 +21,7 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('post_detail', kwargs={'slug': self.slug})
