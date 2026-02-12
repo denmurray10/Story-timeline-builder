@@ -1825,13 +1825,24 @@ def api_relationship_data(request):
     
     nodes = []
     for char in characters:
-        nodes.append({
+        node = {
             'id': char.id,
             'label': char.name,
-            'group': char.role, # for auto-coloring usually, but we use specific colors
+            'group': char.role, 
             'color': char.color_code or '#97c2fc',
-            'description': char.description[:100] + '...' if char.description else ''
-        })
+            'description': char.description[:100] + '...' if char.description else '',
+            'profile_pic_url': char.profile_pic_url
+        }
+        
+        if char.profile_pic_url:
+            node['shape'] = 'circularImage'
+            node['image'] = char.profile_pic_url
+            node['brokenImage'] = 'https://via.placeholder.com/50' # Fallback
+            node['size'] = 30
+        else:
+             node['shape'] = 'dot'
+             
+        nodes.append(node)
         
     edges = []
     
