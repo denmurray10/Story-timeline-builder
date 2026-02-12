@@ -45,6 +45,7 @@ urlpatterns = [
     
     # Events (Timeline)
     path('timeline/', views.timeline_view, name='timeline_view'),
+    path('timeline/horizontal/', views.horizontal_timeline, name='horizontal_timeline'),
     path('events/create/', views.event_create, name='event_create'),
     path('events/<int:pk>/', views.event_detail, name='event_detail'),
     path('events/<int:pk>/edit/', views.event_edit, name='event_edit'),

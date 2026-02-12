@@ -1773,3 +1773,16 @@ def analyze_single_character_with_ai(character_name, text):
     """
     # Use deepseek-chat for speed; it's excellent at extraction.
     return _call_ai_json(prompt, deepseek_model="deepseek-chat")
+
+
+@login_required
+def horizontal_timeline(request):
+    """
+    Displays events in a linear, horizontally scrollable timeline.
+    """
+    events = Event.objects.filter(user=request.user).order_by('sequence_order')
+    
+    context = {
+        'events': events,
+    }
+    return render(request, 'timeline/horizontal_timeline.html', context)
