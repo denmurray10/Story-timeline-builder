@@ -173,6 +173,11 @@ class Character(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    deep_dive_notes = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Last generated AI deep dive for this character"
+    )
 
     @property
     def profile_pic_url(self):

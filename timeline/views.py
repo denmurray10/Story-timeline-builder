@@ -1472,13 +1472,13 @@ def api_event_reorder(request):
 @require_POST
 def api_ai_consultant(request):
     """
-    API endpoint for the AI Story Consultant.
+    API endpoint for the Story Consultant.
     Pulls story context and sends it to DeepSeek (primary) or Gemini.
     """
     if not settings.DEEPSEEK_API_KEY and not settings.GEMINI_API_KEY:
         return JsonResponse({
             'status': 'error', 
-            'message': 'AI features are not configured (Missing API Key).'
+            'message': 'Consultant features are not configured (Missing API Key).'
         }, status=503)
 
     try:
@@ -1508,7 +1508,8 @@ def api_ai_consultant(request):
             context += f"- {e.title}: {e.description[:100]}...\n"
 
         context += f"\nUSER QUESTION: {user_query}\n"
-        context += "\nPlease provide creative, helpful, and insightful feedback based on this context. Keep it concise."
+        context += "\nPlease provide creative, helpful, and insightful feedback based on this context. Keep it concise. "
+        context += "Use UK English spelling and grammar (e.g., 'colour', 'organise', 'centre')."
 
         # 2. Call AI Provider
         if settings.DEEPSEEK_API_KEY:
@@ -1550,17 +1551,7 @@ def api_character_deep_dive(request):
         You are a professional Creative Writing Coach.
         The user wants to do a "Deep Dive" into their character: {character.name}.
         
-        CHARACTER DETAILS:
-        Role: {character.get_role_display()}
-        Description: {character.description}
-        Motivation: {character.motivation}
-        Goals: {character.goals}
-        Traits: {character.traits}
-        
-        Please generate ONE thought-provoking, insightful deep-dive question or writing prompt that will help the author understand this character's internal world or backstory better. 
-        Focus on emotion, conflict, or hidden secrets. 
-        Keep it to a single paragraph.
-        """
+        CHARACTER DETAILS:\r\n        Role: {character.get_role_display()}\r\n        Description: {character.description}\r\n        Motivation: {character.motivation}\r\n        Goals: {character.goals}\r\n        Traits: {character.traits}\r\n        \r\n        Please generate ONE thought-provoking, insightful deep-dive question or writing prompt that will help the author understand this character's internal world or backstory better. \r\n        Focus on emotion, conflict, or hidden secrets. \r\n        Keep it to a single paragraph. \r\n        Use UK English spelling and grammar (e.g., 'colour', 'behaviour', 'authorised').\r\n        """
 
         # Call AI Provider
         if settings.DEEPSEEK_API_KEY:
@@ -1580,10 +1571,101 @@ def api_character_deep_dive(request):
             response = model.generate_content(prompt)
             ai_response = response.text
 
+        # Save to database
+        character.deep_dive_notes = ai_response
+        character.save()
+
         return JsonResponse({
             'status': 'success', 
             'response': ai_response
         })
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+@login_required
+@require_POST
+def api_sync_character_data(request):
+    """
+    Manually sync/fill missing character fields using AI context from books/chapters.
+    """
+    try:
+        data = json.loads(request.body)
+        char_id = data.get('character_id')
+        character = get_object_or_404(Character, id=char_id, user=request.user)
+        
+        # Gather context: Check for introduction book content or event descriptions
+        context_text = ""
+        
+        # 1. Look at introduction book first (best source for character foundation)
+        if character.introduction_book:
+            book = character.introduction_book
+            # Get first 3 chapters or first 50k characters
+            intro_chapters = book.chapters.all().order_by('chapter_number')[:3]
+            for ch in intro_chapters:
+                if ch.content:
+                    context_text += f"\nChapter {ch.chapter_number} ({ch.title}):\n{ch.content[:20000]}\n"
+        
+        # 2. Add snippets from events where they appear (for more nuanced character growth)
+        events = character.events.all().order_by('sequence_order')[:5]
+        for event in events:
+            if event.description:
+                context_text += f"\nEvent: {event.title}\n{event.description}\n"
+        
+        if not context_text.strip():
+            return JsonResponse({
+                'status': 'error', 
+                'message': 'No book content or event descriptions found for this character to sync from.'
+            }, status=400)
+            
+        # Truncate context to safe limits (reduced for speed)
+        context_text = context_text[:40000]
+        
+        # Use the targeted analysis function for speed and accuracy
+        print(f"DEBUG: Calling AI for {character.name}")
+        match = analyze_single_character_with_ai(character.name, context_text)
+        print(f"DEBUG: AI match completed for {character.name}")
+        
+        if not match:
+            return JsonResponse({
+                'status': 'error', 
+                'message': f'AI could not extract data for "{character.name}".'
+            }, status=500)
+            
+        # Update ONLY empty fields
+        updated_fields = []
+        if not character.description and match.get('description'):
+            character.description = match['description']
+            updated_fields.append('description')
+        if not character.motivation and match.get('motivation'):
+            character.motivation = match['motivation']
+            updated_fields.append('motivation')
+        if not character.goals and match.get('goals'):
+            character.goals = match['goals']
+            updated_fields.append('goals')
+        if not character.traits and match.get('traits'):
+            character.traits = match['traits']
+            updated_fields.append('traits')
+            
+        if updated_fields:
+            character.save()
+            return JsonResponse({
+                'status': 'success',
+                'updated_fields': updated_fields,
+                'data': {
+                    'description': character.description,
+                    'motivation': character.motivation,
+                    'goals': character.goals,
+                    'personality_traits': character.traits
+                }
+            })
+        else:
+            return JsonResponse({
+                'status': 'success',
+                'message': 'All fields are already populated. Nothing to sync.',
+                'updated_fields': []
+            })
+            
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
@@ -1654,3 +1736,34 @@ def world_delete(request, pk):
         messages.success(request, f"Deleted: {title}")
         return redirect('world_list')
     return render(request, 'timeline/world_delete.html', {'entry': entry})
+
+
+def analyze_single_character_with_ai(character_name, text):
+    """Targeted pass to extract details for a specific character from context."""
+    print(f"DEBUG: Syncing character {character_name}")
+    prompt = f"""
+    Analyze the story content below and extract specific details for the character: "{character_name}".
+    
+    IMPORTANT: Use British English (UK English) for all spelling and grammar.
+    
+    Provide the following fields based ONLY on the story content:
+    - description: A detailed multi-paragraph description covering physical appearance, personality, and background.
+    - motivation: What drives this character? Their desires, fears, and internal conflicts.
+    - goals: Their specific objectives in the story.
+    - traits: Key personality traits and quirks.
+
+    Return ONLY a JSON object:
+    {{
+      "description": "...",
+      "motivation": "...",
+      "goals": "...",
+      "traits": "..."
+    }}
+
+    If a field cannot be determined from the text, return an empty string for that field.
+
+    Story Content:
+    {text}
+    """
+    # Use deepseek-chat for speed; it's excellent at extraction.
+    return _call_ai_json(prompt, deepseek_model="deepseek-chat")

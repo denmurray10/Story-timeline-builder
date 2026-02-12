@@ -522,7 +522,8 @@
                     {% if user.is_authenticated %}
                     <!-- Universal greeting header -->
                     <div class="d-flex justify-content-end align-items-center mb-3">
-                        <div class="dropdown">
+                        {% block top_header_actions %}{% endblock %}
+                        <div class="dropdown ms-3">
                             <a class="dropdown-toggle d-flex align-items-center fw-bold text-decoration-none" href="#"
                                 id="baseGreetingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"
                                 style="color: #000;">

@@ -1,278 +1,321 @@
 {% extends 'timeline/base.html' %}
 {% load static %}
-
 {% block title %}{{ character.name }} - Story Timeline Builder{% endblock %}
 
-{% block extra_css %}
-<style>
-    .detail-card {
-        background-color: #ffffff;
-        border-radius: 12px;
-        border: 1px solid var(--border-color);
-        box-shadow: var(--shadow-sm);
-        margin-bottom: 1.5rem;
-    }
-
-    .detail-card-header {
-        padding: 1rem 1.25rem;
-        background: #f8fafc;
-        border-bottom: 1px solid var(--border-color);
-        border-top-left-radius: 12px;
-        border-top-right-radius: 12px;
-        font-weight: 700;
-        font-size: 0.9rem;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .detail-card-header i {
-        color: var(--accent);
-    }
-
-    .profile-avatar-box {
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-        border: 1px solid var(--border-color);
-        object-fit: cover;
-        background-color: #f8fafc;
-        box-shadow: var(--shadow-sm);
-    }
-
-    .section-label {
-        font-size: 0.7rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        color: var(--text-muted);
-        margin-bottom: 4px;
-    }
-
-    .relationship-item {
-        padding: 8px 12px;
-        background-color: #f8fafc;
-        border-radius: 8px;
-        border: 1px solid var(--border-color);
-        font-size: 0.9rem;
-    }
-
-    .appearance-item {
-        padding: 12px;
-        border-bottom: 1px solid var(--border-color);
-    }
-
-    .appearance-item:last-child {
-        border-bottom: none;
-    }
-
-    .stat-box {
-        padding: 20px;
-        background-color: var(--accent-soft);
-        border-radius: 12px;
-        text-align: center;
-        border: 1px solid rgba(99, 102, 241, 0.1);
-    }
-
-    .stat-box h3 {
-        color: var(--accent);
-        font-weight: 800;
-        margin-bottom: 0;
-    }
-</style>
+{% block top_header_actions %}
+<button id="syncCharacterBtn" class="btn btn-sm btn-dark btn-invert-hover px-4 fw-bold">
+    <i class="bi bi-arrow-repeat me-2"></i> Sync
+</button>
 {% endblock %}
 
 {% block content %}
-<!-- Navigation and Actions -->
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <a href="{% url 'character_list' %}" class="text-decoration-none text-muted small fw-bold">
-        <i class="bi bi-chevron-left"></i> All Characters
-    </a>
-    <div class="btn-group">
-        <a href="{% url 'character_edit' character.pk %}" class="btn btn-sm btn-outline-secondary">
-            <i class="bi bi-pencil me-1"></i> Edit
-        </a>
-        <a href="{% url 'character_delete' character.pk %}" class="btn btn-sm btn-outline-danger">
-            <i class="bi bi-trash"></i>
-        </a>
-    </div>
-</div>
-
-<!-- Header Info -->
-<div class="detail-card p-4 mb-4">
-    <div class="row align-items-center g-4">
-        <div class="col-auto">
-            {% if character.profile_pic_url %}
-            <img src="{{ character.profile_pic_url }}" alt="{{ character.name }}" class="profile-avatar-box">
-            {% else %}
-            <div class="profile-avatar-box d-flex align-items-center justify-content-center text-muted">
-                <i class="bi bi-person-fill fs-1"></i>
-            </div>
-            {% endif %}
-        </div>
-        <div class="col">
-            <h1 class="mb-1">{{ character.name }}</h1>
-            <div class="d-flex align-items-center gap-2 flex-wrap">
-                <span class="badge bg-secondary">{{ character.get_role_display }}</span>
-                {% if character.nickname %}
-                <span class="text-muted small">"{{ character.nickname }}"</span>
-                {% endif %}
-                {% if not character.is_active %}
-                <span class="badge bg-warning">Inactive</span>
+{% with c=character %}
+<div class="row g-4 mb-5">
+    <!-- Sidebar -->
+    <div class="col-md-3">
+        <div class="character-sidebar card shadow-sm border-0 rounded-4 overflow-hidden mb-4 p-4 text-center bg-white">
+            <!-- Portrait -->
+            <div class="portrait-container mb-3 mx-auto shadow-sm d-flex align-items-center justify-content-center"
+                style="width:140px;height:140px;border-radius:50%; border:1px solid #eee; background: #fff;">
+                {% if c.profile_pic_url %}
+                <img src="{{ c.profile_pic_url }}" class="rounded-pill" alt="{{ c.name }}"
+                    style="width:120px;height:120px;object-fit:cover;">
+                {% else %}
+                <div class="rounded-pill bg-light d-flex align-items-center justify-content-center mx-auto"
+                    style="width:120px;height:120px;">
+                    <i class="bi bi-person display-4 text-muted opacity-50"></i>
+                </div>
                 {% endif %}
             </div>
-        </div>
-        <div class="col-lg-3">
-            <div class="stat-box">
-                <h3>{{ events.count }}</h3>
-                <p class="text-muted small mb-0 fw-bold uppercase">Appearances</p>
+
+            <!-- Header Info -->
+            <h2 class="h4 mb-1 fw-bold">{{ c.name }}</h2>
+            <div class="mb-4"><span class="badge bg-primary px-3 rounded-pill" style="font-size:0.7rem;">{{
+                    c.get_role_display }}</span></div>
+
+            <!-- Tab Navigation -->
+            <div class="nav flex-column nav-pills gap-2 mb-4" id="v-pills-tab" role="tablist">
+                <button class="nav-link active rounded-pill d-flex align-items-center justify-content-center py-2"
+                    id="tab-description-btn" data-bs-toggle="pill" data-bs-target="#tab-description" type="button"
+                    role="tab">
+                    <i class="bi bi-journal-text me-2"></i> Bio
+                </button>
+                <button class="nav-link rounded-pill d-flex align-items-center justify-content-center py-2"
+                    id="tab-motivation-btn" data-bs-toggle="pill" data-bs-target="#tab-motivation" type="button"
+                    role="tab">
+                    <i class="bi bi-heart me-2"></i> Motivation
+                </button>
+                <button class="nav-link rounded-pill d-flex align-items-center justify-content-center py-2"
+                    id="tab-goals-btn" data-bs-toggle="pill" data-bs-target="#tab-goals" type="button" role="tab">
+                    <i class="bi bi-bullseye me-2"></i> Goals
+                </button>
+                <button class="nav-link rounded-pill d-flex align-items-center justify-content-center py-2"
+                    id="tab-traits-btn" data-bs-toggle="pill" data-bs-target="#tab-traits" type="button" role="tab">
+                    <i class="bi bi-stars me-2"></i> Traits
+                </button>
+            </div>
+
+            <!-- Story Consultant Box -->
+            <div class="ai-consultant-sidebar p-4 rounded-4 bg-light text-start border-0 mb-4"
+                style="background-color:#f9f9f9 !important;">
+                <p class="x-small fw-bold text-uppercase text-muted mb-2 tracking-wider text-center">Story Support</p>
+                <p class="x-small text-muted mb-3 text-center">Ask the Consultant for ideas on character development
+                    arcs.</p>
+                <div class="d-grid">
+                    <button id="deepDiveBtn" class="btn btn-dark btn-sm rounded-pill py-2 fw-bold">
+                        <i class="bi bi-chat-left-dots me-2"></i> Consultant
+                    </button>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2">
+                <a href="{% url 'character_edit' c.pk %}" class="btn btn-outline-secondary btn-sm rounded-pill py-2"
+                    style="border-color:#ccc; color:#666;">
+                    <i class="bi bi-pencil me-1"></i> Edit Character
+                </a>
             </div>
         </div>
     </div>
-</div>
 
-<div class="row g-4">
-    <!-- Main Info -->
-    <div class="col-lg-8">
-        <div class="detail-card">
-            <div class="detail-card-header">
-                <i class="bi bi-info-circle"></i> Bio & Motivation
+    <!-- Main Content -->
+    <div class="col-md-9">
+        <div class="content-box card shadow-sm border-0 rounded-4 overflow-hidden mb-4">
+            <div class="content-box-header bg-white border-bottom py-3 px-4 fw-bold text-muted text-uppercase tracking-wider"
+                style="font-size: 0.8rem; letter-spacing:0.05rem;">
+                <span id="active-tab-title">Bio</span>
             </div>
-            <div class="p-4">
-                <div class="row g-4">
-                    <div class="col-md-6 border-end">
-                        <div class="section-label">Description</div>
-                        <p class="mb-0 small text-body">{{ character.description|default:"No description
-                            provided."|linebreaks }}</p>
+            <div class="card-body p-5 bg-white" style="min-height: 440px;">
+                <div class="tab-content" id="v-pills-tabContent">
+                    <div class="tab-pane fade show active" id="tab-description" role="tabpanel">
+                        <p id="char-description" class="lead-small text-dark">{{
+                            c.description|default:"None"|linebreaksbr }}</p>
                     </div>
-                    <div class="col-md-6">
-                        <div class="section-label">Motivation</div>
-                        <p class="mb-0 small text-body">{{ character.motivation|default:"No motivation
-                            specified."|linebreaks }}</p>
+                    <div class="tab-pane fade" id="tab-motivation" role="tabpanel">
+                        <p id="char-motivation" class="lead-small text-dark">{{ c.motivation|default:"None"|linebreaksbr
+                            }}</p>
                     </div>
+                    <div class="tab-pane fade" id="tab-goals" role="tabpanel">
+                        <p id="char-goals" class="lead-small text-dark">{{ c.goals|default:"None"|linebreaksbr }}</p>
+                    </div>
+                    <div class="tab-pane fade" id="tab-traits" role="tabpanel">
+                        <p id="char-traits" class="lead-small text-dark">{{ c.traits|default:"None"|linebreaksbr }}</p>
+                    </div>
+                </div>
+
+                <!-- AI Response Area -->
+                <div id="aiSummaryArea" class="ai-response-box mt-4 p-4 border-0 rounded-4 bg-white shadow-sm"
+                    style="display:none; border: 1px solid #eee !important;">
+                    <div class="d-flex align-items-center mb-3 text-primary fw-bold">
+                        <i class="bi bi-stars me-2"></i> Consultant Insights
+                        <button type="button" class="btn-close ms-auto" style="font-size: 0.7rem;"
+                            onclick="document.getElementById('aiSummaryArea').style.display='none'"></button>
+                    </div>
+                    <div id="aiResponseContent" class="small text-body">
+                        {{ c.deep_dive_notes|default:""|linebreaks }}
+                    </div>
+                </div>
+                <div id="aiLoadingIndicator" class="text-center py-5" style="display:none;">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-3 small text-muted">Consulting Story Advisor...</p>
                 </div>
             </div>
         </div>
 
-        <div class="detail-card">
-            <div class="detail-card-header">
-                <i class="bi bi-bullseye"></i> Goals & Traits
+        <!-- Timeline -->
+        <div class="timeline-box card shadow-sm border-0 rounded-4 overflow-hidden">
+            <div class="detail-card-header bg-white border-bottom py-3 px-4 fw-bold text-muted text-uppercase tracking-wider"
+                style="font-size: 0.8rem; letter-spacing:0.05rem;">
+                Character Timeline
             </div>
-            <div class="p-4">
-                <div class="row g-4">
-                    <div class="col-md-6 border-end">
-                        <div class="section-label">Goals</div>
-                        <p class="mb-0 small text-body">{{ character.goals|default:"No goals specified."|linebreaks }}
-                        </p>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="section-label">Personality Traits</div>
-                        <p class="mb-0 small text-body">{{ character.traits|default:"No traits specified."|linebreaks }}
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="detail-card">
-            <div class="detail-card-header justify-content-between">
-                <div><i class="bi bi-diagram-3"></i> Relationships</div>
-                <a href="{% url 'relationship_create' %}?from_char={{ character.pk }}"
-                    class="btn btn-sm btn-link text-decoration-none py-0">Add New</a>
-            </div>
-            <div class="p-4">
-                {% if character.relationships_from.exists or character.relationships_to.exists %}
-                <div class="row g-2">
-                    {% for rel in character.relationships_from.all %}
-                    <div class="col-md-6">
-                        <div class="relationship-item d-flex align-items-center gap-2">
-                            <span class="badge bg-light text-primary border">{{ rel.relationship_type }}</span>
-                            <i class="bi bi-arrow-right text-muted small"></i>
-                            <a href="{% url 'character_detail' rel.to_character.pk %}"
-                                class="text-decoration-none fw-bold text-dark">{{ rel.to_character.name }}</a>
+            <div class="card-body p-0 bg-white">
+                <div class="list-group list-group-flush border-0">
+                    {% for event in events %}
+                    <a href="{% url 'event_detail' event.pk %}"
+                        class="list-group-item list-group-item-action py-3 px-4 border-light d-flex justify-content-between align-items-center bg-white">
+                        <div>
+                            <span class="d-block fw-bold text-dark">{{ event.title }}</span>
+                            <span class="text-muted small">Date: {{ event.date_display }}</span>
                         </div>
+                        <i class="bi bi-chevron-right text-muted small"></i>
+                    </a>
+                    {% empty %}
+                    <div class="p-5 text-center text-muted">
+                        <i class="bi bi-clock-history d-block mb-2 display-6 opacity-25"></i>
+                        <p class="small mb-0">No events recorded for this character.</p>
                     </div>
                     {% endfor %}
-                    {% for rel in character.relationships_to.all %}
-                    <div class="col-md-6">
-                        <div class="relationship-item d-flex align-items-center gap-2">
-                            <a href="{% url 'character_detail' rel.from_character.pk %}"
-                                class="text-decoration-none fw-bold text-dark">{{ rel.from_character.name }}</a>
-                            <i class="bi bi-arrow-right text-muted small"></i>
-                            <span class="badge bg-light text-muted border">{{ rel.relationship_type }}</span>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-                {% else %}
-                <p class="text-muted small mb-0 italicized">No relationships recorded.</p>
-                {% endif %}
-            </div>
-        </div>
-
-        <div class="detail-card">
-            <div class="detail-card-header">
-                <i class="bi bi-clock-history"></i> Appearing in Events
-            </div>
-            <div class="p-0">
-                {% if events %}
-                {% for event in events %}
-                <div class="appearance-item">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div class="overflow-hidden">
-                            <h6 class="mb-1">
-                                <a href="{% url 'event_detail' event.pk %}"
-                                    class="text-decoration-none text-dark fw-bold">{{ event.title }}</a>
-                            </h6>
-                            <div class="small text-muted d-flex align-items-center gap-2">
-                                <span>{{ event.book.title|default:"Main Story" }}</span>
-                                {% if event.chapter %}<span class="opacity-50">|</span><span>Ch. {{
-                                    event.chapter.chapter_number }}</span>{% endif %}
-                            </div>
-                        </div>
-                        {% if event.pov_character == character %}
-                        <span class="badge bg-success-subtle text-success small">POV</span>
-                        {% endif %}
-                    </div>
-                </div>
-                {% endfor %}
-                {% else %}
-                <div class="p-4 text-center text-muted small italicized">No appearances logged yet.</div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-
-    <!-- Sidebar Stats -->
-    <div class="col-lg-4">
-        <div class="detail-card">
-            <div class="detail-card-header">
-                <i class="bi bi-journal-check"></i> Meta Information
-            </div>
-            <div class="p-4 pt-1">
-                <div class="mt-3">
-                    <div class="section-label">Debut Book</div>
-                    <div class="fw-bold">{{ character.introduction_book.title|default:"Unknown Book" }}</div>
-                </div>
-                <div class="mt-3">
-                    <div class="section-label">Intro Chapter</div>
-                    <div class="fw-bold">{{ character.introduction_chapter|default:"Unknown" }}</div>
-                </div>
-                <div class="mt-3">
-                    <div class="section-label">Color Code</div>
-                    <div class="d-flex align-items-center gap-2">
-                        <div
-                            style="width: 20px; height: 20px; border-radius: 4px; border: 1px solid var(--border-color); background-color: {{ character.color_code|default:'var(--accent)' }};">
-                        </div>
-                        <span class="small text-muted">{{ character.color_code|default:"#6366f1" }}</span>
-                    </div>
                 </div>
             </div>
-        </div>
-
-        <div class="detail-card text-center p-4 bg-light">
-            <p class="text-muted small mb-3">Ask the AI Consultant for ideas on character development arcs.</p>
-            <a href="{% url 'dashboard' %}" class="btn btn-sm btn-outline-primary w-100">AI Consultant</a>
         </div>
     </div>
 </div>
+{% endwith %}
+
+<style>
+    :root {
+        --radius: 1.25rem;
+    }
+
+    .character-sidebar {
+        border: 1px solid #eee !important;
+    }
+
+    .portrait-container img {
+        background: transparent;
+    }
+
+    .nav-pills .nav-link {
+        color: #555;
+        font-weight: 500;
+        background: #f4f1ee;
+        border: none;
+        transition: all 0.2s;
+        font-size: 0.85rem;
+    }
+
+    .nav-pills .nav-link:hover {
+        background: #e9e6e3;
+    }
+
+    .nav-pills .nav-link.active {
+        background: #111 !important;
+        color: #fff !important;
+    }
+
+    .tracking-wider {
+        letter-spacing: 0.05rem;
+    }
+
+    .ai-consultant-sidebar {
+        background: #fff !important;
+    }
+
+    .lead-small {
+        font-size: 1.05rem;
+        line-height: 1.7;
+        color: #333 !important;
+    }
+
+    .x-small {
+        font-size: 0.75rem;
+    }
+
+    /* Buttons consistency */
+    .btn-primary {
+        background-color: #0000ff !important;
+        /* Vivid blue from mock */
+        border-color: #0000ff !important;
+    }
+
+    .content-box-header,
+    .detail-card-header {
+        background: #fdfdfd;
+    }
+
+    .list-group-item:hover {
+        background-color: #fcfcfc !important;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Tab switching title update
+        const tabButtons = document.querySelectorAll('button[data-bs-toggle="pill"]');
+        const activeTitle = document.getElementById('active-tab-title');
+
+        tabButtons.forEach(btn => {
+            btn.addEventListener('shown.bs.tab', function (event) {
+                activeTitle.textContent = event.target.textContent.trim();
+            });
+        });
+
+        // Character Sync Logic
+        const syncBtn = document.getElementById('syncCharacterBtn');
+        if (syncBtn) {
+            syncBtn.addEventListener('click', function () {
+                if (!confirm('Sync empty boxes using AI analysis from the book? This won\'t overwrite your existing notes.')) return;
+
+                const originalContent = syncBtn.innerHTML;
+                syncBtn.disabled = true;
+                syncBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Syncing...';
+
+                fetch("{% url 'api_character_sync' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({ character_id: '{{ character.id }}' })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        syncBtn.disabled = false;
+                        syncBtn.innerHTML = originalContent;
+
+                        if (data.status === 'success') {
+                            if (data.updated_fields && data.updated_fields.length > 0) {
+                                const updates = { 'description': 'char-description', 'motivation': 'char-motivation', 'goals': 'char-goals', 'traits': 'char-traits' };
+                                data.updated_fields.forEach(f => {
+                                    const el = document.getElementById(updates[f]);
+                                    if (el && data.data[f]) el.innerHTML = data.data[f].replace(/\n/g, '<br>');
+                                });
+                                alert('Successfully synced!');
+                            } else {
+                                alert(data.message || 'No empty boxes found to fill.');
+                            }
+                        } else {
+                            alert('Error: ' + data.message);
+                        }
+                    })
+                    .catch(err => {
+                        syncBtn.disabled = false;
+                        syncBtn.innerHTML = originalContent;
+                        console.error(err);
+                        alert('An error occurred during sync.');
+                    });
+            });
+        }
+
+        // Story Consultant Logic
+        const deepDiveBtn = document.getElementById('deepDiveBtn');
+        if (deepDiveBtn) {
+            deepDiveBtn.addEventListener('click', function () {
+                const contentArea = document.getElementById('aiResponseContent');
+                const loadingIndicator = document.getElementById('aiLoadingIndicator');
+                const summaryArea = document.getElementById('aiSummaryArea');
+                const tabContent = document.getElementById('v-pills-tabContent');
+
+                deepDiveBtn.disabled = true;
+                tabContent.style.opacity = '0.3';
+                loadingIndicator.style.display = 'block';
+                summaryArea.style.display = 'none';
+
+                fetch('/api/ai/character-deep-dive/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                    body: JSON.stringify({ character_id: '{{ character.id }}' })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        loadingIndicator.style.display = 'none';
+                        tabContent.style.opacity = '1';
+                        deepDiveBtn.disabled = false;
+
+                        if (data.status === 'success') {
+                            contentArea.innerHTML = data.response.replace(/\n/g, '<br>');
+                            summaryArea.style.display = 'block';
+                        } else {
+                            alert('Error: ' + data.message);
+                        }
+                    })
+                    .catch(err => {
+                        loadingIndicator.style.display = 'none';
+                        tabContent.style.opacity = '1';
+                        deepDiveBtn.disabled = false;
+                        alert('An error occurred.');
+                    });
+            });
+        }
+    });
+</script>
 {% endblock %}

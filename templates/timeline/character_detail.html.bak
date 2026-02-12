@@ -1,0 +1,235 @@
+{% extends 'timeline/base.html' %}
+{% load static %}
+{% block title %}{{ character.name }} - Story Timeline Builder{% endblock %}
+{% block content %}
+{% with c=character %}
+<div class="row mb-5">
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 rounded-4 overflow-hidden mb-4">
+            {% if c.profile_pic_url %}
+            <img src="{{ c.profile_pic_url }}" class="card-img-top" alt="{{ c.name }}"
+                style="height:300px;object-fit:cover;">
+            {% else %}
+            <div class="bg-light text-center py-5"><i class="bi bi-person-circle display-1 text-muted"></i></div>
+            {% endif %}
+            <div class="card-body text-center p-4">
+                <h2 class="h4 mb-1 fw-bold">{{ c.name }}</h2>
+                <div class="mb-3"><span class="badge bg-secondary">{{ c.get_role_display }}</span></div>
+                <div class="d-flex justify-content-center gap-3 text-muted small">
+                    <div class="text-center"><span class="d-block h6 mb-0">{{ appearances_count|default:"0" }}</span>
+                        <span class="x-small text-uppercase">Appearances</span>
+                    </div>
+                </div>
+                <hr>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'character_edit' c.pk %}"
+                        class="btn btn-primary d-flex align-items-center justify-content-center">
+                        <i class="bi bi-pencil me-2"></i> Edit</a>
+                    <button id="syncCharacterBtn"
+                        class="btn btn-outline-secondary btn-sm d-flex align-items-center justify-content-center mt-1">
+                        <i class="bi bi-arrow-repeat me-2"></i> Sync with Book
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-9">
+        <div class="detail-card mb-4">
+            <div class="detail-card-header"><i class="bi bi-journal-text"></i> Bio & Motivation</div>
+            <div class="p-4">
+                <div class="row g-4">
+                    <div class="col-md-6 border-end">
+                        <div class="section-label">Description</div>
+                        <p id="char-description" class="mb-0 small text-body">{{
+                            c.description|default:"None"|linebreaksbr }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="section-label">Motivation</div>
+                        <p id="char-motivation" class="mb-0 small text-body">{{ c.motivation|default:"None"|linebreaksbr
+                            }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="detail-card mb-4">
+            <div class="detail-card-header"><i class="bi bi-bullseye"></i> Goals & Traits</div>
+            <div class="p-4">
+                <div class="row g-4">
+                    <div class="col-md-6 border-end">
+                        <div class="section-label">Goals</div>
+                        <p id="char-goals" class="mb-0 small text-body">{{ c.goals|default:"None"|linebreaksbr }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="section-label">Personality Traits</div>
+                        <p id="char-traits" class="mb-0 small text-body">{{ c.traits|default:"None"|linebreaksbr }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="detail-card mb-4">
+            <div class="detail-card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-chat-left-text"></i> Story Consultant Chat</span>
+                <span class="badge bg-info-subtle text-info fw-normal" style="font-size:0.7rem;">Story Advisor</span>
+            </div>
+            <div class="p-4 bg-light-subtle">
+                <div id="aiSummaryArea" class="ai-response-box mb-4 p-3 border rounded-3 bg-white shadow-sm"
+                    style="min-height:100px;">
+                    <div id="aiResponseContent" class="small text-body">
+                        {{ c.deep_dive_notes|default:"Click button for analysis."|linebreaks }}
+                    </div>
+                    <div id="aiLoadingIndicator" class="text-center py-4" style="display:none;">
+                        <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                        <p class="mt-2 small text-muted">Consulting Story Advisor...</p>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-center">
+                    <button id="deepDiveBtn"
+                        class="btn btn-outline-primary d-flex align-items-center px-4 py-2 shadow-sm">
+                        <i class="bi bi-stars me-2"></i> Story Consultant</button>
+                </div>
+            </div>
+        </div>
+        <div class="detail-card">
+            <div class="detail-card-header"><i class="bi bi-clock-history"></i> Character Timeline</div>
+            <div class="p-0">
+                <div class="list-group list-group-flush">
+                    {% for event in events %}
+                    <a href="{% url 'event_detail' event.pk %}"
+                        class="list-group-item list-group-item-action d-flex justify-content-between align-items-center p-3">
+                        <div><span class="d-block fw-bold small">{{ event.title }}</span>
+                            <span class="text-muted x-small">Date: {{ event.date_display }}</span>
+                        </div>
+                        <i class="bi bi-chevron-right text-muted small"></i>
+                    </a>
+                    {% empty %}
+                    <div class="p-4 text-center text-muted">
+                        <p class="small mb-0">No events found.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endwith %}
+<style>
+    .detail-card {
+        background-color: #fff;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+    }
+
+    .detail-card-header {
+        background: linear-gradient(to right, #f9fafb, #eef2ff);
+        padding: 0.8rem 1.25rem;
+        font-weight: 600;
+        font-size: 0.95rem;
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text-heading);
+    }
+
+    .section-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        margin-bottom: 0.5rem;
+    }
+
+    .x-small {
+        font-size: 0.75rem;
+    }
+
+    .ai-response-box {
+        position: relative;
+        line-height: 1.6;
+    }
+
+    .ai-response-box p:last-child {
+        margin-bottom: 0;
+    }
+</style>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Character Sync Logic
+        const syncBtn = document.getElementById('syncCharacterBtn');
+        if (syncBtn) {
+            syncBtn.addEventListener('click', function () {
+                if (!confirm('Sync empty boxes using AI analysis from the book? This won\'t overwrite your existing notes.')) return;
+
+                const originalContent = syncBtn.innerHTML;
+                syncBtn.disabled = true;
+                syncBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Syncing...';
+
+                fetch("{% url 'api_character_sync' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({ character_id: '{{ character.id }}' })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        syncBtn.disabled = false;
+                        syncBtn.innerHTML = originalContent;
+
+                        if (data.status === 'success') {
+                            if (data.updated_fields && data.updated_fields.length > 0) {
+                            const updates = { 'description': 'char-description', 'motivation': 'char-motivation', 'goals': 'char-goals', 'traits': 'char-traits' };
+                            data.updated_fields.forEach(f => {
+                                const el = document.getElementById(updates[f]);
+                                if (el && data.data[f]) el.innerHTML = data.data[f].replace(/\n/g, '<br>');
+                            });
+                            alert('Successfully synced!');
+                            } else {
+                                alert(data.message || 'No empty boxes found to fill.');
+                            }
+                        } else {
+                            alert('Error: ' + data.message);
+                        }
+                    })
+                    .catch(err => {
+                        syncBtn.disabled = false;
+                        syncBtn.innerHTML = originalContent;
+                        console.error(err);
+                        alert('An error occurred during sync.');
+                    });
+            });
+        }
+
+        const deepDiveBtn = document.getElementById('deepDiveBtn');
+        if (deepDiveBtn) {
+            deepDiveBtn.addEventListener('click', function () {
+                const contentArea = document.getElementById('aiResponseContent');
+                const loadingIndicator = document.getElementById('aiLoadingIndicator');
+                deepDiveBtn.disabled = true;
+                contentArea.style.opacity = '0.3';
+                loadingIndicator.style.display = 'block';
+                fetch('/api/ai/character-deep-dive/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                    body: JSON.stringify({ character_id: '{{ character.id }}' })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        loadingIndicator.style.display = 'none';
+                        contentArea.style.opacity = '1';
+                        deepDiveBtn.disabled = false;
+                        if (data.status === 'success') { contentArea.innerHTML = data.response.replace(/\n/g, '<br>'); }
+                        else { alert('Error: ' + data.message); }
+                    })
+                    .catch(err => {
+                        loadingIndicator.style.display = 'none';
+                        contentArea.style.opacity = '1';
+                        deepDiveBtn.disabled = false;
+                        alert('An error occurred.');
+                    });
+            });
+        }
+    });
+</script>
+{% endblock %}
