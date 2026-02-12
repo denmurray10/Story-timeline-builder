@@ -1837,14 +1837,14 @@ def api_relationship_data(request):
     
     # Color mapping matching the front-end legend
     REL_COLORS = {
-        'friend': '#10b981',      # Green like Ally
+        'friend': '#3b82f6',      # Blue
         'ally': '#10b981',        # Green
         'enemy': '#b91c1c',       # Dark Red
         'romantic': '#f43f5e',    # Pink/Rose
         'family': '#8b5cf6',      # Purple
         'professional': '#64748b',# Slate
-        'rival': '#ef4444',       # Red (lighter than enemy)
-        'mentor': '#f59e0b',      # Amber
+        'rival': '#f97316',       # Orange
+        'mentor': '#eab308',      # Yellow
         'neutral': '#9ca3af',     # Gray
     }
     
