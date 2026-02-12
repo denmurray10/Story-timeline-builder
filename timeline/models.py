@@ -536,6 +536,62 @@ class CharacterRelationship(models.Model):
         validators=[MinValueValidator(1), MaxValueValidator(10)],
         help_text="Strength/intensity of relationship (1-10)"
     )
+    trust_level = models.PositiveIntegerField(
+        default=5,
+        validators=[MinValueValidator(1), MaxValueValidator(10)],
+        help_text="Trust level (1-10)"
+    )
+    POWER_DYNAMICS = [
+        ('balanced', 'Balanced (=)'),
+        ('a_dominant', 'Character A Dominant (>)'),
+        ('b_dominant', 'Character B Dominant (<)'),
+    ]
+    power_dynamic = models.CharField(
+        max_length=20, 
+        choices=POWER_DYNAMICS, 
+        default='balanced'
+    )
+
+    RELATIONSHIP_STATUSES = [
+        ('active', 'Active'),
+        ('estranged', 'Estranged'),
+        ('deceased', 'Deceased'),
+        ('unresolved', 'Unresolved'),
+    ]
+    relationship_status = models.CharField(
+        max_length=20,
+        choices=RELATIONSHIP_STATUSES,
+        default='active'
+    )
+
+    VISIBILITY_LEVELS = [
+        ('public', 'Public Knowledge'),
+        ('secret', 'Secret'),
+        ('rumored', 'Rumored/Suspected'),
+    ]
+    visibility = models.CharField(
+        max_length=20,
+        choices=VISIBILITY_LEVELS,
+        default='public'
+    )
+
+    conflict_source = models.TextField(
+        blank=True,
+        help_text="Source of conflict/tension"
+    )
+    character_a_wants = models.TextField(
+        blank=True,
+        help_text="What Character A wants from B"
+    )
+    character_b_wants = models.TextField(
+        blank=True,
+        help_text="What Character B wants from A"
+    )
+
+    evolution = models.TextField(
+        blank=True,
+        help_text="Notes on how this relationship changes over time"
+    )
     starts_at_event = models.ForeignKey(
         Event,
         on_delete=models.SET_NULL,

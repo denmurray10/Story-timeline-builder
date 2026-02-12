@@ -146,30 +146,115 @@
                         </button>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Type</label>
-                        <select name="relationship_type" id="rel-type" class="form-select">
-                            <option value="friend">Friend</option>
-                            <option value="ally">Ally</option>
-                            <option value="enemy">Enemy</option>
-                            <option value="romantic">Romantic</option>
-                            <option value="family">Family</option>
-                            <option value="professional">Professional</option>
-                            <option value="rival">Rival</option>
-                            <option value="mentor">Mentor</option>
-                        </select>
-                    </div>
+                    <!-- Tabs -->
+                    <ul class="nav nav-tabs mb-3" id="relTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="core-tab" data-bs-toggle="tab" data-bs-target="#core"
+                                type="button" role="tab">Core</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="dynamics-tab" data-bs-toggle="tab" data-bs-target="#dynamics"
+                                type="button" role="tab">Dynamics</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="goals-tab" data-bs-toggle="tab" data-bs-target="#goals"
+                                type="button" role="tab">Goals</button>
+                        </li>
+                    </ul>
 
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Description</label>
-                        <textarea name="description" id="rel-desc" class="form-control" rows="2"></textarea>
-                    </div>
+                    <div class="tab-content" id="relTabsContent">
+                        <!-- Tab 1: Core Details -->
+                        <div class="tab-pane fade show active" id="core" role="tabpanel">
+                            <div class="row g-2 mb-3">
+                                <div class="col-6">
+                                    <label class="form-label small fw-bold">Type</label>
+                                    <select name="relationship_type" id="rel-type" class="form-select">
+                                        <option value="friend">Friend</option>
+                                        <option value="ally">Ally</option>
+                                        <option value="enemy">Enemy</option>
+                                        <option value="romantic">Romantic</option>
+                                        <option value="family">Family</option>
+                                        <option value="professional">Professional</option>
+                                        <option value="rival">Rival</option>
+                                        <option value="mentor">Mentor</option>
+                                        <option value="neutral">Neutral</option>
+                                    </select>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label small fw-bold">Status</label>
+                                    <select name="relationship_status" id="rel-status" class="form-select">
+                                        <option value="active">Active</option>
+                                        <option value="estranged">Estranged</option>
+                                        <option value="deceased">Deceased</option>
+                                        <option value="unresolved">Unresolved</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Visibility</label>
+                                <select name="visibility" id="rel-visibility" class="form-select">
+                                    <option value="public">Public Knowledge</option>
+                                    <option value="secret">Secret</option>
+                                    <option value="rumored">Rumored/Suspected</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold d-flex justify-content-between">
+                                    <span>Strength (Intensity)</span> <span id="strength-val"
+                                        class="text-muted">5</span>
+                                </label>
+                                <input type="range" name="strength" id="rel-strength" class="form-range" min="1"
+                                    max="10" step="1">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold d-flex justify-content-between">
+                                    <span>Trust Level</span> <span id="trust-val" class="text-muted">5</span>
+                                </label>
+                                <input type="range" name="trust_level" id="rel-trust" class="form-range" min="1"
+                                    max="10" step="1">
+                            </div>
+                        </div>
 
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Strength (1-10)</label>
-                        <input type="range" name="strength" id="rel-strength" class="form-range" min="1" max="10"
-                            step="1">
-                        <div class="text-center small text-muted" id="strength-val">5</div>
+                        <!-- Tab 2: Dynamics -->
+                        <div class="tab-pane fade" id="dynamics" role="tabpanel">
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Power Dynamic</label>
+                                <select name="power_dynamic" id="rel-power" class="form-select">
+                                    <option value="balanced">Balanced (=)</option>
+                                    <option value="a_dominant">Char A Dominant (>)</option>
+                                    <option value="b_dominant">Char B Dominant (<)< /option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Conflict Source</label>
+                                <input type="text" name="conflict_source" id="rel-conflict" class="form-control"
+                                    placeholder="What drives the tension?">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Evolution Notes</label>
+                                <textarea name="evolution" id="rel-evolution" class="form-control" rows="2"
+                                    placeholder="e.g. Strangers -> Allies -> Rivals"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Description</label>
+                                <textarea name="description" id="rel-desc" class="form-control" rows="2"
+                                    placeholder="Summary of their bond"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Tab 3: Goals -->
+                        <div class="tab-pane fade" id="goals" role="tabpanel">
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">What Character A Wants</label>
+                                <textarea name="character_a_wants" id="rel-a-wants" class="form-control" rows="3"
+                                    placeholder="Goals regarding Character B"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">What Character B Wants</label>
+                                <textarea name="character_b_wants" id="rel-b-wants" class="form-control" rows="3"
+                                    placeholder="Goals regarding Character A"></textarea>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -255,9 +340,18 @@
                 const relCharA = document.getElementById('rel-char-a');
                 const relCharB = document.getElementById('rel-char-b');
                 const relType = document.getElementById('rel-type');
+                const relStatus = document.getElementById('rel-status');
+                const relVisibility = document.getElementById('rel-visibility');
                 const relDesc = document.getElementById('rel-desc');
                 const relStrength = document.getElementById('rel-strength');
                 const strengthVal = document.getElementById('strength-val');
+                const relTrust = document.getElementById('rel-trust');
+                const trustVal = document.getElementById('trust-val');
+                const relPower = document.getElementById('rel-power');
+                const relConflict = document.getElementById('rel-conflict');
+                const relEvolution = document.getElementById('rel-evolution');
+                const relAWants = document.getElementById('rel-a-wants');
+                const relBWants = document.getElementById('rel-b-wants');
                 const btnSave = document.getElementById('btn-rel-save');
                 const btnDelete = document.getElementById('btn-rel-delete');
                 const btnQuickAdd = document.getElementById('btn-quick-add');
@@ -317,6 +411,19 @@
                                 relStrength.value = suggestion.strength;
                                 strengthVal.innerText = suggestion.strength;
 
+                                // New fields
+                                if (suggestion.trust_level) {
+                                    relTrust.value = suggestion.trust_level;
+                                    trustVal.innerText = suggestion.trust_level;
+                                }
+                                if (suggestion.power_dynamic) relPower.value = suggestion.power_dynamic;
+                                if (suggestion.relationship_status) relStatus.value = suggestion.relationship_status;
+                                if (suggestion.visibility) relVisibility.value = suggestion.visibility;
+                                if (suggestion.conflict_source) relConflict.value = suggestion.conflict_source;
+                                if (suggestion.character_a_wants) relAWants.value = suggestion.character_a_wants;
+                                if (suggestion.character_b_wants) relBWants.value = suggestion.character_b_wants;
+                                if (suggestion.evolution) relEvolution.value = suggestion.evolution;
+
                                 // Visual feedback
                                 btnAskAi.classList.remove('btn-outline-primary');
                                 btnAskAi.classList.add('btn-success');
@@ -338,28 +445,44 @@
                         });
                 };
 
-                // Update strength value display
-                relStrength.oninput = function () {
-                    strengthVal.innerText = this.value;
-                }
+                // Update slider displays
+                relStrength.oninput = function () { strengthVal.innerText = this.value; }
+                relTrust.oninput = function () { trustVal.innerText = this.value; }
 
                 function openModal(relData = null) {
                     relForm.reset();
+                    // Reset tab to first
+                    const firstTab = new bootstrap.Tab(document.querySelector('#relTabs button:first-child'));
+                    firstTab.show();
+
                     if (relData) {
                         relModalTitle.innerText = "Edit Relationship";
                         relIdInput.value = relData.id;
                         relCharA.value = relData.from;
                         relCharB.value = relData.to;
-                        relType.value = relData.type_key || 'friend'; // fallback
+                        relType.value = relData.type_key || 'friend';
                         relDesc.value = relData.title || "";
                         relStrength.value = relData.strength || 5;
                         strengthVal.innerText = relStrength.value;
+
+                        // New fields
+                        relStatus.value = relData.status || 'active';
+                        relVisibility.value = relData.visibility || 'public';
+                        relTrust.value = relData.trust_level || 5;
+                        trustVal.innerText = relTrust.value;
+                        relPower.value = relData.power_dynamic || 'balanced';
+                        relConflict.value = relData.conflict_source || "";
+                        relEvolution.value = relData.evolution || "";
+                        relAWants.value = relData.character_a_wants || "";
+                        relBWants.value = relData.character_b_wants || "";
+
                         btnDelete.style.display = 'block';
                     } else {
                         relModalTitle.innerText = "New Relationship";
                         relIdInput.value = "";
                         btnDelete.style.display = 'none';
                         strengthVal.innerText = "5";
+                        trustVal.innerText = "5";
                     }
                     relModal.show();
                 }
@@ -401,14 +524,68 @@
                         detailsPanel.innerHTML = `
                             <h6>Relationship Detail</h6>
                             <div class="mb-3 p-3 bg-light rounded border">
-                                <h5 class="mb-2 text-center text-primary">${edge.label}</h5>
+                                <h5 class="mb-2 text-center text-primary">${edge.label} <small class="text-muted">(${edge.status || 'Active'})</small></h5>
                                 <p class="small text-muted mb-2 text-center">
                                     Between <strong>${data.nodes.find(n => n.id === edge.from).label}</strong> 
                                     and <strong>${data.nodes.find(n => n.id === edge.to).label}</strong>
                                 </p>
-                                <hr>
-                                <p class="mb-2"><strong>Strength:</strong> ${edge.strength}/10</p>
-                                <p class="mb-0"><strong>Description:</strong><br>${edge.title || '<span class="text-muted fst-italic">No description</span>'}</p>
+                                <div class="text-center mb-2">
+                                    <span class="badge bg-secondary">${edge.visibility || 'Public'}</span>
+                                </div>
+
+                                <div class="accordion" id="relAccordion">
+                                    <!-- Core Stats -->
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingCore">
+                                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCore" aria-expanded="true" aria-controls="collapseCore">
+                                                Core Stats
+                                            </button>
+                                        </h2>
+                                        <div id="collapseCore" class="accordion-collapse collapse show" aria-labelledby="headingCore" data-bs-parent="#relAccordion">
+                                            <div class="accordion-body p-2">
+                                                <div class="d-flex justify-content-between mb-1 small">
+                                                    <span>Strength:</span> <strong>${edge.strength}/10</strong>
+                                                </div>
+                                                <div class="d-flex justify-content-between mb-1 small">
+                                                    <span>Trust:</span> <strong>${edge.trust_level || 5}/10</strong>
+                                                </div>
+                                                <p class="mb-0 small mt-2"><strong>Description:</strong><br>${edge.title || '<span class="text-muted fst-italic">No description</span>'}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Dynamics -->
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingDynamics">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDynamics" aria-expanded="false" aria-controls="collapseDynamics">
+                                                Dynamics
+                                            </button>
+                                        </h2>
+                                        <div id="collapseDynamics" class="accordion-collapse collapse" aria-labelledby="headingDynamics" data-bs-parent="#relAccordion">
+                                            <div class="accordion-body p-2">
+                                                <p class="mb-1 small"><strong>Power:</strong> ${edge.power_dynamic === 'balanced' ? 'Balanced' : (edge.power_dynamic || 'Balanced')}</p>
+                                                ${edge.conflict_source ? `<p class="mb-1 small text-danger"><strong>Conflict:</strong> ${edge.conflict_source}</p>` : ''}
+                                                ${edge.evolution ? `<p class="mt-2 mb-0 small"><strong>Evolution:</strong><br><span class="text-muted">${edge.evolution}</span></p>` : ''}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Goals -->
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingGoals">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseGoals" aria-expanded="false" aria-controls="collapseGoals">
+                                                Goals
+                                            </button>
+                                        </h2>
+                                        <div id="collapseGoals" class="accordion-collapse collapse" aria-labelledby="headingGoals" data-bs-parent="#relAccordion">
+                                            <div class="accordion-body p-2">
+                                                ${(edge.character_a_wants || edge.character_b_wants) ? '' : '<span class="text-muted small fst-italic">No goals defined</span>'}
+                                                ${edge.character_a_wants ? `<p class="mb-1 small"><strong>A Wants:</strong> ${edge.character_a_wants}</p>` : ''}
+                                                ${edge.character_b_wants ? `<p class="mb-1 small"><strong>B Wants:</strong> ${edge.character_b_wants}</p>` : ''}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <button class="btn btn-sm btn-dark w-100" id="btn-edit-active-edge">
                                 <i class="bi bi-pencil-square"></i> Edit Relationship
@@ -417,8 +594,8 @@
 
                         document.getElementById('btn-edit-active-edge').onclick = function () {
                             // Map the edge type back to keys (approximation if not precise in API)
-                            const type_key = edge.label.toLowerCase();
-                            openModal({ ...edge, type_key: type_key, strength: edge.width * 2 });
+                            const type_key = edge.type_key || edge.label.toLowerCase();
+                            openModal({ ...edge, type_key: type_key });
                         };
                     } else {
                         detailsPanel.innerHTML = `
@@ -439,6 +616,14 @@
                         relationship_type: relType.value,
                         description: relDesc.value,
                         strength: relStrength.value,
+                        trust_level: relTrust.value,
+                        relationship_status: relStatus.value,
+                        visibility: relVisibility.value,
+                        power_dynamic: relPower.value,
+                        conflict_source: relConflict.value,
+                        evolution: relEvolution.value,
+                        character_a_wants: relAWants.value,
+                        character_b_wants: relBWants.value,
                         action: 'save'
                     };
 

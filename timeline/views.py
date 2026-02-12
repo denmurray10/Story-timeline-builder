@@ -1860,7 +1860,15 @@ def api_relationship_data(request):
             'width': rel.strength / 2, # scale 1-10 to 0.5-5 width
             'color': {'color': color, 'highlight': color},
             'type_key': rel.relationship_type,
-            'strength': rel.strength
+            'strength': rel.strength,
+            'trust_level': rel.trust_level,
+            'power_dynamic': rel.power_dynamic,
+            'evolution': rel.evolution,
+            'status': rel.relationship_status,
+            'visibility': rel.visibility,
+            'conflict_source': rel.conflict_source,
+            'character_a_wants': rel.character_a_wants,
+            'character_b_wants': rel.character_b_wants
         })
         
     return JsonResponse({'nodes': nodes, 'edges': edges})
@@ -1888,6 +1896,14 @@ def api_manage_relationship(request):
             rel_type = data.get('relationship_type')
             desc = data.get('description', '')
             strength = int(data.get('strength', 5))
+            trust = int(data.get('trust_level', 5))
+            power = data.get('power_dynamic', 'balanced')
+            evolution = data.get('evolution', '')
+            status = data.get('relationship_status', 'active')
+            visibility = data.get('visibility', 'public')
+            conflict = data.get('conflict_source', '')
+            a_wants = data.get('character_a_wants', '')
+            b_wants = data.get('character_b_wants', '')
             
             if not (char_a_id and char_b_id and rel_type):
                  return JsonResponse({'status': 'error', 'message': 'Missing required fields'}, status=400)
@@ -1900,6 +1916,14 @@ def api_manage_relationship(request):
                 rel.relationship_type = rel_type
                 rel.description = desc
                 rel.strength = strength
+                rel.trust_level = trust
+                rel.power_dynamic = power
+                rel.evolution = evolution
+                rel.relationship_status = status
+                rel.visibility = visibility
+                rel.conflict_source = conflict
+                rel.character_a_wants = a_wants
+                rel.character_b_wants = b_wants
                 rel.save()
             else:
                 # Create new (check duplicates first)
@@ -1912,7 +1936,15 @@ def api_manage_relationship(request):
                     character_b_id=char_b_id,
                     relationship_type=rel_type,
                     description=desc,
-                    strength=strength
+                    strength=strength,
+                    trust_level=trust,
+                    power_dynamic=power,
+                    evolution=evolution,
+                    relationship_status=status,
+                    visibility=visibility,
+                    conflict_source=conflict,
+                    character_a_wants=a_wants,
+                    character_b_wants=b_wants
                 )
                 
             return JsonResponse({'status': 'success', 'id': rel.id})
@@ -1984,16 +2016,20 @@ def api_suggest_relationship(request):
         STORY CONTENT:
         {context_text}
         
-        Based on their interactions, determine:
-        1. Relationship Type (one of: ally, enemy, romantic, family, mentor, business, neutral)
-        2. A brief 1-sentence description of their dynamic.
-        3. Relationship Strength (1-10, where 10 is intense love/hate/bond).
-        
+        Based on their interactions, determine the following.
         Return JSON ONLY:
         {{
-            "type": "...", 
-            "description": "...", 
-            "strength": 5
+            "type": "...",  (one of: friend, ally, enemy, romantic, family, professional, rival, mentor, neutral)
+            "description": "...", (1-2 sentences)
+            "strength": 5, (1-10 intensity)
+            "trust_level": 5, (1-10 trust)
+            "power_dynamic": "...", (balanced, a_dominant, or b_dominant)
+            "relationship_status": "...", (active, estranged, deceased, unresolved)
+            "visibility": "...", (public, secret, rumored)
+            "conflict_source": "...", (short phrase explaining tension, if any)
+            "character_a_wants": "...", (what A wants from B)
+            "character_b_wants": "...", (what B wants from A)
+            "evolution": "..." (how it changes: e.g. "Strangers -> Lovers")
         }}
         """
         
