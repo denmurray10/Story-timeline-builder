@@ -4,7 +4,19 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="mb-0">Story Timeline</h2>
-    <div class="d-flex">
+    <div class="d-flex align-items-center">
+        <!-- View Mode Toggle -->
+        <div class="btn-group me-3 shadow-sm" role="group" aria-label="Timeline View Mode">
+            <a href="?mode=chronological"
+                class="btn btn-sm {% if mode == 'narrative' %}btn-outline-dark{% else %}btn-dark{% endif %}">
+                <i class="bi bi-calendar-event me-1"></i> Chronological
+            </a>
+            <a href="?mode=narrative"
+                class="btn btn-sm {% if mode == 'narrative' %}btn-dark{% else %}btn-outline-dark{% endif %}">
+                <i class="bi bi-book me-1"></i> Narrative
+            </a>
+        </div>
+
         <a href="javascript:void(0)" class="btn btn-sm btn-dark btn-invert-hover" onclick="alert('Coming Soon!')">
             <i class="bi bi-list"></i> Vertical View
         </a>

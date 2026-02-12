@@ -131,8 +131,18 @@ class EventForm(forms.ModelForm):
             "content_html",
             "book",
             "chapter",
+            "scene_type",
             "sequence_order",
             "chronological_order",
+            "narrative_order",
+            "date_type",
+            "date",
+            "earliest_date",
+            "latest_date",
+            "end_date",
+            "relative_description",
+            "relative_to_event",
+            "relative_days",
             "story_date",
             "location",
             "pov_character",
@@ -153,9 +163,19 @@ class EventForm(forms.ModelForm):
             "word_count": forms.HiddenInput(),
             "book": forms.Select(attrs={"class": "form-control"}),
             "chapter": forms.Select(attrs={"class": "form-control"}),
+            "scene_type": forms.Select(attrs={"class": "form-control"}),
             "sequence_order": forms.NumberInput(attrs={"class": "form-control"}),
             "chronological_order": forms.NumberInput(attrs={"class": "form-control"}),
-            "story_date": forms.TextInput(attrs={"class": "form-control"}),
+            "narrative_order": forms.NumberInput(attrs={"class": "form-control"}),
+            "date_type": forms.Select(attrs={"class": "form-control"}),
+            "date": forms.DateTimeInput(attrs={"class": "form-control", "type": "datetime-local"}),
+            "earliest_date": forms.DateTimeInput(attrs={"class": "form-control", "type": "datetime-local"}),
+            "latest_date": forms.DateTimeInput(attrs={"class": "form-control", "type": "datetime-local"}),
+            "end_date": forms.DateTimeInput(attrs={"class": "form-control", "type": "datetime-local"}),
+            "relative_description": forms.TextInput(attrs={"class": "form-control", "placeholder": "e.g. 3 days later"}),
+            "relative_to_event": forms.Select(attrs={"class": "form-control"}),
+            "relative_days": forms.NumberInput(attrs={"class": "form-control"}),
+            "story_date": forms.TextInput(attrs={"class": "form-control", "placeholder": "Legacy/In-world string (optional)"}),
             "location": forms.TextInput(attrs={"class": "form-control"}),
             "pov_character": forms.Select(attrs={"class": "form-control"}),
             "characters": forms.CheckboxSelectMultiple(),
@@ -182,6 +202,7 @@ class EventForm(forms.ModelForm):
         if user:
             self.fields["book"].queryset = Book.objects.filter(user=user)
             self.fields["chapter"].queryset = Chapter.objects.filter(book__user=user)
+            self.fields["relative_to_event"].queryset = Event.objects.filter(user=user)
             self.fields["pov_character"].queryset = Character.objects.filter(user=user)
             self.fields["characters"].queryset = Character.objects.filter(user=user)
             self.fields["tags"].queryset = Tag.objects.filter(user=user)

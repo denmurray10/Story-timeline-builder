@@ -337,42 +337,114 @@
                 </div>
             </div>
 
-            <div class="card border-0 shadow-sm mt-3 rounded-4">
-                <div class="card-header bg-white border-0 py-3 px-4" data-bs-toggle="collapse"
-                    data-bs-target="#extraSettings" style="cursor: pointer;">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="small fw-bold text-uppercase text-muted">Technical Notes</span>
-                        <i class="bi bi-chevron-down small opacity-50"></i>
-                    </div>
+        </div>
+
+        <!-- New Timeline Logic Section -->
+        <div class="card border-0 shadow-sm mt-3 rounded-4">
+            <div class="card-header bg-white border-0 py-3 px-4" data-bs-toggle="collapse"
+                data-bs-target="#timelineSettings" style="cursor: pointer;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="small fw-bold text-uppercase text-muted">Timeline Logic</span>
+                    <i class="bi bi-chevron-down small opacity-50"></i>
                 </div>
-                <div id="extraSettings" class="collapse">
-                    <div class="card-body px-4 pb-4 pt-0">
-                        <div class="mb-4">
-                            {{ form.notes }}
-                        </div>
-                        <div class="row g-3 mb-4">
-                            <div class="col-6">
-                                <label class="small text-muted fw-bold">Sequence</label>
-                                {{ form.sequence_order }}
+            </div>
+            <div id="timelineSettings" class="collapse show">
+                <div class="card-body px-4 pb-4 pt-0">
+                    <!-- Date Type Selector -->
+                    <div class="mb-3">
+                        <label class="small text-muted fw-bold">Date Type</label>
+                        {{ form.date_type }}
+                    </div>
+
+                    <!-- 1. Exact Date -->
+                    <div id="field-exact" class="mb-3 date-field-group">
+                        <label class="small text-muted fw-bold">Exact Date/Time</label>
+                        {{ form.date }}
+                    </div>
+
+                    <!-- 2. Fuzzy Date -->
+                    <div id="field-fuzzy" class="mb-3 date-field-group" style="display:none;">
+                        <label class="small text-muted fw-bold">Earliest Possible</label>
+                        {{ form.earliest_date }}
+                        <label class="small text-muted fw-bold mt-2">Latest Possible</label>
+                        {{ form.latest_date }}
+                    </div>
+
+                    <!-- 3. Relative Date -->
+                    <div id="field-relative" class="mb-3 date-field-group" style="display:none;">
+                        <label class="small text-muted fw-bold">Relative To Event</label>
+                        {{ form.relative_to_event }}
+                        <div class="row g-2 mt-2">
+                            <div class="col-8">
+                                <label class="small text-muted fw-bold">Description</label>
+                                {{ form.relative_description }}
                             </div>
-                            <div class="col-6">
-                                <label class="small text-muted fw-bold">Chronology</label>
-                                {{ form.chronological_order }}
+                            <div class="col-4">
+                                <label class="small text-muted fw-bold">Days (+/-)</label>
+                                {{ form.relative_days }}
                             </div>
                         </div>
-                        <div class="mb-4">
-                            <label class="small text-muted fw-bold">World Date</label>
-                            {{ form.story_date }}
+                    </div>
+
+                    <!-- 4. Ongoing Date -->
+                    <div id="field-ongoing" class="mb-3 date-field-group" style="display:none;">
+                        <label class="small text-muted fw-bold">Start Date</label>
+                        {{ form.date }}
+                        <label class="small text-muted fw-bold mt-2">End Date</label>
+                        {{ form.end_date }}
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <label class="small text-muted fw-bold">Scene Type</label>
+                            {{ form.scene_type }}
                         </div>
-                        <div class="form-check form-switch p-0 d-flex justify-content-between align-items-center">
-                            <label class="form-check-label fw-medium text-muted small"
-                                for="{{ form.is_written.id_for_label }}">Mark as Completed</label>
-                            {{ form.is_written }}
+                        <div class="col-6">
+                            <label class="small text-muted fw-bold">Narrative Seq.</label>
+                            {{ form.narrative_order }}
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Legacy settings collapsed -->
+        <div class="card border-0 shadow-sm mt-3 rounded-4">
+            <div class="card-header bg-white border-0 py-3 px-4" data-bs-toggle="collapse"
+                data-bs-target="#extraSettings" style="cursor: pointer;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="small fw-bold text-uppercase text-muted">Advanced / Legacy</span>
+                    <i class="bi bi-chevron-down small opacity-50"></i>
+                </div>
+            </div>
+            <div id="extraSettings" class="collapse">
+                <div class="card-body px-4 pb-4 pt-0">
+                    <div class="mb-4">
+                        {{ form.notes }}
+                    </div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <label class="small text-muted fw-bold">Sequence (Auto)</label>
+                            {{ form.sequence_order }}
+                        </div>
+                        <div class="col-6">
+                            <label class="small text-muted fw-bold">Chronology (Man)</label>
+                            {{ form.chronological_order }}
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="small text-muted fw-bold">Legacy Text Date</label>
+                        {{ form.story_date }}
+                    </div>
+                    <div class="form-check form-switch p-0 d-flex justify-content-between align-items-center">
+                        <label class="form-check-label fw-medium text-muted small"
+                            for="{{ form.is_written.id_for_label }}">Mark as Completed</label>
+                        {{ form.is_written }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     </div>
 </form>
 {% endblock %}
@@ -512,5 +584,39 @@
     };
 
     window.editorInstance = editor;
+
+    // --- Dynamic Date Fields Logic ---
+    const dateTypeSelect = document.querySelector('select[name="date_type"]');
+    const groups = {
+        'exact': document.getElementById('field-exact'),
+        'fuzzy': document.getElementById('field-fuzzy'),
+        'relative': document.getElementById('field-relative'),
+        'ongoing': document.getElementById('field-ongoing'),
+        'none': null
+    };
+
+    function updateDateFields() {
+        const type = dateTypeSelect.value;
+
+        // Hide all first
+        Object.values(groups).forEach(el => {
+            if (el) el.style.display = 'none';
+        });
+
+        // Show active
+        if (groups[type]) {
+            groups[type].style.display = 'block';
+        }
+
+        // Special case: Ongoing also uses the exact date field as 'Start Date'
+        // So if ongoing, we might need to make sure the start date input is visible/labeled correctly
+        // But here we duplicated the render {{ form.date }} in both exact and ongoing blocks for simplicity in HTML
+    }
+
+    if (dateTypeSelect) {
+        dateTypeSelect.addEventListener('change', updateDateFields);
+        // Init on load
+        updateDateFields();
+    }
 </script>
 {% endblock %}

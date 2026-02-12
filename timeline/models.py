@@ -258,6 +258,23 @@ class Event(models.Model):
         ('payoff', 'Payoff'),
     ]
 
+    DATE_TYPE_CHOICES = [
+        ('exact', 'Exact Date'),
+        ('fuzzy', 'Fuzzy/Uncertain'),
+        ('ongoing', 'Ongoing/Event Span'),
+        ('relative', 'Relative Date'),
+        ('none', 'No Date Yet'),
+    ]
+
+    SCENE_TYPE_CHOICES = [
+        ('scene', 'Scene'),
+        ('exposition', 'Exposition/Infodump'),
+        ('flashback', 'Flashback'),
+        ('flashforward', 'Flashforward'),
+        ('interlude', 'Interlude'),
+        ('teaser', 'Cold Open/Teaser'),
+    ]
+
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='events')
     title = models.CharField(max_length=200)
     description = models.TextField(
@@ -300,8 +317,51 @@ class Event(models.Model):
         default=0,
         help_text="Order of this event in actual story chronology (for flashbacks/non-linear narratives)"
     )
+    narrative_order = models.PositiveIntegerField(
+        null=True, 
+        blank=True,
+        help_text="Explicit order for narrative view (reading order)"
+    )
+
+    # Smart Date Fields
+    date_type = models.CharField(
+        max_length=10, 
+        choices=DATE_TYPE_CHOICES, 
+        default='exact'
+    )
     
-    # Story world timestamp (optional - for tracking in-world dates/times)
+    # For exact dates (replaces old usage of story_date potentially)
+    date = models.DateTimeField(null=True, blank=True)
+    
+    # For fuzzy dates (range)
+    earliest_date = models.DateTimeField(null=True, blank=True)
+    latest_date = models.DateTimeField(null=True, blank=True)
+    
+    # For ongoing events
+    end_date = models.DateTimeField(null=True, blank=True)
+    
+    # For relative dates
+    relative_description = models.CharField(
+        max_length=100, 
+        blank=True,
+        help_text="e.g., 'Three days later', 'One week after'"
+    )
+    relative_to_event = models.ForeignKey(
+        'self', 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        related_name='dependent_events'
+    )
+    relative_days = models.IntegerField(null=True, blank=True)
+    
+    # Constraints
+    is_locked = models.BooleanField(
+        default=False, 
+        help_text="Prevent accidental automatic rescheduling"
+    )
+    
+    # Story world timestamp (optional - for tracking in-world dates/times as string)
     story_date = models.CharField(
         max_length=100,
         blank=True,
@@ -337,6 +397,11 @@ class Event(models.Model):
         max_length=100,
         choices=STORY_BEAT_CHOICES,
         blank=True
+    )
+    scene_type = models.CharField(
+        max_length=15,
+        choices=SCENE_TYPE_CHOICES,
+        default='scene'
     )
     tension_level = models.PositiveIntegerField(
         default=5,
@@ -384,6 +449,56 @@ class Event(models.Model):
         # Update book's total word count
         if self.book:
             self.book.update_word_count()
+
+    def get_absolute_date(self):
+        """
+        Resolves the actual date for sorting/timeline positioning.
+        Handles nested recursive checks.
+        """
+        # 1. Exact Date
+        if self.date_type == 'exact':
+            return self.date
+        
+        # 2. Fuzzy Date (midpoint)
+        elif self.date_type == 'fuzzy':
+            if self.earliest_date and self.latest_date:
+                # Calculate midpoint
+                delta = self.latest_date - self.earliest_date
+                return self.earliest_date + (delta / 2)
+            return self.earliest_date or self.latest_date
+            
+        # 3. Ongoing (Start date)
+        elif self.date_type == 'ongoing':
+            return self.date
+            
+        # 4. Relative Date (Resolved)
+        elif self.date_type == 'relative' and self.relative_to_event:
+            # Simple recursion protection: only go 1 level deep for now OR check ID
+            if self.relative_to_event.id == self.id:
+                return None # Prevent self-reference
+                
+            base_date = self.relative_to_event.get_absolute_date()
+            if base_date and self.relative_days is not None:
+                from datetime import timedelta
+                return base_date + timedelta(days=self.relative_days)
+                
+        return None
+
+    def get_display_date(self):
+        """Returns human-readable date string"""
+        if self.date_type == 'exact' and self.date:
+            return self.date.strftime("%Y-%m-%d")
+        elif self.date_type == 'fuzzy':
+            start = self.earliest_date.strftime('%Y') if self.earliest_date else '?'
+            end = self.latest_date.strftime('%Y') if self.latest_date else '?'
+            return f"{start} - {end}"
+        elif self.date_type == 'ongoing':
+            start = self.date.strftime('%Y') if self.date else '?'
+            end = self.end_date.strftime('%Y') if self.end_date else 'Present'
+            return f"{start} - {end}"
+        elif self.date_type == 'relative':
+            return self.relative_description or f"{self.relative_days} days after {self.relative_to_event.title}"
+        return "TBD"
 
 
 class CharacterRelationship(models.Model):

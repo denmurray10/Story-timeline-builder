@@ -25,6 +25,7 @@ from .forms import (
     UserRegisterForm, BookForm, ChapterForm, CharacterForm, 
     EventForm, TagForm, UserAccountForm, CharacterRelationshipForm, WorldEntryForm
 )
+from .utils.ai_context import ContextResolver
 # ============== Authentication Views ==============
 
 @login_required
@@ -1499,26 +1500,20 @@ def api_ai_consultant(request):
         if not user_query:
             return JsonResponse({'status': 'error', 'message': 'No query provided'}, status=400)
 
-        # 1. Build Story Context
-        books = Book.objects.filter(user=request.user)
-        characters = Character.objects.filter(user=request.user)
-        recent_events = Event.objects.filter(user=request.user).order_by('-updated_at')[:10]
+        # 1. Build Story Context using Smart Resolver
+        resolver = ContextResolver(request.user)
         
-        context = "You are a professional Story Consultant. Here is the context of the user's story:\n\n"
+        # We can also try to find the "active scene" content if provided in the payload, 
+        # otherwise just use the query.
+        scene_content = data.get('scene_content', '')
         
-        context += "BOOKS:\n"
-        for b in books:
-            context += f"- {b.title} (Status: {b.get_status_display()}, Progress: {b.progress_percentage}%)\n"
-            
-        context += "\nCHARACTERS:\n"
-        for c in characters:
-            context += f"- {c.name} ({c.get_role_display()}): {c.description[:200]}...\n"
-            
-        context += "\nRECENT EVENTS:\n"
-        for e in recent_events:
-            context += f"- {e.title}: {e.description[:100]}...\n"
-
-        context += f"\nUSER QUESTION: {user_query}\n"
+        relevant_context = resolver.get_context_for_query(user_query, scene_content)
+        
+        context = "You are a professional Story Consultant. "
+        context += "Here is the relevant context from the user's story bible (Characters, Locations, Lore):\n"
+        context += relevant_context
+        
+        context += f"\n\nUSER QUESTION: {user_query}\n"
         context += "\nPlease provide creative, helpful, and insightful feedback based on this context. Keep it concise. "
         context += "Use UK English spelling and grammar (e.g., 'colour', 'organise', 'centre')."
 
@@ -1784,10 +1779,26 @@ def analyze_single_character_with_ai(character_name, text):
 def horizontal_timeline(request):
     """
     Displays events in a linear, horizontally scrollable timeline.
+    Supports 'mode' parameter for Chronological vs Narrative order.
     """
-    events = Event.objects.filter(user=request.user).order_by('sequence_order')
+    mode = request.GET.get('mode', 'chronological')
+    events = Event.objects.filter(user=request.user)
     
+    if mode == 'narrative':
+        # Sort by explicit narrative order, fallback to sequence order
+        events = events.order_by('narrative_order', 'sequence_order')
+    else:
+        # Default: Chronological
+        # Logic: 
+        # 1. Exact dates first? Or mixed with fuzzy?
+        # We start by standardizing on new date fields if possible
+        # For now, let's trust the 'chronological_order' int field as a primary sort
+        # But ideally we want to sort by the actual date if available
+        # combining DB sorting with Python sorting might be needed for complex relative dates
+         events = events.order_by('chronological_order', 'sequence_order')
+
     context = {
         'events': events,
+        'mode': mode,
     }
     return render(request, 'timeline/horizontal_timeline.html', context)
