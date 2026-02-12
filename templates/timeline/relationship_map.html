@@ -126,7 +126,176 @@
 
 <div class="row g-4">
     <div class="col-lg-9">
-        <div id="relationship-network"></div>
+        <div class="position-relative" style="height: 600px; border-radius: 12px; overflow: hidden;">
+            <div id="relationship-network" style="height: 100%;"></div>
+
+            <!-- Overlay Modal -->
+            <div id="relationship-overlay" class="position-absolute top-0 start-0 w-100 h-100 bg-white"
+                style="z-index: 10; display: none; overflow-y: auto;">
+                <div class="p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="mb-0 fw-bold" id="overlayTitle">Manage Relationship</h5>
+                        <button type="button" class="btn-close" id="btn-close-overlay"></button>
+                    </div>
+
+                    <!-- Form Container (Moved from Modal) -->
+                    <div id="overlay-form-container">
+                        <!-- Form will be injected or moved here via JS or just refined here -->
+                    </div>
+
+                    <form id="relationship-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="id" id="rel-id">
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Character A</label>
+                                <select name="character_a" id="rel-char-a" class="form-select" required>
+                                    {% for char in characters %}
+                                    <option value="{{ char.id }}">{{ char.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Character B</label>
+                                <select name="character_a" id="rel-char-b" class="form-select" required>
+                                    {% for char in characters %}
+                                    <option value="{{ char.id }}">{{ char.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- ... (Rest of the form content needs to be here) ... -->
+                        <!-- To avoid massive replace, I will move the modal body content here in next step or use JS to move it? -->
+                        <!-- Better to rewrite the form structure here cleanly. -->
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Relationship Type</label>
+                            <div class="input-group">
+                                <select name="relationship_type" id="rel-type" class="form-select" required>
+                                    <option value="friend">Friend</option>
+                                    <option value="ally">Ally</option>
+                                    <option value="enemy">Enemy</option>
+                                    <option value="romantic">Romantic</option>
+                                    <option value="family">Family</option>
+                                    <option value="mentor">Mentor</option>
+                                    <option value="rival">Rival</option>
+                                    <option value="professional">Professional</option>
+                                    <option value="neutral">Neutral</option>
+                                </select>
+                                <button type="button" class="btn btn-outline-secondary" id="btn-ask-ai"
+                                    title="Auto-detect from story">
+                                    <i class="bi bi-magic"></i> Ask AI
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Tabs for Details -->
+                        <ul class="nav nav-tabs nav-fill mb-3" id="relTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active small fw-bold" id="core-tab" data-bs-toggle="tab"
+                                    data-bs-target="#core" type="button" role="tab">Core Stats</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link small fw-bold" id="dynamics-tab" data-bs-toggle="tab"
+                                    data-bs-target="#dynamics" type="button" role="tab">Dynamics</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link small fw-bold" id="goals-tab" data-bs-toggle="tab"
+                                    data-bs-target="#goals" type="button" role="tab">Goals</button>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content" id="relTabsContent">
+                            <!-- Core Tab -->
+                            <div class="tab-pane fade show active" id="core" role="tabpanel">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label small">Status</label>
+                                        <select id="rel-status" class="form-select form-select-sm">
+                                            <option value="active">Active</option>
+                                            <option value="estranged">Estranged</option>
+                                            <option value="deceased">Ended (Death)</option>
+                                            <option value="unresolved">Unresolved</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small">Visibility</label>
+                                        <select id="rel-visibility" class="form-select form-select-sm">
+                                            <option value="public">Public</option>
+                                            <option value="secret">Secret</option>
+                                            <option value="rumored">Rumored</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small">Connection Strength: <span id="strength-val"
+                                            class="fw-bold text-primary">5</span>/10</label>
+                                    <input type="range" class="form-range" min="1" max="10" id="rel-strength"
+                                        oninput="document.getElementById('strength-val').innerText = this.value">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small">Trust Level: <span id="trust-val"
+                                            class="fw-bold text-success">5</span>/10</label>
+                                    <input type="range" class="form-range" min="1" max="10" id="rel-trust"
+                                        oninput="document.getElementById('trust-val').innerText = this.value">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small">Description</label>
+                                    <textarea id="rel-desc" class="form-control" rows="2"
+                                        placeholder="Brief summary of their bond..."></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Dynamics Tab -->
+                            <div class="tab-pane fade" id="dynamics" role="tabpanel">
+                                <div class="mb-3">
+                                    <label class="form-label small">Power Dynamic</label>
+                                    <select id="rel-power" class="form-select">
+                                        <option value="balanced">Balanced</option>
+                                        <option value="a_dominant">Character A Dominant</option>
+                                        <option value="b_dominant">Character B Dominant</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small">Source of Conflict</label>
+                                    <textarea id="rel-conflict" class="form-control" rows="2"
+                                        placeholder="Why do they clash?"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small"> Evolution</label>
+                                    <textarea id="rel-evolution" class="form-control" rows="2"
+                                        placeholder="How does this relationship change?"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Goals Tab -->
+                            <div class="tab-pane fade" id="goals" role="tabpanel">
+                                <div class="mb-3">
+                                    <label class="form-label small">Character A Wants</label>
+                                    <textarea id="rel-a-wants" class="form-control" rows="2"
+                                        placeholder="What A wants from B..."></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small">Character B Wants</label>
+                                    <textarea id="rel-b-wants" class="form-control" rows="2"
+                                        placeholder="What B wants from A..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <button type="button" class="btn btn-outline-danger btn-sm" id="btn-rel-delete"
+                                style="display:none;">Delete</button>
+                            <button type="button" class="btn btn-secondary btn-sm"
+                                id="btn-cancel-overlay">Cancel</button>
+                            <button type="button" class="btn btn-primary btn-sm" id="btn-rel-save">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="col-lg-3">
         <div class="info-panel shadow-sm" id="selection-details">
@@ -365,8 +534,9 @@
 
                 const network = new vis.Network(container, data, options);
 
-                const relModal = new bootstrap.Modal(document.getElementById('relationshipModal'));
-                const relModalTitle = document.getElementById('relModalTitle');
+                // const relModal = new bootstrap.Modal(document.getElementById('relationshipModal')); // Removed
+                const overlay = document.getElementById('relationship-overlay');
+                const overlayTitle = document.getElementById('overlayTitle');
                 const relForm = document.getElementById('relationship-form');
                 const relIdInput = document.getElementById('rel-id');
                 const relCharA = document.getElementById('rel-char-a');
@@ -388,6 +558,67 @@
                 const btnDelete = document.getElementById('btn-rel-delete');
                 const btnQuickAdd = document.getElementById('btn-quick-add');
                 const btnAskAi = document.getElementById('btn-ask-ai');
+                const btnCloseOverlay = document.getElementById('btn-close-overlay');
+                const btnCancelOverlay = document.getElementById('btn-cancel-overlay');
+
+                // Overlay Toggle Logic
+                function openModal(data = null) {
+                    // Reset Tabs
+                    const coreTab = new bootstrap.Tab(document.getElementById('core-tab'));
+                    coreTab.show();
+
+                    if (data) {
+                        relIdInput.value = data.id;
+                        relCharA.value = data.from;
+                        relCharB.value = data.to;
+
+                        // Handle type key mapping
+                        let typeVal = data.type_key || 'neutral';
+                        if (![...relType.options].some(o => o.value === typeVal)) {
+                            // Try to find by text if key doesn't match
+                            const found = [...relType.options].find(o => o.text.toLowerCase() === data.label.toLowerCase());
+                            if (found) typeVal = found.value;
+                        }
+                        relType.value = typeVal;
+
+                        relDesc.value = data.title || '';
+                        relStrength.value = data.strength || 5;
+                        strengthVal.innerText = data.strength || 5;
+                        relTrust.value = data.trust_level || 5;
+                        trustVal.innerText = data.trust_level || 5;
+                        relStatus.value = data.status || 'active';
+                        relVisibility.value = data.visibility || 'public';
+                        relPower.value = data.power_dynamic || 'balanced';
+                        relConflict.value = data.conflict_source || '';
+                        relEvolution.value = data.evolution || '';
+                        relAWants.value = data.character_a_wants || '';
+                        relBWants.value = data.character_b_wants || '';
+
+                        overlayTitle.innerText = "Edit Relationship";
+                        btnDelete.style.display = 'block';
+
+                        // Disable character select edits for existing relationships to prevet confusion?
+                        // Actually standard behavior varies, but let's keep enabled.
+                    } else {
+                        relIdInput.value = "";
+                        relForm.reset();
+                        strengthVal.innerText = "5";
+                        trustVal.innerText = "5";
+                        overlayTitle.innerText = "New Relationship";
+                        btnDelete.style.display = 'none';
+                    }
+
+                    // Show Overlay
+                    overlay.style.display = 'block';
+                }
+
+                function closeOverlay() {
+                    overlay.style.display = 'none';
+                }
+
+                btnQuickAdd.onclick = () => openModal();
+                btnCloseOverlay.onclick = closeOverlay;
+                btnCancelOverlay.onclick = closeOverlay;
 
                 // AI Auto-Detect Handler
                 btnAskAi.onclick = function () {
@@ -481,43 +712,24 @@
                 relStrength.oninput = function () { strengthVal.innerText = this.value; }
                 relTrust.oninput = function () { trustVal.innerText = this.value; }
 
-                function openModal(relData = null) {
-                    relForm.reset();
-                    // Reset tab to first
-                    const firstTab = new bootstrap.Tab(document.querySelector('#relTabs button:first-child'));
-                    firstTab.show();
+                // Helper to open modal specific tab
+                window.openModalForEdge = function (edgeId, tabName) {
+                    const edge = data.edges.find(e => e.id === edgeId);
+                    if (edge) {
+                        // Map type key
+                        const type_key = edge.type_key || edge.label.toLowerCase();
+                        openModal({ ...edge, type_key: type_key });
 
-                    if (relData) {
-                        relModalTitle.innerText = "Edit Relationship";
-                        relIdInput.value = relData.id;
-                        relCharA.value = relData.from;
-                        relCharB.value = relData.to;
-                        relType.value = relData.type_key || 'friend';
-                        relDesc.value = relData.title || "";
-                        relStrength.value = relData.strength || 5;
-                        strengthVal.innerText = relStrength.value;
-
-                        // New fields
-                        relStatus.value = relData.status || 'active';
-                        relVisibility.value = relData.visibility || 'public';
-                        relTrust.value = relData.trust_level || 5;
-                        trustVal.innerText = relTrust.value;
-                        relPower.value = relData.power_dynamic || 'balanced';
-                        relConflict.value = relData.conflict_source || "";
-                        relEvolution.value = relData.evolution || "";
-                        relAWants.value = relData.character_a_wants || "";
-                        relBWants.value = relData.character_b_wants || "";
-
-                        btnDelete.style.display = 'block';
-                    } else {
-                        relModalTitle.innerText = "New Relationship";
-                        relIdInput.value = "";
-                        btnDelete.style.display = 'none';
-                        strengthVal.innerText = "5";
-                        trustVal.innerText = "5";
+                        // Switch tab
+                        // The new overlay tabs are: core-tab, dynamics-tab, goals-tab
+                        const tabId = `#${tabName}-tab`;
+                        const tabTriggerEl = document.querySelector(tabId);
+                        if (tabTriggerEl) {
+                            const tab = new bootstrap.Tab(tabTriggerEl);
+                            tab.show();
+                        }
                     }
-                    relModal.show();
-                }
+                };
 
                 btnQuickAdd.onclick = () => openModal();
 
