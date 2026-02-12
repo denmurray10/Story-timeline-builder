@@ -47,22 +47,22 @@
                                 {% if forloop.counter|divisibleby:2 %}
                                     /* Bottom Item (Even) */
                                     top: 50%;
-                                    height: 40px; 
+                                    height: 100px; 
                                 {% else %}
                                     /* Top Item (Odd) */
                                     bottom: 50%;
-                                    height: 40px;
+                                    height: 80px;
                                 {% endif %}">
                     </div>
 
                     <!-- Content Card (Dashboard Style) -->
-                    <div class="card dash-card position-absolute" style="width: 100%;
+                    <div class="card dash-card position-absolute" style="width: 100%; z-index: 2;
                                 {% if forloop.counter|divisibleby:2 %}
                                     /* Bottom Item (Even) */
                                     top: calc(50% + 40px);
                                 {% else %}
                                     /* Top Item (Odd) */
-                                    bottom: calc(50% + 40px);
+                                    bottom: calc(50% + 16px);
                                 {% endif %}">
 
                         <div class="card-body p-3">
