@@ -399,13 +399,19 @@
                         const edge = data.edges.find(e => e.id === edgeId);
 
                         detailsPanel.innerHTML = `
-                            <h6>Relationship Edit</h6>
-                            <div class="mb-3 p-3 bg-light rounded border text-center">
-                                <div class="fw-bold mb-1">${edge.label}</div>
-                                <div class="small text-muted">Click below to manage this connection</div>
+                            <h6>Relationship Detail</h6>
+                            <div class="mb-3 p-3 bg-light rounded border">
+                                <h5 class="mb-2 text-center text-primary">${edge.label}</h5>
+                                <p class="small text-muted mb-2 text-center">
+                                    Between <strong>${data.nodes.find(n => n.id === edge.from).label}</strong> 
+                                    and <strong>${data.nodes.find(n => n.id === edge.to).label}</strong>
+                                </p>
+                                <hr>
+                                <p class="mb-2"><strong>Strength:</strong> ${edge.strength}/10</p>
+                                <p class="mb-0"><strong>Description:</strong><br>${edge.title || '<span class="text-muted fst-italic">No description</span>'}</p>
                             </div>
                             <button class="btn btn-sm btn-dark w-100" id="btn-edit-active-edge">
-                                <i class="bi bi-pencil-square"></i> Open Editor
+                                <i class="bi bi-pencil-square"></i> Edit Relationship
                             </button>
                         `;
 
