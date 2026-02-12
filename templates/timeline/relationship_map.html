@@ -138,6 +138,14 @@
                         </div>
                     </div>
 
+                    <!-- AI Auto-Detect Button -->
+                    <div class="mb-3 text-end">
+                        <button type="button" class="btn btn-sm btn-outline-primary" id="btn-ask-ai"
+                            title="Analyze shared scenes to suggest relationship">
+                            <i class="bi bi-magic"></i> Auto-Detect with AI
+                        </button>
+                    </div>
+
                     <div class="mb-3">
                         <label class="form-label small fw-bold">Type</label>
                         <select name="relationship_type" id="rel-type" class="form-select">
@@ -253,6 +261,82 @@
                 const btnSave = document.getElementById('btn-rel-save');
                 const btnDelete = document.getElementById('btn-rel-delete');
                 const btnQuickAdd = document.getElementById('btn-quick-add');
+                const btnAskAi = document.getElementById('btn-ask-ai');
+
+                // AI Auto-Detect Handler
+                btnAskAi.onclick = function () {
+                    const charA = relCharA.value;
+                    const charB = relCharB.value;
+
+                    if (!charA || !charB) {
+                        alert("Please select both characters first.");
+                        return;
+                    }
+
+                    if (charA === charB) {
+                        alert("Characters must be different.");
+                        return;
+                    }
+
+                    // Show loading state
+                    const originalText = btnAskAi.innerHTML;
+                    btnAskAi.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Scannning shared scenes...';
+                    btnAskAi.disabled = true;
+
+                    fetch('{% url "api_suggest_relationship" %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: JSON.stringify({
+                            character_a: charA,
+                            character_b: charB
+                        })
+                    })
+                        .then(response => response.json())
+                        .then(result => {
+                            if (result.status === 'success') {
+                                const suggestion = result.suggestion;
+
+                                // Map AI type to select options roughly
+                                // Our types: friend, ally, enemy, romantic, family, professional, rival, mentor
+                                // AI types: ally, enemy, romantic, family, mentor, business, neutral
+                                let mappedType = 'neutral';
+                                const aiType = suggestion.type.toLowerCase();
+
+                                if (aiType.includes('romantic')) mappedType = 'romantic';
+                                else if (aiType.includes('fam')) mappedType = 'family';
+                                else if (aiType.includes('enem') || aiType.includes('rival')) mappedType = 'enemy';
+                                else if (aiType.includes('business')) mappedType = 'professional';
+                                else if (aiType.includes('mentor')) mappedType = 'mentor';
+                                else if (aiType.includes('ally') || aiType.includes('friend')) mappedType = 'friend';
+
+                                relType.value = mappedType;
+                                relDesc.value = suggestion.description;
+                                relStrength.value = suggestion.strength;
+                                strengthVal.innerText = suggestion.strength;
+
+                                // Visual feedback
+                                btnAskAi.classList.remove('btn-outline-primary');
+                                btnAskAi.classList.add('btn-success');
+                                setTimeout(() => {
+                                    btnAskAi.classList.remove('btn-success');
+                                    btnAskAi.classList.add('btn-outline-primary');
+                                }, 1500);
+                            } else {
+                                alert("AI Error: " + (result.message || "Unknown error"));
+                            }
+                        })
+                        .catch(e => {
+                            console.error(e);
+                            alert("Failed to connect to AI.");
+                        })
+                        .finally(() => {
+                            btnAskAi.innerHTML = originalText;
+                            btnAskAi.disabled = false;
+                        });
+                };
 
                 // Update strength value display
                 relStrength.oninput = function () {

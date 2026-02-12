@@ -1802,3 +1802,236 @@ def horizontal_timeline(request):
         'mode': mode,
     }
     return render(request, 'timeline/horizontal_timeline.html', context)
+
+
+@login_required
+def relationship_map(request):
+    """
+    Renders the relationship visualization page.
+    """
+    characters = Character.objects.filter(user=request.user)
+    return render(request, 'timeline/relationship_map.html', {'characters': characters})
+
+
+@login_required
+def api_relationship_data(request):
+    """
+    Returns JSON data for the Vis.js network graph.
+    Nodes = Characters
+    Edges = Relationships
+    """
+    characters = Character.objects.filter(user=request.user)
+    relationships = CharacterRelationship.objects.filter(user=request.user)
+    
+    nodes = []
+    for char in characters:
+        nodes.append({
+            'id': char.id,
+            'label': char.name,
+            'group': char.role, # for auto-coloring usually, but we use specific colors
+            'color': char.color_code or '#97c2fc',
+            'description': char.description[:100] + '...' if char.description else ''
+        })
+        
+    edges = []
+    
+    # Color mapping matching the front-end legend
+    REL_COLORS = {
+        'friend': '#10b981',      # Green like Ally
+        'ally': '#10b981',        # Green
+        'enemy': '#b91c1c',       # Dark Red
+        'romantic': '#f43f5e',    # Pink/Rose
+        'family': '#8b5cf6',      # Purple
+        'professional': '#64748b',# Slate
+        'rival': '#ef4444',       # Red (lighter than enemy)
+        'mentor': '#f59e0b',      # Amber
+        'neutral': '#9ca3af',     # Gray
+    }
+    
+    for rel in relationships:
+        color = REL_COLORS.get(rel.relationship_type, '#9ca3af')
+        
+        edges.append({
+            'id': rel.id,
+            'from': rel.character_a.id,
+            'to': rel.character_b.id,
+            'label': rel.get_relationship_type_display(),
+            'title': rel.description, # tooltip
+            'width': rel.strength / 2, # scale 1-10 to 0.5-5 width
+            'color': {'color': color, 'highlight': color},
+            'type_key': rel.relationship_type,
+            'strength': rel.strength
+        })
+        
+    return JsonResponse({'nodes': nodes, 'edges': edges})
+
+
+@login_required
+@require_POST
+def api_manage_relationship(request):
+    """
+    AJAX Endpoint to Create, Update, or Delete a relationship.
+    """
+    try:
+        data = json.loads(request.body)
+        action = data.get('action')
+        rel_id = data.get('id')
+        
+        if action == 'delete':
+            rel = get_object_or_404(CharacterRelationship, pk=rel_id, user=request.user)
+            rel.delete()
+            return JsonResponse({'status': 'success', 'message': 'Relationship deleted'})
+            
+        elif action == 'save':
+            char_a_id = data.get('character_a')
+            char_b_id = data.get('character_b')
+            rel_type = data.get('relationship_type')
+            desc = data.get('description', '')
+            strength = int(data.get('strength', 5))
+            
+            if not (char_a_id and char_b_id and rel_type):
+                 return JsonResponse({'status': 'error', 'message': 'Missing required fields'}, status=400)
+
+            if rel_id:
+                # Update existing
+                rel = get_object_or_404(CharacterRelationship, pk=rel_id, user=request.user)
+                rel.character_a_id = char_a_id
+                rel.character_b_id = char_b_id
+                rel.relationship_type = rel_type
+                rel.description = desc
+                rel.strength = strength
+                rel.save()
+            else:
+                # Create new (check duplicates first)
+                if CharacterRelationship.objects.filter(user=request.user, character_a_id=char_a_id, character_b_id=char_b_id).exists():
+                     return JsonResponse({'status': 'error', 'message': 'Relationship already exists!'}, status=400)
+                     
+                rel = CharacterRelationship.objects.create(
+                    user=request.user,
+                    character_a_id=char_a_id,
+                    character_b_id=char_b_id,
+                    relationship_type=rel_type,
+                    description=desc,
+                    strength=strength
+                )
+                
+            return JsonResponse({'status': 'success', 'id': rel.id})
+            
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+@login_required
+@require_POST
+def api_suggest_relationship(request):
+    """
+    Analyzes shared scenes between two characters to suggest relationship details.
+    """
+    try:
+        data = json.loads(request.body)
+        char_a_id = data.get('character_a')
+        char_b_id = data.get('character_b')
+        
+        if not (char_a_id and char_b_id):
+             return JsonResponse({'status': 'error', 'message': 'Both characters are required.'}, status=400)
+             
+        char_a = get_object_or_404(Character, pk=char_a_id, user=request.user)
+        char_b = get_object_or_404(Character, pk=char_b_id, user=request.user)
+        
+        # 1. Find shared events
+        # Events where BOTH characters are in the 'characters' many-to-many field
+        shared_events = Event.objects.filter(
+            user=request.user, 
+            characters=char_a
+        ).filter(
+            characters=char_b
+        ).distinct()
+        
+        if not shared_events.exists():
+             return JsonResponse({
+                 'status': 'success', 
+                 'suggestion': {
+                     'type': 'neutral',
+                     'description': 'No shared scenes found in the database yet.',
+                     'strength': 1
+                 }
+             })
+
+        # 2. Aggregate text (limit to ~3000 words to avoid context overflow)
+        context_text = ""
+        for event in shared_events[:5]: # Check top 5 shared events
+            content = event.content_json or event.content_html or event.description or ""
+            # Strip simple HTML if needed, or just append
+            context_text += f"\n--- SCENE: {event.title} ---\n{str(content)[:1000]}\n"
+            
+        if not context_text.strip():
+             return JsonResponse({
+                 'status': 'success', 
+                 'suggestion': {
+                     'type': 'neutral',
+                     'description': 'Shared scenes found, but they have no content/text yet.',
+                     'strength': 1
+                 }
+             })
+
+        # 3. Call AI
+        prompt = f"""
+        Analyze the relationship between two characters based on these shared scenes.
+        
+        Character A: {char_a.name} ({char_a.get_role_display()})
+        Character B: {char_b.name} ({char_b.get_role_display()})
+        
+        STORY CONTENT:
+        {context_text}
+        
+        Based on their interactions, determine:
+        1. Relationship Type (one of: ally, enemy, romantic, family, mentor, business, neutral)
+        2. A brief 1-sentence description of their dynamic.
+        3. Relationship Strength (1-10, where 10 is intense love/hate/bond).
+        
+        Return JSON ONLY:
+        {{
+            "type": "...", 
+            "description": "...", 
+            "strength": 5
+        }}
+        """
+        
+        # We can reuse the existing analyze helper or call directly
+        # Let's use the explicit call for clarity here as we need specific JSON
+        ai_response = _call_ai_json(prompt, deepseek_model="deepseek-chat")
+        
+        return JsonResponse({'status': 'success', 'suggestion': ai_response})
+
+    except Exception as e:
+        print(f"AI Suggest Error: {e}")
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+@login_required
+def export_story_bible(request, pk):
+    """
+    Export a book as a 'Story Bible' (printable HTML).
+    Includes: Overview, Characters, Timeline, World Metadata.
+    """
+    book = get_object_or_404(Book, pk=pk, user=request.user)
+    
+    # Context Data
+    characters = Character.objects.filter(user=request.user).order_by('role', 'name')
+    # Filter characters that appear in this book if possible, but global list is often better for a bible
+    
+    # Events specific to this book (or all if not assigned?)
+    # Let's show events linked to this book + unassigned ones if relevant? 
+    # Usually just the book's events.
+    events = Event.objects.filter(user=request.user, book=book).order_by('chronological_order', 'sequence_order')
+    
+    tags = Tag.objects.filter(user=request.user).order_by('category', 'name')
+    
+    context = {
+        'book': book,
+        'characters': characters,
+        'events': events,
+        'tags': tags,
+        'now': timezone.now()
+    }
+    return render(request, 'timeline/story_bible_export.html', context)
