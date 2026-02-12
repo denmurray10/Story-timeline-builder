@@ -14,6 +14,7 @@ urlpatterns = [
     # Home/Dashboard
     path('', views.home, name='timeline_home'),
     path('dashboard/', views.dashboard, name='dashboard'),
+    path('home-preview/', views.home_preview, name='home_preview'),
     
     # Books
     path('books/', views.book_list, name='book_list'),

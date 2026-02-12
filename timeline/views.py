@@ -66,6 +66,11 @@ def home(request):
     return render(request, 'timeline/home.html')
 
 
+def home_preview(request):
+    """Preview page for the new homepage design."""
+    return render(request, 'timeline/home_preview.html')
+
+
 @login_required
 def dashboard(request):
     """Main dashboard showing overview of all projects."""

@@ -1,0 +1,254 @@
+{% extends 'timeline/base.html' %}
+{% load static %}
+
+{% block title %}Preview: Story Timeline Builder{% endblock %}
+
+{% block content %}
+<!-- Dashboard-style Header -->
+<div class="d-flex justify-content-end align-items-center mb-3">
+    <div class="d-flex">
+        <a href="{% url 'login' %}" class="btn btn-sm btn-outline-dark me-2">
+            <i class="bi bi-box-arrow-in-right"></i> Login
+        </a>
+        <a href="{% url 'register' %}" class="btn btn-sm btn-dark btn-invert-hover">
+            <i class="bi bi-person-plus"></i> Register
+        </a>
+    </div>
+</div>
+
+<div class="page-container mt-0" style="max-width: 100%;">
+    <!-- HERO -->
+    <div class="card border-0 shadow-sm mb-5"
+        style="background: radial-gradient(circle at top left,#eef2ff,#e0f2fe,#f5f7fb);">
+        <div class="card-body py-5 px-4 px-md-5">
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <span class="badge bg-secondary mb-3">
+                        Built for long‑form fiction
+                    </span>
+                    <h2 class="mb-3">
+                        Your story planning and writing toolbox.
+                    </h2>
+                    <p class="lead text-muted mb-4">
+                        Map timelines, track characters, and draft scenes in one organised workspace,
+                        so your novel stays coherent from first idea to final chapter.
+                    </p>
+
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        <a href="{% url 'register' %}" class="btn btn-primary btn-lg">
+                            <i class="bi bi-person-plus"></i> Start for free
+                        </a>
+                        <a href="{% url 'login' %}" class="btn btn-secondary btn-lg">
+                            <i class="bi bi-box-arrow-in-right"></i> Log in
+                        </a>
+                    </div>
+
+                    <p class="text-muted small mb-0">
+                        No credit card required. Keep all your worlds, books, and timelines together.
+                    </p>
+                </div>
+
+                <!-- Right column: simple “app preview” blocks -->
+                <div class="col-lg-6">
+                    <div class="bg-white rounded-4 shadow-sm p-3 mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="fw-semibold text-muted small">
+                                Series · Ballon d’Estate
+                            </span>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                Writing today
+                            </span>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <div class="bg-light rounded-3 p-3 h-100">
+                                    <small class="text-muted d-block mb-1">Today’s target</small>
+                                    <h4 class="mb-0">1,000</h4>
+                                    <small class="text-muted">words</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="bg-light rounded-3 p-3 h-100">
+                                    <small class="text-muted d-block mb-1">This book</small>
+                                    <h4 class="mb-0">12%</h4>
+                                    <small class="text-muted">towards goal</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-4 shadow-sm p-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="fw-semibold small">
+                                Upcoming scenes
+                            </span>
+                            <span class="text-muted small">
+                                Timeline view
+                            </span>
+                        </div>
+                        <ul class="list-unstyled mb-0">
+                            <li class="d-flex align-items-center mb-2">
+                                <span class="badge rounded-pill bg-primary me-2">Ch. 7</span>
+                                <div>
+                                    <div class="small fw-semibold">The Knock</div>
+                                    <div class="small text-muted">Evening · Estate gate</div>
+                                </div>
+                            </li>
+                            <li class="d-flex align-items-center mb-2">
+                                <span class="badge rounded-pill bg-primary-subtle text-primary me-2">Ch. 8</span>
+                                <div>
+                                    <div class="small fw-semibold">Crossed Wires</div>
+                                    <div class="small text-muted">Multiple POV · Misunderstandings</div>
+                                </div>
+                            </li>
+                            <li class="d-flex align-items-center">
+                                <span class="badge rounded-pill bg-primary-subtle text-primary me-2">Ch. 9</span>
+                                <div>
+                                    <div class="small fw-semibold">Secrets in the Study</div>
+                                    <div class="small text-muted">Night · Tension rising</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div> <!-- /row -->
+        </div>
+    </div>
+
+    <!-- THREE PILLARS STRIP -->
+    <div class="row mt-3 mb-5 py-4 px-3"
+        style="background: linear-gradient(135deg,#eef2ff,#e0f2fe); border-radius: 16px;">
+        <div class="col-md-4 mb-4 mb-md-0">
+            <h5 class="mb-2"><i class="bi bi-clock-history text-primary me-1"></i> Timeline first</h5>
+            <p class="text-muted mb-0">
+                See scenes, chapters, and books laid out chronologically so you can spot gaps,
+                overlaps, and pacing issues at a glance.
+            </p>
+        </div>
+        <div class="col-md-4 mb-4 mb-md-0">
+            <h5 class="mb-2"><i class="bi bi-diagram-3 text-success me-1"></i> World & characters</h5>
+            <p class="text-muted mb-0">
+                Keep a living codex of characters, locations, and lore that stays in sync with
+                every event you add.
+            </p>
+        </div>
+        <div class="col-md-4">
+            <h5 class="mb-2"><i class="bi bi-stars text-warning me-1"></i> AI‑assisted drafting</h5>
+            <p class="text-muted mb-0">
+                Bring in AI as a helper for summaries, variations, and prompts while you stay
+                in control of the voice and final wording.
+            </p>
+        </div>
+    </div>
+
+    <!-- FEATURE GRID -->
+    <div class="mb-5" id="features">
+        <h2 class="mb-3">Everything you need to wrangle a big story</h2>
+        <p class="text-muted mb-4">
+            Story Timeline Builder brings planning, drafting, and world‑building into a single,
+            consistent workspace inspired by professional novel‑writing tools.
+        </p>
+
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <i class="bi bi-journal-text text-primary fs-3 mb-2"></i>
+                        <h5>Manuscript space</h5>
+                        <p class="text-muted mb-0">
+                            Draft scenes and chapters with clean typography, headings, and notes so your
+                            writing view stays focused and clutter‑free.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <i class="bi bi-kanban text-success fs-3 mb-2"></i>
+                        <h5>Storyboard & outline</h5>
+                        <p class="text-muted mb-0">
+                            Break your novel into acts, chapters, and scenes, rearrange them visually, and
+                            keep track of beats for each major thread.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <i class="bi bi-people text-info fs-3 mb-2"></i>
+                        <h5>Codex for your world</h5>
+                        <p class="text-muted mb-0">
+                            Store character profiles, locations, organisations, and history in a searchable
+                            wiki that links back to the scenes where they appear.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <i class="bi bi-magic text-warning fs-3 mb-2"></i>
+                        <h5>Promptable AI toolbox</h5>
+                        <p class="text-muted mb-0">
+                            Use structured prompts to generate scene ideas, tighten prose, or summarise
+                            chapters, always with your own notes and canon in view.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <i class="bi bi-graph-up-arrow text-primary fs-3 mb-2"></i>
+                        <h5>Goals & progress</h5>
+                        <p class="text-muted mb-0">
+                            Set word‑count targets per book, track daily writing streaks, and watch your
+                            progress bars fill as you draft.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <i class="bi bi-people-fill text-success fs-3 mb-2"></i>
+                        <h5>Ready for collaboration</h5>
+                        <p class="text-muted mb-0">
+                            Designed to support sharing books and worlds with editors or co‑authors, so
+                            everyone can see the same timeline and canon.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FINAL CTA -->
+    <div class="card border-0 shadow-sm mt-4">
+        <div
+            class="card-body d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+            <div class="mb-3 mb-md-0">
+                <h4 class="mb-1">Ready to map your story?</h4>
+                <p class="text-muted mb-0">
+                    Create a book, add a few key scenes, and watch your timeline come to life in minutes.
+                </p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{% url 'register' %}" class="btn btn-primary">
+                    <i class="bi bi-person-plus"></i> Start for free
+                </a>
+                <a href="{% url 'login' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-box-arrow-in-right"></i> Log in
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
