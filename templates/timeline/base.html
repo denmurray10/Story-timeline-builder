@@ -467,13 +467,6 @@
                         href="{% url 'dashboard' %}">
                         <i class="bi bi-speedometer2"></i> Dashboard
                     </a>
-                    {% comment %} Temporarily hiding Timeline until fixed {% endcomment %}
-                    {% comment %}
-                    <a class="nav-link {% if 'timeline' in request.resolver_match.url_name %}active{% endif %}"
-                        href="{% url 'timeline_view' %}">
-                        <i class="bi bi-clock-history"></i> Timeline
-                    </a>
-                    {% endcomment %}
                     <a class="nav-link {% if 'book' in request.resolver_match.url_name %}active{% endif %}"
                         href="{% url 'book_list' %}">
                         <i class="bi bi-book"></i> Books

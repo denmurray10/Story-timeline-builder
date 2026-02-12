@@ -5,11 +5,10 @@
 {% block top_header_actions %}{% endblock %}
 
 {% block content %}
-{% with c=character %}
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="mb-0">Profiles</h2>
     <div class="d-flex">
-        <a href="{% url 'character_edit' c.pk %}" class="btn btn-sm btn-outline-dark me-2">
+        <a href="{% url 'character_edit' character.pk %}" class="btn btn-sm btn-outline-dark me-2">
             <i class="bi bi-pencil"></i> Edit Character
         </a>
         <button id="syncCharacterBtn" class="btn btn-sm btn-dark btn-invert-hover px-4 fw-bold">
@@ -25,8 +24,8 @@
             <!-- Portrait -->
             <div class="portrait-container mb-3 mx-auto shadow-sm d-flex align-items-center justify-content-center"
                 style="width:140px;height:140px;border-radius:50%; border:1px solid #eee; background: #fff;">
-                {% if c.profile_pic_url %}
-                <img src="{{ c.profile_pic_url }}" class="rounded-pill" alt="{{ c.name }}"
+                {% if character.profile_pic_url %}
+                <img src="{{ character.profile_pic_url }}" class="rounded-pill" alt="{{ character.name }}"
                     style="width:120px;height:120px;object-fit:cover;">
                 {% else %}
                 <div class="rounded-pill bg-light d-flex align-items-center justify-content-center mx-auto"
@@ -37,9 +36,11 @@
             </div>
 
             <!-- Header Info -->
-            <h2 class="h4 mb-1 fw-bold">{{ c.name }}</h2>
-            <div class="mb-4"><span class="badge bg-primary px-3 rounded-pill" style="font-size:0.7rem;">{{
-                    c.get_role_display }}</span></div>
+            <h2 class="h4 mb-1 fw-bold">{{ character.name }}</h2>
+            <div class="mb-4">
+                <span class="badge bg-primary px-3 rounded-pill" style="font-size:0.7rem;">{{ character.get_role_display
+                    }}</span>
+            </div>
 
             <!-- Tab Navigation -->
             <div class="nav flex-column nav-pills gap-2 mb-4" id="v-pills-tab" role="tablist">
@@ -75,7 +76,6 @@
                     </button>
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -89,18 +89,24 @@
             <div class="card-body p-5 bg-white" style="min-height: 440px;">
                 <div class="tab-content" id="v-pills-tabContent">
                     <div class="tab-pane fade show active" id="tab-description" role="tabpanel">
-                        <p id="char-description" class="lead-small text-dark">{{
-                            c.description|default:"None"|linebreaksbr }}</p>
+                        <p id="char-description" class="lead-small text-dark">
+                            {{ character.description|default:"None"|linebreaksbr }}
+                        </p>
                     </div>
                     <div class="tab-pane fade" id="tab-motivation" role="tabpanel">
-                        <p id="char-motivation" class="lead-small text-dark">{{ c.motivation|default:"None"|linebreaksbr
-                            }}</p>
+                        <p id="char-motivation" class="lead-small text-dark">
+                            {{ character.motivation|default:"None"|linebreaksbr }}
+                        </p>
                     </div>
                     <div class="tab-pane fade" id="tab-goals" role="tabpanel">
-                        <p id="char-goals" class="lead-small text-dark">{{ c.goals|default:"None"|linebreaksbr }}</p>
+                        <p id="char-goals" class="lead-small text-dark">
+                            {{ character.goals|default:"None"|linebreaksbr }}
+                        </p>
                     </div>
                     <div class="tab-pane fade" id="tab-traits" role="tabpanel">
-                        <p id="char-traits" class="lead-small text-dark">{{ c.traits|default:"None"|linebreaksbr }}</p>
+                        <p id="char-traits" class="lead-small text-dark">
+                            {{ character.traits|default:"None"|linebreaksbr }}
+                        </p>
                     </div>
                 </div>
 
@@ -113,7 +119,7 @@
                             onclick="document.getElementById('aiSummaryArea').style.display='none'"></button>
                     </div>
                     <div id="aiResponseContent" class="small text-body">
-                        {{ c.deep_dive_notes|default:""|linebreaks }}
+                        {{ character.deep_dive_notes|default:""|linebreaks }}
                     </div>
                 </div>
                 <div id="aiLoadingIndicator" class="text-center py-5" style="display:none;">
@@ -151,7 +157,6 @@
         </div>
     </div>
 </div>
-{% endwith %}
 
 <style>
     :root {

@@ -167,17 +167,17 @@
             importingBooks.forEach(card => {
                 const bookId = card.id.replace('book-', '');
                 const checkStatus = setInterval(() => {
-                    fetch(\`/api/books/\${bookId}/progress/\`)
+                    fetch(`/api/books/${bookId}/progress/`)
                         .then(res => res.json())
                         .then(data => {
                             if (data.status === 'drafting') {
                                 clearInterval(checkStatus);
                                 if ("Notification" in window && Notification.permission === "granted") {
                                     new Notification("Import Complete!", {
-                                        body: \`Your book has been successfully analyzed. Refresh the page to view it.\`
+                                        body: `Your book has been successfully analyzed. Refresh the page to view it.`
                                     });
                                 } else {
-                                    alert(\`Success! Book analysis is complete. The page will now reload.\`);
+                                    alert(`Success! Book analysis is complete. The page will now reload.`);
                                 }
                                 location.reload();
                             }
