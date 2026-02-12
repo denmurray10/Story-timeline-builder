@@ -475,6 +475,10 @@
                         href="{% url 'chapter_list' %}">
                         <i class="bi bi-list-ol"></i> Chapters
                     </a>
+                    <a class="nav-link {% if request.resolver_match.url_name == 'horizontal_timeline' %}active{% endif %}"
+                        href="{% url 'horizontal_timeline' %}">
+                        <i class="bi bi-clock-history"></i> Story Timeline
+                    </a>
                     <a class="nav-link {% if 'character' in request.resolver_match.url_name %}active{% endif %}"
                         href="{% url 'character_list' %}">
                         <i class="bi bi-people"></i> Characters
