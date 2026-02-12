@@ -2,14 +2,22 @@
 {% load static %}
 {% block title %}{{ character.name }} - Story Timeline Builder{% endblock %}
 
-{% block top_header_actions %}
-<button id="syncCharacterBtn" class="btn btn-sm btn-dark btn-invert-hover px-4 fw-bold">
-    <i class="bi bi-arrow-repeat me-2"></i> Sync
-</button>
-{% endblock %}
+{% block top_header_actions %}{% endblock %}
 
 {% block content %}
 {% with c=character %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Profiles</h2>
+    <div class="d-flex">
+        <a href="{% url 'character_edit' c.pk %}" class="btn btn-sm btn-outline-dark me-2">
+            <i class="bi bi-pencil"></i> Edit Character
+        </a>
+        <button id="syncCharacterBtn" class="btn btn-sm btn-dark btn-invert-hover px-4 fw-bold">
+            <i class="bi bi-arrow-repeat me-2"></i> Sync
+        </button>
+    </div>
+</div>
+
 <div class="row g-4 mb-5">
     <!-- Sidebar -->
     <div class="col-md-3">
@@ -56,7 +64,7 @@
             </div>
 
             <!-- Story Consultant Box -->
-            <div class="ai-consultant-sidebar p-4 rounded-4 bg-light text-start border-0 mb-4"
+            <div class="ai-consultant-sidebar p-4 rounded-4 bg-light text-start border-0"
                 style="background-color:#f9f9f9 !important;">
                 <p class="x-small fw-bold text-uppercase text-muted mb-2 tracking-wider text-center">Story Support</p>
                 <p class="x-small text-muted mb-3 text-center">Ask the Consultant for ideas on character development
@@ -68,12 +76,6 @@
                 </div>
             </div>
 
-            <div class="d-grid gap-2">
-                <a href="{% url 'character_edit' c.pk %}" class="btn btn-outline-secondary btn-sm rounded-pill py-2"
-                    style="border-color:#ccc; color:#666;">
-                    <i class="bi bi-pencil me-1"></i> Edit Character
-                </a>
-            </div>
         </div>
     </div>
 
