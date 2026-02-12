@@ -1067,9 +1067,14 @@ def chapter_detail(request, pk):
     """View a single chapter's content."""
     chapter = get_object_or_404(Chapter, pk=pk, book__user=request.user)
     events = chapter.events.all().order_by('sequence_order')
+    # Get all characters who appear in this chapter's events
+    chapter_characters = Character.objects.filter(
+        events__chapter=chapter
+    ).distinct().order_by('name')
     return render(request, 'timeline/chapter_detail.html', {
         'chapter': chapter,
-        'events': events
+        'events': events,
+        'chapter_characters': chapter_characters,
     })
 
 
