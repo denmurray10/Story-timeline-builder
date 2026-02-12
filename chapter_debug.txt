@@ -1,0 +1,63 @@
+
+User: Den (ID: 2) | First Name: ''
+  Books: 0
+  Total Chapters: 0
+  Chapters with is_complete=True: 0
+  Chapters with content: 0
+
+User: alittle (ID: 3) | First Name: 'Aimee'
+  Books: 0
+  Total Chapters: 0
+  Chapters with is_complete=True: 0
+  Chapters with content: 0
+
+User: did (ID: 4) | First Name: 'df'
+  Books: 0
+  Total Chapters: 0
+  Chapters with is_complete=True: 0
+  Chapters with content: 0
+
+User: dmurray10 (ID: 1) | First Name: 'Dennis'
+  Books: 2
+    - Book: 'Ballon d'Estate' (ID: 1)
+    - Book: 'test 3' (ID: 12)
+  Total Chapters: 37
+  Chapters with is_complete=True: 1
+  Chapters with content: 2
+    - Ch 1 'Concrete Cage': is_complete=True, word_count=8275, content_len=46790
+    - Ch 1 'Concrete Cage': is_complete=False, word_count=3030, content_len=16844
+    - Ch 2 'Grey Morning, Floodlit Failure': is_complete=False, word_count=0, content_len=0
+    - Ch 3 'Weight of Perfection': is_complete=False, word_count=0, content_len=0
+    - Ch 4 'The Snick': is_complete=False, word_count=0, content_len=0
+    - Ch 5 'Passengers': is_complete=False, word_count=0, content_len=0
+    - Ch 6 'The Price Of Entry': is_complete=False, word_count=0, content_len=0
+    - Ch 7 'Yellow Bibs': is_complete=False, word_count=0, content_len=0
+    - Ch 8 'Whispers & Threats': is_complete=False, word_count=0, content_len=0
+    - Ch 9 'Howard's Angle': is_complete=False, word_count=0, content_len=0
+    - Ch 10 'Borrowed Gloves': is_complete=False, word_count=0, content_len=0
+    - Ch 11 'Broken Return': is_complete=False, word_count=0, content_len=0
+    - Ch 12 'Carrying The Weight': is_complete=False, word_count=0, content_len=0
+    - Ch 13 'Nothing To Lose': is_complete=False, word_count=0, content_len=0
+    - Ch 14 'Scouting Aftermath': is_complete=False, word_count=0, content_len=0
+    - Ch 15 'The Walking Wounded': is_complete=False, word_count=0, content_len=0
+    - Ch 16 'Ethan vs Irvine': is_complete=False, word_count=0, content_len=0
+    - Ch 17 'Consequences': is_complete=False, word_count=0, content_len=0
+    - Ch 18 'On The Run': is_complete=False, word_count=0, content_len=0
+    - Ch 19 'Blood and Opportunity': is_complete=False, word_count=0, content_len=0
+    - Ch 20 'The Price of Truth': is_complete=False, word_count=0, content_len=0
+    - Ch 21 'The Edge Of The Pitch': is_complete=False, word_count=0, content_len=0
+    - Ch 22 'Awakening (Trial by Fire)': is_complete=False, word_count=0, content_len=0
+    - Ch 23 'The Walls Have Ears': is_complete=False, word_count=0, content_len=0
+    - Ch 24 'Integration': is_complete=False, word_count=0, content_len=0
+    - Ch 25 'Crossfire': is_complete=False, word_count=0, content_len=0
+    - Ch 26 'Ghost Lines': is_complete=False, word_count=0, content_len=0
+    - Ch 27 'Shattered Silence': is_complete=False, word_count=0, content_len=0
+    - Ch 28 'The Handler': is_complete=False, word_count=0, content_len=0
+    - Ch 29 'Between Two Fires': is_complete=False, word_count=0, content_len=0
+    - Ch 30 'Uneasy Alliances & Desperate Measures': is_complete=False, word_count=0, content_len=0
+    - Ch 31 'Dutch Decision & The Breaking Point': is_complete=False, word_count=0, content_len=0
+    - Ch 32 'The Return & The Price of Loyalty': is_complete=False, word_count=0, content_len=0
+    - Ch 33 'The Gambit': is_complete=False, word_count=0, content_len=0
+    - Ch 34 'Final Play': is_complete=False, word_count=0, content_len=0
+    - Ch 35 'Reckoning': is_complete=False, word_count=0, content_len=0
+    - Ch 36 'Cornish Air & Capital Trials': is_complete=False, word_count=0, content_len=0

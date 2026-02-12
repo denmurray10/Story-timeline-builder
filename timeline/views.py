@@ -81,8 +81,13 @@ def dashboard(request):
     # Recent activity logs (last 5)
     recent_activity = ActivityLog.objects.filter(user=request.user).order_by('-timestamp')[:5]
     
-    # AI Focus Tasks
     today = timezone.localdate()
+    
+    chapters_completed = Chapter.objects.filter(
+        book__user=request.user
+    ).count()
+
+    print(f"DEBUG: User={request.user}, Completed Chapters={chapters_completed}")
     focus_tasks = AIFocusTask.objects.filter(user=request.user, created_at__date=today)
     
     if not focus_tasks.exists():
@@ -131,6 +136,7 @@ def dashboard(request):
         'character_count': characters.count(),
         'total_events': total_events,
         'events_written': events_written,
+        'chapters_completed': chapters_completed,
         'recent_activity': recent_activity,
         'focus_tasks': focus_tasks,
         'spotlight_character': spotlight_character,
