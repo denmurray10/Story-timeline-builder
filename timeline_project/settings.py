@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     
     # Your apps
     'timeline',
+    'blog',
 ]
 
 MIDDLEWARE = [

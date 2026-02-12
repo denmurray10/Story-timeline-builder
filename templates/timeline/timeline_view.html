@@ -19,9 +19,9 @@
                 <select name="book" id="book" class="form-control">
                     <option value="">All Books</option>
                     {% for book in books %}
-                        <option value="{{ book.pk }}" {% if active_book == book.pk|stringformat:"s" %}selected{% endif %}>
-                            {{ book.title }}
-                        </option>
+                    <option value="{{ book.pk }}" {% if active_book==book.pk|stringformat:"s" %}selected{% endif %}>
+                        {{ book.title }}
+                    </option>
                     {% endfor %}
                 </select>
             </div>
@@ -30,9 +30,10 @@
                 <select name="character" id="character" class="form-control">
                     <option value="">All Characters</option>
                     {% for character in characters %}
-                        <option value="{{ character.pk }}" {% if active_character == character.pk|stringformat:"s" %}selected{% endif %}>
-                            {{ character.name }}
-                        </option>
+                    <option value="{{ character.pk }}" {% if active_character==character.pk|stringformat:"s"
+                        %}selected{% endif %}>
+                        {{ character.name }}
+                    </option>
                     {% endfor %}
                 </select>
             </div>
@@ -41,9 +42,9 @@
                 <select name="tag" id="tag" class="form-control">
                     <option value="">All Tags</option>
                     {% for tag in tags %}
-                        <option value="{{ tag.pk }}" {% if active_tag == tag.pk|stringformat:"s" %}selected{% endif %}>
-                            {{ tag.name }}
-                        </option>
+                    <option value="{{ tag.pk }}" {% if active_tag==tag.pk|stringformat:"s" %}selected{% endif %}>
+                        {{ tag.name }}
+                    </option>
                     {% endfor %}
                 </select>
             </div>
@@ -61,102 +62,106 @@
 
 <!-- Timeline Events -->
 {% if events %}
-    <div class="timeline-container">
-        {% for event in events %}
-            <div class="event-card card mb-3" style="border-left-color: {% if event.pov_character %}{{ event.pov_character.color_code }}{% else %}#3498db{% endif %};">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div class="flex-grow-1">
-                            <div class="d-flex align-items-center mb-2">
-                                <span class="badge bg-secondary me-2">{{ event.sequence_order }}</span>
-                                <h5 class="mb-0">
-                                    <a href="{% url 'event_detail' event.pk %}" class="text-decoration-none">
-                                        {{ event.title }}
-                                    </a>
-                                </h5>
-                            </div>
-                            
-                            <p class="mb-2">{{ event.description|truncatewords:30 }}</p>
-                            
-                            <div class="mb-2">
-                                <small class="text-muted">
-                                    {% if event.book %}
-                                        <i class="bi bi-book"></i> {{ event.book.title }}
-                                    {% endif %}
-                                    {% if event.chapter %}
-                                        | <i class="bi bi-list-ol"></i> Ch. {{ event.chapter.chapter_number }}
-                                    {% endif %}
-                                    {% if event.location %}
-                                        | <i class="bi bi-geo-alt"></i> {{ event.location }}
-                                    {% endif %}
-                                </small>
-                            </div>
-                            
-                            <!-- Characters -->
-                            {% if event.pov_character %}
-                                <span class="character-badge" style="background-color: {{ event.pov_character.color_code }};">
-                                    POV: {{ event.pov_character.name }}
-                                </span>
+<div class="timeline-container">
+    {% for event in events %}
+    <div class="event-card card mb-3"
+        style="border-left-color: {{ event.pov_character.color_code|default:'#3498db' }};">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="badge bg-secondary me-2">{{ event.sequence_order }}</span>
+                        <h5 class="mb-0">
+                            <a href="{% url 'event_detail' event.pk %}" class="text-decoration-none">
+                                {{ event.title }}
+                            </a>
+                        </h5>
+                    </div>
+
+                    <p class="mb-2">{{ event.description|truncatewords:30 }}</p>
+
+                    <div class="mb-2">
+                        <small class="text-muted">
+                            {% if event.book %}
+                            <i class="bi bi-book"></i> {{ event.book.title }}
                             {% endif %}
-                            {% for character in event.characters.all %}
-                                <span class="character-badge" style="background-color: {{ character.color_code }};">
-                                    {{ character.name }}
-                                </span>
-                            {% endfor %}
-                            
-                            <!-- Tags -->
-                            <div class="mt-2">
-                                {% for tag in event.tags.all %}
-                                    <span class="tag-badge" style="background-color: {{ tag.color }};">
-                                        {{ tag.name }}
-                                    </span>
-                                {% endfor %}
-                            </div>
-                            
-                            <!-- Tension and Status -->
-                            <div class="mt-2">
-                                <small>
-                                    <span class="tension-indicator tension-{% if event.tension_level <= 3 %}low{% elif event.tension_level <= 7 %}medium{% else %}high{% endif %}"></span>
-                                    Tension: {{ event.tension_level }}/10
-                                    {% if event.emotional_tone %}
-                                        | {{ event.get_emotional_tone_display }}
-                                    {% endif %}
-                                    {% if event.is_written %}
-                                        | <span class="badge bg-success">Written</span>
-                                    {% endif %}
-                                </small>
-                            </div>
-                        </div>
-                        
-                        <div class="ms-3">
-                            <a href="{% url 'event_edit' event.pk %}" class="btn btn-sm btn-outline-secondary">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                            <a href="{% url 'event_delete' event.pk %}" class="btn btn-sm btn-outline-danger">
-                                <i class="bi bi-trash"></i>
-                            </a>
-                        </div>
+                            {% if event.chapter %}
+                            | <i class="bi bi-list-ol"></i> Ch. {{ event.chapter.chapter_number }}
+                            {% endif %}
+                            {% if event.location %}
+                            | <i class="bi bi-geo-alt"></i> {{ event.location }}
+                            {% endif %}
+                        </small>
+                    </div>
+
+                    <!-- Characters -->
+                    {% if event.pov_character %}
+                    <span class="character-badge"
+                        style="background-color: {{ event.pov_character.color_code|default:'#3498db' }};">
+                        POV: {{ event.pov_character.name }}
+                    </span>
+                    {% endif %}
+                    {% for character in event.characters.all %}
+                    <span class="character-badge"
+                        style="background-color: {{ character.color_code|default:'#3498db' }};">
+                        {{ character.name }}
+                    </span>
+                    {% endfor %}
+
+                    <!-- Tags -->
+                    <div class="mt-2">
+                        {% for tag in event.tags.all %}
+                        <span class="tag-badge" style="background-color: {{ tag.color|default:'#95a5a6' }};">
+                            {{ tag.name }}
+                        </span>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Tension and Status -->
+                    <div class="mt-2">
+                        <small>
+                            <span
+                                class="tension-indicator tension-{% if event.tension_level <= 3 %}low{% elif event.tension_level <= 7 %}medium{% else %}high{% endif %}"></span>
+                            Tension: {{ event.tension_level }}/10
+                            {% if event.emotional_tone %}
+                            | {{ event.get_emotional_tone_display }}
+                            {% endif %}
+                            {% if event.is_written %}
+                            | <span class="badge bg-success">Written</span>
+                            {% endif %}
+                        </small>
                     </div>
                 </div>
+
+                <div class="ms-3">
+                    <a href="{% url 'event_edit' event.pk %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    <a href="{% url 'event_delete' event.pk %}" class="btn btn-sm btn-outline-danger">
+                        <i class="bi bi-trash"></i>
+                    </a>
+                </div>
             </div>
-        {% endfor %}
-    </div>
-{% else %}
-    <div class="card">
-        <div class="card-body text-center py-5">
-            <i class="bi bi-calendar-x display-1 text-muted"></i>
-            <h3 class="mt-3">No Events Found</h3>
-            <p class="text-muted">
-                {% if active_book or active_character or active_tag %}
-                    No events match your filters. Try adjusting your search criteria.
-                {% else %}
-                    Create your first event to start building your timeline.
-                {% endif %}
-            </p>
-            <a href="{% url 'event_create' %}" class="btn btn-primary">
-                <i class="bi bi-plus-circle"></i> Create First Event
-            </a>
         </div>
     </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card">
+    <div class="card-body text-center py-5">
+        <i class="bi bi-calendar-x display-1 text-muted"></i>
+        <h3 class="mt-3">No Events Found</h3>
+        <p class="text-muted">
+            {% if active_book or active_character or active_tag %}
+            No events match your filters. Try adjusting your search criteria.
+            {% else %}
+            Create your first event to start building your timeline.
+            {% endif %}
+        </p>
+        <a href="{% url 'event_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Create First Event
+        </a>
+    </div>
+</div>
 {% endif %}
 {% endblock %}
