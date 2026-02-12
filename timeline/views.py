@@ -393,11 +393,23 @@ def run_background_book_import(book_id, content, user_id):
                         if not existing.description and char_info.get('description'):
                             existing.description = char_info['description']
                             updated = True
+                        if not existing.motivation and char_info.get('motivation'):
+                            existing.motivation = char_info['motivation']
+                            updated = True
                         if not existing.goals and char_info.get('goals'):
                             existing.goals = char_info['goals']
                             updated = True
                         if not existing.traits and char_info.get('traits'):
                             existing.traits = char_info['traits']
+                            updated = True
+                        # Auto-set introduction book/chapter if not already set
+                        if not existing.introduction_book:
+                            existing.introduction_book = book
+                            first_ch_num = char_info.get('first_chapter')
+                            if first_ch_num:
+                                intro_chapter = book.chapters.filter(chapter_number=first_ch_num).first()
+                                if intro_chapter:
+                                    existing.introduction_chapter = intro_chapter
                             updated = True
                         # Merge new aliases into existing ones
                         if ai_aliases:
@@ -417,14 +429,22 @@ def run_background_book_import(book_id, content, user_id):
                         char_map[name.lower()] = existing
                     else:
                         aliases_str = ', '.join(ai_aliases) if ai_aliases else ''
+                        # Determine introduction chapter
+                        intro_chapter = None
+                        first_ch_num = char_info.get('first_chapter')
+                        if first_ch_num:
+                            intro_chapter = book.chapters.filter(chapter_number=first_ch_num).first()
                         char = Character.objects.create(
                             user=user,
                             name=name,
                             aliases=aliases_str,
                             role=char_info.get('role', 'supporting')[:100],
                             description=char_info.get('description', ''),
+                            motivation=char_info.get('motivation', ''),
                             goals=char_info.get('goals', ''),
-                            traits=char_info.get('traits', '')
+                            traits=char_info.get('traits', ''),
+                            introduction_book=book,
+                            introduction_chapter=intro_chapter,
                         )
                         char_map[name.lower()] = char
                         # Also register all aliases in the map
@@ -857,18 +877,32 @@ def analyze_characters_with_ai(text):
     (e.g. "Mum", "Sarah", "Mrs. Smith" might all be the same person). 
     Merge these into a SINGLE character entry and list all alternate names as aliases.
     
+    IMPORTANT: Use British English (UK English) for all spelling and grammar.
+    
     For each character, provide:
     - Name (use their most common/full name as the primary name)
     - Aliases (list of OTHER names they go by: nicknames, titles, family terms like "Mum", "Dad", etc.)
     - Role (protagonist, antagonist, or supporting)
-    - Short description
-    - Primary goals (what they want)
-    - Personality traits
+    - Description: Write a DETAILED multi-paragraph description covering their physical appearance, 
+      personality, background, and significance to the story. Be thorough and specific.
+    - Motivation: What fundamentally drives this character? Their deepest desires, fears, and internal conflicts.
+    - Goals: Their specific short-term and long-term objectives in the story.
+    - Personality traits and quirks
+    - first_chapter: The chapter number where this character FIRST appears or is first mentioned
 
     Return ONLY a JSON object:
     {{
       "characters": [
-        {{ "name": "Sarah Smith", "aliases": ["Mum", "Mrs. Smith"], "role": "...", "description": "...", "goals": "...", "traits": "..." }}
+        {{ 
+          "name": "Sarah Smith", 
+          "aliases": ["Mum", "Mrs. Smith"], 
+          "role": "protagonist", 
+          "description": "A detailed multi-paragraph description...", 
+          "motivation": "What drives this character...",
+          "goals": "Their objectives...", 
+          "traits": "Key personality traits...",
+          "first_chapter": 1
+        }}
       ]
     }}
 

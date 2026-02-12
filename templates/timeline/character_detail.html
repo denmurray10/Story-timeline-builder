@@ -154,6 +154,26 @@
         </div>
 
         <div class="detail-card">
+            <div class="detail-card-header">
+                <i class="bi bi-bullseye"></i> Goals & Traits
+            </div>
+            <div class="p-4">
+                <div class="row g-4">
+                    <div class="col-md-6 border-end">
+                        <div class="section-label">Goals</div>
+                        <p class="mb-0 small text-body">{{ character.goals|default:"No goals specified."|linebreaks }}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="section-label">Personality Traits</div>
+                        <p class="mb-0 small text-body">{{ character.traits|default:"No traits specified."|linebreaks }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="detail-card">
             <div class="detail-card-header justify-content-between">
                 <div><i class="bi bi-diagram-3"></i> Relationships</div>
                 <a href="{% url 'relationship_create' %}?from_char={{ character.pk }}"
