@@ -772,15 +772,42 @@ def get_file_word_count(file):
     return 0
 
 def extract_text_from_file(file):
-    """Extract string content from .docx or .txt files."""
+    """Extract string content from .docx or .txt files, preserving paragraph spacing and styling."""
     filename = file.name.lower()
     text = ""
     try:
         if filename.endswith('.docx'):
-            text = docx2txt.process(file)
+            try:
+                from docx import Document
+                file.seek(0)
+                doc = Document(file)
+                paragraphs = []
+                for para in doc.paragraphs:
+                    para_text = para.text.strip()
+                    if not para_text:
+                        # Preserve blank lines (scene breaks / spacing)
+                        paragraphs.append('')
+                        continue
+                    
+                    # Check for heading styles
+                    style_name = para.style.name.lower() if para.style else ''
+                    if 'heading' in style_name or 'title' in style_name:
+                        para_text = f'**{para_text}**'
+                    
+                    paragraphs.append(para_text)
+                
+                text = '\n\n'.join(paragraphs)
+            except ImportError:
+                # Fall back to docx2txt if python-docx not available
+                file.seek(0)
+                text = docx2txt.process(file)
         elif filename.endswith('.txt'):
             file.seek(0)
-            text = file.read().decode('utf-8', errors='ignore')
+            raw = file.read()
+            if isinstance(raw, bytes):
+                text = raw.decode('utf-8', errors='ignore')
+            else:
+                text = raw
     except Exception as e:
         print(f"Error processing file: {e}")
     return text
@@ -957,7 +984,10 @@ def api_chapter_summary(request, pk):
     Write a concise but comprehensive summary of the following chapter from a novel.
     The summary should capture the key plot points, character developments, 
     and any important revelations or turning points.
-    Keep it to 2-4 paragraphs.
+    Write 2-4 separate paragraphs.
+    
+    IMPORTANT: Use British English (UK English) for all spelling, grammar, and formatting 
+    (e.g. "colour" not "color", "realise" not "realize", "travelled" not "traveled").
 
     Book: {chapter.book.title}
     Chapter {chapter.chapter_number}: {chapter.title}
@@ -965,14 +995,24 @@ def api_chapter_summary(request, pk):
     Chapter Content:
     {chapter.content[:15000]}
 
-    Return ONLY a JSON object:
+    Return ONLY a JSON object with paragraphs as a list:
     {{
-        "summary": "Your summary text here..."
+        "paragraphs": [
+            "First paragraph of the summary...",
+            "Second paragraph of the summary...",
+            "Third paragraph of the summary..."
+        ]
     }}
     """
     
-    data = _call_ai_json(prompt, system_message="You are a professional literary analyst. Write clear, engaging chapter summaries. Always respond with valid JSON.")
+    data = _call_ai_json(prompt, system_message="You are a professional literary analyst. Write clear, engaging chapter summaries in British English. Always respond with valid JSON.")
     
+    if data and data.get('paragraphs'):
+        summary_text = '\n\n'.join(data['paragraphs'])
+        chapter.description = summary_text
+        chapter.save()
+        return JsonResponse({'status': 'success', 'summary': summary_text})
+    # Fallback: handle old format where summary is a single string
     if data and data.get('summary'):
         chapter.description = data['summary']
         chapter.save()

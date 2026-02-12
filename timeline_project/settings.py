@@ -145,11 +145,20 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 CLOUDINARY_URL = config('CLOUDINARY_URL', default=None)
 
 if CLOUDINARY_URL:
-    # Production/Heroku - Use Cloudinary for media storage
-    import cloudinary
-    cloudinary.config(
-        cloudinary_url=CLOUDINARY_URL
-    )
+    # Make it available as an environment variable for django-cloudinary-storage
+    os.environ['CLOUDINARY_URL'] = CLOUDINARY_URL
+    
+    # Parse the URL for the CLOUDINARY_STORAGE dict
+    # Format: cloudinary://API_KEY:API_SECRET@CLOUD_NAME
+    import re
+    _match = re.match(r'cloudinary://(\w+):(\w+)@(\w+)', CLOUDINARY_URL)
+    if _match:
+        CLOUDINARY_STORAGE = {
+            'CLOUD_NAME': _match.group(3),
+            'API_KEY': _match.group(1),
+            'API_SECRET': _match.group(2),
+        }
+    
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
     MEDIA_URL = '/media/'
 else:

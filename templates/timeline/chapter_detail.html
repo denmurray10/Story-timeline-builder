@@ -87,9 +87,13 @@
                     <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
                     <span class="text-muted small ms-2">Generating summary...</span>
                 </div>
-                <p class="mb-0 text-muted small" id="summaryText">
-                    {{ chapter.description|default:"No summary available. Click 'Generate' to create one." }}
-                </p>
+                <div class="chapter-summary" id="summaryText">
+                    {% if chapter.description %}
+                    {{ chapter.description|linebreaks }}
+                    {% else %}
+                    <p class="text-muted">No summary available. Click 'Generate' to create one.</p>
+                    {% endif %}
+                </div>
             </div>
         </div>
 
@@ -149,11 +153,55 @@
         font-size: 0.75rem;
     }
 
+    .chapter-summary {
+        font-size: 0.875rem;
+        color: #6c757d;
+        line-height: 1.7;
+    }
+
+    .chapter-summary p {
+        margin-bottom: 0.85em;
+    }
+
+    .chapter-summary p:last-child {
+        margin-bottom: 0;
+    }
+
     .chapter-content-display {
         font-family: 'Merriweather', 'Georgia', serif;
-        font-size: 1.15rem;
-        line-height: 1.8;
+        font-size: 1.1rem;
+        line-height: 1.9;
         color: #2c3e50;
+    }
+
+    .chapter-content-display p {
+        margin-bottom: 1.2em;
+        text-indent: 1.5em;
+    }
+
+    .chapter-content-display p:first-child {
+        text-indent: 0;
+    }
+
+    .chapter-content-display p strong {
+        display: block;
+        text-indent: 0;
+        font-size: 1.25em;
+        margin-top: 0.5em;
+        margin-bottom: 0.3em;
+        color: #1a1a2e;
+    }
+
+    .chapter-content-display hr {
+        border: none;
+        text-align: center;
+        margin: 2em 0;
+    }
+
+    .chapter-content-display hr::after {
+        content: '• • •';
+        color: #999;
+        letter-spacing: 0.5em;
     }
 
     .shadow-inner {
@@ -300,9 +348,11 @@
                     btn.innerHTML = '<i class="bi bi-stars me-1"></i> Regenerate';
 
                     if (data.status === 'success') {
-                        summaryText.textContent = data.summary;
+                        // Convert newlines to paragraphs for readable formatting
+                        const paragraphs = data.summary.split(/\n\n|\n/).filter(p => p.trim());
+                        summaryText.innerHTML = paragraphs.map(p => `<p>${p.trim()}</p>`).join('');
                     } else {
-                        summaryText.textContent = data.message || 'Failed to generate summary.';
+                        summaryText.innerHTML = `<p>${data.message || 'Failed to generate summary.'}</p>`;
                     }
                 })
                 .catch(err => {
@@ -310,7 +360,7 @@
                     summaryText.style.display = 'block';
                     btn.disabled = false;
                     btn.innerHTML = '<i class="bi bi-stars me-1"></i> Generate';
-                    summaryText.textContent = 'Network error. Please try again.';
+                    summaryText.innerHTML = '<p>Network error. Please try again.</p>';
                 });
         });
     }
