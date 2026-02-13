@@ -252,6 +252,33 @@ def api_toggle_focus_task(request, pk):
     return JsonResponse({'status': 'success', 'is_completed': task.is_completed})
 
 
+@login_required
+@require_POST
+def api_add_focus_task(request):
+    """Manually add a focus task."""
+    import json
+    data = json.loads(request.body)
+    task_text = data.get('task_text', '').strip()
+    
+    if not task_text:
+        return JsonResponse({'status': 'error', 'message': 'Task text is required'}, status=400)
+        
+    task = AIFocusTask.objects.create(
+        user=request.user,
+        task_text=task_text,
+        is_completed=False
+    )
+    
+    return JsonResponse({
+        'status': 'success',
+        'task': {
+            'id': task.id,
+            'task_text': task.task_text,
+            'is_completed': task.is_completed
+        }
+    })
+
+
 # ============== Book Views ==============
 
 @login_required

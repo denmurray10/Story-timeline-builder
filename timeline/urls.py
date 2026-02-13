@@ -79,6 +79,7 @@ urlpatterns = [
     # API endpoints for AJAX (we'll use these later for drag-and-drop)
     path('api/events/reorder/', views.api_event_reorder, name='api_event_reorder'),
     path('api/ai/consultant/', views.api_ai_consultant, name='api_ai_consultant'),
+    path('api/ai/focus-tasks/add/', views.api_add_focus_task, name='api_add_focus_task'),
     path('api/ai/focus-tasks/<int:pk>/toggle/', views.api_toggle_focus_task, name='api_toggle_focus_task'),
     path('api/ai/character-deep-dive/', views.api_character_deep_dive, name='api_character_deep_dive'),
     path('api/ai/character-sync/', views.api_sync_character_data, name='api_character_sync'),

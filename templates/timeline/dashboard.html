@@ -430,9 +430,14 @@
 
         <!-- Today’s Focus -->
         <div class="dash-card dash-pill-card p-3 draggable-card mb-3" id="card-focus">
-            <div class="dash-card-header d-flex align-items-center">
-                <i class="bi bi-grip-vertical drag-handle"></i>
-                Today’s Focus
+            <div class="dash-card-header d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-grip-vertical drag-handle"></i>
+                    Today’s Focus
+                </div>
+                <button class="btn btn-link btn-sm text-muted p-0" id="btn-add-focus-task" title="Add manual task">
+                    <i class="bi bi-pencil-square"></i>
+                </button>
             </div>
             <p class="dash-card-sub mb-2">
                 Click a task once you've finished it.
@@ -447,9 +452,15 @@
                     </span>
                 </li>
                 {% empty %}
-                <li class="dash-muted">Generating your focus for today...</li>
+                <li class="dash-muted" id="focus-empty-state">Generating your focus for today...</li>
                 {% endfor %}
             </ul>
+            <div id="add-focus-task-container" style="display: none;" class="mt-2">
+                <div class="input-group input-group-sm">
+                    <input type="text" id="input-new-focus-task" class="form-control" placeholder="New task...">
+                    <button class="btn btn-dark" type="button" id="btn-save-focus-task">Add</button>
+                </div>
+            </div>
         </div>
 
         <!-- Stats strip -->
@@ -590,7 +601,8 @@
                 <li class="d-flex justify-content-between align-items-center mb-2">
                     <div class="d-flex align-items-center">
                         <div class="me-2 fw-semibold" style="font-size: 0.8rem;">
-                            {{ rel.character_a.name }} <i class="bi bi-arrow-left-right mx-1 text-muted"></i> {{ rel.character_b.name }}
+                            {{ rel.character_a.name }} <i class="bi bi-arrow-left-right mx-1 text-muted"></i> {{
+                            rel.character_b.name }}
                         </div>
                     </div>
                     <span class="badge rounded-pill bg-light text-dark border" style="font-size: 0.65rem;">
@@ -930,34 +942,91 @@
             });
         }
 
-        // Toggle Focus Tasks
+        // Focus Task Logic (AI + Manual)
+        const btnAddFocusTask = document.getElementById('btn-add-focus-task');
+        const addTaskContainer = document.getElementById('add-focus-task-container');
+        const inputNewFocusTask = document.getElementById('input-new-focus-task');
+        const btnSaveFocusTask = document.getElementById('btn-save-focus-task');
+        const focusTasksList = document.getElementById('focus-tasks-list');
+        const focusEmptyState = document.getElementById('focus-empty-state');
+
+        if (btnAddFocusTask) {
+            btnAddFocusTask.addEventListener('click', () => {
+                const isHidden = addTaskContainer.style.display === 'none';
+                addTaskContainer.style.display = isHidden ? 'block' : 'none';
+                if (isHidden) inputNewFocusTask.focus();
+            });
+
+            btnSaveFocusTask.addEventListener('click', saveManualTask);
+            inputNewFocusTask.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') saveManualTask();
+            });
+        }
+
+        function saveManualTask() {
+            const taskText = inputNewFocusTask.value.trim();
+            if (!taskText) return;
+
+            fetch('/api/ai/focus-tasks/add/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ task_text: taskText })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const li = document.createElement('li');
+                        li.className = 'focus-task-item d-flex align-items-center mb-2';
+                        li.dataset.taskId = data.task.id;
+                        li.innerHTML = `
+                            <i class="bi bi-circle text-muted me-2"></i>
+                            <span class="focus-task-text">${data.task.task_text}</span>
+                        `;
+                        li.addEventListener('click', function () { toggleTaskStatus(this); });
+
+                        focusTasksList.appendChild(li);
+                        if (focusEmptyState) focusEmptyState.remove();
+
+                        inputNewFocusTask.value = '';
+                        addTaskContainer.style.display = 'none';
+                    }
+                });
+        }
+
+        function toggleTaskStatus(item) {
+            const taskId = item.dataset.taskId;
+            const icon = item.querySelector('i');
+            const text = item.querySelector('.focus-task-text');
+
+            fetch(`/api/ai/focus-tasks/${taskId}/toggle/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        if (data.is_completed) {
+                            icon.classList.replace('bi-circle', 'bi-check-circle-fill');
+                            icon.classList.replace('text-muted', 'text-success');
+                            text.classList.add('completed');
+                        } else {
+                            icon.classList.replace('bi-check-circle-fill', 'bi-circle');
+                            icon.classList.replace('text-success', 'text-muted');
+                            text.classList.remove('completed');
+                        }
+                    }
+                });
+        }
+
         document.querySelectorAll('.focus-task-item').forEach(item => {
             item.addEventListener('click', function () {
-                const taskId = this.dataset.taskId;
-                const icon = this.querySelector('i');
-                const text = this.querySelector('.focus-task-text');
-
-                fetch(`/api/ai/focus-tasks/${taskId}/toggle/`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': '{{ csrf_token }}',
-                        'Content-Type': 'application/json'
-                    }
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            if (data.is_completed) {
-                                icon.classList.replace('bi-circle', 'bi-check-circle-fill');
-                                icon.classList.replace('text-muted', 'text-success');
-                                text.classList.add('completed');
-                            } else {
-                                icon.classList.replace('bi-check-circle-fill', 'bi-circle');
-                                icon.classList.replace('text-success', 'text-muted');
-                                text.classList.remove('completed');
-                            }
-                        }
-                    });
+                toggleTaskStatus(this);
             });
         });
     });
