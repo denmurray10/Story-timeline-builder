@@ -238,6 +238,77 @@ def dashboard_test(request):
         if last_event and last_event.location:
              char_locations.append({'character': char, 'location': last_event.location, 'event': last_event})
 
+    # --- NEW: Writer Mode Data ---
+
+    # 1. Pacing & Tension Graph
+    # Get last 20 events ordered chronologically
+    recent_events = Event.objects.filter(user=request.user).order_by('chronological_order')[:20]
+    pacing_data = []
+    tone_scores = {
+        'tension': 5, 'action': 4, 'emotional': 3, 
+        'dark': 4, 'humorous': 2, 'reflective': 1, 'neutral': 0
+    }
+    for e in recent_events:
+        score = tone_scores.get(e.emotional_tone, 1)
+        pacing_data.append({
+            'title': e.title,
+            'score': score,
+            'height_percent': (score / 5) * 100, # normalize to 0-100%
+            'tone': e.get_emotional_tone_display()
+        })
+
+    # 2. Forgotten Characters
+    # Find active characters not in the last 10 events
+    from django.db.models import Max
+    last_10_event_ids = Event.objects.filter(user=request.user).order_by('-sequence_order').values_list('id', flat=True)[:10]
+    
+    # Get all active non-minor characters
+    active_chars = Character.objects.filter(user=request.user, is_active=True).exclude(role='minor')
+    
+    forgotten_chars = []
+    for char in active_chars:
+        # Check if they are in the last 10 events
+        if not char.events.filter(id__in=last_10_event_ids).exists():
+             # Get their last appearance ever
+             last_event = char.events.order_by('-sequence_order').first()
+             if last_event:
+                 forgotten_chars.append({
+                     'character': char,
+                     'last_seen': last_event.title,
+                     'last_seen_date': last_event.date
+                 })
+    # Sort by who has been gone the longest (we can't easily do that without more complex queries, 
+    # so we'll just take the list for now. Ideally we'd store 'last_sequence_id' on the char)
+
+    # 3. Story Beat Checklist
+    # Check for presence of key beats
+    key_beats = [
+        ('inciting', 'Inciting Incident'),
+        ('rising', 'Rising Action'),
+        ('midpoint', 'Midpoint'), # Note: Model might not have this exact key, checking choices...
+        ('climax', 'Climax'),
+        ('resolution', 'Resolution')
+    ]
+    # Re-check model choices in Event.STORY_BEAT_CHOICES
+    # Choices: exposition, inciting, rising, climax, falling, resolution, setup, payoff
+    # Let's map our target checklist to actual choices
+    target_beats = {
+        'inciting': 'Inciting Incident',
+        'rising': 'Rising Action', 
+        'climax': 'Climax',
+        'resolution': 'Resolution'
+    }
+    
+    story_beats = []
+    for key, label in target_beats.items():
+        beat_event = Event.objects.filter(user=request.user, story_beat=key).first()
+        story_beats.append({
+            'label': label,
+            'is_present': beat_event is not None,
+            'event': beat_event
+        })
+
+
     context = {
         'books': books,
         'character_count': characters.count(),
@@ -253,6 +324,10 @@ def dashboard_test(request):
         'integrity_issues': integrity_issues,
         'unresolved_rels': unresolved_rels,
         'char_locations': char_locations,
+        # New Writer Mode Cards Data
+        'pacing_data': pacing_data,
+        'forgotten_chars': forgotten_chars[:5], # Top 5
+        'story_beats': story_beats,
         'is_test_dashboard': True
     }
     return render(request, 'timeline/dashboard_test.html', context)

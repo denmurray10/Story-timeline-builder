@@ -198,6 +198,11 @@
 
     /* CARDS & PANELS */
 
+    /* Writer Mode - Sidebar Logic */
+    body.writer-mode-active .nav-link.architect-only {
+        display: none !important;
+    }
+
     .card {
         background-color: var(--bg-surface);
         border-radius: var(--radius);
@@ -476,7 +481,7 @@
                         href="{% url 'chapter_list' %}">
                         <i class="bi bi-list-ol"></i> Chapters
                     </a>
-                    <a class="nav-link {% if request.resolver_match.url_name == 'horizontal_timeline' %}active{% endif %}"
+                    <a class="nav-link architect-only {% if request.resolver_match.url_name == 'horizontal_timeline' %}active{% endif %}"
                         href="{% url 'horizontal_timeline' %}">
                         <i class="bi bi-clock-history"></i> Story Timeline
                     </a>
@@ -484,11 +489,11 @@
                         href="{% url 'character_list' %}">
                         <i class="bi bi-people"></i> Characters
                     </a>
-                    <a class="nav-link {% if 'relationship' in request.resolver_match.url_name %}active{% endif %}"
+                    <a class="nav-link architect-only {% if 'relationship' in request.resolver_match.url_name %}active{% endif %}"
                         href="{% url 'relationship_map' %}">
                         <i class="bi bi-diagram-3"></i> Relationship Map
                     </a>
-                    <a class="nav-link {% if 'tag' in request.resolver_match.url_name %}active{% endif %}"
+                    <a class="nav-link architect-only {% if 'tag' in request.resolver_match.url_name %}active{% endif %}"
                         href="{% url 'tag_list' %}">
                         <i class="bi bi-tags"></i> Tags
                     </a>
@@ -496,7 +501,7 @@
                         href="{% url 'world_list' %}">
                         <i class="bi bi-globe-americas"></i> World Wiki
                     </a>
-                    <a class="nav-link {% if 'post' in request.resolver_match.url_name %}active{% endif %}"
+                    <a class="nav-link architect-only {% if 'post' in request.resolver_match.url_name %}active{% endif %}"
                         href="{% url 'post_list' %}">
                         <i class="bi bi-journal-text"></i> Blog
                     </a>
