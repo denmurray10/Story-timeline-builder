@@ -34,6 +34,7 @@ from .forms import (
     EventForm, TagForm, UserAccountForm, CharacterRelationshipForm, WorldEntryForm
 )
 from .utils.ai_context import ContextResolver
+from .context_engine import ContextEngine
 # ============== Authentication Views ==============
 
 @login_required
@@ -1472,13 +1473,44 @@ def chapter_edit(request, pk):
 def chapter_delete(request, pk):
     """Delete a chapter."""
     chapter = get_object_or_404(Chapter, pk=pk, book__user=request.user)
+    book_pk = chapter.book.pk
+    chapter.delete()
+    messages.success(request, "Chapter deleted successfully!")
+    return redirect('book_detail', pk=book_pk)
+
+
+@login_required
+def writing_mode(request, pk=None):
+    """
+    Distraction-free Writing Mode (Edit Mode).
+    If pk is provided, loads that chapter. 
+    Otherwise, picks the most recently updated chapter for the user.
+    """
+    if pk:
+        chapter = get_object_or_404(Chapter, pk=pk, book__user=request.user)
+    else:
+        chapter = Chapter.objects.filter(book__user=request.user).order_by('-updated_at').first()
+        if not chapter:
+            # Fallback to book list if no chapters exist
+            return redirect('book_list')
+    
     book = chapter.book
-    if request.method == 'POST':
-        chapter_title = chapter.title
-        chapter.delete()
-        messages.success(request, f'Chapter "{chapter_title}" deleted successfully!')
-        return redirect('book_detail', pk=book.pk)
-    return render(request, 'timeline/chapter_confirm_delete.html', {'chapter': chapter})
+    chapters = book.chapters.all().order_by('chapter_number')
+    
+    # Get characters for the sidebar
+    characters = Character.objects.filter(user=request.user, is_active=True).order_by('name')
+    
+    # Identify "Chapter Cast" - characters involved in events of this chapter
+    chapter_cast = Character.objects.filter(events__chapter=chapter).distinct()
+    
+    context = {
+        'chapter': chapter,
+        'book': book,
+        'chapters': chapters,
+        'characters': characters,
+        'chapter_cast': chapter_cast,
+    }
+    return render(request, 'timeline/writing_mode.html', context)
 
 
 @login_required
@@ -2799,3 +2831,53 @@ def _perform_relationship_analysis(char_a, char_b, book, interaction_summaries, 
             rel.save()
 
     return ai_response
+
+def _call_ai_text(prompt, system_message="You are a creative writing assistant.", max_retries=3):
+    """
+    Helper to call AI and return raw text (for prose generation).
+    Defaults to Gemini for speed/cost.
+    """
+    if not settings.GEMINI_API_KEY:
+        return "Error: AI API Key not configured."
+    
+    genai.configure(api_key=settings.GEMINI_API_KEY)
+    model = genai.GenerativeModel('gemini-1.5-flash')
+    
+    for attempt in range(max_retries):
+        try:
+            response = model.generate_content(f"{system_message}\n\nTask:\n{prompt}")
+            return response.text
+        except Exception as e:
+            print(f"AI Text Call Error (attempt {attempt + 1}): {e}")
+            if attempt < max_retries - 1:
+                time.sleep(1)
+            else:
+                return f"Error generating text: {str(e)}"
+
+@require_POST
+@login_required
+def api_generate_prose(request):
+    """
+    API endpoint for the Context-Aware Editor.
+    Receives JSON: { chapter_id, current_text, instruction (optional) }
+    Returns JSON: { generated_text }
+    """
+    try:
+        data = json.loads(request.body)
+        chapter_id = data.get('chapter_id')
+        current_text = data.get('current_text', '')
+        instruction = data.get('instruction', 'Continue the story naturally.')
+        
+        chapter = get_object_or_404(Chapter, pk=chapter_id, book__user=request.user)
+        
+        # Build Context Prompt
+        engine = ContextEngine(chapter.id)
+        prompt = engine.build_prompt_packet(current_text, instruction)
+        
+        # Generate
+        generated_text = _call_ai_text(prompt)
+        
+        return JsonResponse({'generated_text': generated_text})
+        
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

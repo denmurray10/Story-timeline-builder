@@ -34,6 +34,8 @@ urlpatterns = [
     path('books/<int:book_pk>/chapters/upload/', views.chapter_bulk_upload, name='chapter_bulk_upload'),
     path('chapters/<int:pk>/', views.chapter_detail, name='chapter_detail'),
     path('chapters/<int:pk>/edit/', views.chapter_edit, name='chapter_edit'),
+    path('write/<int:pk>/', views.writing_mode, name='writing_mode'),
+    path('write/', views.writing_mode, name='writing_mode_latest'),
     path('chapters/<int:pk>/delete/', views.chapter_delete, name='chapter_delete'),
     path('api/chapters/<int:pk>/scene-outline/', views.api_scene_outline, name='api_scene_outline'),
     path('api/chapters/<int:pk>/summary/', views.api_chapter_summary, name='api_chapter_summary'),
@@ -86,5 +88,6 @@ urlpatterns = [
     path('api/ai/character-sync/', views.api_sync_character_data, name='api_character_sync'),
     path('api/books/<int:book_id>/deep-scan/trigger/', views.api_trigger_deep_scan, name='api_trigger_deep_scan'),
     path('api/books/<int:book_id>/deep-scan/status/', views.api_deep_scan_status, name='api_deep_scan_status'),
+    path('api/ai/generate-prose/', views.api_generate_prose, name='api_generate_prose'),
     path('account/', views.account, name='account'),
 ]

@@ -440,6 +440,24 @@
 
         <!-- WRITER COL 1 -->
         <div class="col-lg-4 draggable-zone" id="writer-col-1">
+            <!-- Open Manuscript (Writing Mode) -->
+            <div class="dash-card dash-pill-card p-4 draggable-card mb-4 bg-dark text-white shadow-lg"
+                id="card-writing-mode" style="border-radius: 20px;">
+                <div class="dash-card-header d-flex align-items-center text-white mb-3">
+                    <i class="bi bi-grip-vertical drag-handle me-2"></i>
+                    <span class="badge bg-primary">Writing Mode</span>
+                </div>
+                <div class="px-2">
+                    <h3 class="mb-2 fw-bold">Continue Your Manuscript</h3>
+                    <p class="opacity-75 mb-4">Jump back into your last edited chapter. Distraction-free, AI-powered
+                        writing awaits.</p>
+                    <a href="{% url 'writing_mode_latest' %}"
+                        class="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow">
+                        <i class="bi bi-pencil-square me-2"></i> Start Writing Now
+                    </a>
+                </div>
+            </div>
+
             <!-- 1. Timeline Integrity -->
             <div class="dash-card p-4 draggable-card mb-3" id="card-integrity">
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -737,6 +755,7 @@
                     </div>
                 </div>
             </div>
+
 
             <!-- Stats strip -->
             <div class="dash-card dash-pill-card p-3 draggable-card mb-3" id="card-stats">

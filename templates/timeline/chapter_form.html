@@ -1,43 +1,254 @@
-{% extends 'timeline/base.html' %} {% block title %}{{ action }} Chapter - Story
-Timeline Builder{% endblock %} {% block content %}
+{% extends 'timeline/base.html' %}
+
+{% block title %}{{ action }} Chapter - Story Timeline Builder{% endblock %}
+
+{% block extra_css %}
+<!-- Quill CSS -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<link href="https://cdn.quilljs.com/1.3.6/quill.bubble.css" rel="stylesheet">
+<style>
+    #editor-container {
+        height: 600px;
+        font-family: 'Merriweather', serif;
+        /* Serif for writing */
+        font-size: 1.1rem;
+        line-height: 1.8;
+    }
+
+    .ql-toolbar {
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+        background-color: #f8f9fa;
+    }
+
+    .ql-container {
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+        background-color: #fff;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
 <div class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="card">
-            <div class="card-header">
-                <h4 class="mb-0">
-                    <i class="bi bi-list-ol"></i> {{ action }} Chapter for {{
-                    book.title }}
+    <div class="col-lg-10"> <!-- Widened for editor -->
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h4 class="mb-0 fw-bold">
+                    <i class="bi bi-pen-fill text-primary me-2"></i>{{ action }} Chapter
                 </h4>
+                <div class="text-muted small">
+                    {{ book.title }}
+                </div>
             </div>
-            <div class="card-body">
-                <form method="post" enctype="multipart/form-data">
-                    {% csrf_token %} {% for field in form %}
-                    <div class="mb-3">
-                        <label for="{{ field.id_for_label }}" class="form-label">
-                            {{ field.label }} {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
-                        </label>
-                        {{ field }} {% if field.help_text %}
-                        <small class="form-text text-muted">{{ field.help_text|safe }}</small>
-                        {% endif %} {% if field.errors %}
-                        <div class="text-danger">
-                            {% for error in field.errors %}
-                            <small>{{ error }}</small>
-                            {% endfor %}
+            <div class="card-body p-4">
+                <form method="post" enctype="multipart/form-data" id="chapter-form">
+                    {% csrf_token %}
+
+                    <!-- Render Non-Content Fields First -->
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Ch. Number</label>
+                                {{ form.chapter_number }}
+                                {% if form.chapter_number.errors %}<div class="text-danger small">{{
+                                    form.chapter_number.errors.0 }}</div>{% endif %}
+                            </div>
                         </div>
-                        {% endif %}
+                        <div class="col-md-10">
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Title</label>
+                                {{ form.title }}
+                                {% if form.title.errors %}<div class="text-danger small">{{ form.title.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
-                    {% endfor %}
-                    <div class="d-flex justify-content-between">
-                        <a href="{% url 'book_detail' book.pk %}" class="btn btn-secondary">
-                            <i class="bi bi-x-circle"></i> Cancel
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-uppercase text-muted">Synopsis / Notes</label>
+                        <textarea name="description" rows="2"
+                            class="form-control">{{ form.description.value|default:"" }}</textarea>
+                    </div>
+
+                    <!-- Hidden Content Field -->
+                    <input type="hidden" name="content" id="id_content">
+
+                    <!-- Editor Area -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-end mb-2">
+                            <label class="form-label small fw-bold text-uppercase text-muted mb-0">Manuscript
+                                Content</label>
+
+                            <!-- AI Tools (Ghostwriter) -->
+                            <div class="btn-group">
+                                <button type="button"
+                                    class="btn btn-sm btn-outline-primary d-flex align-items-center gap-2"
+                                    id="btn-ghostwrite">
+                                    <i class="bi bi-stars"></i> Ghostwrite
+                                </button>
+                                <button type="button"
+                                    class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-2"
+                                    id="btn-expand-beat">
+                                    <i class="bi bi-arrows-expand"></i> Expand Beat
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Quill Editor -->
+                        <div id="editor-wrapper">
+                            <div id="editor-container"></div>
+                        </div>
+                    </div>
+
+                    <!-- Other Hidden/Auto fields might be in form, need to be careful not to miss them -->
+                    <!-- We manually rendered visible fields, check for any others like file upload -->
+                    <div class="mb-3 border-top pt-3 mt-4">
+                        <div class="d-flex align-items-center gap-2" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#advancedOptions">
+                            <i class="bi bi-gear"></i> <span class="small fw-bold">Advanced: Upload File</span>
+                        </div>
+                        <div class="collapse mt-2" id="advancedOptions">
+                            {{ form.chapter_file }}
+                            <div class="form-text">Uploading a file will update the word count but NOT replace the
+                                editor text automatically in this version.</div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mt-5">
+                        <a href="{% url 'book_detail' book.pk %}" class="btn btn-link text-decoration-none text-muted">
+                            <i class="bi bi-arrow-left"></i> Back to Book
                         </a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-save"></i> Save Chapter
-                        </button>
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="text-muted small" id="word-count-display">0 words</span>
+                            <button type="submit" class="btn btn-dark px-4 rounded-pill">
+                                <i class="bi bi-save me-1"></i> Save Chapter
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Quill JS -->
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialize Quill
+        var quill = new Quill('#editor-container', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    [{ 'header': [1, 2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    ['blockquote', 'code-block'],
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                    [{ 'color': [] }, { 'background': [] }],
+                    ['clean']
+                ]
+            },
+            placeholder: 'Start writing your chapter here...'
+        });
+
+        // Load existing content
+        // We use the safe filter to render HTML if it exists, or just text
+        // Note: We need to be careful about escaping JS
+        var existingContent = `{{ form.content.value|default:""|escapejs }}`;
+        if (existingContent) {
+            // Check if it looks like HTML (starts with <) or just text
+            if (existingContent.trim().startsWith('<')) {
+                quill.clipboard.dangerouslyPasteHTML(existingContent);
+            } else {
+                quill.setText(existingContent);
+            }
+        }
+
+        // Word Count Logic
+        function updateWordCount() {
+            var text = quill.getText();
+            var wordCount = text.trim().length === 0 ? 0 : text.trim().split(/\s+/).length;
+            document.getElementById('word-count-display').innerText = wordCount + " words";
+        }
+
+        quill.on('text-change', function () {
+            updateWordCount();
+        });
+
+        // Initial Count
+        updateWordCount();
+
+        // Sync on Submit
+        var form = document.getElementById('chapter-form');
+        form.onsubmit = function () {
+            // Populate hidden input with HTML
+            // Note: If text is empty, set to empty string
+            if (quill.getText().trim().length === 0) {
+                document.querySelector('input[name=content]').value = "";
+            } else {
+                document.querySelector('input[name=content]').value = quill.root.innerHTML;
+            }
+        };
+
+        // Ghostwriter AI Hook
+        var btnGhostwrite = document.getElementById('btn-ghostwrite');
+        var chapterId = "{{ chapter.pk|default:'' }}";
+
+        if (btnGhostwrite) {
+            btnGhostwrite.addEventListener('click', function () {
+                if (!chapterId) {
+                    alert("Please save the chapter once before using AI assistance.");
+                    return;
+                }
+
+                // Show loading state
+                var originalText = btnGhostwrite.innerHTML;
+                btnGhostwrite.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Writing...';
+                btnGhostwrite.disabled = true;
+
+                var currentText = quill.getText();
+                // Simple prompt for now, could be enhanced with a modal for instructions
+                var instruction = "Continue the story naturally from the current point.";
+
+                fetch("{% url 'api_generate_prose' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify({
+                        chapter_id: chapterId,
+                        current_text: currentText,
+                        instruction: instruction
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            alert("AI Error: " + data.error);
+                        } else {
+                            var text = data.generated_text;
+                            if (text) {
+                                var selection = quill.getSelection(true);
+                                quill.insertText(selection.index, " " + text);
+                                // Scroll to end
+                                quill.setSelection(selection.index + text.length + 1);
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert("An error occurred while communicating with the AI.");
+                    })
+                    .finally(() => {
+                        btnGhostwrite.innerHTML = originalText;
+                        btnGhostwrite.disabled = false;
+                    });
+            });
+        }
+    });
+</script>
 {% endblock %}
