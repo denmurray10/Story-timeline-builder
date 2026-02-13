@@ -82,7 +82,11 @@ def home_preview(request):
 
 @login_required
 def dashboard(request):
-    """Main dashboard showing overview of all projects."""
+    """
+    Main dashboard showing overview of all projects.
+    Now promoted from the experimental 'Writer Mode' dashboard.
+    """
+    # --- Existing Logic (Cloned) ---
     books = Book.objects.filter(user=request.user).annotate(
         chapter_count=Count('chapters', distinct=True),
         event_count=Count('events', distinct=True),
@@ -102,7 +106,6 @@ def dashboard(request):
         book__user=request.user
     ).count()
 
-    print(f"DEBUG: User={request.user}, Completed Chapters={chapters_completed}")
     focus_tasks = AIFocusTask.objects.filter(user=request.user, created_at__date=today)
     
     if not focus_tasks.exists():
@@ -136,75 +139,6 @@ def dashboard(request):
     if random_tag:
         mood_elements.append({'type': 'tag', 'content': random_tag.name, 'color': random_tag.color})
     
-    # 2. Random Key Event
-    random_event = Event.objects.filter(user=request.user, tension_level__gte=7).order_by('?').first()
-    if random_event:
-        mood_elements.append({'type': 'event', 'content': random_event.title})
-        
-    # 3. Random Character Motivation
-    random_char_motivation = Character.objects.filter(user=request.user).exclude(motivation='').order_by('?').first()
-    if random_char_motivation:
-        mood_elements.append({'type': 'motivation', 'content': random_char_motivation.motivation, 'char': random_char_motivation.name})
-
-    context = {
-        'books': books,
-        'character_count': characters.count(),
-        'total_events': total_events,
-        'events_written': events_written,
-        'chapters_completed': chapters_completed,
-        'recent_activity': recent_activity,
-        'focus_tasks': focus_tasks,
-        'spotlight_character': spotlight_character,
-        'top_relationships': top_relationships,
-        'mood_elements': mood_elements,
-    }
-    return render(request, 'timeline/dashboard.html', context)
-
-
-@login_required
-def dashboard_test(request):
-    """
-    Experimental dashboard with 'Writer Mode' and advanced tracking.
-    """
-    # --- Existing Logic (Cloned) ---
-    books = Book.objects.filter(user=request.user).annotate(
-        chapter_count=Count('chapters', distinct=True),
-        event_count=Count('events', distinct=True),
-        book_character_count=Count('events__characters', distinct=True)
-    )
-    
-    characters = Character.objects.filter(user=request.user, is_active=True)
-    total_events = Event.objects.filter(user=request.user).count()
-    events_written = Event.objects.filter(user=request.user, is_written=True).count()
-    
-    recent_activity = ActivityLog.objects.filter(user=request.user).order_by('-timestamp')[:5]
-    today = timezone.localdate()
-    
-    chapters_completed = Chapter.objects.filter(book__user=request.user).count()
-    focus_tasks = AIFocusTask.objects.filter(user=request.user, created_at__date=today)
-    
-    if not focus_tasks.exists():
-        generate_daily_focus_tasks(request.user)
-        focus_tasks = AIFocusTask.objects.filter(user=request.user, created_at__date=today)
-    else:
-        auto_sense_focus_tasks(request.user, focus_tasks)
-    
-    # Spotlight & Mood Board (Simplified clone)
-    import random
-    spotlight_character = None
-    if characters.exists():
-        seed_value = int(today.strftime('%Y%m%d'))
-        random.seed(seed_value)
-        spotlight_character = random.choice(list(characters))
-        random.seed()
-        
-    top_relationships = CharacterRelationship.objects.filter(user=request.user).order_by('-strength')[:4]
-    
-    mood_elements = []
-    random_tag = Tag.objects.filter(user=request.user).order_by('?').first()
-    if random_tag:
-        mood_elements.append({'type': 'tag', 'content': random_tag.name, 'color': random_tag.color})
-        
     # --- NEW: Timeline Integrity Data ---
     # 1. Fuzzy Dates
     fuzzy_events = Event.objects.filter(user=request.user, date_type='fuzzy')
@@ -328,9 +262,94 @@ def dashboard_test(request):
         'pacing_data': pacing_data,
         'forgotten_chars': forgotten_chars[:5], # Top 5
         'story_beats': story_beats,
-        'is_test_dashboard': True
+        'is_test_dashboard': False # Now it's the main one
     }
-    return render(request, 'timeline/dashboard_test.html', context)
+    # Render the newly renamed dashboard.html (which was dashboard_test.html)
+    return render(request, 'timeline/dashboard.html', context)
+
+
+@login_required
+def dashboard_test(request):
+    """
+    Acts as a backup to view the OLD dashboard.
+    Templates have been swapped, so dashboard_old.html is the original layout.
+    """
+    books = Book.objects.filter(user=request.user).annotate(
+        chapter_count=Count('chapters', distinct=True),
+        event_count=Count('events', distinct=True),
+        book_character_count=Count('events__characters', distinct=True)
+    )
+    
+    characters = Character.objects.filter(user=request.user, is_active=True)
+    total_events = Event.objects.filter(user=request.user).count()
+    events_written = Event.objects.filter(user=request.user, is_written=True).count()
+    
+    # Recent activity logs (last 5)
+    recent_activity = ActivityLog.objects.filter(user=request.user).order_by('-timestamp')[:5]
+    
+    today = timezone.localdate()
+    
+    chapters_completed = Chapter.objects.filter(
+        book__user=request.user
+    ).count()
+
+    focus_tasks = AIFocusTask.objects.filter(user=request.user, created_at__date=today)
+    
+    if not focus_tasks.exists():
+        # Generate new tasks if none exist for today
+        generate_daily_focus_tasks(request.user)
+        focus_tasks = AIFocusTask.objects.filter(user=request.user, created_at__date=today)
+    else:
+        # Auto-sense if tasks have been completed
+        auto_sense_focus_tasks(request.user, focus_tasks)
+    
+    # Character Spotlight (Daily Random)
+    import random
+    spotlight_character = None
+    if characters.exists():
+        # Use date as seed for daily consistency
+        seed_value = int(today.strftime('%Y%m%d'))
+        random.seed(seed_value)
+        spotlight_character = random.choice(list(characters))
+        # Reset seed to avoid affecting other random calls
+        random.seed()
+    
+    # Relationship Sparkline (Latest/Strongest)
+    top_relationships = CharacterRelationship.objects.filter(user=request.user).order_by('-strength')[:4]
+    
+    # Inspiration Mood Board (Random Elements)
+    import random
+    mood_elements = []
+    
+    # 1. Random Tag (Theme or Location)
+    random_tag = Tag.objects.filter(user=request.user).order_by('?').first()
+    if random_tag:
+        mood_elements.append({'type': 'tag', 'content': random_tag.name, 'color': random_tag.color})
+    
+    # 2. Random Key Event
+    random_event = Event.objects.filter(user=request.user, tension_level__gte=7).order_by('?').first()
+    if random_event:
+        mood_elements.append({'type': 'event', 'content': random_event.title})
+        
+    # 3. Random Character Motivation
+    random_char_motivation = Character.objects.filter(user=request.user).exclude(motivation='').order_by('?').first()
+    if random_char_motivation:
+        mood_elements.append({'type': 'motivation', 'content': random_char_motivation.motivation, 'char': random_char_motivation.name})
+
+    context = {
+        'books': books,
+        'character_count': characters.count(),
+        'total_events': total_events,
+        'events_written': events_written,
+        'chapters_completed': chapters_completed,
+        'recent_activity': recent_activity,
+        'focus_tasks': focus_tasks,
+        'spotlight_character': spotlight_character,
+        'top_relationships': top_relationships,
+        'mood_elements': mood_elements,
+    }
+    # Render the renamed OLD dashboard
+    return render(request, 'timeline/dashboard_old.html', context)
 
 
 def generate_daily_focus_tasks(user):

@@ -253,20 +253,8 @@
 
 <!-- Page title -->
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <div class="d-flex align-items-center gap-3">
-        <h2 class="mb-0">Dashboard <span class="badge bg-warning text-dark"
-                style="font-size: 0.6rem; vertical-align: middle;">TEST MODE</span></h2>
-    </div>
-
-    <div class="d-flex align-items-center">
-        <!-- Writer Mode Toggle -->
-        <div class="form-check form-switch me-3 mb-0">
-            <input class="form-check-input" type="checkbox" id="writerModeToggle" style="cursor: pointer;">
-            <label class="form-check-label fw-semibold" for="writerModeToggle" style="cursor: pointer;">
-                <span id="modeLabel">Architect View</span>
-                <span id="modeIcon">📐</span>
-            </label>
-        </div>
+    <h2 class="mb-0">Dashboard</h2>
+    <div class="d-flex">
         <button type="button" class="btn btn-sm btn-outline-dark me-2" data-bs-toggle="modal"
             data-bs-target="#widgetsModal">
             <i class="bi bi-grid-3x3-gap"></i> Widgets
@@ -434,537 +422,267 @@
 <!-- MAIN 3-COLUMN AREA: left / middle / right -->
 <div class="row g-3 mb-3">
 
-    <!-- WRITER MODE CONTAINER (Replaces original #plannerWidgets) -->
-    <!-- Using 3-column layout for consistent Drag-and-Drop -->
-    <div class="row g-3" id="writerModeContainer" style="display: none;">
+    <!-- LEFT COLUMN -->
+    <div class="col-lg-6 draggable-zone" id="col-left">
 
-        <!-- WRITER COL 1 -->
-        <div class="col-lg-4 draggable-zone" id="writer-col-1">
-            <!-- 1. Timeline Integrity -->
-            <div class="dash-card p-4 draggable-card mb-3" id="card-integrity">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="dash-card-header mb-0"><i class="bi bi-grip-vertical drag-handle me-2"></i>Timeline
-                        Integrity</h5>
-                    <span class="badge bg-light text-dark border">Found {{ integrity_issues|length }} Issues</span>
+        <!-- Today’s Focus -->
+        <div class="dash-card dash-pill-card p-3 draggable-card mb-3" id="card-focus">
+            <div class="dash-card-header d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-grip-vertical drag-handle"></i>
+                    Today’s Focus
                 </div>
-
-                {% if integrity_issues %}
-                <div class="list-group list-group-flush">
-                    {% for issue in integrity_issues %}
-                    <div class="list-group-item px-0 border-0 d-flex gap-3 align-items-start">
-                        <div class="mt-1">
-                            {% if issue.type == 'fuzzy_date' %}
-                            <span class="text-warning"><i class="bi bi-calendar-range"></i></span>
-                            {% elif issue.type == 'missing_loc' %}
-                            <span class="text-danger"><i class="bi bi-geo-alt"></i></span>
-                            {% else %}
-                            <span class="text-info"><i class="bi bi-card-text"></i></span>
-                            {% endif %}
-                        </div>
-                        <div>
-                            <div class="fw-semibold text-dark">{{ issue.msg }}</div>
-                            <div class="small text-muted">
-                                {{ issue.event.title }}
-                                {% if issue.event.book %}
-                                <span class="badge bg-secondary opacity-50 ms-1">{{ issue.event.book.title }}</span>
-                                {% endif %}
-                            </div>
-                        </div>
-                        <a href="{% url 'event_edit' issue.event.id %}" class="btn btn-sm btn-light ms-auto">Fix</a>
-                    </div>
-                    {% endfor %}
-                </div>
-                {% else %}
-                <div class="text-center py-4 text-muted">
-                    <i class="bi bi-check-circle text-success fs-1 mb-2"></i>
-                    <p class="mb-0">Timeline is solid! No issues found.</p>
-                </div>
-                {% endif %}
+                <button class="btn btn-link btn-sm text-muted p-0" id="btn-add-focus-task" title="Add manual task">
+                    <i class="bi bi-pencil-square"></i>
+                </button>
             </div>
-
-            <!-- 4. Pacing & Tension Graph -->
-            <div class="dash-card p-4 draggable-card mb-3" id="card-pacing">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="dash-card-header mb-0"><i class="bi bi-grip-vertical drag-handle me-2"></i>Pacing &
-                        Tension</h5>
-                    <small class="text-muted">Last 20 Events</small>
+            <p class="dash-card-sub mb-2">
+                Click a task once you've finished it.
+            </p>
+            <ul class="dash-list" id="focus-tasks-list">
+                {% for task in focus_tasks %}
+                <li class="focus-task-item d-flex align-items-center mb-2" data-task-id="{{ task.id }}">
+                    <i
+                        class="bi {% if task.is_completed %}bi-check-circle-fill text-success{% else %}bi-circle text-muted{% endif %} me-2"></i>
+                    <span class="focus-task-text {% if task.is_completed %}completed{% endif %}">
+                        {{ task.task_text }}
+                    </span>
+                </li>
+                {% empty %}
+                <li class="dash-muted" id="focus-empty-state">Generating your focus for today...</li>
+                {% endfor %}
+            </ul>
+            <div id="add-focus-task-container" style="display: none;" class="mt-2">
+                <div class="input-group input-group-sm">
+                    <input type="text" id="input-new-focus-task" class="form-control" placeholder="New task...">
+                    <button class="btn btn-dark" type="button" id="btn-save-focus-task">Add</button>
                 </div>
-
-                {% if pacing_data %}
-                <div class="d-flex align-items-end justify-content-between" style="height: 120px; gap: 4px;">
-                    {% for p in pacing_data %}
-                    <div class="flex-grow-1 rounded-top" style="background-color: {% if p.score >= 4 %}#e74c3c{% elif p.score == 3 %}#f1c40f{% else %}#3498db{% endif %}; 
-                                height: {{ p.height_percent }}%; 
-                                min-height: 4px;
-                                opacity: 0.8;" title="{{ p.title }} ({{ p.tone }})" data-bs-toggle="tooltip">
-                    </div>
-                    {% endfor %}
-                </div>
-                <div class="d-flex justify-content-between mt-2 text-muted" style="font-size: 0.65rem;">
-                    <span>Start</span>
-                    <span>Current</span>
-                </div>
-                {% else %}
-                <p class="text-muted small text-center py-4">Not enough events to analyze pacing.</p>
-                {% endif %}
             </div>
         </div>
 
-        <!-- WRITER COL 2 -->
-        <div class="col-lg-4 draggable-zone" id="writer-col-2">
-            <!-- 2. Open Loop Tracker -->
-            <div class="dash-card p-4 draggable-card mb-3" id="card-loops">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="dash-card-header mb-0"><i class="bi bi-grip-vertical drag-handle me-2"></i>Open Loops
-                    </h5>
-                    <span class="badge bg-light text-dark border">{{ unresolved_rels.count }} Unresolved</span>
-                </div>
-
-                {% if unresolved_rels %}
-                <div class="row g-2">
-                    {% for rel in unresolved_rels %}
-                    <div class="col-12">
-                        <div class="p-2 border rounded bg-light d-flex align-items-center gap-2">
-                            <div class="d-flex align-items-center">
-                                <div class="avatar-small me-1"
-                                    style="width:24px;height:24px;background-color:{{rel.character_a.color_code}};border-radius:50%;color:white;font-size:0.6rem;display:flex;align-items:center;justify-content:center;">
-                                    {{ rel.character_a.name|slice:":1" }}
-                                </div>
-                                <i class="bi bi-arrow-left-right text-muted mx-1" style="font-size: 0.8rem;"></i>
-                                <div class="avatar-small ms-1"
-                                    style="width:24px;height:24px;background-color:{{rel.character_b.color_code}};border-radius:50%;color:white;font-size:0.6rem;display:flex;align-items:center;justify-content:center;">
-                                    {{ rel.character_b.name|slice:":1" }}
-                                </div>
-                            </div>
-                            <div class="chk-truncate ms-2 flex-grow-1">
-                                <div class="fw-semibold" style="font-size:0.85rem;">{{
-                                    rel.get_relationship_type_display }}</div>
-                                <div class="text-muted" style="font-size:0.75rem;">{{ rel.character_a.name }} & {{
-                                    rel.character_b.name }}</div>
-                            </div>
-                            <a href="{% url 'character_detail' rel.character_a.id %}" class="text-muted"><i
-                                    class="bi bi-pencil-square"></i></a>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-                {% else %}
-                <p class="text-muted small">All relationship arcs are resolved.</p>
-                {% endif %}
+        <!-- Stats strip -->
+        <div class="dash-card dash-pill-card p-3 draggable-card mb-3" id="card-stats">
+            <div class="dash-card-header d-flex align-items-center">
+                <i class="bi bi-grip-vertical drag-handle"></i>
+                Stats
             </div>
-
-            <!-- 5. Forgotten Characters -->
-            <div class="dash-card p-4 draggable-card mb-3" id="card-forgotten">
-                <h5 class="dash-card-header mb-3"><i class="bi bi-grip-vertical drag-handle me-2"></i>Forgotten
-                    Characters <small class="text-muted fw-normal ms-1">(Off-Screen)</small></h5>
-
-                {% if forgotten_chars %}
-                <div class="list-group list-group-flush">
-                    {% for item in forgotten_chars %}
-                    <div class="list-group-item px-0 border-0 d-flex align-items-center gap-2">
-                        <div class="avatar-small"
-                            style="width:32px;height:32px;background-color:{{item.character.color_code}};border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-size:0.8rem;">
-                            {{ item.character.name|slice:":1" }}
-                        </div>
-                        <div class="flex-grow-1" style="line-height: 1.1;">
-                            <div class="fw-semibold text-dark" style="font-size:0.9rem;">{{ item.character.name }}</div>
-                            <div class="text-muted" style="font-size:0.75rem;">Last seen in: <span class="text-dark">{{
-                                    item.last_seen }}</span></div>
-                        </div>
-                        <a href="{% url 'character_detail' item.character.id %}"
-                            class="btn btn-sm btn-outline-secondary py-0" style="font-size: 0.7rem;">View</a>
+            <div class="row text-center">
+                <div class="col-3">
+                    <div class="dash-stat-icon">
+                        <i class="bi bi-book"></i>
                     </div>
-                    {% endfor %}
+                    <div class="dash-stat-value">{{ books.count }}</div>
+                    <div class="dash-stat-label">Books</div>
                 </div>
-                {% else %}
-                <div class="text-center py-4 text-muted">
-                    <i class="bi bi-people text-success fs-1 mb-2"></i>
-                    <p class="mb-0 small">Great job! All active characters are involved.</p>
+                <div class="col-3">
+                    <div class="dash-stat-icon">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <div class="dash-stat-value">{{ character_count }}</div>
+                    <div class="dash-stat-label">Characters</div>
                 </div>
-                {% endif %}
+                <div class="col-3">
+                    <div class="dash-stat-icon">
+                        <i class="bi bi-calendar-event"></i>
+                    </div>
+                    <div class="dash-stat-value">{{ total_events }}</div>
+                    <div class="dash-stat-label">Total Events</div>
+                </div>
+                <div class="col-3">
+                    <div class="dash-stat-icon">
+                        <i class="bi bi-journal-text"></i>
+                    </div>
+                    <div class="dash-stat-value">{{ chapters_completed }}</div>
+                    <div class="dash-stat-label">Chapters</div>
+                </div>
             </div>
         </div>
 
-        <!-- WRITER COL 3 -->
-        <div class="col-lg-4 draggable-zone" id="writer-col-3">
-            <!-- 3. Character Whereabouts -->
-            <div class="dash-card p-4 draggable-card mb-3" id="card-whereabouts">
-                <h5 class="dash-card-header mb-3"><i class="bi bi-grip-vertical drag-handle me-2"></i>Character
-                    Whereabouts <small class="text-muted fw-normal ms-1">(Last Known)</small></h5>
-                <div class="d-flex flex-wrap gap-2">
-                    {% for items in char_locations %}
-                    <div
-                        class="badge bg-white text-dark border p-2 d-flex align-items-center gap-2 rounded-pill fw-normal">
-                        <span class="d-inline-block rounded-circle"
-                            style="width:8px;height:8px;background-color:{{ items.character.color_code }}"></span>
-                        <strong>{{ items.character.name }}:</strong>
-                        <span class="text-muted">{{ items.location }}</span>
-                    </div>
-                    {% empty %}
-                    <p class="text-muted small">No location data available for main characters.</p>
-                    {% endfor %}
-                </div>
+        <!-- World at a Glance -->
+        <div class="dash-card dash-pill-card p-3 draggable-card mb-3" id="card-world-glance">
+            <div class="dash-card-header d-flex align-items-center mb-2">
+                <i class="bi bi-grip-vertical drag-handle"></i>
+                World at a Glance
             </div>
-
-            <!-- 6. Story Beat Checklist -->
-            <div class="dash-card p-4 draggable-card mb-3" id="card-beats">
-                <h5 class="dash-card-header mb-3"><i class="bi bi-grip-vertical drag-handle me-2"></i>Key Beats</h5>
-                <div class="d-flex flex-column gap-2">
-                    {% for beat in story_beats %}
-                    <div
-                        class="d-flex align-items-center justify-content-between p-2 border rounded {% if beat.is_present %}bg-light-success border-success{% else %}bg-light border-light{% endif %}">
-                        <span class="fw-semibold {% if beat.is_present %}text-success{% else %}text-muted{% endif %}"
-                            style="font-size: 0.9rem;">
-                            {{ beat.label }}
-                        </span>
-                        {% if beat.is_present %}
-                        <i class="bi bi-check-circle-fill text-success"></i>
-                        {% else %}
-                        <i class="bi bi-circle text-muted"></i>
-                        {% endif %}
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="p-3" style="background-color:#f5f5f5; border-radius:14px;">
+                        <div class="dash-card-header mb-1" style="font-size:0.9rem;">Top overview</div>
+                        <div class="dash-muted">
+                            Books: {{ books.count }}<br>
+                            Characters: {{ character_count }}<br>
+                            Events: {{ total_events }}
+                        </div>
                     </div>
-                    {% endfor %}
+                </div>
+                <div class="col-md-6">
+                    <div class="p-3" style="background-color:#f5f5f5; border-radius:14px;">
+                        <div class="dash-card-header mb-1" style="font-size:0.9rem;">Gaps &amp; Opportunities</div>
+                        <div class="dash-muted">
+                            Use the timeline to spot chapters with no scenes...
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
     </div>
 
+    <!-- MIDDLE COLUMN -->
+    <div class="col-lg-3 draggable-zone" id="col-middle">
 
-
-
-    <!-- ROW 2: Writer Mode Analysis Cards -->
-
-    <!-- WRITER MODE WIDGETS (Visible by default, hidden when Architect Mode is on) -->
-    <!-- We wrap the existing dashboard columns in this div -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const toggle = document.getElementById('writerModeToggle');
-            const plannerWidgets = document.getElementById('plannerWidgets');
-            const writerWidgets = document.getElementById('writerWidgets');
-            const modeLabel = document.getElementById('modeLabel');
-            const modeIcon = document.getElementById('modeIcon');
-
-            // Initial State: Writer Mode is OFF (Architect View)
-            // But wait, the previous code had specific logic.
-            // Let's refine:
-            // Toggle unchecked = Architect View (Planner widgets visible, Writer widgets hidden?)
-            // Actually, the user wants "Writer Mode" to be the *toggle* state.
-            // So: Unchecked = Architect (Default). Checked = Writer.
-            // Architect View: Shows Timeline Integrity, etc.
-            // Writer View: Shows standard dashboard (Words, Focus, etc).
-
-            // Let's set initial state based on toggle
-            function updateMode() {
-                const isWriterMode = toggle.checked; // If checked, we existing in Writer Mode (New)
-                const writerModeContainer = document.getElementById('writerModeContainer');
-
-                // Toggle sidebar class
-                if (isWriterMode) {
-                    document.body.classList.add('writer-mode-active');
-                } else {
-                    document.body.classList.remove('writer-mode-active');
-                }
-
-                if (isWriterMode) { // WRITER MODE ACTIVE (New Widgets)
-                    writerModeContainer.style.display = 'flex'; // Show New Format
-                    if (writerWidgets) writerWidgets.style.display = 'none'; // Hide Old
-
-                    modeLabel.textContent = "Writer Mode";
-                    modeIcon.textContent = "✍️";
-                    modeLabel.classList.add('text-primary');
-                } else { // ARCHITECT MODE ACTIVE (Standard Dashboard)
-                    writerModeContainer.style.display = 'none'; // Hide New
-                    if (writerWidgets) writerWidgets.style.display = 'flex'; // Show Old
-
-                    modeLabel.textContent = "Architect View";
-                    modeIcon.textContent = "📐";
-                    modeLabel.classList.remove('text-primary');
-                }
-
-                // Persist state
-                localStorage.setItem('dashboard-writer-mode', isWriterMode);
-            }
-
-            toggle.addEventListener('change', updateMode);
-
-            // Run once on load - Check localStorage
-            const savedMode = localStorage.getItem('dashboard-writer-mode');
-            if (savedMode === 'true') {
-                toggle.checked = true;
-            } else {
-                toggle.checked = false;
-            }
-            updateMode();
-        });
-    </script>
-
-    <div class="row g-3" id="writerWidgets">
-        <!-- LEFT COLUMN -->
-        <div class="col-lg-6 draggable-zone" id="col-left">
-
-            <!-- Today’s Focus -->
-            <div class="dash-card dash-pill-card p-3 draggable-card mb-3" id="card-focus">
-                <div class="dash-card-header d-flex align-items-center justify-content-between">
-                    <div class="d-flex align-items-center">
-                        <i class="bi bi-grip-vertical drag-handle"></i>
-                        Today’s Focus
-                    </div>
-                    <button class="btn btn-link btn-sm text-muted p-0" id="btn-add-focus-task" title="Add manual task">
-                        <i class="bi bi-pencil-square"></i>
-                    </button>
-                </div>
-                <p class="dash-card-sub mb-2">
-                    Click a task once you've finished it.
-                </p>
-                <ul class="dash-list" id="focus-tasks-list">
-                    {% for task in focus_tasks %}
-                    <li class="focus-task-item d-flex align-items-center mb-2" data-task-id="{{ task.id }}">
-                        <i
-                            class="bi {% if task.is_completed %}bi-check-circle-fill text-success{% else %}bi-circle text-muted{% endif %} me-2"></i>
-                        <span class="focus-task-text {% if task.is_completed %}completed{% endif %}">
-                            {{ task.task_text }}
-                        </span>
-                    </li>
-                    {% empty %}
-                    <li class="dash-muted" id="focus-empty-state">Generating your focus for today...</li>
-                    {% endfor %}
-                </ul>
-                <div id="add-focus-task-container" style="display: none;" class="mt-2">
-                    <div class="input-group input-group-sm">
-                        <input type="text" id="input-new-focus-task" class="form-control" placeholder="New task...">
-                        <button class="btn btn-dark" type="button" id="btn-save-focus-task">Add</button>
-                    </div>
-                </div>
+        <!-- Recent Activity -->
+        <div class="dash-card p-3 draggable-card mb-3" id="card-recent">
+            <div class="dash-card-header d-flex align-items-center">
+                <i class="bi bi-grip-vertical drag-handle"></i>
+                Recent Activity
             </div>
-
-            <!-- Stats strip -->
-            <div class="dash-card dash-pill-card p-3 draggable-card mb-3" id="card-stats">
-                <div class="dash-card-header d-flex align-items-center">
-                    <i class="bi bi-grip-vertical drag-handle"></i>
-                    Stats
-                </div>
-                <div class="row text-center">
-                    <div class="col-3">
-                        <div class="dash-stat-icon">
-                            <i class="bi bi-book"></i>
-                        </div>
-                        <div class="dash-stat-value">{{ books.count }}</div>
-                        <div class="dash-stat-label">Books</div>
-                    </div>
-                    <div class="col-3">
-                        <div class="dash-stat-icon">
-                            <i class="bi bi-people"></i>
-                        </div>
-                        <div class="dash-stat-value">{{ character_count }}</div>
-                        <div class="dash-stat-label">Characters</div>
-                    </div>
-                    <div class="col-3">
-                        <div class="dash-stat-icon">
-                            <i class="bi bi-calendar-event"></i>
-                        </div>
-                        <div class="dash-stat-value">{{ total_events }}</div>
-                        <div class="dash-stat-label">Total Events</div>
-                    </div>
-                    <div class="col-3">
-                        <div class="dash-stat-icon">
-                            <i class="bi bi-journal-text"></i>
-                        </div>
-                        <div class="dash-stat-value">{{ chapters_completed }}</div>
-                        <div class="dash-stat-label">Chapters</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- World at a Glance -->
-            <div class="dash-card dash-pill-card p-3 draggable-card mb-3" id="card-world-glance">
-                <div class="dash-card-header d-flex align-items-center mb-2">
-                    <i class="bi bi-grip-vertical drag-handle"></i>
-                    World at a Glance
-                </div>
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <div class="p-3" style="background-color:#f5f5f5; border-radius:14px;">
-                            <div class="dash-card-header mb-1" style="font-size:0.9rem;">Top overview</div>
-                            <div class="dash-muted">
-                                Books: {{ books.count }}<br>
-                                Characters: {{ character_count }}<br>
-                                Events: {{ total_events }}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="p-3" style="background-color:#f5f5f5; border-radius:14px;">
-                            <div class="dash-card-header mb-1" style="font-size:0.9rem;">Gaps &amp; Opportunities</div>
-                            <div class="dash-muted">
-                                Use the timeline to spot chapters with no scenes...
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+            <ul class="dash-list">
+                {% for activity in recent_activity %}
+                <li>
+                    <strong>{{ activity.get_action_display }}: {{ activity.object_name }}</strong>
+                    <span class="dash-muted">({{ activity.model_name }}) · {{ activity.timestamp|timesince }} ago</span>
+                </li>
+                {% empty %}
+                <li class="dash-muted">No recent activity found.</li>
+                {% endfor %}
+            </ul>
         </div>
 
-        <!-- MIDDLE COLUMN -->
-        <div class="col-lg-3 draggable-zone" id="col-middle">
-
-            <!-- Recent Activity -->
-            <div class="dash-card p-3 draggable-card mb-3" id="card-recent">
-                <div class="dash-card-header d-flex align-items-center">
-                    <i class="bi bi-grip-vertical drag-handle"></i>
-                    Recent Activity
-                </div>
-                <ul class="dash-list">
-                    {% for activity in recent_activity %}
-                    <li>
-                        <strong>{{ activity.get_action_display }}: {{ activity.object_name }}</strong>
-                        <span class="dash-muted">({{ activity.model_name }}) · {{ activity.timestamp|timesince }}
-                            ago</span>
-                    </li>
-                    {% empty %}
-                    <li class="dash-muted">No recent activity found.</li>
-                    {% endfor %}
-                </ul>
+        <!-- Character Spotlight -->
+        {% if spotlight_character %}
+        <div class="dash-card p-3 draggable-card mb-3" id="card-character-spotlight">
+            <div class="dash-card-header d-flex align-items-center mb-2">
+                <i class="bi bi-grip-vertical drag-handle"></i>
+                Character Spotlight
             </div>
+            <div class="d-flex align-items-center mb-3">
+                <div class="me-3">
+                    {% if spotlight_character.profile_pic_url %}
+                    <img src="{{ spotlight_character.profile_pic_url }}" class="rounded-circle shadow-sm"
+                        style="width: 54px; height: 54px; object-fit: cover;">
+                    {% else %}
+                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center border"
+                        style="width: 54px; height: 54px; font-size: 1.2rem; color: #6b7280;">
+                        {{ spotlight_character.name|first }}
+                    </div>
+                    {% endif %}
+                </div>
+                <div>
+                    <h6 class="mb-0 fw-bold">{{ spotlight_character.name }}</h6>
+                    <small class="text-muted">{{ spotlight_character.get_role_display }}</small>
+                </div>
+            </div>
+            <div id="spotlight-response-area" class="p-2 bg-light rounded-3 mb-2 small"
+                style="display:none; min-height: 40px;">
+                <div id="spotlight-loading" style="display:none;" class="text-center py-1">
+                    <div class="ai-loading-dots"><span></span><span></span><span></span></div>
+                </div>
+                <div id="spotlight-text" class="fst-italic text-secondary"></div>
+            </div>
+            <button class="btn btn-sm btn-outline-dark w-100 rounded-pill" id="btn-character-deep-dive"
+                data-char-id="{{ spotlight_character.id }}">
+                <i class="bi bi-magic"></i> Deep Dive
+            </button>
+        </div>
+        {% endif %}
 
-            <!-- Character Spotlight -->
-            {% if spotlight_character %}
-            <div class="dash-card p-3 draggable-card mb-3" id="card-character-spotlight">
-                <div class="dash-card-header d-flex align-items-center mb-2">
-                    <i class="bi bi-grip-vertical drag-handle"></i>
-                    Character Spotlight
-                </div>
-                <div class="d-flex align-items-center mb-3">
-                    <div class="me-3">
-                        {% if spotlight_character.profile_pic_url %}
-                        <img src="{{ spotlight_character.profile_pic_url }}" class="rounded-circle shadow-sm"
-                            style="width: 54px; height: 54px; object-fit: cover;">
-                        {% else %}
-                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center border"
-                            style="width: 54px; height: 54px; font-size: 1.2rem; color: #6b7280;">
-                            {{ spotlight_character.name|first }}
+        <!-- Relationship Map Sparkline -->
+        <div class="dash-card p-3 draggable-card mb-3" id="card-relationship-sparkline">
+            <div class="dash-card-header d-flex align-items-center mb-2">
+                <i class="bi bi-grip-vertical drag-handle"></i>
+                Character Dynamics
+            </div>
+            <ul class="dash-list">
+                {% for rel in top_relationships %}
+                <li class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="d-flex align-items-center">
+                        <div class="me-2 fw-semibold" style="font-size: 0.8rem;">
+                            <span>{{ rel.character_a.name }}</span>
+                            <i class="bi bi-arrow-left-right mx-1 text-muted"></i>
+                            <span>{{ rel.character_b.name }}</span>
                         </div>
-                        {% endif %}
                     </div>
-                    <div>
-                        <h6 class="mb-0 fw-bold">{{ spotlight_character.name }}</h6>
-                        <small class="text-muted">{{ spotlight_character.get_role_display }}</small>
-                    </div>
-                </div>
-                <div id="spotlight-response-area" class="p-2 bg-light rounded-3 mb-2 small"
-                    style="display:none; min-height: 40px;">
-                    <div id="spotlight-loading" style="display:none;" class="text-center py-1">
-                        <div class="ai-loading-dots"><span></span><span></span><span></span></div>
-                    </div>
-                    <div id="spotlight-text" class="fst-italic text-secondary"></div>
-                </div>
-                <button class="btn btn-sm btn-outline-dark w-100 rounded-pill" id="btn-character-deep-dive"
-                    data-char-id="{{ spotlight_character.id }}">
-                    <i class="bi bi-magic"></i> Deep Dive
-                </button>
+                    <span class="badge rounded-pill bg-light text-dark border" style="font-size: 0.65rem;">
+                        {{ rel.get_relationship_type_display }}
+                    </span>
+                </li>
+                {% empty %}
+                <li class="dash-muted">No relationships tracked yet.</li>
+                {% endfor %}
+            </ul>
+            {% if top_relationships %}
+            <div class="mt-2 pt-2 border-top">
+                <a href="{% url 'relationship_map' %}" class="dash-muted text-decoration-none">
+                    <i class="bi bi-diagram-3 me-1"></i> View relationship map
+                </a>
             </div>
             {% endif %}
-
-            <!-- Relationship Map Sparkline -->
-            <div class="dash-card p-3 draggable-card mb-3" id="card-relationship-sparkline">
-                <div class="dash-card-header d-flex align-items-center mb-2">
-                    <i class="bi bi-grip-vertical drag-handle"></i>
-                    Character Dynamics
-                </div>
-                <ul class="dash-list">
-                    {% for rel in top_relationships %}
-                    <li class="d-flex justify-content-between align-items-center mb-2">
-                        <div class="d-flex align-items-center">
-                            <div class="me-2 fw-semibold" style="font-size: 0.8rem;">
-                                <span>{{ rel.character_a.name }}</span>
-                                <i class="bi bi-arrow-left-right mx-1 text-muted"></i>
-                                <span>{{ rel.character_b.name }}</span>
-                            </div>
-                        </div>
-                        <span class="badge rounded-pill bg-light text-dark border" style="font-size: 0.65rem;">
-                            {{ rel.get_relationship_type_display }}
-                        </span>
-                    </li>
-                    {% empty %}
-                    <li class="dash-muted">No relationships tracked yet.</li>
-                    {% endfor %}
-                </ul>
-                {% if top_relationships %}
-                <div class="mt-2 pt-2 border-top">
-                    <a href="{% url 'relationship_map' %}" class="dash-muted text-decoration-none">
-                        <i class="bi bi-diagram-3 me-1"></i> View relationship map
-                    </a>
-                </div>
-                {% endif %}
-            </div>
-
-            <!-- Quick Actions -->
-            <div class="dash-card p-3 draggable-card mb-3" id="card-quick-actions">
-                <div class="dash-card-header d-flex align-items-center mb-2">
-                    <i class="bi bi-grip-vertical drag-handle"></i>
-                    Quick Actions
-                </div>
-                <div class="d-grid gap-2">
-                    <a href="{% url 'event_create' %}" class="btn btn-light dash-quick-btn">New Event</a>
-                    <a href="{% url 'character_create' %}" class="btn btn-light dash-quick-btn">New Character</a>
-                    <a href="{% url 'book_create' %}" class="btn btn-light dash-quick-btn">New Book</a>
-                </div>
-            </div>
-
         </div>
 
-        <!-- RIGHT COLUMN -->
-        <div class="col-lg-3 draggable-zone" id="col-right">
-            <div class="draggable-card mb-3" id="card-books">
-                <div class="dash-card-header d-flex align-items-center mb-2">
-                    <i class="bi bi-grip-vertical drag-handle"></i>
-                    Your Books
-                </div>
-                {% if books %}
-                {% for book in books|slice:":4" %}
-                <div class="dash-book-mini">
-                    <div class="d-flex align-items-center mb-2">
-                        {% if book.image %}
-                        <img src="{{ book.image.url }}" alt="{{ book.title }} Cover"
-                            style="height: 48px; width: 36px; object-fit: cover; margin-right: 12px; border-radius: 6px;">
-                        {% else %}
-                        <img src="{% static 'img/book-cover.png' %}" alt="No Cover"
-                            style="height: 48px; width: 36px; object-fit: cover; margin-right: 12px; border-radius: 6px;">
-                        {% endif %}
-                        <div class="flex-grow-1">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="dash-book-title">Book {{ book.series_order }}: {{ book.title }}</div>
-                                <span
-                                    class="dash-status-pill badge {% if book.status|lower == 'importing' %}bg-info{% elif book.status|lower == 'drafting' %}bg-warning text-dark{% elif book.status|lower == 'complete' or book.status|lower == 'published' %}bg-success{% elif book.status|lower == 'editing' %}bg-primary{% else %}bg-secondary{% endif %}">
-                                    {{ book.get_status_display }}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="dash-muted mb-2" style="font-size: 0.75rem; line-height: 1.4;">
-                        <div><i class="bi bi-files me-1"></i> {{ book.chapter_count|default:"0" }} Chapters</div>
-                        <div><i class="bi bi-pencil-square me-1"></i> {{ book.current_word_count|default:"0" }} Words
-                        </div>
-                        <div><i class="bi bi-people me-1"></i> {{ book.book_character_count|default:"0" }} Characters
-                        </div>
-                    </div>
-                    <div class="dash-progress-bg mb-2">
-                        <div class="dash-progress-fill js-progress-bar"
-                            style="height: 100%; border-radius: 999px; background-color: {% if book.status|lower == 'importing' %}#0dcaf0{% elif book.status|lower == 'drafting' %}#ffc107{% elif book.status|lower == 'complete' or book.status|lower == 'published' %}#198754{% elif book.status|lower == 'editing' %}#0d6efd{% else %}#6c757d{% endif %} !important; width: {% if book.status|lower == 'published' or book.status|lower == 'complete' %}100%{% elif book.progress_percentage|add:0 < 10 and book.status|lower != 'planning' %}10%{% else %}{{ book.progress_percentage }}%{% endif %} !important;">
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-                {% else %}
-                <div class="dash-card p-3">
-                    <p class="dash-muted mb-2">No books yet.</p>
-                    <a href="{% url 'book_create' %}" class="btn btn-dark btn-sm w-100">New Book</a>
-                </div>
-                {% endif %}
+        <!-- Quick Actions -->
+        <div class="dash-card p-3 draggable-card mb-3" id="card-quick-actions">
+            <div class="dash-card-header d-flex align-items-center mb-2">
+                <i class="bi bi-grip-vertical drag-handle"></i>
+                Quick Actions
+            </div>
+            <div class="d-grid gap-2">
+                <a href="{% url 'event_create' %}" class="btn btn-light dash-quick-btn">New Event</a>
+                <a href="{% url 'character_create' %}" class="btn btn-light dash-quick-btn">New Character</a>
+                <a href="{% url 'book_create' %}" class="btn btn-light dash-quick-btn">New Book</a>
             </div>
         </div>
-    </div> <!-- End writerWidgets -->
+
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="col-lg-3 draggable-zone" id="col-right">
+        <div class="draggable-card mb-3" id="card-books">
+            <div class="dash-card-header d-flex align-items-center mb-2">
+                <i class="bi bi-grip-vertical drag-handle"></i>
+                Your Books
+            </div>
+            {% if books %}
+            {% for book in books|slice:":4" %}
+            <div class="dash-book-mini">
+                <div class="d-flex align-items-center mb-2">
+                    {% if book.image %}
+                    <img src="{{ book.image.url }}" alt="{{ book.title }} Cover"
+                        style="height: 48px; width: 36px; object-fit: cover; margin-right: 12px; border-radius: 6px;">
+                    {% else %}
+                    <img src="{% static 'img/book-cover.png' %}" alt="No Cover"
+                        style="height: 48px; width: 36px; object-fit: cover; margin-right: 12px; border-radius: 6px;">
+                    {% endif %}
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="dash-book-title">Book {{ book.series_order }}: {{ book.title }}</div>
+                            <span
+                                class="dash-status-pill badge {% if book.status|lower == 'importing' %}bg-info{% elif book.status|lower == 'drafting' %}bg-warning text-dark{% elif book.status|lower == 'complete' or book.status|lower == 'published' %}bg-success{% elif book.status|lower == 'editing' %}bg-primary{% else %}bg-secondary{% endif %}">
+                                {{ book.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="dash-muted mb-2" style="font-size: 0.75rem; line-height: 1.4;">
+                    <div><i class="bi bi-files me-1"></i> {{ book.chapter_count|default:"0" }} Chapters</div>
+                    <div><i class="bi bi-pencil-square me-1"></i> {{ book.current_word_count|default:"0" }} Words</div>
+                    <div><i class="bi bi-people me-1"></i> {{ book.book_character_count|default:"0" }} Characters</div>
+                </div>
+                <div class="dash-progress-bg mb-2">
+                    <div class="dash-progress-fill js-progress-bar"
+                        style="height: 100%; border-radius: 999px; background-color: {% if book.status|lower == 'importing' %}#0dcaf0{% elif book.status|lower == 'drafting' %}#ffc107{% elif book.status|lower == 'complete' or book.status|lower == 'published' %}#198754{% elif book.status|lower == 'editing' %}#0d6efd{% else %}#6c757d{% endif %} !important; width: {% if book.status|lower == 'published' or book.status|lower == 'complete' %}100%{% elif book.progress_percentage|add:0 < 10 and book.status|lower != 'planning' %}10%{% else %}{{ book.progress_percentage }}%{% endif %} !important;">
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="dash-card p-3">
+                <p class="dash-muted mb-2">No books yet.</p>
+                <a href="{% url 'book_create' %}" class="btn btn-dark btn-sm w-100">New Book</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
 
 </div>
 
@@ -995,8 +713,7 @@
                 {% elif element.type == 'motivation' %}
                 <div class="p-2 rounded-3 border bg-light shadow-sm" style="flex: 2 1 100%;">
                     <span class="badge bg-secondary">Motivation: {{ element.char }}</span>
-                    <div class="mt-1 fst-italic" style="font-size: 0.85rem;">"{{ element.content|truncatechars:100
-                        }}"
+                    <div class="mt-1 fst-italic" style="font-size: 0.85rem;">"{{ element.content|truncatechars:100 }}"
                     </div>
                 </div>
                 {% endif %}
@@ -1040,7 +757,7 @@
             if (width) bar.style.width = width;
         });
 
-        const columns = ['col-left', 'col-middle', 'col-right', 'col-bottom', 'writer-col-1', 'writer-col-2', 'writer-col-3'];
+        const columns = ['col-left', 'col-middle', 'col-right', 'col-bottom'];
         const sortables = [];
 
         // Function to save the order to localStorage
