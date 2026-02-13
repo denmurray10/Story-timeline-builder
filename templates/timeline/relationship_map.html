@@ -176,12 +176,6 @@
 <div class="map-controls shadow-sm">
     <div class="legend">
         <div class="legend-item">
-            <div class="legend-color" style="background: #6366f1;"></div> Protagonist
-        </div>
-        <div class="legend-item">
-            <div class="legend-color" style="background: #ef4444;"></div> Antagonist
-        </div>
-        <div class="legend-item">
             <div class="legend-color" style="background: #3b82f6;"></div> Friend
         </div>
         <div class="legend-item">
@@ -291,10 +285,6 @@
                                                 <option value="professional">Professional</option>
                                                 <option value="neutral">Neutral</option>
                                             </select>
-                                            <button type="button" class="btn btn-dark px-3" id="btn-ask-ai"
-                                                title="Auto-detect from story">
-                                                <i class="bi bi-magic me-2"></i> Analyze with AI
-                                            </button>
                                         </div>
                                     </div>
 
@@ -488,134 +478,127 @@
                         </div>
                     </div>
 
-                    <!-- AI Auto-Detect Button -->
-                    <div class="mb-3 text-end">
-                        <button type="button" class="btn btn-sm btn-outline-primary" id="btn-ask-ai"
-                            title="Analyze shared scenes to suggest relationship">
-                            <i class="bi bi-magic"></i> Auto-Detect with AI
-                        </button>
-                    </div>
+            </div>
 
-                    <!-- Tabs -->
-                    <ul class="nav nav-tabs mb-3" id="relTabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="core-tab" data-bs-toggle="tab" data-bs-target="#core"
-                                type="button" role="tab">Core</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="dynamics-tab" data-bs-toggle="tab" data-bs-target="#dynamics"
-                                type="button" role="tab">Dynamics</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="goals-tab" data-bs-toggle="tab" data-bs-target="#goals"
-                                type="button" role="tab">Goals</button>
-                        </li>
-                    </ul>
+            <!-- Tabs -->
+            <ul class="nav nav-tabs mb-3" id="relTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="core-tab" data-bs-toggle="tab" data-bs-target="#core"
+                        type="button" role="tab">Core</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="dynamics-tab" data-bs-toggle="tab" data-bs-target="#dynamics"
+                        type="button" role="tab">Dynamics</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="goals-tab" data-bs-toggle="tab" data-bs-target="#goals" type="button"
+                        role="tab">Goals</button>
+                </li>
+            </ul>
 
-                    <div class="tab-content" id="relTabsContent">
-                        <!-- Tab 1: Core Details -->
-                        <div class="tab-pane fade show active" id="core" role="tabpanel">
-                            <div class="row g-2 mb-3">
-                                <div class="col-6">
-                                    <label class="form-label small fw-bold">Type</label>
-                                    <select name="relationship_type" id="rel-type" class="form-select">
-                                        <option value="friend">Friend</option>
-                                        <option value="ally">Ally</option>
-                                        <option value="enemy">Enemy</option>
-                                        <option value="romantic">Romantic</option>
-                                        <option value="family">Family</option>
-                                        <option value="professional">Professional</option>
-                                        <option value="rival">Rival</option>
-                                        <option value="mentor">Mentor</option>
-                                        <option value="neutral">Neutral</option>
-                                    </select>
-                                </div>
-                                <div class="col-6">
-                                    <label class="form-label small fw-bold">Status</label>
-                                    <select name="relationship_status" id="rel-status" class="form-select">
-                                        <option value="active">Active</option>
-                                        <option value="estranged">Estranged</option>
-                                        <option value="deceased">Deceased</option>
-                                        <option value="unresolved">Unresolved</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label small fw-bold">Visibility</label>
-                                <select name="visibility" id="rel-visibility" class="form-select">
-                                    <option value="public">Public Knowledge</option>
-                                    <option value="secret">Secret</option>
-                                    <option value="rumored">Rumored/Suspected</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label small fw-bold d-flex justify-content-between">
-                                    <span>Strength (Intensity)</span> <span id="strength-val"
-                                        class="text-muted">5</span>
-                                </label>
-                                <input type="range" name="strength" id="rel-strength" class="form-range" min="1"
-                                    max="10" step="1">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label small fw-bold d-flex justify-content-between">
-                                    <span>Trust Level</span> <span id="trust-val" class="text-muted">5</span>
-                                </label>
-                                <input type="range" name="trust_level" id="rel-trust" class="form-range" min="1"
-                                    max="10" step="1">
-                            </div>
+            <div class="tab-content" id="relTabsContent">
+                <!-- Tab 1: Core Details -->
+                <div class="tab-pane fade show active" id="core" role="tabpanel">
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label small fw-bold">Type</label>
+                            <select name="relationship_type" id="rel-type" class="form-select">
+                                <option value="friend">Friend</option>
+                                <option value="ally">Ally</option>
+                                <option value="enemy">Enemy</option>
+                                <option value="romantic">Romantic</option>
+                                <option value="family">Family</option>
+                                <option value="professional">Professional</option>
+                                <option value="rival">Rival</option>
+                                <option value="mentor">Mentor</option>
+                                <option value="neutral">Neutral</option>
+                            </select>
                         </div>
-
-                        <!-- Tab 2: Dynamics -->
-                        <div class="tab-pane fade" id="dynamics" role="tabpanel">
-                            <div class="mb-3">
-                                <label class="form-label small fw-bold">Power Dynamic</label>
-                                <select name="power_dynamic" id="rel-power" class="form-select">
-                                    <option value="balanced">Balanced (=)</option>
-                                    <option value="a_dominant">Char A Dominant (>)</option>
-                                    <option value="b_dominant">Char B Dominant (<)< /option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label small fw-bold">Conflict Source</label>
-                                <input type="text" name="conflict_source" id="rel-conflict" class="form-control"
-                                    placeholder="What drives the tension?">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label small fw-bold">Evolution Notes</label>
-                                <textarea name="evolution" id="rel-evolution" class="form-control" rows="2"
-                                    placeholder="e.g. Strangers -> Allies -> Rivals"></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label small fw-bold">Description</label>
-                                <textarea name="description" id="rel-desc" class="form-control" rows="2"
-                                    placeholder="Summary of their bond"></textarea>
-                            </div>
-                        </div>
-
-                        <!-- Tab 3: Goals -->
-                        <div class="tab-pane fade" id="goals" role="tabpanel">
-                            <div class="mb-3">
-                                <label class="form-label small fw-bold">What Character A Wants</label>
-                                <textarea name="character_a_wants" id="rel-a-wants" class="form-control" rows="3"
-                                    placeholder="Goals regarding Character B"></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label small fw-bold">What Character B Wants</label>
-                                <textarea name="character_b_wants" id="rel-b-wants" class="form-control" rows="3"
-                                    placeholder="Goals regarding Character A"></textarea>
-                            </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-bold">Status</label>
+                            <select name="relationship_status" id="rel-status" class="form-select">
+                                <option value="active">Active</option>
+                                <option value="estranged">Estranged</option>
+                                <option value="deceased">Deceased</option>
+                                <option value="unresolved">Unresolved</option>
+                            </select>
                         </div>
                     </div>
-                </form>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Visibility</label>
+                        <select name="visibility" id="rel-visibility" class="form-select">
+                            <option value="public">Public Knowledge</option>
+                            <option value="secret">Secret</option>
+                            <option value="rumored">Rumored/Suspected</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold d-flex justify-content-between">
+                            <span>Strength (Intensity)</span> <span id="strength-val" class="text-muted">5</span>
+                        </label>
+                        <input type="range" name="strength" id="rel-strength" class="form-range" min="1" max="10"
+                            step="1">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold d-flex justify-content-between">
+                            <span>Trust Level</span> <span id="trust-val" class="text-muted">5</span>
+                        </label>
+                        <input type="range" name="trust_level" id="rel-trust" class="form-range" min="1" max="10"
+                            step="1">
+                    </div>
+                </div>
+
+                <!-- Tab 2: Dynamics -->
+                <div class="tab-pane fade" id="dynamics" role="tabpanel">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Power Dynamic</label>
+                        <select name="power_dynamic" id="rel-power" class="form-select">
+                            <option value="balanced">Balanced (=)</option>
+                            <option value="a_dominant">Char A Dominant (>)</option>
+                            <option value="b_dominant">Char B Dominant (<)< /option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Conflict Source</label>
+                        <input type="text" name="conflict_source" id="rel-conflict" class="form-control"
+                            placeholder="What drives the tension?">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Evolution Notes</label>
+                        <textarea name="evolution" id="rel-evolution" class="form-control" rows="2"
+                            placeholder="e.g. Strangers -> Allies -> Rivals"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Description</label>
+                        <textarea name="description" id="rel-desc" class="form-control" rows="2"
+                            placeholder="Summary of their bond"></textarea>
+                    </div>
+                </div>
+
+                <!-- Tab 3: Goals -->
+                <div class="tab-pane fade" id="goals" role="tabpanel">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">What Character A Wants</label>
+                        <textarea name="character_a_wants" id="rel-a-wants" class="form-control" rows="3"
+                            placeholder="Goals regarding Character B"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">What Character B Wants</label>
+                        <textarea name="character_b_wants" id="rel-b-wants" class="form-control" rows="3"
+                            placeholder="Goals regarding Character A"></textarea>
+                    </div>
+                </div>
             </div>
-            <div class="modal-footer bg-light">
-                <button type="button" class="btn btn-sm btn-outline-danger me-auto" id="btn-rel-delete"
-                    style="display:none;">Delete</button>
-                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-sm btn-dark" id="btn-rel-save">Save changes</button>
-            </div>
+            </form>
+        </div>
+        <div class="modal-footer bg-light">
+            <button type="button" class="btn btn-sm btn-outline-danger me-auto" id="btn-rel-delete"
+                style="display:none;">Delete</button>
+            <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-sm btn-dark" id="btn-rel-save">Save changes</button>
         </div>
     </div>
+</div>
 </div>
 {% endblock %}
 
@@ -783,7 +766,6 @@
                 const btnSave = document.getElementById('btn-rel-save');
                 const btnDelete = document.getElementById('btn-rel-delete');
                 const btnQuickAdd = document.getElementById('btn-quick-add');
-                const btnAskAi = document.getElementById('btn-ask-ai');
                 const btnCloseOverlay = document.getElementById('btn-close-overlay');
                 const btnCancelOverlay = document.getElementById('btn-cancel-overlay');
 
@@ -879,101 +861,6 @@
                 btnCloseOverlay.onclick = closeOverlay;
                 btnCancelOverlay.onclick = closeOverlay;
 
-                // AI Auto-Detect Handler
-                btnAskAi.onclick = function () {
-                    const charA = relCharA.value;
-                    const charB = relCharB.value;
-
-                    if (!charA || !charB) {
-                        alert("Please select both characters first.");
-                        return;
-                    }
-
-                    if (charA === charB) {
-                        alert("Characters must be different.");
-                        return;
-                    }
-
-                    // Show loading state
-                    const originalText = btnAskAi.innerHTML;
-                    btnAskAi.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Scannning shared scenes...';
-                    btnAskAi.disabled = true;
-
-                    fetch('{% url "api_suggest_relationship" %}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': '{{ csrf_token }}'
-                        },
-                        body: JSON.stringify({
-                            character_a: charA,
-                            character_b: charB
-                        })
-                    })
-                        .then(response => response.json())
-                        .then(result => {
-                            if (result.status === 'success') {
-                                const suggestion = result.suggestion;
-
-                                // Map AI type to select options roughly
-                                // Our types: friend, ally, enemy, romantic, family, professional, rival, mentor
-                                // AI types: ally, enemy, romantic, family, mentor, business, neutral
-                                let mappedType = 'neutral';
-                                const aiType = suggestion.type.toLowerCase();
-
-                                if (aiType.includes('romantic')) mappedType = 'romantic';
-                                else if (aiType.includes('fam')) mappedType = 'family';
-                                else if (aiType.includes('enem') || aiType.includes('rival')) mappedType = 'enemy';
-                                else if (aiType.includes('business')) mappedType = 'professional';
-                                else if (aiType.includes('mentor')) mappedType = 'mentor';
-                                else if (aiType.includes('ally') || aiType.includes('friend')) mappedType = 'friend';
-
-                                relType.value = mappedType;
-                                relDesc.value = suggestion.description;
-                                relStrength.value = suggestion.strength;
-                                strengthVal.innerText = suggestion.strength;
-
-                                // New fields
-                                if (suggestion.trust_level) {
-                                    relTrust.value = suggestion.trust_level;
-                                    trustVal.innerText = suggestion.trust_level;
-                                }
-                                if (suggestion.power_dynamic) relPower.value = suggestion.power_dynamic;
-                                if (suggestion.relationship_status) relStatus.value = suggestion.relationship_status;
-                                if (suggestion.visibility) relVisibility.value = suggestion.visibility;
-                                if (suggestion.conflict_source) relConflict.value = suggestion.conflict_source;
-                                if (suggestion.character_a_wants) relAWants.value = suggestion.character_a_wants;
-                                if (suggestion.character_b_wants) relBWants.value = suggestion.character_b_wants;
-                                if (suggestion.evolution) relEvolution.value = suggestion.evolution;
-                                if (suggestion.shared_secret) relSharedSecret.value = suggestion.shared_secret;
-                                if (suggestion.first_impression) relFirstImpression.value = suggestion.first_impression;
-                                if (suggestion.vulnerability) relVulnerability.value = suggestion.vulnerability;
-                                if (suggestion.major_shared_moments) relMoments.value = suggestion.major_shared_moments;
-                                if (suggestion.predictability) {
-                                    relPredictability.value = suggestion.predictability;
-                                    predictabilityVal.innerText = suggestion.predictability;
-                                }
-
-                                // Visual feedback
-                                btnAskAi.classList.remove('btn-outline-primary');
-                                btnAskAi.classList.add('btn-success');
-                                setTimeout(() => {
-                                    btnAskAi.classList.remove('btn-success');
-                                    btnAskAi.classList.add('btn-outline-primary');
-                                }, 1500);
-                            } else {
-                                alert("AI Error: " + (result.message || "Unknown error"));
-                            }
-                        })
-                        .catch(e => {
-                            console.error(e);
-                            alert("Failed to connect to AI.");
-                        })
-                        .finally(() => {
-                            btnAskAi.innerHTML = originalText;
-                            btnAskAi.disabled = false;
-                        });
-                };
 
                 // Update slider displays
                 relStrength.oninput = function () { strengthVal.innerText = this.value; }
@@ -1052,7 +939,7 @@
                                     <div class="d-grid gap-2 mb-3">
                                         <button class="btn btn-profile-style rounded-pill py-2 d-flex align-items-center justify-content-center" 
                                             onclick="openModalForEdge(${edge.id}, 'core')">
-                                            <i class="bi bi-heart me-2"></i> Edit Core Detail
+                                            <i class="bi bi-heart me-2"></i> Core Detail
                                         </button>
                                         <button class="btn btn-profile-style rounded-pill py-2 d-flex align-items-center justify-content-center" 
                                             onclick="openModalForEdge(${edge.id}, 'dynamics')">

@@ -23,6 +23,10 @@ from django.utils import timezone
 import google.generativeai as genai
 from openai import OpenAI
 from django.conf import settings
+import ebooklib
+from ebooklib import epub
+from bs4 import BeautifulSoup
+import tempfile
 
 from .models import Book, Chapter, Character, Event, Tag, CharacterRelationship, AIFocusTask, ActivityLog, WorldEntry, InteractionSummaryCache, RelationshipAnalysisCache, StoryScanStatus
 from .forms import (
@@ -624,6 +628,20 @@ def book_delete(request, pk):
     book = get_object_or_404(Book, pk=pk, user=request.user)
     if request.method == 'POST':
         book_title = book.title
+        
+        # Enhanced cleanup: Find characters that were introduced in this book
+        # and delete them if they aren't used in any other books.
+        orphan_candidates = Character.objects.filter(introduction_book=book, user=request.user)
+        for char in orphan_candidates:
+            # Check if character has events (either as POV or listed character)
+            # in any other book besides the one being deleted.
+            is_used_elsewhere = Event.objects.filter(
+                Q(characters=char) | Q(pov_character=char)
+            ).exclude(book=book).exists()
+            
+            if not is_used_elsewhere:
+                char.delete()
+
         book.delete()
         messages.success(request, f'Book "{book_title}" deleted successfully!')
         return redirect('book_list')
@@ -835,7 +853,7 @@ def get_file_word_count(file):
     return 0
 
 def extract_text_from_file(file):
-    """Extract string content from .docx or .txt files, preserving paragraph spacing and styling."""
+    """Extract string content from .docx, .txt, or .epub files, preserving paragraph spacing and styling."""
     filename = file.name.lower()
     text = ""
     try:
@@ -871,6 +889,41 @@ def extract_text_from_file(file):
                 text = raw.decode('utf-8', errors='ignore')
             else:
                 text = raw
+        elif filename.endswith('.epub'):
+            # Create a temporary file to store the EPUB content
+            # since EbookLib.epub.read_epub often requires a real file path
+            fd, tmp_path = tempfile.mkstemp(suffix='.epub')
+            try:
+                with os.fdopen(fd, 'wb') as tmp:
+                    file.seek(0)
+                    tmp.write(file.read())
+                
+                book = epub.read_epub(tmp_path)
+                chapters = []
+                
+                # Iterate through items, look for documents
+                for item in book.get_items():
+                    if item.get_type() == ebooklib.ITEM_DOCUMENT:
+                        # Parse HTML content
+                        content = item.get_content()
+                        soup = BeautifulSoup(content, 'html.parser')
+                        
+                        # Get clean text with double newlines for paragraphs
+                        chapter_content = soup.get_text(separator='\n\n').strip()
+                        if chapter_content:
+                            chapters.append(chapter_content)
+                
+                text = '\n\n'.join(chapters)
+            except Exception as epub_error:
+                print(f"EPUB processing error: {epub_error}")
+                text = ""
+            finally:
+                # Always clean up the temporary file
+                if os.path.exists(tmp_path):
+                    try:
+                        os.remove(tmp_path)
+                    except:
+                        pass
     except Exception as e:
         print(f"Error processing file: {e}")
     return text
@@ -2214,6 +2267,10 @@ def api_trigger_deep_scan(request, book_id):
     scan_status.error_message = ""
     scan_status.save()
 
+    # Clear old caches for this book to ensure upgrades take effect
+    RelationshipAnalysisCache.objects.filter(book=book).delete()
+    InteractionSummaryCache.objects.filter(book=book).delete()
+
     def run_deep_scan(u_id, b_id, status_id):
         try:
             user = User.objects.get(id=u_id)
@@ -2243,6 +2300,46 @@ def api_trigger_deep_scan(request, book_id):
                         char.motivation = res.get('motivation', char.motivation)
                         char.save()
             
+            # Step 1.5: Tag Recovery - Scan scenes for character mentions 
+            # (Fixes the "Empty Map" issue where AI missed tags during import)
+            scan_status.current_step = "Syncing Character Tags..."
+            scan_status.progress_percentage = 20
+            scan_status.save()
+            
+            all_chars = list(Character.objects.filter(user=user))
+            book_events = Event.objects.filter(book=book)
+            
+            # Identify common surnames/words to avoid over-tagging (e.g. "Temple" in every name)
+            from collections import Counter
+            word_counts = Counter()
+            for c in all_chars:
+                word_counts.update([w.lower() for w in c.name.split() if len(w) > 2])
+            common_words = {w for w, count in word_counts.items() if count > 2}
+            
+            for event in book_events:
+                # Scan event-specific text PLUS the whole chapter text for context
+                chapter_text = event.chapter.content if event.chapter else ""
+                text_to_scan = (event.title or "") + " " + (event.description or "") + " " + chapter_text
+                
+                for char in all_chars:
+                    names_to_check = [char.name]
+                    if char.aliases:
+                        names_to_check.extend([a.strip() for a in char.aliases.split(',') if a.strip()])
+                    
+                    name_parts = char.name.split()
+                    if len(name_parts) > 1:
+                        for part in name_parts:
+                            low_part = part.lower()
+                            # Skip common titles AND the common family surname
+                            if len(part) > 2 and low_part not in ['mrs', 'mr', 'miss', 'dr', 'sir', 'lady'] and low_part not in common_words:
+                                if not any(low_part == a.lower().strip() for a in names_to_check):
+                                    names_to_check.append(part)
+                    
+                    # Use a regex with word boundaries for precise matching
+                    pattern = r'\b(' + '|'.join(re.escape(name) for name in names_to_check) + r')\b'
+                    if re.search(pattern, text_to_scan, re.IGNORECASE):
+                        event.characters.add(char)
+
             # 2. Relationship Pre-Caching
             pairs = list(combinations(characters, 2))
             total_pairs = len(pairs)
@@ -2311,11 +2408,6 @@ def _ensure_relationship_cache(char_a, char_b, book):
     This is a headless version of api_suggest_relationship.
     """
     try:
-        # Re-use the existing logic by simulating the view's data flow
-        # In a real app, you'd refactor the view into a service, but here 
-        # we'll just implement the core logic or call a function that does it.
-        # For now, let's keep it simple and just do the base logic for one pair.
-        
         char_a_data = f"{char_a.traits}|{char_a.motivation}|{char_a.role}"
         char_b_data = f"{char_b.traits}|{char_b.motivation}|{char_b.role}"
         h_a = hashlib.sha256(char_a_data.encode()).hexdigest()
@@ -2344,6 +2436,12 @@ def _ensure_relationship_cache(char_a, char_b, book):
             full_text = ""
             for event in batch:
                 content = event.content_json or event.content_html or event.description or ""
+                # If the summary is very short, supplement with a snippet from the chapter content 
+                # to give the AI actual narrative context for relationship mapping.
+                if len(str(content)) < 500 and event.chapter and event.chapter.content:
+                    # Take up to 2000 chars of chapter content as context
+                    content = f"{content}\n[SCENE CONTEXT]: {event.chapter.content[:2000]}..."
+                
                 full_text += f"\n--- SCENE: {event.title} ---\n{str(content)}\n"
             batch_texts.append(full_text)
 

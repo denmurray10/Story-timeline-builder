@@ -40,9 +40,10 @@
 
                         <div class="mb-5 text-start">
                             <label for="book_file" class="form-label fw-bold">Manuscript File</label>
-                            <input type="file" name="book_file" id="book_file" class="form-control" accept=".docx,.txt"
-                                required>
-                            <div class="form-text mt-2">Supports Microsoft Word (.docx) and Plain Text (.txt) files.
+                            <input type="file" name="book_file" id="book_file" class="form-control"
+                                accept=".docx,.txt,.epub" required>
+                            <div class="form-text mt-2">Supports Microsoft Word (.docx), Plain Text (.txt), and EPUB
+                                (.epub) files.
                             </div>
                         </div>
 
@@ -65,9 +66,19 @@
                     <div id="loadingMessage" class="mt-4" style="display: none;">
                         <div class="alert alert-info border-0 shadow-sm rounded-4 text-start">
                             <p class="mb-1" id="statusMessage"><i class="bi bi-robot me-2"></i> Initializing...</p>
-                            <div class="progress mt-2" style="height: 10px; border-radius: 5px;">
+                            <div class="progress mt-2 mb-3" style="height: 10px; border-radius: 5px;">
                                 <div id="uiProgressBar" class="progress-bar progress-bar-striped progress-bar-animated"
                                     role="progressbar" style="width: 5%"></div>
+                            </div>
+
+                            <div class="text-center">
+                                <form id="cancelForm" method="post" style="display: none;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3"
+                                        onclick="return confirm('Are you sure you want to cancel this import and delete the partial data?')">
+                                        <i class="bi bi-x-circle me-1"></i> Cancel & Delete
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -120,6 +131,11 @@
             .then(data => {
                 if (data.status === 'success') {
                     const bookId = data.book_id;
+
+                    // Setup Cancel Button
+                    const cancelForm = document.getElementById('cancelForm');
+                    cancelForm.action = `/books/${bookId}/delete/`;
+                    cancelForm.style.display = 'block';
 
                     // Start Polling
                     const pollInterval = setInterval(() => {

@@ -23,11 +23,19 @@
         <div class="card border-0 shadow-sm rounded-4 overflow-hidden book-card h-100 {% if book.status == 'importing' %}book-processing{% endif %}"
             id="book-{{ book.pk }}">
             {% if book.status == 'importing' %}
-            <div class="book-overlay">
-                <div class="text-center text-white">
+            <div class="book-overlay d-flex flex-column align-items-center justify-content-center">
+                <div class="text-center text-white mb-3">
                     <div class="spinner-border mb-2" role="status"></div>
                     <div class="fw-bold">Import in Progress...</div>
-                    <small>Please wait while AI analyzes your book.</small>
+                    <small class="d-block mb-3">Please wait while AI analyzes your book.</small>
+
+                    <form action="{% url 'book_delete' book.pk %}" method="post" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-danger rounded-pill px-3"
+                            onclick="return confirm('Are you sure you want to cancel this import and delete the partial data?')">
+                            <i class="bi bi-x-circle me-1"></i> Cancel Import
+                        </button>
+                    </form>
                 </div>
             </div>
             {% endif %}
