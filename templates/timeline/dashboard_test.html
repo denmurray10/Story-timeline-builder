@@ -1,0 +1,1216 @@
+{% extends 'timeline/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Story Timeline Builder{% endblock %}
+
+{% block extra_css %}
+<style>
+    .sidebar .nav-link {
+        border-radius: 999px;
+    }
+
+    .dash-header-row {
+        margin-bottom: 18px;
+    }
+
+    .dash-logo {
+        height: 44px;
+        width: auto;
+    }
+
+    .dash-hello {
+        font-size: 0.95rem;
+        color: #000000;
+    }
+
+    .dash-card {
+        background-color: #ffffff;
+        border-radius: 18px;
+        border: none;
+        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.05);
+    }
+
+    .dash-card-header {
+        font-weight: 600;
+        font-size: 0.95rem;
+        margin-bottom: 6px;
+    }
+
+    .dash-card-sub {
+        font-size: 0.8rem;
+        color: #6b7280;
+    }
+
+    .dash-pill-card {
+        border-radius: 20px;
+    }
+
+    .dash-stat-icon {
+        font-size: 1.6rem;
+        margin-bottom: 4px;
+    }
+
+    .dash-stat-label {
+        font-size: 0.8rem;
+        color: #6b7280;
+    }
+
+    .dash-stat-value {
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .dash-list {
+        list-style: none;
+        padding-left: 0;
+        margin-bottom: 0;
+        font-size: 0.85rem;
+    }
+
+    .dash-list li+li {
+        margin-top: 6px;
+    }
+
+    .dash-muted {
+        color: #6b7280;
+        font-size: 0.8rem;
+    }
+
+    .dash-book-mini {
+        border-radius: 18px;
+        background-color: #ffffff;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+        padding: 16px 18px;
+        margin-bottom: 12px;
+    }
+
+    .dash-book-title {
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 2px;
+    }
+
+    .dash-status-pill {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 0.7rem;
+    }
+
+    .dash-progress-bg {
+        height: 6px;
+        border-radius: 999px;
+        background-color: #e5e7eb;
+        overflow: hidden;
+    }
+
+    .dash-progress-fill {
+        height: 100%;
+        border-radius: 999px;
+    }
+
+    .dash-quick-btn {
+        border-radius: 999px;
+        width: 100%;
+        text-align: left;
+        justify-content: flex-start;
+        font-size: 0.9rem;
+    }
+
+    .dash-ai-input {
+        border-radius: 999px;
+        border: 1px solid #d1d5db;
+        padding: 0.6rem 1rem;
+        width: 100%;
+        font-size: 0.9rem;
+    }
+
+    .dash-ai-input:focus {
+        outline: none;
+        border-color: #111827;
+        box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.2);
+    }
+
+    /* Draggable styles */
+    .draggable-zone {
+        min-height: 100px;
+    }
+
+    .dash-ai-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 999px;
+        border: 1px solid #d1d5db;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        background-color: #fff;
+        transition: all 0.2s;
+    }
+
+    .dash-ai-icon:hover {
+        background-color: #f3f4f6;
+        border-color: #111827;
+    }
+
+    .dash-ai-response-container {
+        display: none;
+        margin-top: 15px;
+        padding: 15px;
+        background-color: #f9fafb;
+        border-radius: 14px;
+        border: 1px solid #e5e7eb;
+        font-size: 0.9rem;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    .focus-task-item {
+        cursor: pointer;
+        transition: all 0.2s;
+        padding: 4px 8px;
+        border-radius: 8px;
+    }
+
+    .focus-task-item:hover {
+        background-color: #f1f5f9;
+    }
+
+    .focus-task-text.completed {
+        color: #10b981 !important;
+        /* Green */
+        text-decoration: line-through;
+        opacity: 0.8;
+    }
+
+    .ai-loading-dots span {
+        animation: blink 1.4s infinite both;
+        height: 6px;
+        width: 6px;
+        background-color: #6366f1;
+        border-radius: 50%;
+        display: inline-block;
+        margin: 0 2px;
+    }
+
+    .ai-loading-dots span:nth-child(2) {
+        animation-delay: .2s;
+    }
+
+    .ai-loading-dots span:nth-child(3) {
+        animation-delay: .4s;
+    }
+
+    @keyframes blink {
+        0% {
+            opacity: .2;
+        }
+
+        20% {
+            opacity: 1;
+        }
+
+        100% {
+            opacity: .2;
+        }
+    }
+
+    .draggable-card {
+        cursor: grab;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .draggable-card:active {
+        cursor: grabbing;
+    }
+
+    .sortable-ghost {
+        opacity: 0.4;
+        border: 2px dashed #6366f1 !important;
+    }
+
+    .drag-handle {
+        cursor: grab;
+        color: #d1d5db;
+        margin-right: 8px;
+        opacity: 0;
+        transition: opacity 0.2s ease, color 0.2s ease;
+    }
+
+    .draggable-card:hover .drag-handle {
+        color: #6366f1;
+        opacity: 1;
+    }
+
+    @media (max-width: 991px) {}
+</style>
+{% endblock %}
+
+{% block content %}
+
+
+
+<!-- Page title -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex align-items-center gap-3">
+        <h2 class="mb-0">Dashboard <span class="badge bg-warning text-dark"
+                style="font-size: 0.6rem; vertical-align: middle;">TEST MODE</span></h2>
+
+        <!-- Writer Mode Toggle -->
+        <div class="form-check form-switch ms-3">
+            <input class="form-check-input" type="checkbox" id="writerModeToggle" style="cursor: pointer;">
+            <label class="form-check-label fw-semibold" for="writerModeToggle" style="cursor: pointer;">
+                <span id="modeLabel">Architect View</span>
+                <span id="modeIcon">📐</span>
+            </label>
+        </div>
+    </div>
+
+    <div class="d-flex">
+        <button type="button" class="btn btn-sm btn-outline-dark me-2" data-bs-toggle="modal"
+            data-bs-target="#widgetsModal">
+            <i class="bi bi-grid-3x3-gap"></i> Widgets
+        </button>
+        <button id="reset-layout" class="btn btn-sm btn-dark btn-invert-hover">
+            <i class="bi bi-arrow-counterclockwise"></i> Reset Layout
+        </button>
+    </div>
+</div>
+
+<!-- Widgets Management Modal -->
+<div class="modal fade" id="widgetsModal" tabindex="-1" aria-labelledby="widgetsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" id="widgetsModalLabel">Dashboard Widgets</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted small mb-4">Choose which modules you'd like to see on your dashboard.</p>
+
+                <!-- Tabs -->
+                <ul class="nav nav-pills nav-fill mb-4 bg-light p-1 rounded-pill" id="widgetTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active rounded-pill px-4 py-2" id="core-tab" data-bs-toggle="tab"
+                            data-bs-target="#core-widgets" type="button" role="tab">Core</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link rounded-pill px-4 py-2" id="tools-tab" data-bs-toggle="tab"
+                            data-bs-target="#tools-widgets" type="button" role="tab">Tools & AI</button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="widgetTabsContent">
+                    <!-- Core Widgets Tab -->
+                    <div class="tab-pane fade show active" id="core-widgets" role="tabpanel">
+                        <div class="list-group list-group-flush">
+                            <div
+                                class="list-group-item border-0 d-flex justify-content-between align-items-center px-0">
+                                <div>
+                                    <h6 class="mb-0 fw-semibold">Story Stats</h6>
+                                    <small class="text-muted">Total counts of books, characters, etc.</small>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input widget-toggle" type="checkbox"
+                                        data-card-id="card-stats" checked>
+                                </div>
+                            </div>
+                            <div
+                                class="list-group-item border-0 d-flex justify-content-between align-items-center px-0">
+                                <div>
+                                    <h6 class="mb-0 fw-semibold">Recent Activity</h6>
+                                    <small class="text-muted">Show your latest 5 platform saves.</small>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input widget-toggle" type="checkbox"
+                                        data-card-id="card-recent" checked>
+                                </div>
+                            </div>
+                            <div
+                                class="list-group-item border-0 d-flex justify-content-between align-items-center px-0">
+                                <div>
+                                    <h6 class="mb-0 fw-semibold">Your Books</h6>
+                                    <small class="text-muted">Quick access to your library.</small>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input widget-toggle" type="checkbox"
+                                        data-card-id="card-books" checked>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tools Tab -->
+                    <div class="tab-pane fade" id="tools-widgets" role="tabpanel">
+                        <div class="list-group list-group-flush">
+                            <div
+                                class="list-group-item border-0 d-flex justify-content-between align-items-center px-0">
+                                <div>
+                                    <h6 class="mb-0 fw-semibold">Today's Focus</h6>
+                                    <small class="text-muted">Generated daily writing tasks.</small>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input widget-toggle" type="checkbox"
+                                        data-card-id="card-focus" checked>
+                                </div>
+                            </div>
+                            <div
+                                class="list-group-item border-0 d-flex justify-content-between align-items-center px-0">
+                                <div>
+                                    <h6 class="mb-0 fw-semibold">Character Spotlight</h6>
+                                    <small class="text-muted">A daily random deep dive into a character.</small>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input widget-toggle" type="checkbox"
+                                        data-card-id="card-character-spotlight" checked>
+                                </div>
+                            </div>
+                            <div
+                                class="list-group-item border-0 d-flex justify-content-between align-items-center px-0">
+                                <div>
+                                    <h6 class="mb-0 fw-semibold">Relationship Sparkline</h6>
+                                    <small class="text-muted">Quick view of your key character dynamics.</small>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input widget-toggle" type="checkbox"
+                                        data-card-id="card-relationship-sparkline" checked>
+                                </div>
+                            </div>
+                            <div
+                                class="list-group-item border-0 d-flex justify-content-between align-items-center px-0">
+                                <div>
+                                    <h6 class="mb-0 fw-semibold">Inspiration Mood Board</h6>
+                                    <small class="text-muted">Random themes and motivations for ideas.</small>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input widget-toggle" type="checkbox"
+                                        data-card-id="card-mood-board" checked>
+                                </div>
+                            </div>
+                            <div
+                                class="list-group-item border-0 d-flex justify-content-between align-items-center px-0">
+                                <div>
+                                    <h6 class="mb-0 fw-semibold">World at a Glance</h6>
+                                    <small class="text-muted">Overview of your story bible.</small>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input widget-toggle" type="checkbox"
+                                        data-card-id="card-world-glance" checked>
+                                </div>
+                            </div>
+                            <div
+                                class="list-group-item border-0 d-flex justify-content-between align-items-center px-0">
+                                <div>
+                                    <h6 class="mb-0 fw-semibold">Quick Actions</h6>
+                                    <small class="text-muted">Buttons for new events and characters.</small>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input widget-toggle" type="checkbox"
+                                        data-card-id="card-quick-actions" checked>
+                                </div>
+                            </div>
+                            <div
+                                class="list-group-item border-0 d-flex justify-content-between align-items-center px-0">
+                                <div>
+                                    <h6 class="mb-0 fw-semibold">Story Support</h6>
+                                    <small class="text-muted">Chat with your writing consultant.</small>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input widget-toggle" type="checkbox" data-card-id="card-ai"
+                                        checked>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-dark rounded-pill px-4" data-bs-dismiss="modal">Done</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MAIN 3-COLUMN AREA: left / middle / right -->
+<div class="row g-3 mb-3">
+
+    <!-- PLANNER MODE WIDGETS (Hidden by default, shown via toggle) -->
+    <div class="col-12" id="plannerWidgets" style="display: none;">
+        <div class="row">
+            <!-- 1. Timeline Integrity Card -->
+            <div class="col-lg-4 mb-4">
+                <div class="dash-card p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="dash-card-header mb-0">Timeline Integrity</h5>
+                        <span class="badge bg-light text-dark border">Found {{ integrity_issues|length }} Issues</span>
+                    </div>
+
+                    {% if integrity_issues %}
+                    <div class="list-group list-group-flush">
+                        {% for issue in integrity_issues %}
+                        <div class="list-group-item px-0 border-0 d-flex gap-3 align-items-start">
+                            <div class="mt-1">
+                                {% if issue.type == 'fuzzy_date' %}
+                                <span class="text-warning"><i class="bi bi-calendar-range"></i></span>
+                                {% elif issue.type == 'missing_loc' %}
+                                <span class="text-danger"><i class="bi bi-geo-alt"></i></span>
+                                {% else %}
+                                <span class="text-info"><i class="bi bi-card-text"></i></span>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <div class="fw-semibold text-dark">{{ issue.msg }}</div>
+                                <div class="small text-muted">
+                                    {{ issue.event.title }}
+                                    {% if issue.event.book %}
+                                    <span class="badge bg-secondary opacity-50 ms-1">{{ issue.event.book.title }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <a href="{% url 'event_edit' issue.event.id %}" class="btn btn-sm btn-light ms-auto">Fix</a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-check-circle text-success fs-1 mb-2"></i>
+                        <p class="mb-0">Timeline is solid! No issues found.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- 2. Open Loop Tracker -->
+            <div class="col-lg-4 mb-4">
+                <div class="dash-card p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="dash-card-header mb-0">Open Loops</h5>
+                        <span class="badge bg-light text-dark border">{{ unresolved_rels.count }} Unresolved</span>
+                    </div>
+
+                    {% if unresolved_rels %}
+                    <div class="row g-2">
+                        {% for rel in unresolved_rels %}
+                        <div class="col-12">
+                            <div class="p-2 border rounded bg-light d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-small me-1"
+                                        style="width:24px;height:24px;background-color:{{rel.character_a.color_code}};border-radius:50%;color:white;font-size:0.6rem;display:flex;align-items:center;justify-content:center;">
+                                        {{ rel.character_a.name|slice:":1" }}
+                                    </div>
+                                    <i class="bi bi-arrow-left-right text-muted mx-1" style="font-size: 0.8rem;"></i>
+                                    <div class="avatar-small ms-1"
+                                        style="width:24px;height:24px;background-color:{{rel.character_b.color_code}};border-radius:50%;color:white;font-size:0.6rem;display:flex;align-items:center;justify-content:center;">
+                                        {{ rel.character_b.name|slice:":1" }}
+                                    </div>
+                                </div>
+                                <div class="chk-truncate ms-2 flex-grow-1">
+                                    <div class="fw-semibold" style="font-size:0.85rem;">{{
+                                        rel.get_relationship_type_display }}</div>
+                                    <div class="text-muted" style="font-size:0.75rem;">{{ rel.character_a.name }} & {{
+                                        rel.character_b.name }}</div>
+                                </div>
+                                <a href="{% url 'character_detail' rel.character_a.id %}" class="text-muted"><i
+                                        class="bi bi-pencil-square"></i></a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted small">All relationship arcs are resolved.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- 3. Character Whereabouts -->
+            <div class="col-lg-4 mb-4">
+                <div class="dash-card p-4 h-100">
+                    <h5 class="dash-card-header mb-3">Character Whereabouts <small
+                            class="text-muted fw-normal ms-1">(Last Known)</small></h5>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for items in char_locations %}
+                        <div
+                            class="badge bg-white text-dark border p-2 d-flex align-items-center gap-2 rounded-pill fw-normal">
+                            <span class="d-inline-block rounded-circle"
+                                style="width:8px;height:8px;background-color:{{ items.character.color_code }}"></span>
+                            <strong>{{ items.character.name }}:</strong>
+                            <span class="text-muted">{{ items.location }}</span>
+                        </div>
+                        {% empty %}
+                        <p class="text-muted small">No location data available for main characters.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WRITER MODE WIDGETS (Visible by default, hidden when Architect Mode is on) -->
+    <!-- We wrap the existing dashboard columns in this div -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const toggle = document.getElementById('writerModeToggle');
+            const plannerWidgets = document.getElementById('plannerWidgets');
+            const writerWidgets = document.getElementById('writerWidgets');
+            const modeLabel = document.getElementById('modeLabel');
+            const modeIcon = document.getElementById('modeIcon');
+
+            // Initial State: Writer Mode is OFF (Architect View)
+            // But wait, the previous code had specific logic.
+            // Let's refine:
+            // Toggle unchecked = Architect View (Planner widgets visible, Writer widgets hidden?)
+            // Actually, the user wants "Writer Mode" to be the *toggle* state.
+            // So: Unchecked = Architect (Default). Checked = Writer.
+            // Architect View: Shows Timeline Integrity, etc.
+            // Writer View: Shows standard dashboard (Words, Focus, etc).
+
+            // Let's set initial state based on toggle
+            function updateMode() {
+                const isWriterMode = toggle.checked; // If checked, we are in Writer Mode
+
+                if (isWriterMode) {
+                    // WRITER MODE
+                    plannerWidgets.style.display = 'none';
+                    if (writerWidgets) writerWidgets.style.display = 'flex'; // Restore flex for row
+                    modeLabel.textContent = "Writer Focus";
+                    modeIcon.textContent = "✍️";
+                    modeLabel.classList.add('text-primary');
+                } else {
+                    // ARCHITECT MODE
+                    plannerWidgets.style.display = 'block';
+                    if (writerWidgets) writerWidgets.style.display = 'none';
+                    modeLabel.textContent = "Architect View";
+                    modeIcon.textContent = "📐";
+                    modeLabel.classList.remove('text-primary');
+                }
+            }
+
+            toggle.addEventListener('change', updateMode);
+
+            // Run once on load
+            // updateMode(); 
+            // Actually, let's force Architect View by default for this test
+            toggle.checked = false;
+            updateMode();
+        });
+    </script>
+
+    <div class="row g-3" id="writerWidgets">
+        <!-- LEFT COLUMN -->
+        <div class="col-lg-6 draggable-zone" id="col-left">
+
+            <!-- Today’s Focus -->
+            <div class="dash-card dash-pill-card p-3 draggable-card mb-3" id="card-focus">
+                <div class="dash-card-header d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-grip-vertical drag-handle"></i>
+                        Today’s Focus
+                    </div>
+                    <button class="btn btn-link btn-sm text-muted p-0" id="btn-add-focus-task" title="Add manual task">
+                        <i class="bi bi-pencil-square"></i>
+                    </button>
+                </div>
+                <p class="dash-card-sub mb-2">
+                    Click a task once you've finished it.
+                </p>
+                <ul class="dash-list" id="focus-tasks-list">
+                    {% for task in focus_tasks %}
+                    <li class="focus-task-item d-flex align-items-center mb-2" data-task-id="{{ task.id }}">
+                        <i
+                            class="bi {% if task.is_completed %}bi-check-circle-fill text-success{% else %}bi-circle text-muted{% endif %} me-2"></i>
+                        <span class="focus-task-text {% if task.is_completed %}completed{% endif %}">
+                            {{ task.task_text }}
+                        </span>
+                    </li>
+                    {% empty %}
+                    <li class="dash-muted" id="focus-empty-state">Generating your focus for today...</li>
+                    {% endfor %}
+                </ul>
+                <div id="add-focus-task-container" style="display: none;" class="mt-2">
+                    <div class="input-group input-group-sm">
+                        <input type="text" id="input-new-focus-task" class="form-control" placeholder="New task...">
+                        <button class="btn btn-dark" type="button" id="btn-save-focus-task">Add</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats strip -->
+            <div class="dash-card dash-pill-card p-3 draggable-card mb-3" id="card-stats">
+                <div class="dash-card-header d-flex align-items-center">
+                    <i class="bi bi-grip-vertical drag-handle"></i>
+                    Stats
+                </div>
+                <div class="row text-center">
+                    <div class="col-3">
+                        <div class="dash-stat-icon">
+                            <i class="bi bi-book"></i>
+                        </div>
+                        <div class="dash-stat-value">{{ books.count }}</div>
+                        <div class="dash-stat-label">Books</div>
+                    </div>
+                    <div class="col-3">
+                        <div class="dash-stat-icon">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <div class="dash-stat-value">{{ character_count }}</div>
+                        <div class="dash-stat-label">Characters</div>
+                    </div>
+                    <div class="col-3">
+                        <div class="dash-stat-icon">
+                            <i class="bi bi-calendar-event"></i>
+                        </div>
+                        <div class="dash-stat-value">{{ total_events }}</div>
+                        <div class="dash-stat-label">Total Events</div>
+                    </div>
+                    <div class="col-3">
+                        <div class="dash-stat-icon">
+                            <i class="bi bi-journal-text"></i>
+                        </div>
+                        <div class="dash-stat-value">{{ chapters_completed }}</div>
+                        <div class="dash-stat-label">Chapters</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- World at a Glance -->
+            <div class="dash-card dash-pill-card p-3 draggable-card mb-3" id="card-world-glance">
+                <div class="dash-card-header d-flex align-items-center mb-2">
+                    <i class="bi bi-grip-vertical drag-handle"></i>
+                    World at a Glance
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="p-3" style="background-color:#f5f5f5; border-radius:14px;">
+                            <div class="dash-card-header mb-1" style="font-size:0.9rem;">Top overview</div>
+                            <div class="dash-muted">
+                                Books: {{ books.count }}<br>
+                                Characters: {{ character_count }}<br>
+                                Events: {{ total_events }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3" style="background-color:#f5f5f5; border-radius:14px;">
+                            <div class="dash-card-header mb-1" style="font-size:0.9rem;">Gaps &amp; Opportunities</div>
+                            <div class="dash-muted">
+                                Use the timeline to spot chapters with no scenes...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- MIDDLE COLUMN -->
+        <div class="col-lg-3 draggable-zone" id="col-middle">
+
+            <!-- Recent Activity -->
+            <div class="dash-card p-3 draggable-card mb-3" id="card-recent">
+                <div class="dash-card-header d-flex align-items-center">
+                    <i class="bi bi-grip-vertical drag-handle"></i>
+                    Recent Activity
+                </div>
+                <ul class="dash-list">
+                    {% for activity in recent_activity %}
+                    <li>
+                        <strong>{{ activity.get_action_display }}: {{ activity.object_name }}</strong>
+                        <span class="dash-muted">({{ activity.model_name }}) · {{ activity.timestamp|timesince }}
+                            ago</span>
+                    </li>
+                    {% empty %}
+                    <li class="dash-muted">No recent activity found.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Character Spotlight -->
+            {% if spotlight_character %}
+            <div class="dash-card p-3 draggable-card mb-3" id="card-character-spotlight">
+                <div class="dash-card-header d-flex align-items-center mb-2">
+                    <i class="bi bi-grip-vertical drag-handle"></i>
+                    Character Spotlight
+                </div>
+                <div class="d-flex align-items-center mb-3">
+                    <div class="me-3">
+                        {% if spotlight_character.profile_pic_url %}
+                        <img src="{{ spotlight_character.profile_pic_url }}" class="rounded-circle shadow-sm"
+                            style="width: 54px; height: 54px; object-fit: cover;">
+                        {% else %}
+                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center border"
+                            style="width: 54px; height: 54px; font-size: 1.2rem; color: #6b7280;">
+                            {{ spotlight_character.name|first }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <h6 class="mb-0 fw-bold">{{ spotlight_character.name }}</h6>
+                        <small class="text-muted">{{ spotlight_character.get_role_display }}</small>
+                    </div>
+                </div>
+                <div id="spotlight-response-area" class="p-2 bg-light rounded-3 mb-2 small"
+                    style="display:none; min-height: 40px;">
+                    <div id="spotlight-loading" style="display:none;" class="text-center py-1">
+                        <div class="ai-loading-dots"><span></span><span></span><span></span></div>
+                    </div>
+                    <div id="spotlight-text" class="fst-italic text-secondary"></div>
+                </div>
+                <button class="btn btn-sm btn-outline-dark w-100 rounded-pill" id="btn-character-deep-dive"
+                    data-char-id="{{ spotlight_character.id }}">
+                    <i class="bi bi-magic"></i> Deep Dive
+                </button>
+            </div>
+            {% endif %}
+
+            <!-- Relationship Map Sparkline -->
+            <div class="dash-card p-3 draggable-card mb-3" id="card-relationship-sparkline">
+                <div class="dash-card-header d-flex align-items-center mb-2">
+                    <i class="bi bi-grip-vertical drag-handle"></i>
+                    Character Dynamics
+                </div>
+                <ul class="dash-list">
+                    {% for rel in top_relationships %}
+                    <li class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="d-flex align-items-center">
+                            <div class="me-2 fw-semibold" style="font-size: 0.8rem;">
+                                <span>{{ rel.character_a.name }}</span>
+                                <i class="bi bi-arrow-left-right mx-1 text-muted"></i>
+                                <span>{{ rel.character_b.name }}</span>
+                            </div>
+                        </div>
+                        <span class="badge rounded-pill bg-light text-dark border" style="font-size: 0.65rem;">
+                            {{ rel.get_relationship_type_display }}
+                        </span>
+                    </li>
+                    {% empty %}
+                    <li class="dash-muted">No relationships tracked yet.</li>
+                    {% endfor %}
+                </ul>
+                {% if top_relationships %}
+                <div class="mt-2 pt-2 border-top">
+                    <a href="{% url 'relationship_map' %}" class="dash-muted text-decoration-none">
+                        <i class="bi bi-diagram-3 me-1"></i> View relationship map
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="dash-card p-3 draggable-card mb-3" id="card-quick-actions">
+                <div class="dash-card-header d-flex align-items-center mb-2">
+                    <i class="bi bi-grip-vertical drag-handle"></i>
+                    Quick Actions
+                </div>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'event_create' %}" class="btn btn-light dash-quick-btn">New Event</a>
+                    <a href="{% url 'character_create' %}" class="btn btn-light dash-quick-btn">New Character</a>
+                    <a href="{% url 'book_create' %}" class="btn btn-light dash-quick-btn">New Book</a>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div class="col-lg-3 draggable-zone" id="col-right">
+            <div class="draggable-card mb-3" id="card-books">
+                <div class="dash-card-header d-flex align-items-center mb-2">
+                    <i class="bi bi-grip-vertical drag-handle"></i>
+                    Your Books
+                </div>
+                {% if books %}
+                {% for book in books|slice:":4" %}
+                <div class="dash-book-mini">
+                    <div class="d-flex align-items-center mb-2">
+                        {% if book.image %}
+                        <img src="{{ book.image.url }}" alt="{{ book.title }} Cover"
+                            style="height: 48px; width: 36px; object-fit: cover; margin-right: 12px; border-radius: 6px;">
+                        {% else %}
+                        <img src="{% static 'img/book-cover.png' %}" alt="No Cover"
+                            style="height: 48px; width: 36px; object-fit: cover; margin-right: 12px; border-radius: 6px;">
+                        {% endif %}
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="dash-book-title">Book {{ book.series_order }}: {{ book.title }}</div>
+                                <span
+                                    class="dash-status-pill badge {% if book.status|lower == 'importing' %}bg-info{% elif book.status|lower == 'drafting' %}bg-warning text-dark{% elif book.status|lower == 'complete' or book.status|lower == 'published' %}bg-success{% elif book.status|lower == 'editing' %}bg-primary{% else %}bg-secondary{% endif %}">
+                                    {{ book.get_status_display }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dash-muted mb-2" style="font-size: 0.75rem; line-height: 1.4;">
+                        <div><i class="bi bi-files me-1"></i> {{ book.chapter_count|default:"0" }} Chapters</div>
+                        <div><i class="bi bi-pencil-square me-1"></i> {{ book.current_word_count|default:"0" }} Words
+                        </div>
+                        <div><i class="bi bi-people me-1"></i> {{ book.book_character_count|default:"0" }} Characters
+                        </div>
+                    </div>
+                    <div class="dash-progress-bg mb-2">
+                        <div class="dash-progress-fill js-progress-bar"
+                            style="height: 100%; border-radius: 999px; background-color: {% if book.status|lower == 'importing' %}#0dcaf0{% elif book.status|lower == 'drafting' %}#ffc107{% elif book.status|lower == 'complete' or book.status|lower == 'published' %}#198754{% elif book.status|lower == 'editing' %}#0d6efd{% else %}#6c757d{% endif %} !important; width: {% if book.status|lower == 'published' or book.status|lower == 'complete' %}100%{% elif book.progress_percentage|add:0 < 10 and book.status|lower != 'planning' %}10%{% else %}{{ book.progress_percentage }}%{% endif %} !important;">
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="dash-card p-3">
+                    <p class="dash-muted mb-2">No books yet.</p>
+                    <a href="{% url 'book_create' %}" class="btn btn-dark btn-sm w-100">New Book</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div> <!-- End writerWidgets -->
+
+</div>
+
+<!-- AI Support -->
+<div class="row g-3 mb-3">
+    <div class="col-12 draggable-zone" id="col-bottom">
+
+        <!-- Inspiration Mood Board -->
+        <div class="dash-card dash-pill-card p-3 draggable-card mb-3" id="card-mood-board">
+            <div class="dash-card-header d-flex align-items-center mb-2">
+                <i class="bi bi-grip-vertical drag-handle"></i>
+                Inspiration Mood Board
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                {% for element in mood_elements %}
+                {% if element.type == 'tag' %}
+                <div class="p-2 rounded-3 border"
+                    style="background-color: {{ element.color }}15; border-color: {{ element.color }}; flex: 1 1 auto;">
+                    <span class="badge" style="background-color: {{ element.color }};">Theme/Loc</span>
+                    <div class="mt-1 fw-bold" style="font-size: 0.9rem;">{{ element.content }}</div>
+                </div>
+                {% elif element.type == 'event' %}
+                <div class="p-2 rounded-3 border bg-white"
+                    style="border-style: dashed; flex: 1 1 auto; border-color: #6366f1;">
+                    <span class="badge bg-primary">Key Event</span>
+                    <div class="mt-1 fw-bold" style="font-size: 0.9rem;">{{ element.content }}</div>
+                </div>
+                {% elif element.type == 'motivation' %}
+                <div class="p-2 rounded-3 border bg-light shadow-sm" style="flex: 2 1 100%;">
+                    <span class="badge bg-secondary">Motivation: {{ element.char }}</span>
+                    <div class="mt-1 fst-italic" style="font-size: 0.85rem;">"{{ element.content|truncatechars:100
+                        }}"
+                    </div>
+                </div>
+                {% endif %}
+                {% empty %}
+                <div class="dash-muted">Add more characters, events, or tags to see inspiration here.</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="dash-card dash-pill-card p-3 draggable-card" id="card-ai">
+            <div class="dash-card-header d-flex align-items-center mb-1">
+                <i class="bi bi-grip-vertical drag-handle"></i>
+                Story Support
+            </div>
+            <p class="dash-muted mb-3">How can I help you with your story today?</p>
+            <div class="d-flex align-items-center gap-2">
+                <input type="text" class="dash-ai-input" id="ai-query" placeholder="I need help with…">
+                <div class="dash-ai-icon" id="ai-submit"><i class="bi bi-chat-dots"></i></div>
+            </div>
+
+            <div id="ai-response-area" class="dash-ai-response-container">
+                <div id="ai-loading" style="display: none;" class="text-center py-2">
+                    <div class="ai-loading-dots"><span></span><span></span><span></span></div>
+                </div>
+                <div id="ai-text" class="markdown-content"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialize Progress Bars
+        document.querySelectorAll('.js-progress-bar').forEach(bar => {
+            const width = bar.getAttribute('data-width');
+            if (width) bar.style.width = width;
+        });
+
+        const columns = ['col-left', 'col-middle', 'col-right', 'col-bottom'];
+        const sortables = [];
+
+        // Function to save the order to localStorage
+        function saveLayout() {
+            const layout = {};
+            columns.forEach(colId => {
+                const col = document.getElementById(colId);
+                layout[colId] = Array.from(col.children).map(child => child.id);
+            });
+            localStorage.setItem('dashboard-layout', JSON.stringify(layout));
+        }
+
+        // Function to load and apply the saved order
+        function loadLayout() {
+            const savedLayout = localStorage.getItem('dashboard-layout');
+            if (savedLayout) {
+                const layout = JSON.parse(savedLayout);
+                Object.keys(layout).forEach(colId => {
+                    const col = document.getElementById(colId);
+                    if (col) {
+                        layout[colId].forEach(cardId => {
+                            const card = document.getElementById(cardId);
+                            if (card) col.appendChild(card);
+                        });
+                    }
+                });
+            }
+        }
+
+        // Initialize Sortable for each column
+        columns.forEach(colId => {
+            const el = document.getElementById(colId);
+            if (el) {
+                sortables.push(new Sortable(el, {
+                    group: 'dashboard',
+                    animation: 250,
+                    ghostClass: 'sortable-ghost',
+                    handle: '.drag-handle',
+                    onEnd: saveLayout
+                }));
+            }
+        });
+
+        // --- Widget Visibility Logic ---
+        const toggles = document.querySelectorAll('.widget-toggle');
+
+        function saveVisibility() {
+            const visibility = {};
+            toggles.forEach(box => {
+                visibility[box.dataset.cardId] = box.checked;
+            });
+            localStorage.setItem('dashboard-visibility', JSON.stringify(visibility));
+        }
+
+        function applyVisibility() {
+            const savedVisibility = localStorage.getItem('dashboard-visibility');
+            if (savedVisibility) {
+                const visibility = JSON.parse(savedVisibility);
+                toggles.forEach(box => {
+                    const cardId = box.dataset.cardId;
+                    if (visibility.hasOwnProperty(cardId)) {
+                        box.checked = visibility[cardId];
+                        const card = document.getElementById(cardId);
+                        if (card) {
+                            card.style.display = visibility[cardId] ? 'block' : 'none';
+                        }
+                    }
+                });
+            }
+        }
+
+        toggles.forEach(box => {
+            box.addEventListener('change', () => {
+                const card = document.getElementById(box.dataset.cardId);
+                if (card) {
+                    card.style.display = box.checked ? 'block' : 'none';
+                }
+                saveVisibility();
+            });
+        });
+
+        // Load existing layout and visibility
+        loadLayout();
+        applyVisibility();
+
+        // Reset functionality
+        document.getElementById('reset-layout').addEventListener('click', () => {
+            if (confirm('Are you sure you want to reset your dashboard layout?')) {
+                localStorage.removeItem('dashboard-layout');
+                localStorage.removeItem('dashboard-visibility');
+                window.location.reload();
+            }
+        });
+
+        // AI Consultant Logic
+        const aiInput = document.getElementById('ai-query');
+        const aiSubmit = document.getElementById('ai-submit');
+        const aiResponseArea = document.getElementById('ai-response-area');
+        const aiLoading = document.getElementById('ai-loading');
+        const aiText = document.getElementById('ai-text');
+
+        function submitAIQuery() {
+            const query = aiInput.value.trim();
+            if (!query) return;
+
+            // UI State
+            aiResponseArea.style.display = 'block';
+            aiLoading.style.display = 'block';
+            aiText.innerHTML = '';
+            aiInput.disabled = true;
+
+            fetch('{% url "api_ai_consultant" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ query: query })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    aiLoading.style.display = 'none';
+                    aiInput.disabled = false;
+
+                    if (data.status === 'success') {
+                        // Simple formatting for now - we could add a markdown renderer if needed
+                        aiText.innerHTML = data.response.replace(/\n/g, '<br>');
+                    } else {
+                        aiText.innerHTML = `<span class="text-danger">Error: ${data.message}</span>`;
+                    }
+                })
+                .catch(error => {
+                    aiLoading.style.display = 'none';
+                    aiInput.disabled = false;
+                    aiText.innerHTML = `<span class="text-danger">Failed to connect to AI consultant.</span>`;
+                    console.error('Error:', error);
+                });
+        }
+
+        aiSubmit.addEventListener('click', submitAIQuery);
+        aiInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') submitAIQuery();
+        });
+
+        // Character Spotlight Deep Dive
+        const spotlightBtn = document.getElementById('btn-character-deep-dive');
+        const spotlightArea = document.getElementById('spotlight-response-area');
+        const spotlightLoading = document.getElementById('spotlight-loading');
+        const spotlightText = document.getElementById('spotlight-text');
+
+        if (spotlightBtn) {
+            spotlightBtn.addEventListener('click', function () {
+                const charId = this.dataset.charId;
+
+                spotlightArea.style.display = 'block';
+                spotlightLoading.style.display = 'block';
+                spotlightText.innerText = '';
+                spotlightBtn.disabled = true;
+
+                fetch('{% url "api_character_deep_dive" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({ character_id: charId })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        spotlightLoading.style.display = 'none';
+                        spotlightBtn.disabled = false;
+                        if (data.status === 'success') {
+                            spotlightText.innerText = data.response;
+                        } else {
+                            spotlightText.innerHTML = `<span class="text-danger small">Error generating deep dive.</span>`;
+                        }
+                    })
+                    .catch(error => {
+                        spotlightLoading.style.display = 'none';
+                        spotlightBtn.disabled = false;
+                        spotlightText.innerHTML = `<span class="text-danger small">Connection failed.</span>`;
+                        console.error('Error:', error);
+                    });
+            });
+        }
+
+        // Focus Task Logic (AI + Manual)
+        const btnAddFocusTask = document.getElementById('btn-add-focus-task');
+        const addTaskContainer = document.getElementById('add-focus-task-container');
+        const inputNewFocusTask = document.getElementById('input-new-focus-task');
+        const btnSaveFocusTask = document.getElementById('btn-save-focus-task');
+        const focusTasksList = document.getElementById('focus-tasks-list');
+        const focusEmptyState = document.getElementById('focus-empty-state');
+
+        if (btnAddFocusTask) {
+            btnAddFocusTask.addEventListener('click', () => {
+                const isHidden = addTaskContainer.style.display === 'none';
+                addTaskContainer.style.display = isHidden ? 'block' : 'none';
+                if (isHidden) inputNewFocusTask.focus();
+            });
+
+            btnSaveFocusTask.addEventListener('click', saveManualTask);
+            inputNewFocusTask.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') saveManualTask();
+            });
+        }
+
+        function saveManualTask() {
+            const taskText = inputNewFocusTask.value.trim();
+            if (!taskText) return;
+
+            fetch('/api/ai/focus-tasks/add/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ task_text: taskText })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const li = document.createElement('li');
+                        li.className = 'focus-task-item d-flex align-items-center mb-2';
+                        li.dataset.taskId = data.task.id;
+                        li.innerHTML = `
+                            <i class="bi bi-circle text-muted me-2"></i>
+                            <span class="focus-task-text">${data.task.task_text}</span>
+                        `;
+                        li.addEventListener('click', function () { toggleTaskStatus(this); });
+
+                        focusTasksList.appendChild(li);
+                        if (focusEmptyState) focusEmptyState.remove();
+
+                        inputNewFocusTask.value = '';
+                        addTaskContainer.style.display = 'none';
+                    }
+                });
+        }
+
+        function toggleTaskStatus(item) {
+            const taskId = item.dataset.taskId;
+            const icon = item.querySelector('i');
+            const text = item.querySelector('.focus-task-text');
+
+            fetch(`/api/ai/focus-tasks/${taskId}/toggle/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        if (data.is_completed) {
+                            icon.classList.replace('bi-circle', 'bi-check-circle-fill');
+                            icon.classList.replace('text-muted', 'text-success');
+                            text.classList.add('completed');
+                        } else {
+                            icon.classList.replace('bi-check-circle-fill', 'bi-circle');
+                            icon.classList.replace('text-success', 'text-muted');
+                            text.classList.remove('completed');
+                        }
+                    }
+                });
+        }
+
+        document.querySelectorAll('.focus-task-item').forEach(item => {
+            item.addEventListener('click', function () {
+                toggleTaskStatus(this);
+            });
+        });
+    });
+</script>
+{% endblock %}

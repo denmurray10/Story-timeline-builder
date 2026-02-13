@@ -161,6 +161,103 @@ def dashboard(request):
     return render(request, 'timeline/dashboard.html', context)
 
 
+@login_required
+def dashboard_test(request):
+    """
+    Experimental dashboard with 'Writer Mode' and advanced tracking.
+    """
+    # --- Existing Logic (Cloned) ---
+    books = Book.objects.filter(user=request.user).annotate(
+        chapter_count=Count('chapters', distinct=True),
+        event_count=Count('events', distinct=True),
+        book_character_count=Count('events__characters', distinct=True)
+    )
+    
+    characters = Character.objects.filter(user=request.user, is_active=True)
+    total_events = Event.objects.filter(user=request.user).count()
+    events_written = Event.objects.filter(user=request.user, is_written=True).count()
+    
+    recent_activity = ActivityLog.objects.filter(user=request.user).order_by('-timestamp')[:5]
+    today = timezone.localdate()
+    
+    chapters_completed = Chapter.objects.filter(book__user=request.user).count()
+    focus_tasks = AIFocusTask.objects.filter(user=request.user, created_at__date=today)
+    
+    if not focus_tasks.exists():
+        generate_daily_focus_tasks(request.user)
+        focus_tasks = AIFocusTask.objects.filter(user=request.user, created_at__date=today)
+    else:
+        auto_sense_focus_tasks(request.user, focus_tasks)
+    
+    # Spotlight & Mood Board (Simplified clone)
+    import random
+    spotlight_character = None
+    if characters.exists():
+        seed_value = int(today.strftime('%Y%m%d'))
+        random.seed(seed_value)
+        spotlight_character = random.choice(list(characters))
+        random.seed()
+        
+    top_relationships = CharacterRelationship.objects.filter(user=request.user).order_by('-strength')[:4]
+    
+    mood_elements = []
+    random_tag = Tag.objects.filter(user=request.user).order_by('?').first()
+    if random_tag:
+        mood_elements.append({'type': 'tag', 'content': random_tag.name, 'color': random_tag.color})
+        
+    # --- NEW: Timeline Integrity Data ---
+    # 1. Fuzzy Dates
+    fuzzy_events = Event.objects.filter(user=request.user, date_type='fuzzy')
+    # 2. Missing Locations
+    missing_loc_events = Event.objects.filter(user=request.user, location='').exclude(title__icontains='chapter') # Exclude potential placeholders
+    # 3. No Description
+    empty_desc_events = Event.objects.filter(user=request.user, description='')
+
+    integrity_issues = []
+    for e in fuzzy_events[:3]:
+        integrity_issues.append({'type': 'fuzzy_date', 'event': e, 'msg': 'Fuzzy Date'})
+    for e in missing_loc_events[:3]:
+        integrity_issues.append({'type': 'missing_loc', 'event': e, 'msg': 'Missing Location'})
+    if not integrity_issues and empty_desc_events.exists():
+         for e in empty_desc_events[:3]:
+            integrity_issues.append({'type': 'empty_desc', 'event': e, 'msg': 'No Description'})
+
+    # --- NEW: Open Loop Tracker ---
+    # Unresolved Relationships
+    unresolved_rels = CharacterRelationship.objects.filter(
+        user=request.user, 
+        relationship_status__in=['unresolved', 'estranged']
+    )[:5]
+    
+    # --- NEW: Character Whereabouts ---
+    # Get last event for each main character (Protagonist/Antagonist)
+    main_chars = Character.objects.filter(user=request.user, role__in=['protagonist', 'antagonist'])
+    char_locations = []
+    for char in main_chars:
+        last_event = char.events.order_by('-chronological_order').first()
+        if last_event and last_event.location:
+             char_locations.append({'character': char, 'location': last_event.location, 'event': last_event})
+
+    context = {
+        'books': books,
+        'character_count': characters.count(),
+        'total_events': total_events,
+        'events_written': events_written,
+        'chapters_completed': chapters_completed,
+        'recent_activity': recent_activity,
+        'focus_tasks': focus_tasks,
+        'spotlight_character': spotlight_character,
+        'top_relationships': top_relationships,
+        'mood_elements': mood_elements,
+        # New Context
+        'integrity_issues': integrity_issues,
+        'unresolved_rels': unresolved_rels,
+        'char_locations': char_locations,
+        'is_test_dashboard': True
+    }
+    return render(request, 'timeline/dashboard_test.html', context)
+
+
 def generate_daily_focus_tasks(user):
     """Helper to generate 3 focus tasks for the user using AI."""
     # 1. Gather context
