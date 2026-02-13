@@ -590,8 +590,7 @@
                 <li class="d-flex justify-content-between align-items-center mb-2">
                     <div class="d-flex align-items-center">
                         <div class="me-2 fw-semibold" style="font-size: 0.8rem;">
-                            {{ rel.character_a.name }} <i class="bi bi-arrow-left-right mx-1 text-muted"></i> {{
-                            rel.character_b.name }}
+                            {{ rel.character_a.name }} <i class="bi bi-arrow-left-right mx-1 text-muted"></i> {{ rel.character_b.name }}
                         </div>
                     </div>
                     <span class="badge rounded-pill bg-light text-dark border" style="font-size: 0.65rem;">
@@ -651,7 +650,11 @@
                         </div>
                     </div>
                 </div>
-                <div class="dash-muted mb-2">Chapters {{ book.chapter_count|default:"0" }}</div>
+                <div class="dash-muted mb-2" style="font-size: 0.75rem; line-height: 1.4;">
+                    <div><i class="bi bi-files me-1"></i> {{ book.chapter_count|default:"0" }} Chapters</div>
+                    <div><i class="bi bi-pencil-square me-1"></i> {{ book.current_word_count|default:"0" }} Words</div>
+                    <div><i class="bi bi-people me-1"></i> {{ book.book_character_count|default:"0" }} Characters</div>
+                </div>
                 <div class="dash-progress-bg mb-2">
                     <div class="dash-progress-fill js-progress-bar" data-width="{{ book.progress_percentage }}%">
                     </div>

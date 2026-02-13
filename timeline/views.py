@@ -84,8 +84,9 @@ def home_preview(request):
 def dashboard(request):
     """Main dashboard showing overview of all projects."""
     books = Book.objects.filter(user=request.user).annotate(
-        chapter_count=Count('chapters'),
-        event_count=Count('events')
+        chapter_count=Count('chapters', distinct=True),
+        event_count=Count('events', distinct=True),
+        book_character_count=Count('events__characters', distinct=True)
     )
     
     characters = Character.objects.filter(user=request.user, is_active=True)
