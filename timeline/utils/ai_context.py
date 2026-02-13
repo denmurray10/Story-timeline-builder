@@ -87,6 +87,8 @@ class ContextResolver:
                     info += f". Desc: {desc}"
                 if obj.motivation:
                      info += f". Motive: {obj.motivation[:100]}"
+                if obj.traits:
+                     info += f". Traits: {obj.traits[:100]}"
                 context_lines.append(info)
             
             elif isinstance(obj, WorldEntry):
