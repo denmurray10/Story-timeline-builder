@@ -1550,11 +1550,14 @@ def api_ai_consultant(request):
         relevant_context = resolver.get_context_for_query(user_query, scene_content)
         
         context = "You are a professional Story Consultant. "
-        context += "Here is the relevant context from the user's story bible (Characters, Locations, Lore):\n"
+        context += "Here is the relevant context from the user's story bible (Characters, Locations, Lore, Relationships, and Deep Analysis):\n"
         context += relevant_context
         
         context += f"\n\nUSER QUESTION: {user_query}\n"
-        context += "\nPlease provide creative, helpful, and insightful feedback based on this context. Keep it concise. "
+        context += "\nINSTRUCTIONS: Provide creative, helpful, and insightful feedback based ONLY on the provided context. "
+        context += "Synthesise the 'Deep Insights' (which contain AI-reasoned character dynamics and scene summaries) with the basic 'Character Profiles' to give a nuanced answer. "
+        context += "If the answer is not in the context, say you don't know rather than inventing new characters or facts. "
+        context += "Do NOT hallucinate names or backstories. "
         context += "Use UK English spelling and grammar (e.g., 'colour', 'organise', 'centre')."
 
         # 2. Call AI Provider
@@ -1919,7 +1922,12 @@ def api_relationship_data(request):
             'visibility': rel.visibility,
             'conflict_source': rel.conflict_source,
             'character_a_wants': rel.character_a_wants,
-            'character_b_wants': rel.character_b_wants
+            'character_b_wants': rel.character_b_wants,
+            'first_impression': rel.first_impression,
+            'shared_secret': rel.shared_secret,
+            'vulnerability': rel.vulnerability,
+            'major_shared_moments': rel.major_shared_moments,
+            'predictability': rel.predictability
         })
         
     return JsonResponse({'nodes': nodes, 'edges': edges})
@@ -1975,6 +1983,11 @@ def api_manage_relationship(request):
                 rel.conflict_source = conflict
                 rel.character_a_wants = a_wants
                 rel.character_b_wants = b_wants
+                rel.first_impression = data.get('first_impression', rel.first_impression)
+                rel.shared_secret = data.get('shared_secret', rel.shared_secret)
+                rel.vulnerability = data.get('vulnerability', rel.vulnerability)
+                rel.major_shared_moments = data.get('major_shared_moments', rel.major_shared_moments)
+                rel.predictability = data.get('predictability', rel.predictability)
                 rel.save()
             else:
                 # Create new (check duplicates first)
@@ -1995,7 +2008,12 @@ def api_manage_relationship(request):
                     visibility=visibility,
                     conflict_source=conflict,
                     character_a_wants=a_wants,
-                    character_b_wants=b_wants
+                    character_b_wants=b_wants,
+                    first_impression=data.get('first_impression', ''),
+                    shared_secret=data.get('shared_secret', ''),
+                    vulnerability=data.get('vulnerability', ''),
+                    major_shared_moments=data.get('major_shared_moments', ''),
+                    predictability=data.get('predictability', 5)
                 )
                 
             return JsonResponse({'status': 'success', 'id': rel.id})
@@ -2131,53 +2149,9 @@ def api_suggest_relationship(request):
             )
 
         # 3. Final Synthesis Pass (JSON Extraction)
-        final_prompt = f"""
-        Synthesize the full relationship profile between {char_a.name} and {char_b.name} based on these three chronological summaries of their interactions.
+        ai_response = _perform_relationship_analysis(char_a, char_b, book, interaction_summaries, snapshots_hash, h_a, h_b)
         
-        Character A: {char_a.name} | Role: {char_a.get_role_display()} | Traits: {char_a.traits} | Motivation: {char_a.motivation}
-        Character B: {char_b.name} | Role: {char_b.get_role_display()} | Traits: {char_b.traits} | Motivation: {char_b.motivation}
-
-        INTERACTION SUMMARIES:
-        1: {interaction_summaries[0] if len(interaction_summaries) > 0 else "N/A"}
-        2: {interaction_summaries[1] if len(interaction_summaries) > 1 else "N/A"}
-        3: {interaction_summaries[2] if len(interaction_summaries) > 2 else "N/A"}
-        
-        Return the final Relationship JSON:
-        {{
-            "type": "...",  (friend, ally, enemy, romantic, family, professional, rival, mentor, neutral)
-            "description": "...", (Detailed narrative summary)
-            "strength": 5, (1-10)
-            "trust_level": 5, (1-10)
-            "power_dynamic": "...", (balanced, a_dominant, or b_dominant)
-            "relationship_status": "...", (active, estranged, deceased, unresolved)
-            "visibility": "...", (public, secret, rumored)
-            "conflict_source": "...", (underlying tension)
-            "character_a_wants": "...", 
-            "character_b_wants": "...", 
-            "evolution": "...", (Narrative arc across the book)
-            "shared_secret": "...", 
-            "first_impression": "...", 
-            "vulnerability": "...", 
-            "major_shared_moments": "...", (Highlight moments from all three parts)
-            "predictability": 5 (1-10)
-        }}
-        """
-        
-        ai_response = _call_ai_json(final_prompt, deepseek_model="deepseek-reasoner")
-
-        # Save to Final Result Cache
-        if ai_response:
-            RelationshipAnalysisCache.objects.update_or_create(
-                character_a=char_a,
-                character_b=char_b,
-                defaults={
-                    'full_json': ai_response,
-                    'char_a_metadata_hash': h_a,
-                    'char_b_metadata_hash': h_b,
-                    'interaction_snapshots_hash': snapshots_hash,
-                    'book': book
-                }
-            )
+        return JsonResponse({'status': 'success', 'suggestion': ai_response})
         
         return JsonResponse({'status': 'success', 'suggestion': ai_response})
 
@@ -2416,17 +2390,90 @@ def _ensure_relationship_cache(char_a, char_b, book):
             )
 
         # 3. Final Synthesis
-        final_prompt = f"Synthesize relationship between {char_a.name} and {char_b.name}..."
-        ai_response = _call_ai_json(final_prompt, deepseek_model="deepseek-reasoner")
-
-        if ai_response:
-            RelationshipAnalysisCache.objects.update_or_create(
-                character_a=char_a, character_b=char_b,
-                defaults={
-                    'full_json': ai_response,
-                    'char_a_metadata_hash': h_a, 'char_b_metadata_hash': h_b,
-                    'interaction_snapshots_hash': snapshots_hash, 'book': book
-                }
-            )
+        _perform_relationship_analysis(char_a, char_b, book, interaction_summaries, snapshots_hash, h_a, h_b)
     except Exception as e:
-        print(f"Deep Scan error for pair: {e}")
+        print(f"Deep Scan error for pair {char_a.name}/{char_b.name}: {e}")
+
+def _perform_relationship_analysis(char_a, char_b, book, interaction_summaries, snapshots_hash, h_a, h_b):
+    """
+    Standardised synthesis pass. Populates cache AND mirrors data to CharacterRelationship.
+    """
+    final_prompt = f"""
+    Synthesize the full relationship profile between {char_a.name} and {char_b.name} based on three chronological summaries.
+    
+    Character A: {char_a.name} | Traits: {char_a.traits} | Motivation: {char_a.motivation}
+    Character B: {char_b.name} | Traits: {char_b.traits} | Motivation: {char_b.motivation}
+
+    INTERACTION SUMMARIES:
+    1: {interaction_summaries[0] if len(interaction_summaries) > 0 else "N/A"}
+    2: {interaction_summaries[1] if len(interaction_summaries) > 1 else "N/A"}
+    3: {interaction_summaries[2] if len(interaction_summaries) > 2 else "N/A"}
+    
+    Return Relationship JSON:
+    {{
+        "type": "...",  (friend, ally, enemy, romantic, family, professional, rival, mentor, neutral)
+        "description": "...", (Detailed narrative summary)
+        "strength": 5, (1-10)
+        "trust_level": 5, (1-10)
+        "power_dynamic": "...", (balanced, a_dominant, b_dominant)
+        "relationship_status": "...", (active, estranged, deceased, unresolved)
+        "visibility": "...", (public, secret, rumored)
+        "conflict_source": "...", 
+        "character_a_wants": "...", 
+        "character_b_wants": "...", 
+        "evolution": "...", (Narrative arc)
+        "shared_secret": "...", 
+        "first_impression": "...", 
+        "vulnerability": "...", 
+        "major_shared_moments": "...",
+        "predictability": 5 (1-10)
+    }}
+    """
+    
+    ai_response = _call_ai_json(final_prompt, deepseek_model="deepseek-reasoner")
+
+    if ai_response:
+        # Flatten if nested under 'analysis' key
+        if 'analysis' in ai_response and isinstance(ai_response['analysis'], dict):
+            ai_response = ai_response['analysis']
+            
+        # 1. Update Cache
+        RelationshipAnalysisCache.objects.update_or_create(
+            character_a=char_a, character_b=char_b,
+            defaults={
+                'full_json': ai_response,
+                'char_a_metadata_hash': h_a, 'char_b_metadata_hash': h_b,
+                'interaction_snapshots_hash': snapshots_hash, 'book': book
+            }
+        )
+
+        # 2. Mirror/Sync to permanent record
+        rel, created = CharacterRelationship.objects.get_or_create(
+            user=char_a.user,
+            character_a=char_a,
+            character_b=char_b,
+            defaults={'relationship_type': ai_response.get('type', 'neutral')}
+        )
+        
+        # Smart Sync: Update if AI found significant depth (strength >= existing)
+        ai_strength = ai_response.get('strength', 5)
+        if ai_strength >= rel.strength or created:
+            rel.relationship_type = ai_response.get('type', rel.relationship_type)
+            rel.description = ai_response.get('description', rel.description)
+            rel.strength = ai_strength
+            rel.trust_level = ai_response.get('trust_level', rel.trust_level)
+            rel.power_dynamic = ai_response.get('power_dynamic', rel.power_dynamic)
+            rel.relationship_status = ai_response.get('relationship_status', rel.relationship_status)
+            rel.visibility = ai_response.get('visibility', rel.visibility)
+            rel.conflict_source = ai_response.get('conflict_source', rel.conflict_source)
+            rel.character_a_wants = ai_response.get('character_a_wants', rel.character_a_wants)
+            rel.character_b_wants = ai_response.get('character_b_wants', rel.character_b_wants)
+            rel.evolution = ai_response.get('evolution', rel.evolution)
+            rel.shared_secret = ai_response.get('shared_secret', rel.shared_secret)
+            rel.first_impression = ai_response.get('first_impression', rel.first_impression)
+            rel.vulnerability = ai_response.get('vulnerability', rel.vulnerability)
+            rel.major_shared_moments = ai_response.get('major_shared_moments', rel.major_shared_moments)
+            rel.predictability = ai_response.get('predictability', rel.predictability)
+            rel.save()
+
+    return ai_response

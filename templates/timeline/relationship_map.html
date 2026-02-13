@@ -114,6 +114,61 @@
         height: 12px;
         border-radius: 50%;
     }
+
+    /* Filter Bar Area */
+    .filter-bar {
+        background: #f8fafc;
+        padding: 12px 18px;
+        border-radius: var(--radius);
+        margin-bottom: 20px;
+        border: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .filter-pill {
+        padding: 4px 12px;
+        border-radius: 999px;
+        background: #fff;
+        border: 1px solid #cbd5e1;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        user-select: none;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .filter-pill:hover {
+        border-color: #64748b;
+        background: #f1f5f9;
+    }
+
+    .filter-pill.active {
+        background: #1e293b;
+        color: #fff;
+        border-color: #1e293b;
+    }
+
+    .filter-pill.active .pill-icon {
+        color: #94a3b8;
+    }
+
+    .search-input {
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        padding: 4px 10px;
+        font-size: 0.85rem;
+        outline: none;
+        min-width: 150px;
+    }
+
+    .search-input:focus {
+        border-color: #1e293b;
+    }
 </style>
 {% endblock %}
 
@@ -170,6 +225,17 @@
     <div class="text-muted small">
         <i class="bi bi-info-circle"></i> <b>Tip:</b> Click a relationship line (edge) to edit the connection.
     </div>
+</div>
+
+<div class="filter-bar shadow-sm">
+    <span class="text-muted small fw-bold text-uppercase me-2"><i class="bi bi-filter"></i> Filter:</span>
+    <input type="text" class="search-input" id="filter-search" placeholder="Search character...">
+    <div id="filter-pills" class="d-flex flex-wrap gap-2">
+        <!-- JS will populate these -->
+    </div>
+    <button class="btn btn-sm btn-link text-decoration-none text-muted" id="btn-clear-filter" style="display: none;">
+        Clear All
+    </button>
 </div>
 
 <div class="row g-4">
@@ -634,6 +700,98 @@
 
                 const network = new vis.Network(container, data, options);
 
+                // --- FILTER LOGIC ---
+                const filterPillsContainer = document.getElementById('filter-pills');
+                const filterSearch = document.getElementById('filter-search');
+                const btnClearFilter = document.getElementById('btn-clear-filter');
+                let activeFilters = new Set();
+
+                // Store original sets for quick reference
+                const originalNodes = JSON.parse(JSON.stringify(data.nodes));
+                const originalEdges = JSON.parse(JSON.stringify(data.edges));
+
+                function populateFilterPills() {
+                    filterPillsContainer.innerHTML = '';
+                    originalNodes.sort((a, b) => a.label.localeCompare(b.label)).forEach(node => {
+                        const pill = document.createElement('div');
+                        pill.className = 'filter-pill';
+                        pill.innerHTML = `<span class="pill-icon"><i class="bi bi-person"></i></span> ${node.label}`;
+                        pill.dataset.id = node.id;
+                        pill.onclick = () => toggleFilter(node.id);
+                        filterPillsContainer.appendChild(pill);
+                    });
+                }
+
+                function applyFilter() {
+                    if (activeFilters.size === 0) {
+                        network.setData({ nodes: originalNodes, edges: originalEdges });
+                        btnClearFilter.style.display = 'none';
+                    } else {
+                        // Filter nodes: include explicitly selected nodes
+                        // or nodes connected to selected nodes (to show their relationships)
+                        const filteredNodes = originalNodes.filter(n => {
+                            const isMatched = activeFilters.has(n.id);
+                            // If we want to show ONLY connections between selected, stop here.
+                            // But usually, if I select "Leo", I want to see Leo and everyone he connects to.
+                            if (isMatched) return true;
+
+                            // Check if this node is connected to any active filter node
+                            return originalEdges.some(e =>
+                                (e.from === n.id && activeFilters.has(e.to)) ||
+                                (e.to === n.id && activeFilters.has(e.from))
+                            );
+                        });
+
+                        // Filter edges: must have at least one end in the active filters
+                        const filteredEdges = originalEdges.filter(e =>
+                            activeFilters.has(e.from) || activeFilters.has(e.to)
+                        );
+
+                        network.setData({ nodes: filteredNodes, edges: filteredEdges });
+                        btnClearFilter.style.display = 'inline-block';
+                    }
+
+                    // Update Pill UI
+                    const pills = filterPillsContainer.querySelectorAll('.filter-pill');
+                    pills.forEach(p => {
+                        if (activeFilters.has(parseInt(p.dataset.id))) {
+                            p.classList.add('active');
+                        } else {
+                            p.classList.remove('active');
+                        }
+                    });
+                }
+
+                function toggleFilter(nodeId) {
+                    const id = parseInt(nodeId);
+                    if (activeFilters.has(id)) {
+                        activeFilters.delete(id);
+                    } else {
+                        activeFilters.add(id);
+                    }
+                    applyFilter();
+                }
+
+                filterSearch.oninput = function () {
+                    const term = this.value.toLowerCase();
+                    const pills = filterPillsContainer.querySelectorAll('.filter-pill');
+                    pills.forEach(p => {
+                        const label = p.innerText.toLowerCase();
+                        p.style.display = label.includes(term) ? 'flex' : 'none';
+                    });
+                };
+
+                btnClearFilter.onclick = function () {
+                    activeFilters.clear();
+                    applyFilter();
+                    filterSearch.value = '';
+                    const pills = filterPillsContainer.querySelectorAll('.filter-pill');
+                    pills.forEach(p => p.style.display = 'flex');
+                };
+
+                // Initial build
+                populateFilterPills();
+
                 // const relModal = new bootstrap.Modal(document.getElementById('relationshipModal')); // Removed
                 const overlay = document.getElementById('relationship-overlay');
                 const overlayTitle = document.getElementById('overlayTitle');
@@ -918,34 +1076,53 @@
                                     
                                     <h5 class="mb-1 fw-bold text-dark">${edge.label}</h5>
                                     <p class="small text-muted mb-3">
-                                        Between <a href="/timeline/characters/${charA.id}/" class="text-decoration-none fw-bold text-dark">${charA.label}</a> 
-                                        & <a href="/timeline/characters/${charB.id}/" class="text-decoration-none fw-bold text-dark">${charB.label}</a>
+                                        Between <a href="/characters/${charA.id}/" class="text-decoration-none fw-bold text-dark">${charA.label}</a> 
+                                        & <a href="/characters/${charB.id}/" class="text-decoration-none fw-bold text-dark">${charB.label}</a>
                                     </p>
                                     
                                     <div class="d-flex gap-2 justify-content-center mb-4">
                                         <span class="badge bg-light text-dark border">${edge.status || 'Active'}</span>
                                         <span class="badge bg-light text-dark border">${edge.visibility || 'Public'}</span>
+                                        <span class="badge bg-dark text-white border">${edge.strength}/10 Intensity</span>
+                                    </div>
+
+                                    <!-- Deep Intelligence Section -->
+                                    <div class="text-start mb-4">
+                                        ${edge.shared_secret ? `
+                                            <div class="bg-light-info p-2 rounded-3 mb-2 border-start border-info border-4" style="background-color: #f0f7ff;">
+                                                <h6 class="small fw-bold text-info text-uppercase mb-1" style="font-size: 0.65rem;">Shared Secret</h6>
+                                                <p class="small mb-0 fst-italic">"${edge.shared_secret}"</p>
+                                            </div>
+                                        ` : ''}
+                                        ${edge.vulnerability ? `
+                                            <div class="bg-light-warning p-2 rounded-3 mb-2 border-start border-warning border-4" style="background-color: #fffaf0;">
+                                                <h6 class="small fw-bold text-warning text-uppercase mb-1" style="font-size: 0.65rem;">Mutual Vulnerability</h6>
+                                                <p class="small mb-0">"${edge.vulnerability}"</p>
+                                            </div>
+                                        ` : ''}
+                                        ${edge.conflict_source ? `
+                                            <div class="bg-light-danger p-2 rounded-3 mb-2 border-start border-danger border-4" style="background-color: #fff5f5;">
+                                                <h6 class="small fw-bold text-danger text-uppercase mb-1" style="font-size: 0.65rem;">Core Friction</h6>
+                                                <p class="small mb-0">${edge.conflict_source}</p>
+                                            </div>
+                                        ` : ''}
                                     </div>
 
                                     <!-- Pill Navigation Buttons -->
-                                    <div class="d-grid gap-2 mb-3">
+                                    <div class="d-grid gap-2 mb-4">
                                         <button class="btn btn-profile-style rounded-pill py-2 d-flex align-items-center justify-content-center" 
                                             onclick="openModalForEdge(${edge.id}, 'core')">
-                                            <i class="bi bi-heart me-2"></i> Core Stats
+                                            <i class="bi bi-heart me-2"></i> Edit Core Detail
                                         </button>
                                         <button class="btn btn-profile-style rounded-pill py-2 d-flex align-items-center justify-content-center" 
                                             onclick="openModalForEdge(${edge.id}, 'dynamics')">
-                                            <i class="bi bi-lightning me-2"></i> Dynamics
-                                        </button>
-                                        <button class="btn btn-profile-style rounded-pill py-2 d-flex align-items-center justify-content-center" 
-                                            onclick="openModalForEdge(${edge.id}, 'goals')">
-                                            <i class="bi bi-bullseye me-2"></i> Goals
+                                            <i class="bi bi-lightning me-2"></i> Power Dynamics
                                         </button>
                                     </div>
 
                                     <div class="text-start bg-light p-3 rounded-3 mb-3 border">
-                                        <h6 class="small fw-bold text-uppercase text-muted mb-2">Description</h6>
-                                        <p class="small mb-0 text-break">${edge.title || '<span class="text-muted fst-italic">No description provided.</span>'}</p>
+                                        <h6 class="small fw-bold text-uppercase text-muted mb-2">Narrative Arc</h6>
+                                        <p class="small mb-0 text-break">${edge.evolution || edge.title || '<span class="text-muted fst-italic">No arc data yet.</span>'}</p>
                                     </div>
                                 </div>
                             </div>
