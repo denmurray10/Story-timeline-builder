@@ -156,6 +156,37 @@
     .filter-pill.active .pill-icon {
         color: #94a3b8;
     }
+
+    /* Zoom Controls */
+    .zoom-controls {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .btn-zoom {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        background: white;
+        border: 1px solid #e2e8f0;
+        color: #475569;
+        transition: all 0.2s;
+    }
+
+    .btn-zoom:hover {
+        background: #f8fafc;
+        color: #0f172a;
+        border-color: #cbd5e1;
+        transform: translateY(-2px);
+    }
 </style>
 {% endblock %}
 
@@ -231,6 +262,16 @@
     <div class="col-lg-9">
         <div class="position-relative" style="height: 600px; border-radius: 12px; overflow: hidden;">
             <div id="relationship-network" style="height: 100%;"></div>
+
+            <!-- Zoom Controls -->
+            <div class="zoom-controls">
+                <button id="btn-zoom-in" class="btn btn-zoom shadow-sm rounded-circle" title="Zoom In">
+                    <i class="bi bi-plus-lg"></i>
+                </button>
+                <button id="btn-zoom-out" class="btn btn-zoom shadow-sm rounded-circle" title="Zoom Out">
+                    <i class="bi bi-dash-lg"></i>
+                </button>
+            </div>
 
             <!-- Overlay Modal -->
             <div id="relationship-overlay" class="position-absolute top-0 start-0 w-100 h-100 bg-white"
@@ -754,10 +795,6 @@
                     applyFilter();
                 }
 
-                // Initial build
-                populateFilterPills();
-
-                // const relModal = new bootstrap.Modal(document.getElementById('relationshipModal')); // Removed
                 const overlay = document.getElementById('relationship-overlay');
                 const overlayTitle = document.getElementById('overlayTitle');
                 const relForm = document.getElementById('relationship-form');
@@ -788,6 +825,30 @@
                 const btnQuickAdd = document.getElementById('btn-quick-add');
                 const btnCloseOverlay = document.getElementById('btn-close-overlay');
                 const btnCancelOverlay = document.getElementById('btn-cancel-overlay');
+                const btnZoomIn = document.getElementById('btn-zoom-in');
+                const btnZoomOut = document.getElementById('btn-zoom-out');
+
+                // Initial build
+                populateFilterPills();
+
+                // Zoom Logic
+                btnZoomIn.onclick = () => {
+                    const currentScale = network.getScale();
+                    network.moveTo({
+                        scale: currentScale * 1.5,
+                        animation: { duration: 300 }
+                    });
+                };
+
+                btnZoomOut.onclick = () => {
+                    const currentScale = network.getScale();
+                    network.moveTo({
+                        scale: currentScale * 0.7,
+                        animation: { duration: 300 }
+                    });
+                };
+
+                // const relModal = new bootstrap.Modal(document.getElementById('relationshipModal')); // Removed
 
                 // Overlay Toggle Logic
                 function openModal(data = null, section = 'core') {
