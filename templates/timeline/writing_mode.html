@@ -5,17 +5,40 @@
 
 {% block extra_css %}
 <style>
-    /* Writing Mode Layout */
+    /* Writing Mode Layout - FORCE FULL WIDTH */
     body.writing-mode-active {
         overflow: hidden;
     }
 
+    /* Hide base.html sidebar and main container padding */
+    body.writing-mode-active .sidebar,
+    body.writing-mode-active .navbar,
+    body.writing-mode-active .d-flex.justify-content-end.align-items-center.mb-3 {
+        display: none !important;
+    }
+
+    /* Override Bootstrap columns to take full width */
+    body.writing-mode-active .main-content {
+        width: 100% !important;
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    body.writing-mode-active .page-container {
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+    }
+
     #writing-mode-container {
         display: flex;
-        height: calc(100vh - 56px);
-        /* Adjust based on nav height */
+        height: 100vh;
         background-color: #f8f9fa;
         overflow: hidden;
+        width: 100vw;
     }
 
     /* Sidebars */
@@ -156,7 +179,8 @@
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         min-height: 1000px;
         padding: 4rem 5rem;
-        border-radius: 4px;
+        border-radius: 30px;
+        /* USER REQUEST: 30px border radius */
     }
 
     #writing-editor {
@@ -320,7 +344,7 @@
                     </button>
                     <ul class="dropdown-menu shadow border-0">
                         <li><a class="dropdown-item py-2" href="{% url 'dashboard' %}"><i
-                                    class="bi bi-房屋-fill me-2"></i> Exit to Dashboard</a></li>
+                                    class="bi bi-house-fill me-2"></i> Exit to Dashboard</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
@@ -523,14 +547,8 @@
             });
         }
 
-        // Sidebar layout adjustment on load
+        // CSS handles full-width layout via .writing-mode-active class on body
         document.body.classList.add('writing-mode-active');
-        // Hide main nav
-        const mainNav = document.querySelector('.navbar');
-        if (mainNav) mainNav.style.display = 'none';
-
-        // Adjust container height if nav is hidden
-        document.getElementById('writing-mode-container').style.height = '100vh';
     });
 </script>
 {% endblock %}
