@@ -5,6 +5,9 @@ Timeline Builder{% endblock %} {% block content %}
         <i class="bi bi-book"></i> Book {{ book.series_order }}: {{ book.title}}
     </h1>
     <div>
+        <button class="btn btn-primary me-2" id="btn-deep-scan" title="Perform a full book AI analysis">
+            <i class="bi bi-magic"></i> Deep Story Scan
+        </button>
         <a href="{% url 'book_export' book.pk %}" class="btn btn-outline-dark me-2">
             <i class="bi bi-file-earmark-pdf"></i> Export Story Bible
         </a>
@@ -14,6 +17,51 @@ Timeline Builder{% endblock %} {% block content %}
         <a href="{% url 'book_delete' book.pk %}" class="btn btn-danger">
             <i class="bi bi-trash"></i> Delete
         </a>
+    </div>
+</div>
+
+<!-- Deep Scan Progress Modal -->
+<div class="modal fade" id="deepScanModal" data-bs-backdrop="static" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-header bg-dark text-white border-0">
+                <h5 class="modal-title"><i class="bi bi-cpu-fill me-2"></i> Omniscience Scan</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" id="btn-close-scan-x"
+                    style="display:none;"></button>
+            </div>
+            <div class="modal-body p-4 text-center">
+                <div id="scan-init">
+                    <i class="bi bi-stars fs-1 text-primary d-block mb-3 animate-pulse"></i>
+                    <h4>Initializing Deep Scan</h4>
+                    <p class="text-muted small">DeepSeek R1 will now meticulously analyze your entire story to build a
+                        unified Story Bible.</p>
+                </div>
+
+                <div id="scan-active" style="display:none;">
+                    <div class="progress mb-3" style="height: 12px;">
+                        <div id="scan-progress-bar" class="progress-bar progress-bar-striped progress-bar-animated"
+                            role="progressbar"></div>
+                    </div>
+                    <h5 id="scan-step-title" class="mb-1">Analyzing...</h5>
+                    <p id="scan-step-desc" class="small text-muted mb-0">Starting engines...</p>
+                </div>
+
+                <div id="scan-complete" style="display:none;">
+                    <i class="bi bi-check-circle-fill fs-1 text-success d-block mb-3"></i>
+                    <h4>Scan Complete!</h4>
+                    <p class="small text-muted">All character profiles, relationships, and world markers have been
+                        pre-cached across the app.</p>
+                    <button class="btn btn-dark w-100 mt-3" data-bs-dismiss="modal">Excellent</button>
+                </div>
+
+                <div id="scan-error" style="display:none;">
+                    <i class="bi bi-exclamation-triangle-fill fs-1 text-danger d-block mb-3"></i>
+                    <h4>Scan Failed</h4>
+                    <p id="scan-error-msg" class="small text-danger"></p>
+                    <button class="btn btn-secondary w-100 mt-3" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -182,6 +230,94 @@ Timeline Builder{% endblock %} {% block content %}
             const width = bar.getAttribute('data-width');
             if (width) bar.style.width = width;
         });
+
+        // Deep Scan Logic
+        const btnDeepScan = document.getElementById('btn-deep-scan');
+        const modalEl = document.getElementById('deepScanModal');
+        const modal = new bootstrap.Modal(modalEl);
+
+        const scanInit = document.getElementById('scan-init');
+        const scanActive = document.getElementById('scan-active');
+        const scanComplete = document.getElementById('scan-complete');
+        const scanError = document.getElementById('scan-error');
+        const progressBar = document.getElementById('scan-progress-bar');
+        const stepTitle = document.getElementById('scan-step-title');
+        const stepDesc = document.getElementById('scan-step-desc');
+        const errorMsg = document.getElementById('scan-error-msg');
+        const btnCloseX = document.getElementById('btn-close-scan-x');
+
+        let pollInterval = null;
+
+        btnDeepScan.onclick = function () {
+            // Reset modal state
+            scanInit.style.display = 'block';
+            scanActive.style.display = 'none';
+            scanComplete.style.display = 'none';
+            scanError.style.display = 'none';
+            btnCloseX.style.display = 'none';
+            modal.show();
+
+            // Trigger scan
+            fetch('{% url "api_trigger_deep_scan" book.pk %}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        startPolling();
+                    } else {
+                        showError(data.message);
+                    }
+                })
+                .catch(err => showError(err));
+        };
+
+        function startPolling() {
+            scanInit.style.display = 'none';
+            scanActive.style.display = 'block';
+
+            pollInterval = setInterval(() => {
+                fetch('{% url "api_deep_scan_status" book.pk %}')
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.status === 'none') {
+                            clearInterval(pollInterval);
+                        } else if (data.status === 'running') {
+                            progressBar.style.width = data.progress + '%';
+                            stepTitle.innerText = data.step;
+                            stepDesc.innerText = `AI is reasoning... (${data.progress}%)`;
+                        } else if (data.status === 'completed') {
+                            clearInterval(pollInterval);
+                            showComplete();
+                        } else if (data.status === 'failed') {
+                            clearInterval(pollInterval);
+                            showError(data.error);
+                        }
+                    })
+                    .catch(err => {
+                        clearInterval(pollInterval);
+                        showError(err);
+                    });
+            }, 2000);
+        }
+
+        function showComplete() {
+            scanActive.style.display = 'none';
+            scanComplete.style.display = 'block';
+            btnCloseX.style.display = 'block';
+        }
+
+        function showError(msg) {
+            scanInit.style.display = 'none';
+            scanActive.style.display = 'none';
+            scanError.style.display = 'block';
+            errorMsg.innerText = msg;
+            btnCloseX.style.display = 'block';
+        }
     });
 </script>
 {% endblock %}

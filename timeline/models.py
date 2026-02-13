@@ -43,6 +43,7 @@ class Book(models.Model):
     last_import_update = models.DateTimeField(auto_now=True)
     started_date = models.DateField(null=True, blank=True)
     completed_date = models.DateField(null=True, blank=True)
+    last_deep_scan = models.DateTimeField(null=True, blank=True, help_text="Last full AI analysis date")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -67,6 +68,10 @@ class Book(models.Model):
         if self.word_count_target == 0:
             return 0
         return min(100, (self.current_word_count / self.word_count_target) * 100)
+
+    def get_deep_scan_status(self):
+        """Returns the latest scan status for this book."""
+        return self.scan_status if hasattr(self, 'scan_status') else None
 
 
 class Chapter(models.Model):
@@ -506,13 +511,15 @@ class CharacterRelationship(models.Model):
     Tracks relationships between characters and how they evolve over time.
     """
     RELATIONSHIP_TYPES = [
-        ('ally', 'Ally/Friend'),
-        ('enemy', 'Enemy/Rival'),
+        ('friend', 'Friend'),
+        ('ally', 'Ally'),
+        ('enemy', 'Enemy'),
         ('romantic', 'Romantic'),
         ('family', 'Family'),
-        ('mentor', 'Mentor/Student'),
-        ('business', 'Business/Professional'),
-        ('neutral', 'Neutral/Acquaintance'),
+        ('rival', 'Rival'),
+        ('mentor', 'Mentor'),
+        ('professional', 'Professional'),
+        ('neutral', 'Neutral'),
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='relationships')
@@ -592,6 +599,27 @@ class CharacterRelationship(models.Model):
         blank=True,
         help_text="Notes on how this relationship changes over time"
     )
+    shared_secret = models.TextField(
+        blank=True,
+        help_text="Something only these two characters know"
+    )
+    first_impression = models.TextField(
+        blank=True,
+        help_text="Their initial perception of each other"
+    )
+    vulnerability = models.TextField(
+        blank=True,
+        help_text="What they hide from the other / their mutual weakness"
+    )
+    major_shared_moments = models.TextField(
+        blank=True,
+        help_text="Pivotal events that defined their bond"
+    )
+    predictability = models.PositiveIntegerField(
+        default=5,
+        validators=[MinValueValidator(1), MaxValueValidator(10)],
+        help_text="How well they anticipate each other (1-10)"
+    )
     starts_at_event = models.ForeignKey(
         Event,
         on_delete=models.SET_NULL,
@@ -600,14 +628,53 @@ class CharacterRelationship(models.Model):
         related_name='relationships_starting',
         help_text="When does this relationship begin or become significant?"
     )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class InteractionSummaryCache(models.Model):
+    """
+    Caches the 1/3, 2/3, 3/3 chronological interaction snapshots 
+    to avoid re-reading the entire book for different character pairs.
+    """
+    book = models.ForeignKey('Book', on_delete=models.CASCADE, related_name='interaction_caches')
+    character_a = models.ForeignKey('Character', on_delete=models.CASCADE, related_name='interaction_a_caches')
+    character_b = models.ForeignKey('Character', on_delete=models.CASCADE, related_name='interaction_b_caches')
+    batch_index = models.PositiveIntegerField(help_text="0, 1, or 2 (for the 3 passes)")
+    summary_text = models.TextField()
+    
+    # Store the hash of the scene content represented in this batch to invalidate
+    content_hash = models.CharField(max_length=64, help_text="Hash of scene content/order to detect changes")
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = ['character_a', 'character_b']
+        unique_together = ('book', 'character_a', 'character_b', 'batch_index')
+
+class RelationshipAnalysisCache(models.Model):
+    """
+    Caches the final R1-generated JSON for a character pair.
+    """
+    book = models.ForeignKey('Book', on_delete=models.CASCADE, related_name='analysis_caches')
+    character_a = models.ForeignKey('Character', on_delete=models.CASCADE, related_name='analysis_a_caches')
+    character_b = models.ForeignKey('Character', on_delete=models.CASCADE, related_name='analysis_b_caches')
+    
+    full_json = models.JSONField(help_text="The final suggested relationship metadata")
+    
+    # Invalidation triggers
+    char_a_metadata_hash = models.CharField(max_length=64, help_text="Hash of traits/motivation for A")
+    char_b_metadata_hash = models.CharField(max_length=64, help_text="Hash of traits/motivation for B")
+    interaction_snapshots_hash = models.CharField(max_length=300, help_text="Hash of the 3 interaction summaries")
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('book', 'character_a', 'character_b')
 
     def __str__(self):
-        return f"{self.character_a.name} → {self.character_b.name} ({self.get_relationship_type_display()})"
+        return f"{self.character_a.name} → {self.character_b.name}"
 
 
 class AIFocusTask(models.Model):
@@ -680,3 +747,28 @@ class WorldEntry(models.Model):
 
     def __str__(self):
         return f"{self.get_category_display()}: {self.title}"
+
+class StoryScanStatus(models.Model):
+    """
+    Tracks the progress of a bulk 'Omniscience' AI scan for a book.
+    """
+    book = models.OneToOneField(Book, on_delete=models.CASCADE, related_name='scan_status')
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ('pending', 'Pending'),
+            ('running', 'Running'),
+            ('completed', 'Completed'),
+            ('failed', 'Failed'),
+        ],
+        default='pending'
+    )
+    current_step = models.CharField(max_length=255, blank=True, help_text="e.g. 'Analyzing Relationships (3/15)'")
+    progress_percentage = models.PositiveIntegerField(default=0)
+    error_message = models.TextField(blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Scan for {self.book.title} - {self.status} ({self.progress_percentage}%)"

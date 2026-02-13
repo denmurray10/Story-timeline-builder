@@ -4,6 +4,7 @@ Views for the Timeline app.
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
+from django.contrib.auth.models import User
 from django.contrib import messages
 import docx2txt
 import io
@@ -13,14 +14,17 @@ from django.db.models import Count, Sum, Q
 from django.views.decorators.http import require_POST
 import json
 import re
+import hashlib
 import time
 import threading
+import math
+from itertools import combinations
 from django.utils import timezone
 import google.generativeai as genai
 from openai import OpenAI
 from django.conf import settings
 
-from .models import Book, Chapter, Character, Event, Tag, CharacterRelationship, AIFocusTask, ActivityLog, WorldEntry
+from .models import Book, Chapter, Character, Event, Tag, CharacterRelationship, AIFocusTask, ActivityLog, WorldEntry, InteractionSummaryCache, RelationshipAnalysisCache, StoryScanStatus
 from .forms import (
     UserRegisterForm, BookForm, ChapterForm, CharacterForm, 
     EventForm, TagForm, UserAccountForm, CharacterRelationshipForm, WorldEntryForm
@@ -734,19 +738,38 @@ def api_relationship_data(request):
         width = max(1, rel.strength / 2)
         
         # Style based on type
-        color = '#94a3b8' # Default
-        if rel.relationship_type == 'romantic': color = '#f43f5e'
-        elif rel.relationship_type == 'enemy': color = '#b91c1c'
-        elif rel.relationship_type == 'ally': color = '#059669'
+        color = '#94a3b8' # Gray (Default)
+        if rel.relationship_type == 'romantic': color = '#f43f5e' # Rose
+        elif rel.relationship_type == 'enemy': color = '#ef4444' # Red
+        elif rel.relationship_type == 'rival': color = '#f59e0b' # Amber/Orange
+        elif rel.relationship_type == 'ally': color = '#10b981' # Emerald
+        elif rel.relationship_type == 'friend': color = '#0ea5e9' # Sky Blue
+        elif rel.relationship_type == 'mentor': color = '#8b5cf6' # Violet
+        elif rel.relationship_type == 'family': color = '#ec4899' # Pink
         
         edges.append({
             'id': rel.id,
             'from': rel.character_a.id,
             'to': rel.character_b.id,
             'label': rel.get_relationship_type_display(),
+            'type_key': rel.relationship_type,
             'title': rel.description,
             'width': width,
             'color': color,
+            'strength': rel.strength,
+            'trust_level': rel.trust_level,
+            'power_dynamic': rel.power_dynamic,
+            'status': rel.relationship_status,
+            'visibility': rel.visibility,
+            'conflict_source': rel.conflict_source,
+            'character_a_wants': rel.character_a_wants,
+            'character_b_wants': rel.character_b_wants,
+            'evolution': rel.evolution,
+            'shared_secret': rel.shared_secret,
+            'first_impression': rel.first_impression,
+            'vulnerability': rel.vulnerability,
+            'major_shared_moments': rel.major_shared_moments,
+            'predictability': rel.predictability,
             'arrows': 'to' # Or none if mutual
         })
         
@@ -768,6 +791,8 @@ def api_manage_relationship(request):
 
         if action == 'delete' and rel_id:
             rel = get_object_or_404(CharacterRelationship, id=rel_id, user=request.user)
+            # Invalidate Cache on Delete
+            RelationshipAnalysisCache.objects.filter(character_a=rel.character_a, character_b=rel.character_b).delete()
             rel.delete()
             return JsonResponse({'status': 'success', 'message': 'Relationship deleted'})
 
@@ -782,15 +807,21 @@ def api_manage_relationship(request):
             rel = form.save(commit=False)
             rel.user = request.user
             rel.save()
+            
+            # Invalidate Cache on Save (Manual edits override AI suggestions)
+            RelationshipAnalysisCache.objects.filter(character_a=rel.character_a, character_b=rel.character_b).delete()
+            
             return JsonResponse({
                 'status': 'success', 
                 'message': 'Relationship saved',
                 'id': rel.id
             })
         else:
+            print(f"Relationship Save Form Errors: {form.errors}")
             return JsonResponse({'status': 'error', 'errors': form.errors}, status=400)
 
     except Exception as e:
+        print(f"Relationship Save API Exception: {e}")
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
 
@@ -844,14 +875,27 @@ def extract_text_from_file(file):
         print(f"Error processing file: {e}")
     return text
 
-def _call_ai_json(prompt, system_message="You are a professional literary analyst. Always respond with valid JSON.", max_retries=3, deepseek_model="deepseek-chat"):
+def _call_ai_json(prompt, system_message="You are a professional literary analyst. Always respond with valid JSON.", max_retries=3, deepseek_model="deepseek-chat", prefer_gemini=False):
     """Helper to call AI and return parsed JSON with retry logic."""
     if not settings.DEEPSEEK_API_KEY and not settings.GEMINI_API_KEY:
         return None
     
     for attempt in range(max_retries):
         try:
-            if settings.DEEPSEEK_API_KEY:
+            # Use Gemini if preferred or if DeepSeek key is missing
+            # BUT if deepseek_model is 'deepseek-reasoner', we override prefer_gemini
+            should_use_gemini = (prefer_gemini and settings.GEMINI_API_KEY) or not settings.DEEPSEEK_API_KEY
+            if deepseek_model == 'deepseek-reasoner':
+                should_use_gemini = False if settings.DEEPSEEK_API_KEY else True
+
+            if should_use_gemini:
+                genai.configure(api_key=settings.GEMINI_API_KEY)
+                # If we were forced to Gemini but wanted reasoner, use pro
+                model_name = 'gemini-1.5-pro' if deepseek_model == 'deepseek-reasoner' else 'gemini-1.5-flash'
+                model = genai.GenerativeModel(model_name)
+                response = model.generate_content(f"{system_message}\n\nTask:\n{prompt}")
+                content = response.text
+            else:
                 client = OpenAI(api_key=settings.DEEPSEEK_API_KEY, base_url="https://api.deepseek.com")
                 response = client.chat.completions.create(
                     model=deepseek_model,
@@ -859,14 +903,10 @@ def _call_ai_json(prompt, system_message="You are a professional literary analys
                         {"role": "system", "content": system_message},
                         {"role": "user", "content": prompt},
                     ],
-                    stream=False
+                    stream=False,
+                    timeout=60
                 )
                 content = response.choices[0].message.content
-            else:
-                genai.configure(api_key=settings.GEMINI_API_KEY)
-                model = genai.GenerativeModel('gemini-1.5-flash')
-                response = model.generate_content(f"{system_message}\n\nTask:\n{prompt}")
-                content = response.text
 
             if "```json" in content:
                 content = content.split("```json")[1].split("```")[0].strip()
@@ -1981,8 +2021,13 @@ def api_suggest_relationship(request):
         char_a = get_object_or_404(Character, pk=char_a_id, user=request.user)
         char_b = get_object_or_404(Character, pk=char_b_id, user=request.user)
         
+        # 0. Calculate Metadata Hashes for Invalidation
+        char_a_data = f"{char_a.traits}|{char_a.motivation}|{char_a.role}"
+        char_b_data = f"{char_b.traits}|{char_b.motivation}|{char_b.role}"
+        h_a = hashlib.sha256(char_a_data.encode()).hexdigest()
+        h_b = hashlib.sha256(char_b_data.encode()).hexdigest()
+
         # 1. Find shared events
-        # Events where BOTH characters are in the 'characters' many-to-many field
         shared_events = Event.objects.filter(
             user=request.user, 
             characters=char_a
@@ -2000,53 +2045,139 @@ def api_suggest_relationship(request):
                  }
              })
 
-        # 2. Aggregate text (limit to ~3000 words to avoid context overflow)
-        context_text = ""
-        for event in shared_events[:5]: # Check top 5 shared events
-            content = event.content_json or event.content_html or event.description or ""
-            # Strip simple HTML if needed, or just append
-            context_text += f"\n--- SCENE: {event.title} ---\n{str(content)[:1000]}\n"
+        # Order and Split events into 3 batches
+        all_events = list(shared_events.order_by('chronological_order', 'sequence_order'))
+        total_count = len(all_events)
+        
+        import math
+        chunk_size = math.ceil(total_count / 3)
+        batches = [all_events[i:i + chunk_size] for i in range(0, total_count, chunk_size)]
+        
+        # Calculate Batch Hashes to detect story changes
+        batch_hashes = []
+        batch_texts = []
+        for batch in batches:
+            batch_content = ""
+            for event in batch:
+                content = event.content_json or event.content_html or event.description or ""
+                batch_content += f"{event.id}:{str(content)}|"
+            batch_hashes.append(hashlib.sha256(batch_content.encode()).hexdigest())
             
-        if not context_text.strip():
-             return JsonResponse({
-                 'status': 'success', 
-                 'suggestion': {
-                     'type': 'neutral',
-                     'description': 'Shared scenes found, but they have no content/text yet.',
-                     'strength': 1
-                 }
-             })
+            # Form full text for AI pass if needed
+            full_text = ""
+            for event in batch:
+                content = event.content_json or event.content_html or event.description or ""
+                full_text += f"\n--- SCENE: {event.title} ---\n{str(content)}\n"
+            batch_texts.append(full_text)
 
-        # 3. Call AI
-        prompt = f"""
-        Analyze the relationship between two characters based on these shared scenes.
+        # Check Final Result Cache
+        snapshots_hash = "|".join(batch_hashes)
+        book = all_events[0].book if all_events[0].book else None
         
-        Character A: {char_a.name} ({char_a.get_role_display()})
-        Character B: {char_b.name} ({char_b.get_role_display()})
+        cache_hit = RelationshipAnalysisCache.objects.filter(
+            character_a=char_a, 
+            character_b=char_b,
+            char_a_metadata_hash=h_a,
+            char_b_metadata_hash=h_b,
+            interaction_snapshots_hash=snapshots_hash
+        ).first()
+
+        if cache_hit:
+            return JsonResponse({'status': 'success', 'suggestion': cache_hit.full_json, 'cached': True})
+
+        # 2. Process batches for intermediate "Interaction Snapshots" (with caching)
+        interaction_summaries = []
+        for idx in range(len(batches)):
+            # Check intermediate cache
+            summary_cache = InteractionSummaryCache.objects.filter(
+                character_a=char_a,
+                character_b=char_b,
+                batch_index=idx,
+                content_hash=batch_hashes[idx]
+            ).first()
+
+            if summary_cache:
+                interaction_summaries.append(summary_cache.summary_text)
+                continue
+
+            summary_prompt = f"""
+            Analyze this CHUNK OF STORY ({idx+1}/3) between {char_a.name} and {char_b.name}.
+            Summarize their interactions, focusing on:
+            1. Conflict/Tension shifts.
+            2. Secrets or vulnerabilities shared.
+            3. Any power dynamic changes (who is dominant).
+            4. Significant character growth.
+            
+            Keep the summary to 300 words. Focus on SUBTEXT and specific data points.
+            
+            Return JSON ONLY:
+            {{
+                "summary": "..."
+            }}
+
+            STORY CONTENT:
+            {batch_texts[idx]}
+            """
+            result = _call_ai_json(summary_prompt, system_message="Provide deep narrative summaries in JSON format.", deepseek_model="deepseek-reasoner")
+            summary_text = result['summary'] if (result and 'summary' in result) else "Summary generation failed."
+            interaction_summaries.append(summary_text)
+
+            # Save to intermediate cache
+            InteractionSummaryCache.objects.update_or_create(
+                character_a=char_a,
+                character_b=char_b,
+                batch_index=idx,
+                defaults={'summary_text': summary_text, 'content_hash': batch_hashes[idx], 'book': book}
+            )
+
+        # 3. Final Synthesis Pass (JSON Extraction)
+        final_prompt = f"""
+        Synthesize the full relationship profile between {char_a.name} and {char_b.name} based on these three chronological summaries of their interactions.
         
-        STORY CONTENT:
-        {context_text}
+        Character A: {char_a.name} | Role: {char_a.get_role_display()} | Traits: {char_a.traits} | Motivation: {char_a.motivation}
+        Character B: {char_b.name} | Role: {char_b.get_role_display()} | Traits: {char_b.traits} | Motivation: {char_b.motivation}
+
+        INTERACTION SUMMARIES:
+        1: {interaction_summaries[0] if len(interaction_summaries) > 0 else "N/A"}
+        2: {interaction_summaries[1] if len(interaction_summaries) > 1 else "N/A"}
+        3: {interaction_summaries[2] if len(interaction_summaries) > 2 else "N/A"}
         
-        Based on their interactions, determine the following.
-        Return JSON ONLY:
+        Return the final Relationship JSON:
         {{
-            "type": "...",  (one of: friend, ally, enemy, romantic, family, professional, rival, mentor, neutral)
-            "description": "...", (1-2 sentences)
-            "strength": 5, (1-10 intensity)
-            "trust_level": 5, (1-10 trust)
+            "type": "...",  (friend, ally, enemy, romantic, family, professional, rival, mentor, neutral)
+            "description": "...", (Detailed narrative summary)
+            "strength": 5, (1-10)
+            "trust_level": 5, (1-10)
             "power_dynamic": "...", (balanced, a_dominant, or b_dominant)
             "relationship_status": "...", (active, estranged, deceased, unresolved)
             "visibility": "...", (public, secret, rumored)
-            "conflict_source": "...", (short phrase explaining tension, if any)
-            "character_a_wants": "...", (what A wants from B)
-            "character_b_wants": "...", (what B wants from A)
-            "evolution": "..." (how it changes: e.g. "Strangers -> Lovers")
+            "conflict_source": "...", (underlying tension)
+            "character_a_wants": "...", 
+            "character_b_wants": "...", 
+            "evolution": "...", (Narrative arc across the book)
+            "shared_secret": "...", 
+            "first_impression": "...", 
+            "vulnerability": "...", 
+            "major_shared_moments": "...", (Highlight moments from all three parts)
+            "predictability": 5 (1-10)
         }}
         """
         
-        # We can reuse the existing analyze helper or call directly
-        # Let's use the explicit call for clarity here as we need specific JSON
-        ai_response = _call_ai_json(prompt, deepseek_model="deepseek-chat")
+        ai_response = _call_ai_json(final_prompt, deepseek_model="deepseek-reasoner")
+
+        # Save to Final Result Cache
+        if ai_response:
+            RelationshipAnalysisCache.objects.update_or_create(
+                character_a=char_a,
+                character_b=char_b,
+                defaults={
+                    'full_json': ai_response,
+                    'char_a_metadata_hash': h_a,
+                    'char_b_metadata_hash': h_b,
+                    'interaction_snapshots_hash': snapshots_hash,
+                    'book': book
+                }
+            )
         
         return JsonResponse({'status': 'success', 'suggestion': ai_response})
 
@@ -2082,3 +2213,220 @@ def export_story_bible(request, pk):
         'now': timezone.now()
     }
     return render(request, 'timeline/story_bible_export.html', context)
+
+
+@login_required
+@require_POST
+def api_trigger_deep_scan(request, book_id):
+    """
+    Triggers a background thread to perform a full book analysis 
+    (Omniscience mode).
+    """
+    book = get_object_or_404(Book, pk=book_id, user=request.user)
+    user_id = request.user.id
+    
+    # Reset or create scan status
+    scan_status, created = StoryScanStatus.objects.get_or_create(book=book)
+    
+    # If it was stuck or failed, let them restart
+    if not created and scan_status.status == 'running':
+        # Check if it's actually been running too long (e.g. > 5 minutes)
+        if (timezone.now() - scan_status.updated_at).total_seconds() < 300:
+            return JsonResponse({'status': 'error', 'message': 'A scan is already in progress.'})
+
+    scan_status.status = 'running'
+    scan_status.progress_percentage = 0
+    scan_status.current_step = 'Starting analysis engine...'
+    scan_status.error_message = ""
+    scan_status.save()
+
+    def run_deep_scan(u_id, b_id, status_id):
+        try:
+            user = User.objects.get(id=u_id)
+            book = Book.objects.get(id=b_id)
+            scan_status = StoryScanStatus.objects.get(id=status_id)
+            
+            # 1. Enrich Characters
+            characters = Character.objects.filter(user=user)
+            total_chars = characters.count()
+            
+            for idx, char in enumerate(characters):
+                scan_status.current_step = f"Analyzing Profile: {char.name} ({idx+1}/{total_chars})..."
+                scan_status.progress_percentage = int(5 + (idx / total_chars) * 15)
+                scan_status.save()
+
+                char_scenes = Event.objects.filter(book=book, characters=char).distinct().order_by('chronological_order')
+                if char_scenes.exists():
+                    scene_text = ""
+                    for s in char_scenes[:5]:
+                        content = s.content_json or s.content_html or s.description or ""
+                        scene_text += f"\n--- SCENE: {s.title} ---\n{str(content)}\n"
+                    
+                    profile_prompt = f"Analyze Profile for {char.name}. JSON: {{\"traits\": \"...\", \"motivation\": \"...\"}}\n\nSCENES: {scene_text}"
+                    res = _call_ai_json(profile_prompt, deepseek_model="deepseek-reasoner")
+                    if res:
+                        char.traits = res.get('traits', char.traits)
+                        char.motivation = res.get('motivation', char.motivation)
+                        char.save()
+            
+            # 2. Relationship Pre-Caching
+            pairs = list(combinations(characters, 2))
+            total_pairs = len(pairs)
+            
+            for idx, (char_a, char_b) in enumerate(pairs):
+                shared = Event.objects.filter(book=book, characters=char_a).filter(characters=char_b).exists()
+                if shared:
+                    scan_status.current_step = f"Mapping Relationships: {char_a.name} & {char_b.name} ({idx+1}/{total_pairs})..."
+                    scan_status.progress_percentage = int(20 + (idx / total_pairs) * 70)
+                    scan_status.save()
+                    _ensure_relationship_cache(char_a, char_b, book)
+            
+            # Step 3: Chapter Summaries (New)
+            chapters = book.chapters.all()
+            total_ch = chapters.count()
+            for idx, chapter in enumerate(chapters):
+                if not chapter.description:
+                    scan_status.current_step = f"Summarizing Chapter {chapter.chapter_number} ({idx+1}/{total_ch})..."
+                    scan_status.progress_percentage = int(90 + (idx / total_ch) * 10)
+                    scan_status.save()
+                    
+                    # Core summary logic (simplified)
+                    sum_prompt = f"Summarize Chapter {chapter.chapter_number}: {chapter.title}\nContent: {chapter.content[:5000]}"
+                    sum_res = _call_ai_json(sum_prompt)
+                    if sum_res and 'summary' in sum_res:
+                        chapter.description = sum_res['summary']
+                        chapter.save()
+
+            scan_status.status = 'completed'
+            scan_status.progress_percentage = 100
+            scan_status.current_step = "Deep Scan Complete."
+            book.last_deep_scan = timezone.now()
+            book.save()
+            scan_status.save()
+            
+        except Exception as e:
+            s = StoryScanStatus.objects.get(id=status_id)
+            s.status = 'failed'
+            s.error_message = str(e)
+            s.save()
+
+    thread = threading.Thread(target=run_deep_scan, args=(user_id, book.id, scan_status.id))
+    thread.daemon = True
+    thread.start()
+
+    return JsonResponse({'status': 'success', 'message': 'Deep scan started.'})
+
+@login_required
+def api_deep_scan_status(request, book_id):
+    """Returns the current progress of the deep scan."""
+    book = get_object_or_404(Book, pk=book_id, user=request.user)
+    status = book.get_deep_scan_status()
+    if not status:
+        return JsonResponse({'status': 'none'})
+    
+    return JsonResponse({
+        'status': status.status,
+        'progress': status.progress_percentage,
+        'step': status.current_step,
+        'error': status.error_message
+    })
+
+def _ensure_relationship_cache(char_a, char_b, book):
+    """
+    Internal helper to run the 3-pass R1 analysis and populate caches.
+    This is a headless version of api_suggest_relationship.
+    """
+    try:
+        # Re-use the existing logic by simulating the view's data flow
+        # In a real app, you'd refactor the view into a service, but here 
+        # we'll just implement the core logic or call a function that does it.
+        # For now, let's keep it simple and just do the base logic for one pair.
+        
+        char_a_data = f"{char_a.traits}|{char_a.motivation}|{char_a.role}"
+        char_b_data = f"{char_b.traits}|{char_b.motivation}|{char_b.role}"
+        h_a = hashlib.sha256(char_a_data.encode()).hexdigest()
+        h_b = hashlib.sha256(char_b_data.encode()).hexdigest()
+
+        shared_events = Event.objects.filter(book=book, characters=char_a).filter(characters=char_b).distinct()
+        if not shared_events.exists():
+            return
+
+        all_events = list(shared_events.order_by('chronological_order', 'sequence_order'))
+        total_count = len(all_events)
+        
+        import math
+        chunk_size = math.ceil(total_count / 3)
+        batches = [all_events[i:i + chunk_size] for i in range(0, total_count, chunk_size)]
+        
+        batch_hashes = []
+        batch_texts = []
+        for batch in batches:
+            batch_content = ""
+            for event in batch:
+                content = event.content_json or event.content_html or event.description or ""
+                batch_content += f"{event.id}:{str(content)}|"
+            batch_hashes.append(hashlib.sha256(batch_content.encode()).hexdigest())
+            
+            full_text = ""
+            for event in batch:
+                content = event.content_json or event.content_html or event.description or ""
+                full_text += f"\n--- SCENE: {event.title} ---\n{str(content)}\n"
+            batch_texts.append(full_text)
+
+        snapshots_hash = "|".join(batch_hashes)
+        
+        # Check if already cached
+        exists = RelationshipAnalysisCache.objects.filter(
+            character_a=char_a, 
+            character_b=char_b,
+            char_a_metadata_hash=h_a,
+            char_b_metadata_hash=h_b,
+            interaction_snapshots_hash=snapshots_hash
+        ).exists()
+        if exists: return
+
+        # 2. Process batches
+        interaction_summaries = []
+        for idx in range(len(batches)):
+            # Check intermediate cache
+            summary_cache = InteractionSummaryCache.objects.filter(
+                character_a=char_a,
+                character_b=char_b,
+                batch_index=idx,
+                content_hash=batch_hashes[idx]
+            ).first()
+
+            if summary_cache:
+                interaction_summaries.append(summary_cache.summary_text)
+                continue
+
+            summary_prompt = f"""
+            Analyze this CHUNK OF STORY ({idx+1}/3) between {char_a.name} and {char_b.name}.
+            Summarize their interactions... (truncated for brevity in scan)
+            Return JSON ONLY: {{"summary": "..."}}
+            STORY CONTENT: {batch_texts[idx]}
+            """
+            result = _call_ai_json(summary_prompt, system_message="Provide deep narrative summaries in JSON format.", deepseek_model="deepseek-reasoner")
+            summary_text = result['summary'] if (result and 'summary' in result) else "Summary generation failed."
+            interaction_summaries.append(summary_text)
+
+            InteractionSummaryCache.objects.update_or_create(
+                character_a=char_a, character_b=char_b, batch_index=idx,
+                defaults={'summary_text': summary_text, 'content_hash': batch_hashes[idx], 'book': book}
+            )
+
+        # 3. Final Synthesis
+        final_prompt = f"Synthesize relationship between {char_a.name} and {char_b.name}..."
+        ai_response = _call_ai_json(final_prompt, deepseek_model="deepseek-reasoner")
+
+        if ai_response:
+            RelationshipAnalysisCache.objects.update_or_create(
+                character_a=char_a, character_b=char_b,
+                defaults={
+                    'full_json': ai_response,
+                    'char_a_metadata_hash': h_a, 'char_b_metadata_hash': h_b,
+                    'interaction_snapshots_hash': snapshots_hash, 'book': book
+                }
+            )
+    except Exception as e:
+        print(f"Deep Scan error for pair: {e}")

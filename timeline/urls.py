@@ -82,5 +82,7 @@ urlpatterns = [
     path('api/ai/focus-tasks/<int:pk>/toggle/', views.api_toggle_focus_task, name='api_toggle_focus_task'),
     path('api/ai/character-deep-dive/', views.api_character_deep_dive, name='api_character_deep_dive'),
     path('api/ai/character-sync/', views.api_sync_character_data, name='api_character_sync'),
+    path('api/books/<int:book_id>/deep-scan/trigger/', views.api_trigger_deep_scan, name='api_trigger_deep_scan'),
+    path('api/books/<int:book_id>/deep-scan/status/', views.api_deep_scan_status, name='api_deep_scan_status'),
     path('account/', views.account, name='account'),
 ]
