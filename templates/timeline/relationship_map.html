@@ -156,19 +156,6 @@
     .filter-pill.active .pill-icon {
         color: #94a3b8;
     }
-
-    .search-input {
-        border-radius: 8px;
-        border: 1px solid #cbd5e1;
-        padding: 4px 10px;
-        font-size: 0.85rem;
-        outline: none;
-        min-width: 150px;
-    }
-
-    .search-input:focus {
-        border-color: #1e293b;
-    }
 </style>
 {% endblock %}
 
@@ -229,7 +216,6 @@
 
 <div class="filter-bar shadow-sm">
     <span class="text-muted small fw-bold text-uppercase me-2"><i class="bi bi-filter"></i> Filter:</span>
-    <input type="text" class="search-input" id="filter-search" placeholder="Search character...">
     <div id="filter-pills" class="d-flex flex-wrap gap-2">
         <!-- JS will populate these -->
     </div>
@@ -702,7 +688,6 @@
 
                 // --- FILTER LOGIC ---
                 const filterPillsContainer = document.getElementById('filter-pills');
-                const filterSearch = document.getElementById('filter-search');
                 const btnClearFilter = document.getElementById('btn-clear-filter');
                 let activeFilters = new Set();
 
@@ -772,19 +757,9 @@
                     applyFilter();
                 }
 
-                filterSearch.oninput = function () {
-                    const term = this.value.toLowerCase();
-                    const pills = filterPillsContainer.querySelectorAll('.filter-pill');
-                    pills.forEach(p => {
-                        const label = p.innerText.toLowerCase();
-                        p.style.display = label.includes(term) ? 'flex' : 'none';
-                    });
-                };
-
                 btnClearFilter.onclick = function () {
                     activeFilters.clear();
                     applyFilter();
-                    filterSearch.value = '';
                     const pills = filterPillsContainer.querySelectorAll('.filter-pill');
                     pills.forEach(p => p.style.display = 'flex');
                 };
