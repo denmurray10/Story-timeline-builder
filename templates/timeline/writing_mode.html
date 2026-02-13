@@ -249,8 +249,10 @@
     }
 
     .writing-sidebar-right.expanded {
-        width: 400px;
-        /* Expanded width when content is shown */
+        width: 800px !important;
+        min-width: 800px !important;
+        max-width: 800px !important;
+        /* Forced 800px width for maximum visibility */
     }
 
     /* Vertical Icon Bar - Always 50px */
@@ -306,8 +308,8 @@
         /* Hidden unless expanded */
         flex-direction: column;
         overflow: hidden;
-        background-color: #000000;
-        border-left: 1px solid #111111;
+        background-color: #f4f1ee;
+        border-right: 1px solid #e5e7eb;
     }
 
     .writing-sidebar-right.expanded .sidebar-content-area {
@@ -332,40 +334,63 @@
     }
 
     .writing-sidebar-right .writing-sidebar-header {
-        background-color: #000000;
-        color: #ffffff;
-        border-bottom: 1px solid #111111;
-        padding: 1rem 1.25rem;
+        background-color: #f4f1ee;
+        color: #111827;
+        border-bottom: none;
+        padding: 1.25rem 1.25rem 0.5rem 1.25rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        font-weight: 700;
+        font-size: 1.1rem;
     }
 
     .writing-sidebar-right .writing-sidebar-content {
-        background-color: #000000;
-        color: #d1d5db;
+        background-color: #f4f1ee;
+        color: #4b5563;
         padding: 1.25rem;
         overflow-y: auto;
     }
 
+    .sidebar-card {
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid #e5e7eb;
+    }
+
     .writing-sidebar-right .cast-item {
-        border-bottom: 1px solid #1f2937;
+        border-bottom: 1px solid #f3f4f6;
     }
 
     .writing-sidebar-right .nav-section-title {
-        color: #6b7280;
+        color: #9ca3af;
         font-size: 0.7rem;
         text-transform: uppercase;
         letter-spacing: 0.05em;
         margin-top: 1rem;
     }
 
-    /* AI Ghostwriter Sidebar & Chat - Pure Black */
+    /* AI Ghostwriter Sidebar & Chat - Card Theme */
     .ghostwriter-chat-container {
         display: flex;
         flex-direction: column;
         height: 100%;
-        background-color: #000000;
+        background-color: #f4f1ee;
+        padding: 1.25rem;
+    }
+
+    .ghostwriter-chat-card {
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        overflow: hidden;
+        border: 1px solid #e5e7eb;
     }
 
     .chat-messages {
@@ -386,15 +411,14 @@
     }
 
     .chat-bubble.ai {
-        background-color: #1f2937;
-        color: #f3f4f6;
+        background-color: #f3f4f6;
+        color: #1f2937;
         align-self: flex-start;
         border-bottom-left-radius: 2px;
     }
 
     .chat-bubble.user {
         background-color: #3b82f6;
-        /* Subtle blue for user in dark mode */
         color: #ffffff;
         align-self: flex-end;
         border-bottom-right-radius: 2px;
@@ -402,22 +426,23 @@
 
     .chat-input-area {
         padding: 1rem;
-        border-top: 1px solid #1f2937;
+        border-top: 1px solid #f3f4f6;
         display: flex;
         gap: 0.5rem;
+        background-color: #ffffff;
     }
 
     .chat-input-area input {
         border-radius: 20px;
         padding: 0.5rem 1rem;
         font-size: 0.85rem;
-        background-color: #1f2937;
-        border: 1px solid #374151;
-        color: #ffffff;
+        background-color: #f9fafb;
+        border: 1px solid #e5e7eb;
+        color: #111827;
     }
 
     .chat-input-area input::placeholder {
-        color: #6b7280;
+        color: #9ca3af;
     }
 
     .quick-insight-btns {
@@ -425,24 +450,24 @@
         grid-template-columns: 1fr 1fr;
         gap: 0.5rem;
         padding: 1rem;
-        border-bottom: 1px solid #1f2937;
+        border-bottom: 1px solid #e5e7eb;
     }
 
     .insight-btn {
-        background-color: #1f2937;
-        border: 1px solid #374151;
+        background-color: #f9fafb;
+        border: 1px solid #e5e7eb;
         padding: 0.5rem;
         border-radius: 6px;
         font-size: 0.7rem;
-        color: #d1d5db;
+        color: #374151;
         text-align: left;
         transition: all 0.2s;
     }
 
     .insight-btn:hover {
-        background-color: #374151;
-        border-color: #4b5563;
-        color: #ffffff;
+        background-color: #f3f4f6;
+        border-color: #d1d5db;
+        color: #111827;
     }
 
     .insight-btn i {
@@ -683,32 +708,37 @@
                     <i class="bi bi-x-lg cursor-pointer small" onclick="closeSidebarRight()"></i>
                 </div>
                 <div class="writing-sidebar-content">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h6 class="small fw-bold text-uppercase text-muted mb-0">Characters</h6>
-                        <button class="btn btn-sm p-0 text-white"><i class="bi bi-plus-lg"></i></button>
+                    <div class="sidebar-card">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="small fw-bold text-uppercase text-muted mb-0">Characters</h6>
+                            <button class="btn btn-sm p-0 text-dark"><i class="bi bi-plus-lg"></i></button>
+                        </div>
+
+                        {% if chapter_cast %}
+                        {% for char in chapter_cast %}
+                        <div class="cast-item d-flex align-items-center mb-2 pb-2">
+                            <div class="cast-avatar" style="background-color: {{ char.color_code }};">
+                                {{ char.name|slice:":1" }}
+                            </div>
+                            <div>
+                                <div class="fw-semibold small text-dark">{{ char.name }}</div>
+                                <div class="text-muted" style="font-size: 0.65rem;">{{ char.get_role_display }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="text-center py-4 text-muted">
+                            <i class="bi bi-people fs-2 opacity-20"></i>
+                            <p class="small mt-2">No characters found.</p>
+                        </div>
+                        {% endif %}
                     </div>
 
-                    {% if chapter_cast %}
-                    {% for char in chapter_cast %}
-                    <div class="cast-item d-flex align-items-center mb-2 pb-2">
-                        <div class="cast-avatar" style="background-color: {{ char.color_code }};">
-                            {{ char.name|slice:":1" }}
-                        </div>
-                        <div>
-                            <div class="fw-semibold small text-white">{{ char.name }}</div>
-                            <div class="text-muted" style="font-size: 0.65rem;">{{ char.get_role_display }}</div>
-                        </div>
+                    <div class="sidebar-card">
+                        <div class="nav-section-title mt-0 mb-3">Relationships</div>
+                        <p class="text-muted small italic mb-0" style="font-size: 0.75rem;">Select character to see
+                            dynamics.</p>
                     </div>
-                    {% endfor %}
-                    {% else %}
-                    <div class="text-center py-5 text-muted">
-                        <i class="bi bi-people fs-1 opacity-20"></i>
-                        <p class="small mt-2">No characters found.</p>
-                    </div>
-                    {% endif %}
-
-                    <div class="nav-section-title mt-4">Relationships</div>
-                    <p class="text-muted small italic" style="font-size: 0.75rem;">Select character to see dynamics.</p>
                 </div>
             </div>
 
@@ -718,30 +748,33 @@
                     <i class="bi bi-x-lg cursor-pointer small" onclick="closeSidebarRight()"></i>
                 </div>
                 <div class="ghostwriter-chat-container">
-                    <div class="quick-insight-btns">
-                        <button class="insight-btn" onclick="askGhostwriter('Summarize the current plot')"><i
-                                class="bi bi-text-paragraph"></i> Summarize</button>
-                        <button class="insight-btn"
-                            onclick="askGhostwriter('What character dynamics are active here?')"><i
-                                class="bi bi-people"></i> Dynamics</button>
-                        <button class="insight-btn" onclick="askGhostwriter('Check for plot holes in this scene')"><i
-                                class="bi bi-search"></i> Plot Check</button>
-                        <button class="insight-btn"
-                            onclick="askGhostwriter('Suggest character actions for this beat')"><i
-                                class="bi bi-lightning"></i> suggestions</button>
-                    </div>
-                    <div class="chat-messages" id="ghostwriter-messages">
-                        <div class="chat-bubble ai">
-                            Hello! I am your Story Ghostwriter. How can I help with Chapter {{ chapter.chapter_number
-                            }}?
+                    <div class="ghostwriter-chat-card">
+                        <div class="quick-insight-btns">
+                            <button class="insight-btn" onclick="askGhostwriter('Summarize the current plot')"><i
+                                    class="bi bi-text-paragraph"></i> Summarize</button>
+                            <button class="insight-btn"
+                                onclick="askGhostwriter('What character dynamics are active here?')"><i
+                                    class="bi bi-people"></i> Dynamics</button>
+                            <button class="insight-btn"
+                                onclick="askGhostwriter('Check for plot holes in this scene')"><i
+                                    class="bi bi-search"></i> Plot Check</button>
+                            <button class="insight-btn"
+                                onclick="askGhostwriter('Suggest character actions for this beat')"><i
+                                    class="bi bi-lightning"></i> suggestions</button>
                         </div>
-                    </div>
-                    <div class="chat-input-area">
-                        <input type="text" class="form-control" id="ghostwriter-input"
-                            placeholder="Ask about your story..."
-                            onkeypress="if(event.key === 'Enter') sendToGhostwriter()">
-                        <button class="btn btn-primary btn-sm rounded-circle" onclick="sendToGhostwriter()"><i
-                                class="bi bi-send"></i></button>
+                        <div class="chat-messages" id="ghostwriter-messages">
+                            <div class="chat-bubble ai">
+                                Hello! I am your Story Ghostwriter. How can I help with Chapter {{
+                                chapter.chapter_number }}?
+                            </div>
+                        </div>
+                        <div class="chat-input-area">
+                            <input type="text" class="form-control" id="ghostwriter-input"
+                                placeholder="Ask about your story..."
+                                onkeypress="if(event.key === 'Enter') sendToGhostwriter()">
+                            <button class="btn btn-primary btn-sm rounded-circle" onclick="sendToGhostwriter()"><i
+                                    class="bi bi-send"></i></button>
+                        </div>
                     </div>
                 </div>
             </div>
