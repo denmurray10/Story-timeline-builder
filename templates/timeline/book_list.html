@@ -73,7 +73,7 @@
                                 {% endif %}
                             </h6>
                             <span
-                                class="badge rounded-pill ms-2 flex-shrink-0 {% if book.status == 'importing' %}bg-info{% elif book.status == 'drafting' %}bg-warning text-dark{% elif book.status == 'complete' %}bg-success{% else %}bg-secondary{% endif %}"
+                                class="badge rounded-pill ms-2 flex-shrink-0 {% if book.status|lower == 'importing' %}bg-info{% elif book.status|lower == 'drafting' %}bg-warning text-dark{% elif book.status|lower == 'complete' or book.status|lower == 'published' %}bg-success{% elif book.status|lower == 'editing' %}bg-primary{% else %}bg-secondary{% endif %}"
                                 style="font-size: 0.65rem;">
                                 {{ book.get_status_display }}
                             </span>
@@ -96,9 +96,9 @@
 
                         <div class="progress rounded-pill mb-2" style="height: 5px;">
                             <div class="progress-bar js-progress-bar rounded-pill" role="progressbar"
-                                data-width="{{ book.progress_percentage }}%"
-                                aria-valuenow="{{ book.progress_percentage }}" aria-valuemin="0" aria-valuemax="100"
-                                style="background: linear-gradient(90deg, #667eea, #764ba2);">
+                                style="background-color: {% if book.status|lower == 'importing' %}#0dcaf0{% elif book.status|lower == 'drafting' %}#ffc107{% elif book.status|lower == 'complete' or book.status|lower == 'published' %}#198754{% elif book.status|lower == 'editing' %}#0d6efd{% else %}#6c757d{% endif %} !important; width: {% if book.status|lower == 'published' or book.status|lower == 'complete' %}100%{% elif book.progress_percentage|add:0 < 10 and book.status|lower != 'planning' %}10%{% else %}{{ book.progress_percentage }}%{% endif %} !important;"
+                                aria-valuenow="{% if book.status|lower == 'published' or book.status|lower == 'complete' %}100{% else %}{{ book.progress_percentage }}{% endif %}"
+                                aria-valuemin="0" aria-valuemax="100">
                             </div>
                         </div>
                         <div class="d-flex justify-content-between">
