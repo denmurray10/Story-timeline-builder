@@ -219,9 +219,6 @@
     <div id="filter-pills" class="d-flex flex-wrap gap-2">
         <!-- JS will populate these -->
     </div>
-    <button class="btn btn-sm btn-link text-decoration-none text-muted" id="btn-clear-filter" style="display: none;">
-        Clear All
-    </button>
 </div>
 
 <div class="row g-4">
@@ -688,7 +685,6 @@
 
                 // --- FILTER LOGIC ---
                 const filterPillsContainer = document.getElementById('filter-pills');
-                const btnClearFilter = document.getElementById('btn-clear-filter');
                 let activeFilters = new Set();
 
                 // Store original sets for quick reference
@@ -710,7 +706,6 @@
                 function applyFilter() {
                     if (activeFilters.size === 0) {
                         network.setData({ nodes: originalNodes, edges: originalEdges });
-                        btnClearFilter.style.display = 'none';
                     } else {
                         // Filter nodes: include explicitly selected nodes
                         // or nodes connected to selected nodes (to show their relationships)
@@ -733,7 +728,6 @@
                         );
 
                         network.setData({ nodes: filteredNodes, edges: filteredEdges });
-                        btnClearFilter.style.display = 'inline-block';
                     }
 
                     // Update Pill UI
@@ -756,13 +750,6 @@
                     }
                     applyFilter();
                 }
-
-                btnClearFilter.onclick = function () {
-                    activeFilters.clear();
-                    applyFilter();
-                    const pills = filterPillsContainer.querySelectorAll('.filter-pill');
-                    pills.forEach(p => p.style.display = 'flex');
-                };
 
                 // Initial build
                 populateFilterPills();
@@ -1061,30 +1048,8 @@
                                         <span class="badge bg-dark text-white border">${edge.strength}/10 Intensity</span>
                                     </div>
 
-                                    <!-- Deep Intelligence Section -->
-                                    <div class="text-start mb-4">
-                                        ${edge.shared_secret ? `
-                                            <div class="bg-light-info p-2 rounded-3 mb-2 border-start border-info border-4" style="background-color: #f0f7ff;">
-                                                <h6 class="small fw-bold text-info text-uppercase mb-1" style="font-size: 0.65rem;">Shared Secret</h6>
-                                                <p class="small mb-0 fst-italic">"${edge.shared_secret}"</p>
-                                            </div>
-                                        ` : ''}
-                                        ${edge.vulnerability ? `
-                                            <div class="bg-light-warning p-2 rounded-3 mb-2 border-start border-warning border-4" style="background-color: #fffaf0;">
-                                                <h6 class="small fw-bold text-warning text-uppercase mb-1" style="font-size: 0.65rem;">Mutual Vulnerability</h6>
-                                                <p class="small mb-0">"${edge.vulnerability}"</p>
-                                            </div>
-                                        ` : ''}
-                                        ${edge.conflict_source ? `
-                                            <div class="bg-light-danger p-2 rounded-3 mb-2 border-start border-danger border-4" style="background-color: #fff5f5;">
-                                                <h6 class="small fw-bold text-danger text-uppercase mb-1" style="font-size: 0.65rem;">Core Friction</h6>
-                                                <p class="small mb-0">${edge.conflict_source}</p>
-                                            </div>
-                                        ` : ''}
-                                    </div>
-
-                                    <!-- Pill Navigation Buttons -->
-                                    <div class="d-grid gap-2 mb-4">
+                                    <!-- Pill Navigation Buttons (Moved to Top) -->
+                                    <div class="d-grid gap-2 mb-3">
                                         <button class="btn btn-profile-style rounded-pill py-2 d-flex align-items-center justify-content-center" 
                                             onclick="openModalForEdge(${edge.id}, 'core')">
                                             <i class="bi bi-heart me-2"></i> Edit Core Detail
@@ -1095,9 +1060,32 @@
                                         </button>
                                     </div>
 
+                                    <!-- Narrative Arc (Moved up) -->
                                     <div class="text-start bg-light p-3 rounded-3 mb-3 border">
                                         <h6 class="small fw-bold text-uppercase text-muted mb-2">Narrative Arc</h6>
                                         <p class="small mb-0 text-break">${edge.evolution || edge.title || '<span class="text-muted fst-italic">No arc data yet.</span>'}</p>
+                                    </div>
+
+                                    <!-- Deep Intelligence Section (Colored Boxes) -->
+                                    <div class="text-start mb-4">
+                                        ${edge.shared_secret ? `
+                                            <div class="bg-light-info p-2 rounded-3 mb-2" style="background-color: #f0f7ff; border: 1px solid #dbeafe;">
+                                                <h6 class="small fw-bold text-info text-uppercase mb-1" style="font-size: 0.65rem;">Shared Secret</h6>
+                                                <p class="small mb-0 fst-italic">"${edge.shared_secret}"</p>
+                                            </div>
+                                        ` : ''}
+                                        ${edge.vulnerability ? `
+                                            <div class="bg-light-warning p-2 rounded-3 mb-2" style="background-color: #fffaf0; border: 1px solid #fef3c7;">
+                                                <h6 class="small fw-bold text-warning text-uppercase mb-1" style="font-size: 0.65rem;">Mutual Vulnerability</h6>
+                                                <p class="small mb-0">"${edge.vulnerability}"</p>
+                                            </div>
+                                        ` : ''}
+                                        ${edge.conflict_source ? `
+                                            <div class="bg-light-danger p-2 rounded-3 mb-2" style="background-color: #fff5f5; border: 1px solid #fee2e2;">
+                                                <h6 class="small fw-bold text-danger text-uppercase mb-1" style="font-size: 0.65rem;">Core Friction</h6>
+                                                <p class="small mb-0">${edge.conflict_source}</p>
+                                            </div>
+                                        ` : ''}
                                     </div>
                                 </div>
                             </div>
