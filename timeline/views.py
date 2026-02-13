@@ -756,14 +756,19 @@ def api_relationship_data(request):
         width = max(1, rel.strength / 2)
         
         # Style based on type
-        color = '#94a3b8' # Gray (Default)
-        if rel.relationship_type == 'romantic': color = '#f43f5e' # Rose
-        elif rel.relationship_type == 'enemy': color = '#ef4444' # Red
-        elif rel.relationship_type == 'rival': color = '#f59e0b' # Amber/Orange
-        elif rel.relationship_type == 'ally': color = '#10b981' # Emerald
-        elif rel.relationship_type == 'friend': color = '#0ea5e9' # Sky Blue
-        elif rel.relationship_type == 'mentor': color = '#8b5cf6' # Violet
-        elif rel.relationship_type == 'family': color = '#ec4899' # Pink
+        color = '#94a3b8'  # Gray (Default)
+        if rel.relationship_type == 'romantic': color = '#ff2d55'
+        elif rel.relationship_type == 'enemy': color = '#d00e00'
+        elif rel.relationship_type == 'nemesis': color = '#450a0a'
+        elif rel.relationship_type == 'rival': color = '#f97316'
+        elif rel.relationship_type == 'ally': color = '#10b981'
+        elif rel.relationship_type == 'friend': color = '#0ea5e9'
+        elif rel.relationship_type == 'mentor': color = '#f5b60b'
+        elif rel.relationship_type == 'protege': color = '#22d3ee'
+        elif rel.relationship_type == 'family': color = '#8b5cf6'
+        elif rel.relationship_type == 'professional': color = '#475569'
+        elif rel.relationship_type == 'acquaintance': color = '#2dd4bf'
+        elif rel.relationship_type == 'complicated': color = '#d946ef'
         
         edges.append({
             'id': rel.id,
@@ -2509,7 +2514,7 @@ def _perform_relationship_analysis(char_a, char_b, book, interaction_summaries, 
     
     Return Relationship JSON:
     {{
-        "type": "...",  (friend, ally, enemy, romantic, family, professional, rival, mentor, neutral)
+        "type": "...",  (friend, ally, enemy, nemesis, romantic, family, professional, rival, mentor, protege, acquaintance, complicated, neutral)
         "description": "...", (Detailed narrative summary)
         "strength": 5, (1-10)
         "trust_level": 5, (1-10)

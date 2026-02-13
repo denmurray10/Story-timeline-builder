@@ -518,7 +518,11 @@ class CharacterRelationship(models.Model):
         ('family', 'Family'),
         ('rival', 'Rival'),
         ('mentor', 'Mentor'),
+        ('protege', 'Protege / Apprentice'),
         ('professional', 'Professional'),
+        ('acquaintance', 'Acquaintance'),
+        ('complicated', 'Complicated / Ambiguous'),
+        ('nemesis', 'Nemesis'),
         ('neutral', 'Neutral'),
     ]
 
