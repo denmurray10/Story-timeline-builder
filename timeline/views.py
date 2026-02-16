@@ -76,10 +76,10 @@ def register(request):
 # ============== Home & Dashboard ==============
 
 def home(request):
-    """Landing page - redirects to dashboard if logged in."""
+    """New Landing Page - redirects to dashboard if logged in."""
     if request.user.is_authenticated:
         return redirect('dashboard')
-    return render(request, 'timeline/home.html')
+    return render(request, 'timeline/landingpagev2.html')
 
 
 def home_preview(request):
