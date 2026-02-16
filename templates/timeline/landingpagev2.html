@@ -318,7 +318,7 @@
                         class="relative w-full h-[500px] bg-gray-50 dark:bg-gray-900/50 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden mb-6">
 
                         <!-- Connection Line: Agnes to Dora (Family - Purple) -->
-                        <svg class="absolute pointer-events-none overflow-visible"
+                        <svg class="absolute pointer-events-none overflow-visible connection-line family-connection"
                             style="top: calc(47.5% - 6px); left: calc(50% - 156px); width: 130px; height: 60px; z-index: 5;">
                             <!-- Segment 1: Agnes side (Diagonal) -->
                             <path d="M 130 60 L 85 39" stroke="#9333EA" stroke-width="3" fill="none" opacity="0.9" />
@@ -334,7 +334,8 @@
                         </svg>
 
                         <!-- Dora Temple Hotspot Overlay -->
-                        <div id="dora-hotspot" class="map-hotspot absolute flex flex-col items-center gap-1 z-10"
+                        <div id="dora-hotspot"
+                            class="map-hotspot character-node character-family absolute flex flex-col items-center gap-1 z-10"
                             style="top: calc(47.5% - 30px); left: calc(50% - 180px); " title="Click for Profile">
                             <div
                                 class="w-12 h-12 rounded-full border-2 border-white/50 bg-accent dark:bg-yellow-900/40 flex items-center justify-center overflow-hidden shadow-lg relative">
@@ -365,7 +366,7 @@
                         </div>
 
                         <!-- Connection Line: Agnes to Lucius -->
-                        <svg class="absolute pointer-events-none overflow-visible"
+                        <svg class="absolute pointer-events-none overflow-visible connection-line mentor-connection"
                             style="top: calc(47.5%); left: calc(50% - 16px); width: 130px; height: 75px; z-index: 5;">
                             <!-- Straight Line Segment 1: Agnes side -->
                             <path d="M 0 54 L 60 28" stroke="#FACC15" stroke-width="3" fill="none" opacity="0.9" />
@@ -381,7 +382,8 @@
                         </svg>
 
                         <!-- Lucius Temple Hotspot Overlay -->
-                        <div id="lucius-hotspot" class="map-hotspot absolute flex flex-col items-center gap-1 z-10"
+                        <div id="lucius-hotspot"
+                            class="character-node character-mentor map-hotspot absolute flex flex-col items-center gap-1 z-10"
                             style="top: calc(47.5% - 30px); left: calc(50% + 80px);" title="Click for Profile">
                             <div
                                 class="w-12 h-12 rounded-full border-2 border-white/50 bg-accent dark:bg-yellow-900/40 flex items-center justify-center overflow-hidden shadow-lg relative">
@@ -396,7 +398,7 @@
                         </div>
 
                         <!-- Connection Line: Agnes to Theodora (Friend) -->
-                        <svg class="absolute pointer-events-none overflow-visible"
+                        <svg class="absolute pointer-events-none overflow-visible connection-line friend-connection"
                             style="top: calc(47.5% + 45px); left: calc(50% - 16px); width: 130px; height: 95px; z-index: 5;">
                             <!-- Segment 1: Agnes side (Corrected Diagonal) -->
                             <path d="M 0 15 L 50 42" stroke="#3B82F6" stroke-width="3" fill="none" opacity="0.9" />
@@ -412,7 +414,8 @@
                         </svg>
 
                         <!-- Aunt Theodora Hotspot Overlay -->
-                        <div id="theodora-hotspot" class="map-hotspot absolute flex flex-col items-center gap-1 z-10"
+                        <div id="theodora-hotspot"
+                            class="character-node character-friend map-hotspot absolute flex flex-col items-center gap-1 z-10"
                             style="top: calc(47.5% + 100px); left: calc(50% + 80px);" title="Click for Profile">
                             <div
                                 class="w-12 h-12 rounded-full border-2 border-white/50 bg-accent dark:bg-yellow-900/40 flex items-center justify-center overflow-hidden shadow-lg relative">
@@ -427,7 +430,7 @@
                         </div>
 
                         <!-- Connection Line: Agnes to Elise (Family) -->
-                        <svg class="absolute pointer-events-none overflow-visible"
+                        <svg class="absolute pointer-events-none overflow-visible connection-line family-connection"
                             style="top: calc(47.5% + 45px); left: calc(50% - 146px); width: 130px; height: 95px; z-index: 5;">
                             <!-- Straight Line Segment 1: Agnes side -->
                             <path d="M 130 0 L 85 28" stroke="#9333EA" stroke-width="3" fill="none" opacity="0.9" />
@@ -443,7 +446,8 @@
                         </svg>
 
                         <!-- Elise Temple Hotspot Overlay -->
-                        <div id="elise-hotspot" class="map-hotspot absolute flex flex-col items-center gap-1 z-10"
+                        <div id="elise-hotspot"
+                            class="character-node character-family map-hotspot absolute flex flex-col items-center gap-1 z-10"
                             style="top: calc(47.5% + 100px); left: calc(50% - 180px);" title="Click for Profile">
                             <div
                                 class="w-12 h-12 rounded-full border-2 border-white/50 bg-accent dark:bg-yellow-900/40 flex items-center justify-center overflow-hidden shadow-lg relative">
@@ -458,7 +462,7 @@
                         </div>
 
                         <!-- Connection Line: Agnes to Amy (Family) -->
-                        <svg class="absolute pointer-events-none overflow-visible"
+                        <svg class="absolute pointer-events-none overflow-visible connection-line family-connection"
                             style="top: calc(47.5% + 48px); left: calc(50% - 22px); width: 22px; height: 122px; z-index: 5;">
                             <!-- Segment 1: Agnes side (Diagonal from Middle) -->
                             <path d="M 12 0 L 13.4 56" stroke="#9333EA" stroke-width="3" fill="none" opacity="0.9" />
@@ -474,7 +478,7 @@
                         </svg>
 
                         <!-- Connection Line: Agnes to Mrs. Temple (Family) -->
-                        <svg class="absolute pointer-events-none overflow-visible"
+                        <svg class="absolute pointer-events-none overflow-visible connection-line family-connection"
                             style="top: calc(47.5% - 87px); left: calc(50%); width: 22px; height: 122px; z-index: 5;">
                             <!-- Segment 1: Agnes side (Diagonal from Middle) -->
                             <path d="M 0 122 L 4 81" stroke="#9333EA" stroke-width="3" fill="none" opacity="0.9" />
@@ -490,7 +494,8 @@
                         </svg>
 
                         <!-- Amy Temple Hotspot Overlay -->
-                        <div id="amy-hotspot" class="map-hotspot absolute flex flex-col items-center gap-1 z-10"
+                        <div id="amy-hotspot"
+                            class="character-node character-family map-hotspot absolute flex flex-col items-center gap-1 z-10"
                             style="top: calc(47.5% + 170px); left: calc(50% - 46px);" title="Click for Profile">
                             <div
                                 class="w-12 h-12 rounded-full border-2 border-white/50 bg-accent dark:bg-purple-900/40 flex items-center justify-center overflow-hidden shadow-lg relative">
@@ -504,7 +509,8 @@
                         </div>
 
                         <!-- Mrs. Temple Hotspot Overlay -->
-                        <div id="mrs-hotspot" class="map-hotspot absolute flex flex-col items-center gap-1 z-10"
+                        <div id="mrs-hotspot"
+                            class="character-node character-family map-hotspot absolute flex flex-col items-center gap-1 z-10"
                             style="top: calc(47.5% - 125px); left: calc(50% - 24px);" title="Click for Profile">
                             <div
                                 class="w-12 h-12 rounded-full border-2 border-white/50 bg-accent dark:bg-red-900/40 flex items-center justify-center overflow-hidden shadow-lg relative">
@@ -517,16 +523,21 @@
                                 Temple</span>
                         </div>
 
-                        <!-- Connection Key (Restored Overlay) -->
-                        <div class="absolute top-4 right-4 z-20 pointer-events-none">
+                        <!-- Connection Key (Horizontal Header) -->
+                        <div class="absolute top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none w-max">
                             <div
-                                class="bg-white/90 dark:bg-surface-dark/90 backdrop-blur-md p-3 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm pointer-events-auto">
-                                <h4
-                                    class="text-[9px] font-bold uppercase tracking-widest text-gray-400 mb-2 border-b border-gray-100 dark:border-gray-700 pb-1">
-                                    Connection Key</h4>
-                                <div class="space-y-2">
-                                    <div class="flex items-center gap-2">
-                                        <div class="w-4 h-0.5 bg-yellow-400 relative">
+                                class="bg-white/90 dark:bg-surface-dark/90 backdrop-blur-md px-5 py-2 rounded-full border border-gray-200 dark:border-gray-800 shadow-lg pointer-events-auto flex items-center gap-6">
+                                <div class="flex items-center gap-3 border-r border-gray-200 dark:border-gray-700 pr-4">
+                                    <span class="material-icons-outlined text-xs text-gray-400">key</span>
+                                    <h4 class="text-[9px] font-bold uppercase tracking-widest text-gray-400">
+                                        Connection Key</h4>
+                                </div>
+                                <div class="flex items-center gap-6">
+                                    <div id="legend-mentor"
+                                        class="flex items-center gap-3 cursor-pointer hover:opacity-70 transition-all active:scale-95 group"
+                                        data-type="mentor">
+                                        <div
+                                            class="w-4 h-0.5 bg-yellow-400 relative group-hover:scale-x-110 transition-transform">
                                             <div
                                                 class="absolute right-0 -top-0.5 w-1.5 h-1.5 rounded-full bg-yellow-400">
                                             </div>
@@ -534,16 +545,22 @@
                                         <span
                                             class="text-[9px] font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Mentor</span>
                                     </div>
-                                    <div class="flex items-center gap-2">
-                                        <div class="w-4 h-0.5 bg-blue-500 relative">
+                                    <div id="legend-friend"
+                                        class="flex items-center gap-3 cursor-pointer hover:opacity-70 transition-all active:scale-95 group"
+                                        data-type="friend">
+                                        <div
+                                            class="w-4 h-0.5 bg-blue-500 relative group-hover:scale-x-110 transition-transform">
                                             <div class="absolute right-0 -top-0.5 w-1.5 h-1.5 rounded-full bg-blue-500">
                                             </div>
                                         </div>
                                         <span
                                             class="text-[9px] font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Friend</span>
                                     </div>
-                                    <div class="flex items-center gap-2">
-                                        <div class="w-4 h-0.5 bg-purple-600 relative">
+                                    <div id="legend-family"
+                                        class="flex items-center gap-3 cursor-pointer hover:opacity-70 transition-all active:scale-95 group"
+                                        data-type="family">
+                                        <div
+                                            class="w-4 h-0.5 bg-purple-600 relative group-hover:scale-x-110 transition-transform">
                                             <div
                                                 class="absolute right-0 -top-0.5 w-1.5 h-1.5 rounded-full bg-purple-600">
                                             </div>
@@ -2151,6 +2168,42 @@
                 familyAmy: document.getElementById('family-label-amy'),
                 familyMrs: document.getElementById('family-label-mrs')
             };
+
+            // Connection Key Toggle Logic
+            const legendItems = {
+                mentor: document.getElementById('legend-mentor'),
+                friend: document.getElementById('legend-friend'),
+                family: document.getElementById('legend-family')
+            };
+
+            Object.entries(legendItems).forEach(([type, element]) => {
+                if (element) {
+                    element.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const lines = document.querySelectorAll(`.${type}-connection`);
+                        const nodes = document.querySelectorAll(`.character-${type}`);
+
+                        // Toggle active state on legend item
+                        element.classList.toggle('opacity-40');
+                        const isActive = !element.classList.contains('opacity-40');
+
+                        // Toggle lines
+                        lines.forEach(line => {
+                            line.style.transition = 'opacity 0.4s ease';
+                            line.style.opacity = isActive ? '0.9' : '0';
+                            line.style.pointerEvents = isActive ? 'auto' : 'none';
+                        });
+
+                        // Toggle character nodes
+                        nodes.forEach(node => {
+                            node.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+                            node.style.opacity = isActive ? '1' : '0';
+                            node.style.pointerEvents = isActive ? 'auto' : 'none';
+                            node.style.transform = isActive ? 'scale(1)' : 'scale(0.5)';
+                        });
+                    });
+                }
+            });
 
             const panels = {
                 default: document.getElementById('codex-default'),
