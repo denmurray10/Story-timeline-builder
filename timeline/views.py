@@ -35,6 +35,87 @@ from .forms import (
 )
 from .utils.ai_context import ContextResolver
 from .context_engine import ContextEngine
+import datetime
+from django.contrib.auth.views import LoginView as DjangoLoginView
+
+class CustomLoginView(DjangoLoginView):
+    """
+    Login view that adds daily AI-generated quotes to the context.
+    """
+    template_name = 'timeline/loginv2.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['daily_quotes'] = self.get_daily_quotes()
+        return context
+
+    def get_daily_quotes(self):
+        """
+        Retrieves quotes for today. Caches them in a file to avoid over-calling AI.
+        """
+        cache_file = os.path.join(settings.BASE_DIR, 'daily_quotes.json')
+        today = datetime.date.today().isoformat()
+        
+        # Default fallback quotes
+        fallbacks = [
+            {"text": "There is no greater agony than bearing an untold story inside you.", "author": "Maya Angelou"},
+            {"text": "A professional writer is an amateur who didn’t quit.", "author": "Richard Bach"},
+            {"text": "You can always edit a bad page. You can’t edit a blank page.", "author": "Jodi Picoult"},
+            {"text": "Start before you’re ready. Start where you are.", "author": "Steven Pressfield"}
+        ]
+
+        try:
+            if os.path.exists(cache_file):
+                with open(cache_file, 'r') as f:
+                    data = json.load(f)
+                    if data.get('date') == today:
+                        return data.get('quotes')
+        except Exception:
+            pass
+        
+        # If not today or error reading cache, generate new ones
+        quotes = self.generate_ai_quotes() or fallbacks
+        
+        try:
+            with open(cache_file, 'w') as f:
+                json.dump({'date': today, 'quotes': quotes}, f)
+        except Exception:
+            pass
+            
+        return quotes
+
+    def generate_ai_quotes(self):
+        """
+        Uses Gemini to generate 4 fresh writing quotes with generated author names.
+        """
+        api_key = getattr(settings, 'GEMINI_API_KEY', None)
+        if not api_key:
+            return None
+            
+        try:
+            import google.generativeai as genai
+            genai.configure(api_key=api_key)
+            model = genai.GenerativeModel('gemini-1.5-flash')
+            prompt = (
+                "Generate 4 inspiring and unique quotes about writing and storytelling. "
+                "For EACH quote, also generate a fictional but professional-sounding author name. "
+                "Format the response ONLY as a JSON list of objects, for example: "
+                '[{"text": "Quote here...", "author": "Name here"}, ...]'
+            )
+            response = model.generate_content(prompt)
+            text = response.text.strip()
+            
+            # Clean up markdown if present
+            if '```json' in text:
+                text = text.split('```json')[1].split('```')[0].strip()
+            elif '```' in text:
+                text = text.split('```')[1].split('```')[0].strip()
+                
+            return json.loads(text)
+        except Exception as e:
+            print(f"Daily Quote Generation Error: {e}")
+            return None
+
 # ============== Authentication Views ==============
 
 @login_required

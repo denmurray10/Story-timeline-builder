@@ -1,0 +1,741 @@
+{% extends 'timeline/base.html' %}
+{% load static %}
+
+{% block title %}Login - Story Timeline Builder{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Playfair+Display:ital@0;1&display=swap"
+    rel="stylesheet">
+<style>
+    /* Reset some base styles for this specific page */
+    .main-content {
+        padding: 0 !important;
+        background-color: #f2f0eb !important;
+    }
+
+    .page-container {
+        max-width: 100% !important;
+        margin: 0 !important;
+    }
+
+    .login-v2-wrapper {
+        min-height: 100vh;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        background-color: #f2f0eb;
+        overflow-x: hidden;
+    }
+
+    /* Decorative Grid Background - REMOVED */
+    .login-v2-wrapper::before {
+        display: none;
+    }
+
+    /* Header */
+    .login-header {
+        width: 100%;
+        padding: 1.5rem 3rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 10;
+    }
+
+    .brand-logo {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        text-decoration: none;
+    }
+
+    .brand-logo .logo-icon {
+        background: #1a1a1a;
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .brand-text {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .brand-text h1 {
+        font-family: 'DM Serif Display', serif;
+        font-size: 1.25rem;
+        margin: 0;
+        line-height: 1;
+        color: #1a1a1a;
+        letter-spacing: -0.02em;
+    }
+
+    .brand-text span {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        color: #666;
+        font-weight: 600;
+        margin-top: 2px;
+    }
+
+    .header-nav {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        font-size: 0.9rem;
+    }
+
+    .header-nav span {
+        color: #666;
+    }
+
+    .header-nav a {
+        color: #1a1a1a;
+        font-weight: 600;
+        text-decoration: none;
+        border-bottom: 2px solid #1a1a1a;
+        padding-bottom: 2px;
+        transition: opacity 0.2s;
+    }
+
+    .header-nav a:hover {
+        opacity: 0.7;
+    }
+
+    /* Main Card */
+    .login-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-grow: 1;
+        padding: 2rem;
+        z-index: 5;
+        width: 100%;
+        max-width: 1200px;
+    }
+
+    .studio-card {
+        background: #fdfcf8;
+        border: none;
+        border-radius: 32px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+        display: flex;
+        overflow: hidden;
+        min-height: 680px;
+        width: 100%;
+        position: relative;
+        z-index: 2;
+    }
+
+    .corner-blur {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(60px);
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    .corner-blur-yellow {
+        bottom: -40px;
+        right: -40px;
+        width: 300px;
+        height: 300px;
+        background: rgba(254, 240, 138, 0.3);
+    }
+
+    .corner-blur-purple {
+        top: -40px;
+        left: -40px;
+        width: 250px;
+        height: 250px;
+        background: rgba(168, 85, 247, 0.2);
+    }
+
+    /* Left Side: Form */
+    .login-form-area {
+        flex: 1;
+        padding: 4rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        max-width: 480px;
+    }
+
+    .form-header h2 {
+        font-family: 'DM Serif Display', serif;
+        font-size: 3rem;
+        margin-bottom: 0.5rem;
+        color: #1a1a1a;
+    }
+
+    .form-header p {
+        font-family: 'Inter', sans-serif;
+        font-size: 1.1rem;
+        font-weight: 300;
+        color: #666;
+        margin-bottom: 3rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #666;
+        margin-bottom: 0.75rem;
+    }
+
+    .input-wrapper {
+        position: relative;
+        background: rgba(242, 240, 235, 0.5);
+        border-bottom: 2px solid #e5e5e5;
+        transition: border-color 0.3s;
+    }
+
+    .input-wrapper:focus-within {
+        border-color: #1a1a1a;
+    }
+
+    .input-wrapper input {
+        width: 100%;
+        padding: 1rem 0;
+        background: transparent;
+        border: none;
+        outline: none;
+        font-size: 1.1rem;
+        color: #1a1a1a;
+    }
+
+    .input-wrapper input::placeholder {
+        color: rgba(156, 163, 175, 0.5);
+    }
+
+    .password-label-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+    }
+
+    .forgot-link {
+        font-size: 0.75rem;
+        color: #666;
+        text-decoration: underline;
+        text-decoration-style: dotted;
+        text-underline-offset: 4px;
+    }
+
+    .btn-studio {
+        background: #1a1a1a;
+        color: white;
+        width: 100%;
+        padding: 1.25rem;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        margin-top: 1rem;
+        cursor: pointer;
+        transition: transform 0.2s, background 0.2s;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-studio:hover {
+        background: #333;
+        transform: translateY(-2px);
+    }
+
+    .social-divider {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin: 2rem 0;
+        color: #666;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .social-divider::before,
+    .social-divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: #e5e5e5;
+    }
+
+    .social-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .btn-social {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.75rem;
+        border: 1px solid #e5e5e5;
+        border-radius: 8px;
+        background: white;
+        font-weight: 500;
+        color: #262626;
+        text-decoration: none;
+        transition: background 0.2s;
+    }
+
+    .btn-social:hover {
+        background: #f9fafb;
+    }
+
+    /* Right Side: Showcase */
+    .login-showcase-area {
+        flex: 1.2;
+        background-color: rgba(244, 235, 217, 0.3);
+        border-left: none;
+        padding: 4rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        gap: 4rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Blurs */
+    .blur-orange {
+        position: absolute;
+        width: 256px;
+        height: 256px;
+        top: -128px;
+        right: -128px;
+        background: rgba(254, 215, 170, 0.2);
+        filter: blur(32px);
+        border-radius: 50%;
+    }
+
+    .blur-yellow {
+        position: absolute;
+        width: 384px;
+        height: 384px;
+        bottom: -96px;
+        left: -128px;
+        background: rgba(254, 240, 138, 0.2);
+        filter: blur(32px);
+        border-radius: 50%;
+    }
+
+    .blur-purple {
+        display: none;
+    }
+
+    /* System Status */
+    .system-status {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        z-index: 2;
+    }
+
+    .status-badge {
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(2px);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        padding: 0.4rem 0.8rem;
+        border-radius: 9999px;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        background: #22c55e;
+        border-radius: 50%;
+    }
+
+    .version-tag {
+        font-size: 0.75rem;
+        color: #666;
+        font-weight: 500;
+    }
+
+    /* Showcase Card */
+    .showcase-content {
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        gap: 4rem;
+    }
+
+    .ai-card {
+        background: white;
+        border: none;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        width: 100%;
+        max-width: 500px;
+    }
+
+    .ai-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .ai-card-title {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .ai-card-title i {
+        color: #1a1a1a;
+        font-size: 1.1rem;
+    }
+
+    .ai-card-title h3 {
+        font-family: 'DM Serif Display', serif;
+        font-size: 1.15rem;
+        margin: 0;
+    }
+
+    .active-tag {
+        background: rgba(26, 26, 26, 0.05);
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+    }
+
+    .ai-message {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .message-indicator {
+        width: 2px;
+        background: rgba(26, 26, 26, 0.1);
+        border-radius: 999px;
+        align-self: stretch;
+    }
+
+    .ai-message p {
+        font-size: 0.9rem;
+        line-height: 1.6;
+        color: #666;
+        margin: 0;
+    }
+
+    .ai-actions {
+        display: flex;
+        gap: 0.5rem;
+        border-top: 1px solid #f3f4f6;
+        padding-top: 1.25rem;
+    }
+
+    .btn-ai {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    /* Quote */
+    .quote-area {
+        max-width: 450px;
+    }
+
+    .quote-area blockquote {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.5rem;
+        line-height: 1.25;
+        color: #1a1a1a;
+        margin-bottom: 0.75rem;
+        opacity: 0.8;
+    }
+
+    .quote-area cite {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #666;
+        font-style: normal;
+    }
+
+    .quote-area {
+        min-height: 160px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .quote-item {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(20px);
+        filter: blur(8px);
+        transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .quote-item.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+        filter: blur(0);
+    }
+
+    .quote-item.exiting {
+        opacity: 0;
+        transform: translateY(-20px);
+        filter: blur(8px);
+    }
+
+    /* Footer */
+    .login-footer {
+        width: 100%;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        z-index: 10;
+        font-size: 0.75rem;
+        color: #666;
+    }
+
+    .footer-links {
+        display: flex;
+        gap: 1.5rem;
+    }
+
+    .footer-links a {
+        color: #666;
+        text-decoration: none;
+    }
+
+    .footer-links a:hover {
+        text-decoration: underline;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+        .login-showcase-area {
+            display: none;
+        }
+
+        .studio-card {
+            max-width: 500px;
+        }
+
+        .login-form-area {
+            padding: 3rem;
+            max-width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-v2-wrapper">
+    <header class="login-header">
+        <a href="{% url 'timeline_home' %}" class="brand-logo">
+            <img src="{% static 'img/logo.png' %}" alt="Story Timeline Builder" style="height: 3.5rem; width: auto;">
+        </a>
+        <nav class="header-nav">
+            <span>Don't have an account?</span>
+            <a href="{% url 'register' %}">Request Access</a>
+        </nav>
+    </header>
+
+    <main class="login-container">
+        <!-- Wrapper for relative blurs -->
+        <div style="position: relative; width: 100%; display: flex; justify-content: center; align-items: center;">
+            <div class="corner-blur corner-blur-yellow"></div>
+            <div class="corner-blur corner-blur-purple"></div>
+            <div class="studio-card">
+                <!-- Form Area -->
+                <section class="login-form-area">
+                    <div class="form-header">
+                        <h2>Welcome back.</h2>
+                        <p>Your story universe awaits.</p>
+                    </div>
+
+                    <form method="post" action="{% url 'login' %}">
+                        {% csrf_token %}
+
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <div class="input-wrapper">
+                                <input type="text" name="username" id="username" placeholder="Username" required
+                                    autofocus>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="password-label-row">
+                                <label for="password">Password</label>
+                                <a href="#" class="forgot-link">Forgot?</a>
+                            </div>
+                            <div class="input-wrapper">
+                                <input type="password" name="password" id="password" placeholder="••••••••••••"
+                                    required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-studio">
+                            Enter the Studio
+                            <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </form>
+
+                    <div class="social-divider">
+                        Or continue with
+                    </div>
+
+                    <div class="social-buttons">
+                        <a href="#" class="btn-social">
+                            <i class="bi bi-google"></i>
+                            Google
+                        </a>
+                        <a href="#" class="btn-social">
+                            <i class="bi bi-apple"></i>
+                            Apple
+                        </a>
+                    </div>
+                </section>
+
+                <!-- Showcase Area -->
+                <section class="login-showcase-area">
+                    <div class="blur-orange"></div>
+                    <div class="blur-yellow"></div>
+                    <div class="blur-purple"></div>
+
+                    <div class="system-status">
+                        <div class="status-badge">
+                            <div class="status-dot"></div>
+                            System Online
+                        </div>
+                        <span class="version-tag">v2.0.1</span>
+                    </div>
+
+                    <div class="showcase-content">
+                        <div class="ai-card">
+                            <div class="ai-card-header">
+                                <div class="ai-card-title">
+                                    <i class="bi bi-stars"></i>
+                                    <h3>The Ghostwriter</h3>
+                                </div>
+                                <div class="active-tag">Active</div>
+                            </div>
+                            <div class="ai-message">
+                                <div class="message-indicator"></div>
+                                <p>"I've analyzed the tension arc in Chapter 4. The pacing slows down significantly
+                                    during
+                                    the dialogue between Elena and the Archivist. Shall we inject some conflict?"</p>
+                            </div>
+                            <div class="ai-actions">
+                                <button class="btn-ai">Review Suggestions</button>
+                                <button class="btn-ai">Ignore</button>
+                            </div>
+                        </div>
+
+                        <div class="quote-area" id="quote-carousel">
+                            {% for quote in daily_quotes %}
+                            <div class="quote-item {% if forloop.first %}active{% endif %}"
+                                data-index="{{ forloop.counter0 }}">
+                                <blockquote>“{{ quote.text }}”</blockquote>
+                                <cite>— {{ quote.author }}</cite>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                    </div>
+                </section>
+            </div>
+    </main>
+
+    <footer class="login-footer">
+        <div class="footer-links">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Help Center</a>
+        </div>
+        <div>&copy; 2026 Story Timeline Builder. All rights reserved.</div>
+    </footer>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const quotes = document.querySelectorAll('.quote-item');
+        let currentIndex = 0;
+        const totalQuotes = quotes.length;
+
+        function showQuote(index) {
+            const currentQuote = quotes[currentIndex];
+            const nextQuote = quotes[index];
+
+            if (currentQuote === nextQuote) return;
+
+            // Handle current quote exiting
+            currentQuote.classList.remove('active');
+            currentQuote.classList.add('exiting');
+
+            // Handle next quote entering
+            nextQuote.classList.add('active');
+
+            // Clean up exiting class after animation completes
+            setTimeout(() => {
+                currentQuote.classList.remove('exiting');
+            }, 800);
+
+            currentIndex = index;
+        }
+
+        function nextQuote() {
+            let next = (currentIndex + 1) % totalQuotes;
+            showQuote(next);
+        }
+
+        // Auto rotate every 6 seconds (with 1s delay in CSS)
+        setInterval(nextQuote, 6000);
+    });
+</script>
+{% endblock %}

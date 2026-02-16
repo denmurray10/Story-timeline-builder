@@ -441,7 +441,7 @@
 
 <body>
     {% if not user.is_authenticated %}
-    {% if request.resolver_match.url_name != "timeline_home" %}
+    {% if request.resolver_match.url_name != "timeline_home" and request.resolver_match.url_name != "login" %}
     {% if request.resolver_match.url_name != "home_preview" %}
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container-fluid">
@@ -599,11 +599,13 @@
         </div>
     </div>
 
+    {% if request.resolver_match.url_name != "login" %}
     <footer class="footer text-center py-3 mt-4">
         <div class="container">
             <small>&copy; 2026 Story Timeline Builder</small>
         </div>
     </footer>
+    {% endif %}
 
     <!-- JS: Bootstrap + jQuery (optional for AJAX) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
