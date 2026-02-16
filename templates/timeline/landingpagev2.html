@@ -126,18 +126,14 @@
             padding-right: 10%;
         }
 
-        /* Relationship Drawer Drawer Styles */
-        .drawer-open #agnes-drawer {
-            transform: translateX(0);
-        }
-
+        /* Relationship Drawer Styles */
         .map-hotspot {
             cursor: pointer;
             transition: all 0.3s ease;
         }
 
         .map-hotspot:hover {
-            transform: scale(1.5);
+            transform: scale(1.1);
             background-color: rgba(255, 255, 255, 0.4);
         }
     </style>
@@ -308,6 +304,43 @@
                             class="bg-black/60 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded-full font-medium whitespace-nowrap shadow-sm">Agnes
                             Temple</span>
                     </div>
+
+                    <!-- Connection Line: Agnes to Lucius -->
+                    <svg class="absolute pointer-events-none overflow-visible"
+                        style="top: calc(47.5% - 70px + 30px); left: calc(21.7% + 34px); width: 150px; height: 80px; z-index: 5;">
+                        <defs>
+                            <marker id="arrowhead" markerWidth="6" markerHeight="4" refX="6" refY="2" orient="auto">
+                                <polygon points="0 0, 6 2, 0 4" fill="#FACC15" />
+                            </marker>
+                        </defs>
+                        <!-- Straight Line Segment 1: Agnes side -->
+                        <path d="M 0 75 L 70 38" stroke="#FACC15" stroke-width="3" fill="none" opacity="0.9" />
+                        <!-- Straight Line Segment 2: Lucius side -->
+                        <path d="M 110 16 L 143 -2" stroke="#FACC15" stroke-width="3" fill="none"
+                            marker-end="url(#arrowhead)" opacity="0.9" />
+                        <!-- Label shifted further 'up' the line -->
+                        <text id="mentor-label" x="90" y="27" text-anchor="middle" alignment-baseline="middle"
+                            font-size="7" fill="black"
+                            class="font-bold uppercase tracking-[0.2em] cursor-pointer hover:fill-blue-600 transition-colors pointer-events-auto"
+                            transform="rotate(-28.3, 90, 27)">
+                            Mentor
+                        </text>
+                    </svg>
+
+                    <!-- Lucius Temple Hotspot Overlay -->
+                    <div id="lucius-hotspot" class="map-hotspot absolute flex flex-col items-center gap-1 z-10"
+                        style="top: calc(47.5% - 80px); left: calc(21.7% + 150px);" title="Click for Profile">
+                        <div
+                            class="w-12 h-12 rounded-full border-2 border-white/50 bg-accent dark:bg-yellow-900/40 flex items-center justify-center overflow-hidden shadow-lg relative">
+                            <img src="{% static 'img/Lucius-Temple.png' %}" alt="Lucius Temple Profile"
+                                class="w-full h-full object-cover">
+                            <span
+                                class="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full animate-ping opacity-75"></span>
+                        </div>
+                        <span
+                            class="bg-black/60 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded-full font-medium whitespace-nowrap shadow-sm">Lucius
+                            Temple</span>
+                    </div>
                 </div>
                 <!-- Background Glows -->
                 <div
@@ -395,6 +428,113 @@
             </div>
         </div>
     </section>
+
+    <!-- Mentor Relationship Drawer -->
+    <div id="mentor-drawer"
+        class="fixed top-0 right-0 w-80 md:w-96 h-full bg-white dark:bg-surface-dark shadow-2xl transform translate-x-full transition-transform duration-500 z-[100] overflow-y-auto border-l border-gray-200 dark:border-border-dark selection:bg-accent/30">
+        <div
+            class="p-5 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center sticky top-0 bg-white/80 dark:bg-surface-dark/80 backdrop-blur-md z-10">
+            <h3 class="font-bold text-sm uppercase tracking-widest text-gray-500 dark:text-gray-400">Relationship
+                Insight
+            </h3>
+            <button id="close-mentor-drawer"
+                class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-400">
+                <span class="material-icons-outlined">close</span>
+            </button>
+        </div>
+        <div class="p-8">
+            <!-- Overlapping Avatars -->
+            <div class="flex justify-center items-center mb-8 h-20 relative">
+                <div class="absolute left-1/2 -translate-x-12 z-10">
+                    <img src="{% static 'img/Agnes.png' %}" alt="Agnes"
+                        class="w-16 h-16 rounded-full border-4 border-white dark:border-surface-dark shadow-lg object-cover">
+                </div>
+                <div class="absolute left-1/2 -translate-x-4 z-20">
+                    <div
+                        class="bg-accent text-primary text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm border border-white/50">
+                        MENTOR
+                    </div>
+                </div>
+                <div class="absolute left-1/2 translate-x-4 z-10">
+                    <img src="{% static 'img/Lucius-Temple.png' %}" alt="Lucius"
+                        class="w-16 h-16 rounded-full border-4 border-white dark:border-surface-dark shadow-lg object-cover">
+                </div>
+            </div>
+
+            <div class="text-center mb-10">
+                <h4 class="text-2xl font-serif text-primary dark:text-white mb-1">Mentor</h4>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Beneath the surface of the Temple Dynasty</p>
+
+                <div class="flex gap-2 justify-center mt-4">
+                    <span
+                        class="text-[9px] px-2 py-0.5 rounded-full bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border border-green-100 dark:border-green-800 font-bold uppercase">Active</span>
+                    <span
+                        class="text-[9px] px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-800 font-bold uppercase">Publicly
+                        Known</span>
+                    <span
+                        class="text-[9px] px-2 py-0.5 rounded-full bg-primary text-white font-bold uppercase italic">8/10
+                        Intensity</span>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Narrative Arc -->
+                <div class="p-5 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700">
+                    <h5
+                        class="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3 flex items-center gap-2">
+                        <span class="material-icons-outlined text-xs">timeline</span> Narrative Arc
+                    </h5>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed font-serif italic">
+                        "The transmission of logic from father to daughter is rarely a straight line; it is a series of
+                        encrypted handshakes."
+                    </p>
+                    <p class="mt-3 text-xs text-gray-500 dark:text-gray-500 leading-relaxed">
+                        Lucius provides Agnes with the "unrestricted" data paths she needs for her investigation,
+                        operating through encrypted shadows while maintaining a cold, formal patriarch facade.
+                    </p>
+                </div>
+
+                <!-- Deep Intelligence -->
+                <div class="space-y-3">
+                    <div
+                        class="p-3 rounded-xl bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100/50 dark:border-blue-800/30">
+                        <h6
+                            class="text-[9px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-tighter mb-1">
+                            Shared Secret</h6>
+                        <p class="text-[11px] text-gray-600 dark:text-gray-400 italic">"The true archives of Project
+                            Gilded Cage remain hidden in the residency cellar."</p>
+                    </div>
+
+                    <div
+                        class="p-3 rounded-xl bg-orange-50/50 dark:bg-orange-900/10 border border-orange-100/50 dark:border-orange-800/30">
+                        <h6
+                            class="text-[9px] font-bold text-orange-600 dark:text-orange-400 uppercase tracking-tighter mb-1">
+                            Core Friction</h6>
+                        <p class="text-[11px] text-gray-600 dark:text-gray-400">Lucius demands 'Structured' resolution
+                            while Agnes pursues 'Unstructured' truth.</p>
+                    </div>
+
+                    <div
+                        class="p-3 rounded-xl bg-red-50/50 dark:bg-red-900/10 border border-red-100/50 dark:border-red-800/30">
+                        <h6 class="text-[9px] font-bold text-red-600 dark:text-red-400 uppercase tracking-tighter mb-1">
+                            Mutual Vulnerability</h6>
+                        <p class="text-[11px] text-gray-600 dark:text-gray-400">The Temple family reputation is tied to
+                            the success of the case.</p>
+                    </div>
+                </div>
+
+                <!-- Forecast -->
+                <div class="p-5 rounded-2xl bg-primary text-white dark:bg-white dark:text-primary">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="material-icons-outlined text-sm">auto_awesome</span>
+                        <span class="text-[10px] font-bold uppercase tracking-widest opacity-70">AI Prediction</span>
+                    </div>
+                    <p class="text-xs leading-relaxed">Their relationship is reaching a breaking point. One will soon
+                        have to sacrifice their principles for the other's safety.</p>
+                </div>
+            </div>
+        </div>
+    </div>
     <section class="py-24 bg-background-light dark:bg-background-dark">
         <div class="reveal slide-up max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <span class="material-icons-outlined text-4xl text-yellow-500 mb-8 opacity-50">format_quote</span>
@@ -588,6 +728,92 @@
         </div>
     </div>
 
+    <!-- Lucius Temple Insight Drawer -->
+    <div id="lucius-drawer"
+        class="fixed top-0 right-0 w-80 md:w-96 h-full bg-white dark:bg-surface-dark shadow-2xl transform translate-x-full transition-transform duration-500 z-[100] overflow-y-auto border-l border-gray-200 dark:border-border-dark selection:bg-accent/30">
+        <!-- Header -->
+        <div
+            class="p-5 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center sticky top-0 bg-white/80 dark:bg-surface-dark/80 backdrop-blur-md z-10">
+            <h3 class="font-bold text-sm uppercase tracking-widest text-gray-500 dark:text-gray-400">Codex: Character
+                Insight</h3>
+            <button id="close-lucius-drawer"
+                class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-400">
+                <span class="material-icons-outlined">close</span>
+            </button>
+        </div>
+
+        <!-- Content -->
+        <div class="p-8">
+            <div class="flex items-center gap-6 mb-10">
+                <div class="relative">
+                    <div
+                        class="w-20 h-20 rounded-2xl bg-accent overflow-hidden shadow-sm rotate-3 border-4 border-white dark:border-gray-800">
+                        <img src="{% static 'img/Lucius-Temple.png' %}" alt="Lucius Temple Portrait"
+                            class="w-full h-full object-cover">
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-2xl font-serif text-primary dark:text-white leading-none mb-2">Lucius Temple</h4>
+                    <div class="flex items-center gap-2">
+                        <span
+                            class="text-[10px] font-bold uppercase tracking-widest bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-gray-500">Antagonist
+                            / Patriarch</span>
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-red-500">Book 1</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-8">
+                <div class="reveal slide-up active">
+                    <h5
+                        class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-3 border-b border-gray-100 dark:border-gray-800 pb-1">
+                        Core Motivation</h5>
+                    <p class="text-base text-gray-600 dark:text-gray-400 leading-relaxed font-serif italic">
+                        "The truth is not a luxury; it is a weapon. And I have spent my life forging it."
+                    </p>
+                    <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">
+                        Lucius believes that order must be maintained at any cost. His meticulous archiving of the
+                        city's secrets has made him both the most respected and the most feared man in London.
+                    </p>
+                </div>
+
+                <div class="reveal slide-up active delay-100">
+                    <h5
+                        class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-4 border-b border-gray-100 dark:border-gray-800 pb-1">
+                        Relationship Pulse</h5>
+                    <div class="space-y-4">
+                        <div
+                            class="group p-4 rounded-xl bg-background-light dark:bg-gray-800/50 border border-transparent hover:border-accent dark:hover:border-yellow-900/30 transition-all cursor-default">
+                            <div class="flex justify-between items-center mb-2">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-6 h-6 rounded bg-gray-200 dark:bg-gray-700"></div>
+                                    <span class="text-sm font-bold text-primary dark:text-white">Agnes Temple</span>
+                                </div>
+                                <span
+                                    class="text-[8px] px-2 py-0.5 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 uppercase font-bold tracking-tighter">Strained</span>
+                            </div>
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 h-1 rounded-full overflow-hidden mb-2">
+                                <div class="bg-red-400 h-full w-[40%]"></div>
+                            </div>
+                            <p class="text-[11px] text-gray-500 leading-snug">His daughter. He sees her rebellion as a
+                                threat to the Temple legacy, yet secretly admires her intuition.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-6 rounded-2xl bg-primary text-white dark:bg-white dark:text-primary mt-12">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="material-icons-outlined text-sm">auto_awesome</span>
+                        <span class="text-[10px] font-bold uppercase tracking-widest opacity-70">AI Ghostwriter
+                            Prediction</span>
+                    </div>
+                    <p class="text-xs leading-relaxed">Lucius is likely to reveal the true nature of the 'Gilded Cage'
+                        to Agnes in Chapter 22, forcing her to choose between truth and familial loyalty.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Intersection Observer for Reveal Animations
         document.addEventListener('DOMContentLoaded', () => {
@@ -641,26 +867,68 @@
 
             // Relationship Drawer Toggle
             const agnesHotspot = document.getElementById('agnes-hotspot');
+            const luciusHotspot = document.getElementById('lucius-hotspot');
+            const mentorLabel = document.getElementById('mentor-label');
+
             const closeDrawer = document.getElementById('close-drawer');
-            const drawer = document.getElementById('agnes-drawer');
+            const closeLuciusDrawer = document.getElementById('close-lucius-drawer');
+            const closeMentorDrawer = document.getElementById('close-mentor-drawer');
 
-            if (agnesHotspot && drawer) {
-                agnesHotspot.addEventListener('click', () => {
+            const agnesDrawer = document.getElementById('agnes-drawer');
+            const luciusDrawer = document.getElementById('lucius-drawer');
+            const mentorDrawer = document.getElementById('mentor-drawer');
+
+            const closeAllDrawers = () => {
+                if (agnesDrawer) agnesDrawer.classList.add('translate-x-full');
+                if (luciusDrawer) luciusDrawer.classList.add('translate-x-full');
+                if (mentorDrawer) mentorDrawer.classList.add('translate-x-full');
+                document.body.classList.remove('drawer-open');
+            };
+
+            if (agnesHotspot && agnesDrawer) {
+                agnesHotspot.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    closeAllDrawers();
                     document.body.classList.add('drawer-open');
+                    agnesDrawer.classList.remove('translate-x-full');
                 });
             }
 
-            if (closeDrawer) {
-                closeDrawer.addEventListener('click', () => {
-                    document.body.classList.remove('drawer-open');
+            if (luciusHotspot && luciusDrawer) {
+                luciusHotspot.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    closeAllDrawers();
+                    document.body.classList.add('drawer-open');
+                    luciusDrawer.classList.remove('translate-x-full');
                 });
             }
+
+            if (mentorLabel && mentorDrawer) {
+                mentorLabel.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    closeAllDrawers();
+                    document.body.classList.add('drawer-open');
+                    mentorDrawer.classList.remove('translate-x-full');
+                });
+            }
+
+            if (closeDrawer) closeDrawer.addEventListener('click', closeAllDrawers);
+            if (closeLuciusDrawer) closeLuciusDrawer.addEventListener('click', closeAllDrawers);
+            if (closeMentorDrawer) closeMentorDrawer.addEventListener('click', closeAllDrawers);
 
             // Close on outside click
             document.addEventListener('click', (e) => {
                 if (document.body.classList.contains('drawer-open')) {
-                    if (!drawer.contains(e.target) && !agnesHotspot.contains(e.target)) {
-                        document.body.classList.remove('drawer-open');
+                    const hotspotClicked = (agnesHotspot && agnesHotspot.contains(e.target)) ||
+                        (luciusHotspot && luciusHotspot.contains(e.target)) ||
+                        (mentorLabel && mentorLabel.contains(e.target));
+
+                    const drawerClicked = (agnesDrawer && agnesDrawer.contains(e.target)) ||
+                        (luciusDrawer && luciusDrawer.contains(e.target)) ||
+                        (mentorDrawer && mentorDrawer.contains(e.target));
+
+                    if (!hotspotClicked && !drawerClicked) {
+                        closeAllDrawers();
                     }
                 }
             });
