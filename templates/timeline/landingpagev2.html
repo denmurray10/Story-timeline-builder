@@ -295,14 +295,14 @@
                         <button
                             class="bg-primary text-white dark:bg-white dark:text-primary px-6 py-2 rounded-lg text-sm font-medium">Zen
                             Mode</button>
-                        <button
+                        <button id="theme-toggle-btn"
                             class="bg-transparent border border-gray-300 dark:border-gray-600 text-primary dark:text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">Dark/Light
                             Themes</button>
                     </div>
                 </div>
                 <div class="w-full md:w-1/2">
-                    <div
-                        class="bg-background-light dark:bg-background-dark rounded-xl p-4 shadow-lg border border-gray-100 dark:border-gray-700">
+                    <div id="writing-pad-mockup"
+                        class="bg-background-light dark:bg-background-dark rounded-xl p-4 shadow-lg border border-gray-100 dark:border-gray-700 transition-colors duration-500">
                         <div class="bg-white dark:bg-surface-dark rounded-lg shadow-sm overflow-hidden h-96 flex">
                             <div
                                 class="flex-1 p-6 md:p-8 font-serif text-gray-800 dark:text-gray-200 text-sm md:text-base leading-relaxed overflow-y-auto">
@@ -474,6 +474,16 @@
             };
             window.addEventListener('scroll', handleScroll);
             handleScroll(); // Initial check
+
+            // Theme Toggle Demo Logic
+            const themeBtn = document.getElementById('theme-toggle-btn');
+            const mockup = document.getElementById('writing-pad-mockup');
+
+            if (themeBtn && mockup) {
+                themeBtn.addEventListener('click', () => {
+                    mockup.classList.toggle('dark');
+                });
+            }
         });
     </script>
 
