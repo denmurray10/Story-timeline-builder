@@ -125,6 +125,21 @@
             padding-left: 10%;
             padding-right: 10%;
         }
+
+        /* Relationship Drawer Drawer Styles */
+        .drawer-open #agnes-drawer {
+            transform: translateX(0);
+        }
+
+        .map-hotspot {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .map-hotspot:hover {
+            transform: scale(1.5);
+            background-color: rgba(255, 255, 255, 0.4);
+        }
     </style>
 </head>
 
@@ -274,9 +289,25 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
             <div class="reveal fade-in relative w-full">
                 <div
-                    class="relative rounded-xl md:rounded-3xl overflow-hidden shadow-xl border border-gray-100 dark:border-gray-800">
+                    class="relative rounded-xl md:rounded-3xl overflow-hidden shadow-xl border border-gray-100 dark:border-gray-800 group">
                     <img src="{% static 'img/relationship_map_figma.webp' %}" alt="Relationship Map Interface"
                         class="w-full h-auto block">
+
+                    <!-- Agnes Temple Hotspot Overlay -->
+                    <div id="agnes-hotspot"
+                        class="map-hotspot absolute top-[47.5%] left-[21.7%] flex flex-col items-center gap-1 z-10"
+                        title="Click for Profile">
+                        <div
+                            class="w-12 h-12 rounded-full border-2 border-white/50 bg-accent dark:bg-yellow-900/40 flex items-center justify-center overflow-hidden shadow-lg relative">
+                            <img src="{% static 'img/Elena.webp' %}" alt="Agnes Temple Profile"
+                                class="w-full h-full object-cover">
+                            <span
+                                class="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full animate-ping opacity-75"></span>
+                        </div>
+                        <span
+                            class="bg-black/60 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded-full font-medium whitespace-nowrap shadow-sm">Agnes
+                            Temple</span>
+                    </div>
                 </div>
                 <!-- Background Glows -->
                 <div
@@ -452,6 +483,109 @@
         </div>
     </footer>
 
+    <!-- Character Insight Drawer (Slides in from right) -->
+    <div id="agnes-drawer"
+        class="fixed top-0 right-0 w-80 md:w-96 h-full bg-white dark:bg-surface-dark shadow-2xl transform translate-x-full transition-transform duration-500 z-[100] overflow-y-auto border-l border-gray-200 dark:border-border-dark selection:bg-accent/30">
+        <!-- Header -->
+        <div
+            class="p-5 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center sticky top-0 bg-white/80 dark:bg-surface-dark/80 backdrop-blur-md z-10">
+            <h3 class="font-bold text-sm uppercase tracking-widest text-gray-500 dark:text-gray-400">Codex: Character
+                Insight</h3>
+            <button id="close-drawer"
+                class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-400">
+                <span class="material-icons-outlined">close</span>
+            </button>
+        </div>
+
+        <!-- Content -->
+        <div class="p-8">
+            <div class="flex items-center gap-6 mb-10">
+                <div class="relative">
+                    <div
+                        class="w-20 h-20 rounded-2xl bg-accent dark:bg-yellow-900/30 flex items-center justify-center text-primary dark:text-accent font-serif text-3xl shadow-sm rotate-3">
+                        AT</div>
+                    <div
+                        class="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 border-4 border-white dark:border-surface-dark rounded-full">
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-2xl font-serif text-primary dark:text-white leading-none mb-2">Agnes Temple</h4>
+                    <div class="flex items-center gap-2">
+                        <span
+                            class="text-[10px] font-bold uppercase tracking-widest bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-gray-500">Protagonist</span>
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-blue-500">Book 1</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-8">
+                <div class="reveal slide-up active">
+                    <h5
+                        class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-3 border-b border-gray-100 dark:border-gray-800 pb-1">
+                        Core Motivation</h5>
+                    <p class="text-base text-gray-600 dark:text-gray-400 leading-relaxed font-serif italic">
+                        "I am not my father's legacy. I am the silence that follows his noise."
+                    </p>
+                    <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">
+                        Agnes seeks to prove her intellectual independence from the Temple dynasty by solving the
+                        'Gilded Cage' case using methods her father would deem 'unstructured.'
+                    </p>
+                </div>
+
+                <div class="reveal slide-up active delay-100">
+                    <h5
+                        class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-4 border-b border-gray-100 dark:border-gray-800 pb-1">
+                        Relationship Pulse</h5>
+                    <div class="space-y-4">
+                        <div
+                            class="group p-4 rounded-xl bg-background-light dark:bg-gray-800/50 border border-transparent hover:border-accent dark:hover:border-yellow-900/30 transition-all cursor-default">
+                            <div class="flex justify-between items-center mb-2">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-6 h-6 rounded bg-gray-200 dark:bg-gray-700"></div>
+                                    <span class="text-sm font-bold text-primary dark:text-white">Leo Vance</span>
+                                </div>
+                                <span
+                                    class="text-[8px] px-2 py-0.5 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 uppercase font-bold tracking-tighter">Complicated</span>
+                            </div>
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 h-1 rounded-full overflow-hidden mb-2">
+                                <div class="bg-orange-400 h-full w-[75%]"></div>
+                            </div>
+                            <p class="text-[11px] text-gray-500 leading-snug">Intellectual rivals since the London
+                                Academy. Leo keeps his discovery of the antidote secret from her.</p>
+                        </div>
+
+                        <div
+                            class="group p-4 rounded-xl bg-background-light dark:bg-gray-800/50 border border-transparent hover:border-accent dark:hover:border-yellow-900/30 transition-all cursor-default">
+                            <div class="flex justify-between items-center mb-2">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-6 h-6 rounded bg-gray-200 dark:bg-gray-700"></div>
+                                    <span class="text-sm font-bold text-primary dark:text-white">The Curator</span>
+                                </div>
+                                <span
+                                    class="text-[8px] px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 uppercase font-bold tracking-tighter">Mentor</span>
+                            </div>
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 h-1 rounded-full overflow-hidden mb-2">
+                                <div class="bg-blue-400 h-full w-[90%]"></div>
+                            </div>
+                            <p class="text-[11px] text-gray-500 leading-snug">The only person Agnes truly trusts. He
+                                provides the contextual breadcrumbs that fuel her investigation.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-6 rounded-2xl bg-primary text-white dark:bg-white dark:text-primary mt-12">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="material-icons-outlined text-sm">auto_awesome</span>
+                        <span class="text-[10px] font-bold uppercase tracking-widest opacity-70">AI Ghostwriter
+                            Prediction</span>
+                    </div>
+                    <p class="text-xs leading-relaxed">Based on current beats, Agnes is likely to betray The Curator in
+                        Chapter 14 to save Leo. This creates a major emotional pivot point.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Intersection Observer for Reveal Animations
         document.addEventListener('DOMContentLoaded', () => {
@@ -502,6 +636,32 @@
                     mockup.classList.toggle('zen-mode-active');
                 });
             }
+
+            // Relationship Drawer Toggle
+            const agnesHotspot = document.getElementById('agnes-hotspot');
+            const closeDrawer = document.getElementById('close-drawer');
+            const drawer = document.getElementById('agnes-drawer');
+
+            if (agnesHotspot && drawer) {
+                agnesHotspot.addEventListener('click', () => {
+                    document.body.classList.add('drawer-open');
+                });
+            }
+
+            if (closeDrawer) {
+                closeDrawer.addEventListener('click', () => {
+                    document.body.classList.remove('drawer-open');
+                });
+            }
+
+            // Close on outside click
+            document.addEventListener('click', (e) => {
+                if (document.body.classList.contains('drawer-open')) {
+                    if (!drawer.contains(e.target) && !agnesHotspot.contains(e.target)) {
+                        document.body.classList.remove('drawer-open');
+                    }
+                }
+            });
         });
     </script>
 
