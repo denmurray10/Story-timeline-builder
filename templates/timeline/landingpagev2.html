@@ -319,22 +319,16 @@
 
                         <!-- Connection Line: Agnes to Dora (Family - Purple) -->
                         <svg class="absolute pointer-events-none overflow-visible"
-                            style="top: calc(47.5% - 30px); left: calc(50% - 146px); width: 130px; height: 75px; z-index: 5;">
-                            <defs>
-                                <marker id="arrowhead-purple-dora" markerWidth="6" markerHeight="4" refX="6" refY="2"
-                                    orient="auto">
-                                    <polygon points="0 0, 6 2, 0 4" fill="#9333EA" />
-                                </marker>
-                            </defs>
-                            <!-- Line from Agnes (Bottom Right) to Dora (Top Left) -->
-                            <path d="M 96 60 L 40 20" stroke="#9333EA" stroke-width="3" fill="none" opacity="0.9" />
-                            <path d="M 12 5 L -10 0" stroke="#9333EA" stroke-width="3" fill="none"
-                                marker-end="url(#arrowhead-purple-dora)" opacity="0.9" />
+                            style="top: calc(47.5% - 6px); left: calc(50% - 156px); width: 130px; height: 60px; z-index: 5;">
+                            <!-- Segment 1: Agnes side (Diagonal) -->
+                            <path d="M 130 60 L 85 39" stroke="#9333EA" stroke-width="3" fill="none" opacity="0.9" />
+                            <!-- Segment 2: Dora side -->
+                            <path d="M 45 21 L 0 0" stroke="#9333EA" stroke-width="3" fill="none" opacity="0.9" />
                             <!-- Label Family -->
-                            <text id="family-label-dora" x="45" y="35" text-anchor="middle" alignment-baseline="middle"
+                            <text id="family-label-dora" x="65" y="30" text-anchor="middle" alignment-baseline="middle"
                                 font-size="7" fill="black"
                                 class="font-bold uppercase tracking-[0.2em] cursor-pointer hover:fill-purple-400 transition-colors pointer-events-auto"
-                                transform="rotate(30, 45, 35)">
+                                transform="rotate(25, 65, 30)">
                                 Family
                             </text>
                         </svg>
@@ -404,15 +398,15 @@
                         <!-- Connection Line: Agnes to Theodora (Friend) -->
                         <svg class="absolute pointer-events-none overflow-visible"
                             style="top: calc(47.5% + 45px); left: calc(50% - 16px); width: 130px; height: 95px; z-index: 5;">
-                            <!-- Straight Line Segment 1: Agnes side -->
-                            <path d="M 0 0 L 60 50" stroke="#3B82F6" stroke-width="3" fill="none" opacity="0.9" />
-                            <!-- Straight Line Segment 2: Theodora side -->
-                            <path d="M 90 70 L 123 77" stroke="#3B82F6" stroke-width="3" fill="none" opacity="0.9" />
+                            <!-- Segment 1: Agnes side (Corrected Diagonal) -->
+                            <path d="M 0 15 L 50 42" stroke="#3B82F6" stroke-width="3" fill="none" opacity="0.9" />
+                            <!-- Segment 2: Theodora side -->
+                            <path d="M 80 58 L 120 80" stroke="#3B82F6" stroke-width="3" fill="none" opacity="0.9" />
                             <!-- Label Friend -->
-                            <text id="friend-label" x="75" y="60" text-anchor="middle" alignment-baseline="middle"
+                            <text id="friend-label" x="65" y="50" text-anchor="middle" alignment-baseline="middle"
                                 font-size="7" fill="black"
                                 class="font-bold uppercase tracking-[0.2em] cursor-pointer hover:fill-blue-400 transition-colors pointer-events-auto"
-                                transform="rotate(25, 75, 60)">
+                                transform="rotate(28, 65, 50)">
                                 Friend
                             </text>
                         </svg>
@@ -481,10 +475,18 @@
 
                         <!-- Connection Line: Agnes to Mrs. Temple (Family) -->
                         <svg class="absolute pointer-events-none overflow-visible"
-                            style="top: calc(47.5% - 40px); left: calc(50% - 20px); width: 100px; height: 100px; z-index: 5;">
-                            <!-- Line from Agnes (Top) to Mrs. Temple (Bottom) -->
-                            <path d="M 0 100 L 70 0" stroke="#9333EA" stroke-width="2" fill="none" opacity="0.6"
-                                stroke-dasharray="4" />
+                            style="top: calc(47.5% - 87px); left: calc(50%); width: 22px; height: 122px; z-index: 5;">
+                            <!-- Segment 1: Agnes side (Diagonal from Middle) -->
+                            <path d="M 0 122 L 4 81" stroke="#9333EA" stroke-width="3" fill="none" opacity="0.9" />
+                            <!-- Segment 2: Mrs. Temple side -->
+                            <path d="M 8 41 L 12 0" stroke="#9333EA" stroke-width="3" fill="none" opacity="0.9" />
+                            <!-- Family Label centered on the line -->
+                            <text id="family-label-mrs" x="6" y="61" text-anchor="middle" alignment-baseline="middle"
+                                font-size="7" fill="black"
+                                class="font-bold uppercase tracking-[0.2em] cursor-pointer hover:fill-purple-400 transition-colors pointer-events-auto"
+                                transform="rotate(-84, 6, 61)">
+                                Family
+                            </text>
                         </svg>
 
                         <!-- Amy Temple Hotspot Overlay -->
@@ -503,11 +505,11 @@
 
                         <!-- Mrs. Temple Hotspot Overlay -->
                         <div id="mrs-hotspot" class="map-hotspot absolute flex flex-col items-center gap-1 z-10"
-                            style="top: calc(47.5% - 80px); left: calc(50% + 40px);" title="Click for Profile">
+                            style="top: calc(47.5% - 125px); left: calc(50% - 24px);" title="Click for Profile">
                             <div
                                 class="w-12 h-12 rounded-full border-2 border-white/50 bg-accent dark:bg-red-900/40 flex items-center justify-center overflow-hidden shadow-lg relative">
                                 <img src="{% static 'img/Elise-temple.png' %}" alt="Mrs. Temple Profile"
-                                    class="w-full h-full object-cover opacity-80 backdrop-grayscale">
+                                    class="w-full h-full object-cover">
                                 <span class="absolute -top-1 -right-1 w-2 h-2 bg-red-400 rounded-full"></span>
                             </div>
                             <span
@@ -2146,7 +2148,8 @@
                 friend: document.getElementById('friend-label'),
                 family: document.getElementById('family-label'),
                 familyDora: document.getElementById('family-label-dora'),
-                familyAmy: document.getElementById('family-label-amy')
+                familyAmy: document.getElementById('family-label-amy'),
+                familyMrs: document.getElementById('family-label-mrs')
             };
 
             const panels = {
@@ -2162,7 +2165,8 @@
                 friend: document.getElementById('codex-friend'),
                 family: document.getElementById('codex-family'),
                 familyDora: document.getElementById('codex-family'),
-                familyAmy: document.getElementById('codex-family')
+                familyAmy: document.getElementById('codex-family'),
+                familyMrs: document.getElementById('codex-family')
             };
 
             let autoScrollInterval;
