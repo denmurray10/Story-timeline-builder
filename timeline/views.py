@@ -50,6 +50,12 @@ def account(request):
         form = UserAccountForm(instance=request.user)
     return render(request, 'timeline/account.html', {'form': form})
 
+def landing_page_v2(request):
+    """
+    Renders the V2 landing page (Developer UI Specs).
+    """
+    return render(request, 'timeline/landingpagev2.html')
+
 
 # ============== Authentication Views ==============
 

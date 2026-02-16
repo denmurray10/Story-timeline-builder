@@ -16,6 +16,9 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('dashboard/test/', views.dashboard_test, name='dashboard_test'),
     path('home-preview/', views.home_preview, name='home_preview'),
+    path('landing-pagev2/', views.landing_page_v2, name='landing_page_v2'),
+    path('landingpagev2/', views.landing_page_v2),
+    path('landingpagev2.html', views.landing_page_v2),
     
     # Books
     path('books/', views.book_list, name='book_list'),

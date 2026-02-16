@@ -1,0 +1,381 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Story Timeline Builder - Developer UI Specs V1</title>
+    <meta content="AI-powered writing platform for storytellers. Plan, draft, and polish your fictional world."
+        name="description" />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&amp;family=Inter:wght@300;400;500;600;700&amp;family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#333333", // Dark charcoal for primary buttons/text
+                        accent: "#F4EBD9", // Warm highlight
+                        "background-light": "#F2F0EB", // Warm grey/beige background from screenshot
+                        "background-dark": "#121212", // Deep dark background
+                        "surface-light": "#FFFFFF",
+                        "surface-dark": "#1E1E1E",
+                        "text-light": "#333333",
+                        "text-dark": "#E0E0E0",
+                        "border-light": "#E5E5E5",
+                        "border-dark": "#333333",
+                        "green-success": "#4CAF50",
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['DM Serif Display', 'serif'], // For Headlines
+                        display: ['Playfair Display', 'serif'], // For italic accents
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem",
+                        'xl': '0.75rem',
+                        '2xl': '1rem',
+                        '3xl': '1.5rem',
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'card': '0 10px 30px -5px rgba(0, 0, 0, 0.08)',
+                    }
+                },
+            },
+        };
+    </script>
+    <style>
+        .glass-panel {
+            backdrop-filter: blur(8px);
+            background: rgba(255, 255, 255, 0.7);
+        }
+
+        .dark .glass-panel {
+            background: rgba(30, 30, 30, 0.7);
+        }
+
+        .h-20 {
+            height: 8rem;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-sans transition-colors duration-300 antialiased selection:bg-accent selection:text-primary">
+    <nav
+        class="fixed w-full z-50 top-0 left-0 transition-all duration-300 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md border-b border-transparent dark:border-border-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <a href="{% url 'landing_page_v2' %}" class="flex-shrink-0 flex items-center cursor-pointer">
+                    <img src="{% static 'img/logo.png' %}" alt="Story Timeline Builder"
+                        style="height: 3.5rem; width: auto;">
+                </a>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-white transition-colors"
+                        href="#">Features</a>
+                    <a class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-white transition-colors"
+                        href="#">Pricing</a>
+                    <a class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-white transition-colors"
+                        href="#">Resources</a>
+                    <a class="bg-primary text-white dark:bg-white dark:text-primary px-5 py-2.5 rounded-full text-sm font-medium hover:opacity-90 transition-opacity shadow-sm"
+                        href="#">Start Writing</a>
+                </div>
+                <div class="md:hidden flex items-center">
+                    <button class="text-primary dark:text-white p-2">
+                        <span class="material-icons-outlined">menu</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <section class="pt-32 pb-20 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center">
+            <div
+                class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark shadow-sm mb-8">
+                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                <span class="text-xs font-semibold tracking-wide uppercase text-gray-500 dark:text-gray-400">v2.0 Now
+                    Available</span>
+            </div>
+            <h1
+                class="text-5xl md:text-7xl font-serif text-primary dark:text-white mb-6 leading-tight max-w-4xl mx-auto">
+                Contextual Intelligence <br />
+                <span class="font-display italic font-normal text-gray-600 dark:text-gray-300">for your fictional
+                    world</span>
+            </h1>
+            <p class="text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+                Stop juggling scattered notes. Write with an AI partner that understands the deep history, emotional
+                arcs, and hidden connections within your story.
+            </p>
+            <div class="flex flex-col sm:flex-row items-center gap-4 mb-20">
+                <a class="bg-primary text-white dark:bg-white dark:text-primary px-8 py-3.5 rounded-full font-medium hover:scale-105 transition-transform duration-200 shadow-lg flex items-center gap-2"
+                    href="#">
+                    Try For Free <span class="material-icons-outlined text-sm">arrow_forward</span>
+                </a>
+                <a class="bg-white dark:bg-surface-dark text-primary dark:text-white border border-gray-200 dark:border-border-dark px-8 py-3.5 rounded-full font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm flex items-center gap-2"
+                    href="#">
+                    <span class="material-icons-outlined">play_circle_outline</span> Watch Demo
+                </a>
+            </div>
+            <div class="relative w-full max-w-7xl mx-auto">
+                <div class="relative rounded-xl md:rounded-3xl overflow-hidden transform scale-105 md:scale-110">
+                    <img src="{% static 'img/hero_mockup.png' %}" alt="Story Timeline Builder Interface"
+                        class="w-full h-auto block">
+                </div>
+                <div
+                    class="absolute -top-10 -left-10 w-40 h-40 bg-yellow-200/50 dark:bg-yellow-600/20 rounded-full blur-3xl -z-10">
+                </div>
+                <div
+                    class="absolute -bottom-10 -right-10 w-60 h-60 bg-purple-200/50 dark:bg-purple-600/20 rounded-full blur-3xl -z-10">
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="py-24 bg-white dark:bg-surface-dark relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-serif text-primary dark:text-white mb-4">From Spark to Manuscript
+                </h2>
+                <p class="text-gray-600 dark:text-gray-400 text-lg max-w-2xl mx-auto">Our structured workflow guides you
+                    through the creative process without stifling your voice.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div
+                    class="bg-background-light dark:bg-background-dark p-8 rounded-2xl hover:shadow-card transition-all duration-300 border border-transparent dark:border-border-dark group">
+                    <div
+                        class="w-12 h-12 rounded-full bg-white dark:bg-surface-dark flex items-center justify-center text-yellow-600 mb-6 shadow-sm group-hover:scale-110 transition-transform">
+                        <span class="material-icons-outlined">lightbulb</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-primary dark:text-white mb-3">1. Brainstorm &amp; Map</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+                        Dump your ideas into the Codex. Create character profiles, world-building notes, and
+                        drag-and-drop your plot points onto the timeline.
+                    </p>
+                </div>
+                <div
+                    class="bg-background-light dark:bg-background-dark p-8 rounded-2xl hover:shadow-card transition-all duration-300 border border-transparent dark:border-border-dark group">
+                    <div
+                        class="w-12 h-12 rounded-full bg-white dark:bg-surface-dark flex items-center justify-center text-yellow-600 mb-6 shadow-sm group-hover:scale-110 transition-transform">
+                        <span class="material-icons-outlined">architecture</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-primary dark:text-white mb-3">2. Outline &amp; Structure</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+                        Convert your timeline into chapter beats. The AI checks for pacing issues and ensures your plot
+                        arcs resolve satisfactorily.
+                    </p>
+                </div>
+                <div
+                    class="bg-background-light dark:bg-background-dark p-8 rounded-2xl hover:shadow-card transition-all duration-300 border border-transparent dark:border-border-dark group">
+                    <div
+                        class="w-12 h-12 rounded-full bg-white dark:bg-surface-dark flex items-center justify-center text-yellow-600 mb-6 shadow-sm group-hover:scale-110 transition-transform">
+                        <span class="material-icons-outlined">auto_stories</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-primary dark:text-white mb-3">3. Draft &amp; Polish</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+                        Write in our distraction-free editor. Stuck? Ask the Ghostwriter to describe a setting or
+                        suggest dialogue based on your character's voice.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="py-24 bg-background-light dark:bg-background-dark overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+            <div class="flex items-center gap-2 mb-4 text-xs font-bold text-blue-500 uppercase tracking-widest">
+                <span class="w-8 h-[1px] bg-blue-500"></span> Relationship Map
+            </div>
+            <h2 class="text-4xl md:text-5xl font-serif text-primary dark:text-white mb-6 text-center">Visualize the
+                Invisible</h2>
+            <p class="text-gray-600 dark:text-gray-400 text-lg mb-12 leading-relaxed text-center max-w-2xl">
+                Our dynamic Relationship Map updates automatically as you write, visualizing the complex web of
+                interactions between your characters.
+            </p>
+            <div class="relative w-full">
+                <div
+                    class="relative rounded-xl md:rounded-3xl overflow-hidden shadow-2xl border border-gray-100 dark:border-gray-800">
+                    <img src="{% static 'img/relationship_map_figma.png' %}" alt="Relationship Map Interface"
+                        class="w-full h-auto block">
+                </div>
+                <div
+                    class="absolute -top-10 -right-10 w-40 h-40 bg-blue-200/50 dark:bg-blue-600/20 rounded-full blur-3xl -z-10">
+                </div>
+                <div
+                    class="absolute -bottom-10 -left-10 w-60 h-60 bg-green-200/50 dark:bg-green-600/20 rounded-full blur-3xl -z-10">
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="py-24 bg-white dark:bg-surface-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col-reverse md:flex-row items-center gap-16">
+                <div class="w-full md:w-1/2">
+                    <div class="flex items-center gap-2 mb-4 text-xs font-bold text-blue-500 uppercase tracking-widest">
+                        <span class="w-8 h-[1px] bg-blue-500"></span> Deep Focus
+                    </div>
+                    <h2 class="text-4xl md:text-5xl font-serif text-primary dark:text-white mb-6">Write without
+                        Distraction</h2>
+                    <p class="text-gray-600 dark:text-gray-400 text-lg mb-8 leading-relaxed">
+                        The Minimalist Writing Pad strips away the UI clutter, leaving only you and your words. Need
+                        context? A warm, non-intrusive drawer slides out with everything you need.
+                    </p>
+                    <div class="flex gap-4">
+                        <button
+                            class="bg-primary text-white dark:bg-white dark:text-primary px-6 py-2 rounded-lg text-sm font-medium">Zen
+                            Mode</button>
+                        <button
+                            class="bg-transparent border border-gray-300 dark:border-gray-600 text-primary dark:text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">Dark/Light
+                            Themes</button>
+                    </div>
+                </div>
+                <div class="w-full md:w-1/2">
+                    <div
+                        class="bg-background-light dark:bg-background-dark rounded-xl p-4 shadow-xl border border-gray-100 dark:border-gray-700">
+                        <div class="bg-white dark:bg-surface-dark rounded-lg shadow-sm overflow-hidden h-96 flex">
+                            <div
+                                class="flex-1 p-6 md:p-8 font-serif text-gray-800 dark:text-gray-200 text-sm md:text-base leading-relaxed overflow-y-auto">
+                                <div class="flex items-center gap-2 mb-4 opacity-30">
+                                    <div class="w-2 h-2 rounded-full bg-gray-400"></div>
+                                    <div class="w-2 h-2 rounded-full bg-gray-400"></div>
+                                </div>
+                                <div class="text-xs text-gray-400 font-sans mb-4 text-center uppercase tracking-widest">
+                                    Chapter 4: The Arrival</div>
+                                <p class="mb-4">The rain lashed against the cobblestones, turning the narrow streets of
+                                    London into rivers of shadow. Holmes stood by the window, his silhouette cut sharply
+                                    against the gaslight outside.</p>
+                                <p class="mb-4">"You see, Watson," he murmured, without turning around. "The absence of
+                                    evidence is not the evidence of absence."</p>
+                            </div>
+                            <div
+                                class="w-1/3 bg-orange-50/50 dark:bg-orange-900/10 border-l border-orange-100 dark:border-orange-900/30 p-3 hidden sm:block">
+                                <div
+                                    class="bg-white dark:bg-surface-dark rounded border border-orange-100 dark:border-orange-900/30 p-2 mb-2 shadow-sm">
+                                    <div class="flex items-center gap-1 mb-1">
+                                        <span class="w-2 h-2 bg-orange-400 rounded-full"></span>
+                                        <h5 class="text-[10px] font-bold uppercase text-gray-500 dark:text-gray-400">
+                                            Tone Suggestion</h5>
+                                    </div>
+                                    <p class="text-[10px] text-gray-600 dark:text-gray-400 leading-tight">Consider
+                                        increasing the pacing here. The dialogue is snappy, but the descriptive beats
+                                        are slowing down the tension.</p>
+                                </div>
+                                <div
+                                    class="bg-white dark:bg-surface-dark rounded border border-gray-100 dark:border-gray-700 p-2 shadow-sm">
+                                    <div class="flex items-center gap-1 mb-1">
+                                        <span class="material-icons-outlined text-[12px] text-blue-500">person</span>
+                                        <h5 class="text-[10px] font-bold text-gray-700 dark:text-gray-300">Sherlock
+                                            Holmes</h5>
+                                    </div>
+                                    <div class="bg-gray-50 dark:bg-gray-800 rounded px-1.5 py-1 mb-1">
+                                        <span class="text-[9px] text-gray-500 dark:text-gray-400 block">Status:
+                                            Agitated</span>
+                                    </div>
+                                    <div class="bg-gray-50 dark:bg-gray-800 rounded px-1.5 py-1">
+                                        <span class="text-[9px] text-gray-500 dark:text-gray-400 block">Loc: 221B Baker
+                                            St</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="py-24 bg-background-light dark:bg-background-dark">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <span class="material-icons-outlined text-4xl text-yellow-500 mb-8 opacity-50">format_quote</span>
+            <blockquote class="text-3xl md:text-4xl font-serif text-primary dark:text-white leading-tight mb-10">
+                "Story Timeline Builder didn't just help me finish my trilogy; it helped me keep track of 40 characters
+                across three generations without a single spreadsheet. It's indispensable."
+            </blockquote>
+            <div class="flex items-center justify-center gap-4">
+                <div class="w-12 h-12 rounded-full bg-orange-200 dark:bg-orange-800"></div>
+                <div class="text-left">
+                    <div class="font-bold text-primary dark:text-white">Elena R. Vance</div>
+                    <div class="text-sm text-gray-500 dark:text-gray-400">Bestselling Fantasy Author</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="py-24 bg-white dark:bg-surface-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-5xl md:text-6xl font-serif text-primary dark:text-white mb-6">Ready to tell your story?</h2>
+            <p class="text-xl text-gray-600 dark:text-gray-400 mb-10">Join 15,000+ writers who have found their flow.
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center items-center gap-4 mb-6">
+                <a class="bg-primary text-white dark:bg-white dark:text-primary px-8 py-4 rounded-full font-bold text-lg hover:opacity-90 transition-opacity shadow-lg w-full sm:w-auto"
+                    href="#">
+                    Get Started for Free
+                </a>
+                <a class="bg-transparent border border-gray-300 dark:border-gray-600 text-primary dark:text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors w-full sm:w-auto"
+                    href="#">
+                    View Pricing
+                </a>
+            </div>
+            <p class="text-xs text-gray-400 dark:text-gray-500">No credit card required for 3-day trial.</p>
+        </div>
+    </section>
+    <footer
+        class="bg-background-light dark:bg-background-dark pt-20 pb-10 border-t border-gray-200 dark:border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-16">
+                <div class="col-span-2 lg:col-span-2">
+                    <div class="flex items-center mb-4">
+                        <img src="{% static 'img/logo.png' %}" alt="Story Timeline Builder"
+                            style="height: 3.5rem; width: auto;">
+                    </div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 max-w-xs mb-6">
+                        Empowering storytellers with tools for planning, drafting, and world-building.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-primary dark:text-white mb-4">Product</h4>
+                    <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+                        <li><a class="hover:text-primary dark:hover:text-white" href="#">Features</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="#">Pricing</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="#">Changelog</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="#">Download</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-primary dark:text-white mb-4">Resources</h4>
+                    <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+                        <li><a class="hover:text-primary dark:hover:text-white" href="#">Community</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="#">Help Center</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="#">Blog</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="#">Writers Guide</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-primary dark:text-white mb-4">Legal</h4>
+                    <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+                        <li><a class="hover:text-primary dark:hover:text-white" href="#">Privacy Policy</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="#">Terms of Service</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="#">Cookie Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div
+                class="border-t border-gray-200 dark:border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-sm text-gray-500 dark:text-gray-400">© 2023 Story Timeline Builder. All rights reserved.
+                </p>
+                <div class="flex gap-4 text-gray-400">
+                    <a class="hover:text-primary dark:hover:text-white transition-colors" href="#"><span
+                            class="material-icons-outlined">flutter_dash</span></a>
+                    <a class="hover:text-primary dark:hover:text-white transition-colors" href="#"><span
+                            class="material-icons-outlined">code</span></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+
+</html>
