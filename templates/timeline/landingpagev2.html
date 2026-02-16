@@ -115,6 +115,16 @@
         .dark nav.scrolled {
             top: 0 !important;
         }
+
+        /* Zen Mode Demo Styles */
+        #writing-pad-mockup.zen-mode-active #mockup-sidebar {
+            display: none !important;
+        }
+
+        #writing-pad-mockup.zen-mode-active .flex-1 {
+            padding-left: 10%;
+            padding-right: 10%;
+        }
     </style>
 </head>
 
@@ -292,7 +302,7 @@
                         context? A warm, non-intrusive drawer slides out with everything you need.
                     </p>
                     <div class="flex gap-4">
-                        <button
+                        <button id="zen-mode-btn"
                             class="bg-primary text-white dark:bg-white dark:text-primary px-6 py-2 rounded-lg text-sm font-medium">Zen
                             Mode</button>
                         <button id="theme-toggle-btn"
@@ -318,8 +328,8 @@
                                 <p class="mb-4">"You see, Watson," he murmured, without turning around. "The absence of
                                     evidence is not the evidence of absence."</p>
                             </div>
-                            <div
-                                class="w-1/3 bg-orange-50/50 dark:bg-orange-900/10 border-l border-orange-100 dark:border-orange-900/30 p-3 hidden sm:block">
+                            <div id="mockup-sidebar"
+                                class="w-1/3 bg-orange-50/50 dark:bg-orange-900/10 border-l border-orange-100 dark:border-orange-900/30 p-3 hidden sm:block transition-all duration-500">
                                 <div
                                     class="bg-white dark:bg-surface-dark rounded border border-orange-100 dark:border-orange-900/30 p-2 mb-2 shadow-sm">
                                     <div class="flex items-center gap-1 mb-1">
@@ -477,11 +487,19 @@
 
             // Theme Toggle Demo Logic
             const themeBtn = document.getElementById('theme-toggle-btn');
+            const zenBtn = document.getElementById('zen-mode-btn');
             const mockup = document.getElementById('writing-pad-mockup');
+            const sidebar = document.getElementById('mockup-sidebar');
 
             if (themeBtn && mockup) {
                 themeBtn.addEventListener('click', () => {
                     mockup.classList.toggle('dark');
+                });
+            }
+
+            if (zenBtn && mockup) {
+                zenBtn.addEventListener('click', () => {
+                    mockup.classList.toggle('zen-mode-active');
                 });
             }
         });
