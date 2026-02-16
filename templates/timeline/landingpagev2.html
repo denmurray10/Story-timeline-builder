@@ -344,8 +344,8 @@
                             style="top: calc(47.5% - 30px); left: calc(50% - 180px); " title="Click for Profile">
                             <div
                                 class="w-12 h-12 rounded-full border-2 border-white/50 bg-accent dark:bg-yellow-900/40 flex items-center justify-center overflow-hidden shadow-lg relative">
-                                <img src="{% static 'img/Dora.png' %}" alt="Dora Temple Profile"
-                                    class="w-full h-full object-cover object-top">
+                                <img src="{% static 'img/Dora-new.png' %}" alt="Dora Temple Profile"
+                                    class="w-full h-full object-cover object-top scale-[2.0] translate-y-[45%]">
                                 <span
                                     class="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full animate-ping opacity-75"></span>
                             </div>
@@ -373,16 +373,10 @@
                         <!-- Connection Line: Agnes to Lucius -->
                         <svg class="absolute pointer-events-none overflow-visible"
                             style="top: calc(47.5%); left: calc(50% - 16px); width: 130px; height: 75px; z-index: 5;">
-                            <defs>
-                                <marker id="arrowhead" markerWidth="6" markerHeight="4" refX="6" refY="2" orient="auto">
-                                    <polygon points="0 0, 6 2, 0 4" fill="#FACC15" />
-                                </marker>
-                            </defs>
                             <!-- Straight Line Segment 1: Agnes side -->
                             <path d="M 0 54 L 60 28" stroke="#FACC15" stroke-width="3" fill="none" opacity="0.9" />
                             <!-- Straight Line Segment 2: Lucius side -->
-                            <path d="M 90 15 L 123 0" stroke="#FACC15" stroke-width="3" fill="none"
-                                marker-end="url(#arrowhead)" opacity="0.9" />
+                            <path d="M 90 15 L 123 0" stroke="#FACC15" stroke-width="3" fill="none" opacity="0.9" />
                             <!-- Label shifted further 'up' the line -->
                             <text id="mentor-label" x="75" y="21" text-anchor="middle" alignment-baseline="middle"
                                 font-size="7" fill="black"
@@ -410,17 +404,10 @@
                         <!-- Connection Line: Agnes to Theodora (Friend) -->
                         <svg class="absolute pointer-events-none overflow-visible"
                             style="top: calc(47.5% + 45px); left: calc(50% - 16px); width: 130px; height: 95px; z-index: 5;">
-                            <defs>
-                                <marker id="arrowhead-blue" markerWidth="6" markerHeight="4" refX="6" refY="2"
-                                    orient="auto">
-                                    <polygon points="0 0, 6 2, 0 4" fill="#3B82F6" />
-                                </marker>
-                            </defs>
                             <!-- Straight Line Segment 1: Agnes side -->
                             <path d="M 0 0 L 60 50" stroke="#3B82F6" stroke-width="3" fill="none" opacity="0.9" />
                             <!-- Straight Line Segment 2: Theodora side -->
-                            <path d="M 90 70 L 123 77" stroke="#3B82F6" stroke-width="3" fill="none"
-                                marker-end="url(#arrowhead-blue)" opacity="0.9" />
+                            <path d="M 90 70 L 123 77" stroke="#3B82F6" stroke-width="3" fill="none" opacity="0.9" />
                             <!-- Label Friend -->
                             <text id="friend-label" x="75" y="60" text-anchor="middle" alignment-baseline="middle"
                                 font-size="7" fill="black"
@@ -448,17 +435,10 @@
                         <!-- Connection Line: Agnes to Elise (Family) -->
                         <svg class="absolute pointer-events-none overflow-visible"
                             style="top: calc(47.5% + 45px); left: calc(50% - 146px); width: 130px; height: 95px; z-index: 5;">
-                            <defs>
-                                <marker id="arrowhead-purple" markerWidth="6" markerHeight="4" refX="6" refY="2"
-                                    orient="auto">
-                                    <polygon points="0 0, 6 2, 0 4" fill="#9333EA" />
-                                </marker>
-                            </defs>
                             <!-- Straight Line Segment 1: Agnes side -->
                             <path d="M 130 0 L 85 28" stroke="#9333EA" stroke-width="3" fill="none" opacity="0.9" />
                             <!-- Straight Line Segment 2: Elise side -->
-                            <path d="M 55 47 L 2 80" stroke="#9333EA" stroke-width="3" fill="none"
-                                marker-end="url(#arrowhead-purple)" opacity="0.9" />
+                            <path d="M 55 47 L 2 80" stroke="#9333EA" stroke-width="3" fill="none" opacity="0.9" />
                             <!-- Label Family -->
                             <text id="family-label" x="70" y="38" text-anchor="middle" alignment-baseline="middle"
                                 font-size="7" fill="black"
@@ -480,6 +460,58 @@
                             </div>
                             <span
                                 class="bg-black/60 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded-full font-medium whitespace-nowrap shadow-sm">Elise
+                                Temple</span>
+                        </div>
+
+                        <!-- Connection Line: Agnes to Amy (Family) -->
+                        <svg class="absolute pointer-events-none overflow-visible"
+                            style="top: calc(47.5% + 48px); left: calc(50% - 22px); width: 22px; height: 122px; z-index: 5;">
+                            <!-- Segment 1: Agnes side (Diagonal from Middle) -->
+                            <path d="M 12 0 L 13.4 56" stroke="#9333EA" stroke-width="3" fill="none" opacity="0.9" />
+                            <!-- Segment 2: Amy side -->
+                            <path d="M 14.1 86 L 15 122" stroke="#9333EA" stroke-width="3" fill="none" opacity="0.9" />
+                            <!-- Family Label centered on the line -->
+                            <text id="family-label-amy" x="13.7" y="71" text-anchor="middle" alignment-baseline="middle"
+                                font-size="7" fill="black"
+                                class="font-bold uppercase tracking-[0.2em] cursor-pointer hover:fill-purple-400 transition-colors pointer-events-auto"
+                                transform="rotate(89, 13.7, 71)">
+                                Family
+                            </text>
+                        </svg>
+
+                        <!-- Connection Line: Agnes to Mrs. Temple (Family) -->
+                        <svg class="absolute pointer-events-none overflow-visible"
+                            style="top: calc(47.5% - 40px); left: calc(50% - 20px); width: 100px; height: 100px; z-index: 5;">
+                            <!-- Line from Agnes (Top) to Mrs. Temple (Bottom) -->
+                            <path d="M 0 100 L 70 0" stroke="#9333EA" stroke-width="2" fill="none" opacity="0.6"
+                                stroke-dasharray="4" />
+                        </svg>
+
+                        <!-- Amy Temple Hotspot Overlay -->
+                        <div id="amy-hotspot" class="map-hotspot absolute flex flex-col items-center gap-1 z-10"
+                            style="top: calc(47.5% + 170px); left: calc(50% - 46px);" title="Click for Profile">
+                            <div
+                                class="w-12 h-12 rounded-full border-2 border-white/50 bg-accent dark:bg-purple-900/40 flex items-center justify-center overflow-hidden shadow-lg relative">
+                                <img src="{% static 'img/Amy-temple.png' %}" alt="Amy Temple Profile"
+                                    class="w-full h-full object-cover object-top">
+                                <span class="absolute -top-1 -right-1 w-2 h-2 bg-purple-400 rounded-full"></span>
+                            </div>
+                            <span
+                                class="bg-black/60 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded-full font-medium whitespace-nowrap shadow-sm">Amy
+                                Temple</span>
+                        </div>
+
+                        <!-- Mrs. Temple Hotspot Overlay -->
+                        <div id="mrs-hotspot" class="map-hotspot absolute flex flex-col items-center gap-1 z-10"
+                            style="top: calc(47.5% - 80px); left: calc(50% + 40px);" title="Click for Profile">
+                            <div
+                                class="w-12 h-12 rounded-full border-2 border-white/50 bg-accent dark:bg-red-900/40 flex items-center justify-center overflow-hidden shadow-lg relative">
+                                <img src="{% static 'img/Elise-temple.png' %}" alt="Mrs. Temple Profile"
+                                    class="w-full h-full object-cover opacity-80 backdrop-grayscale">
+                                <span class="absolute -top-1 -right-1 w-2 h-2 bg-red-400 rounded-full"></span>
+                            </div>
+                            <span
+                                class="bg-black/60 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded-full font-medium whitespace-nowrap shadow-sm">Mrs.
                                 Temple</span>
                         </div>
 
@@ -573,8 +605,8 @@
                             <div class="relative">
                                 <div
                                     class="w-20 h-20 rounded-2xl bg-accent overflow-hidden shadow-sm rotate-3 border-4 border-white dark:border-gray-800">
-                                    <img src="{% static 'img/Dora.png' %}" alt="Dora Temple"
-                                        class="w-full h-full object-cover">
+                                    <img src="{% static 'img/Dora-new.png' %}" alt="Dora Temple"
+                                        class="w-full h-full object-cover object-top scale-[2.0] translate-y-[45%]">
                                 </div>
                             </div>
                             <div>
@@ -860,24 +892,7 @@
                                 <p class="text-base text-gray-600 dark:text-gray-400 leading-relaxed font-serif italic">
                                     "Order is a cage. True friendship is the key we hide in plain sight."</p>
                             </div>
-                            <div>
-                                <div>
-                                    <h5
-                                        class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-2 border-b border-gray-100 dark:border-gray-700 pb-1">
-                                        AI Recommendation</h5>
-                                    <div
-                                        class="p-3 rounded-xl bg-blue-500 text-white dark:bg-blue-600 border border-transparent">
-                                        <div class="flex items-center gap-2 mb-1">
-                                            <span class="material-icons-outlined text-xs">auto_awesome</span>
-                                            <span
-                                                class="text-[9px] font-bold uppercase tracking-widest opacity-80">Ghostwriter</span>
-                                        </div>
-                                        <p class="text-[11px] leading-relaxed">Theodora operates on the fringes
-                                            of High London society to protect those who seek to dismantle it.
-                                            Use her to introduce the resistance.</p>
-                                    </div>
-                                </div>
-                            </div>
+
                             <div>
                                 <h5
                                     class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-2 border-b border-gray-100 dark:border-gray-700 pb-1">
@@ -904,6 +919,22 @@
                                     <p class="text-[11px] text-gray-500 leading-snug">The niece she swore to
                                         protect.
                                     </p>
+                                </div>
+                            </div>
+                            <div>
+                                <h5
+                                    class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-2 border-b border-gray-100 dark:border-gray-700 pb-1">
+                                    AI Recommendation</h5>
+                                <div
+                                    class="p-3 rounded-xl bg-blue-500 text-white dark:bg-blue-600 border border-transparent">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="material-icons-outlined text-xs">auto_awesome</span>
+                                        <span
+                                            class="text-[9px] font-bold uppercase tracking-widest opacity-80">Ghostwriter</span>
+                                    </div>
+                                    <p class="text-[11px] leading-relaxed">Theodora operates on the fringes of High
+                                        London society to protect those who seek to dismantle it. Use her to introduce
+                                        the resistance.</p>
                                 </div>
                             </div>
                         </div>
@@ -976,9 +1007,106 @@
                                         <span
                                             class="text-[9px] font-bold uppercase tracking-widest opacity-80">Ghostwriter</span>
                                     </div>
-                                    <p class="text-[11px] leading-relaxed">Elise will attempt to burn the
-                                        archives
-                                        before Agnes can access them.</p>
+                                </div>
+
+                                <p class="text-[11px] leading-relaxed">Elise will attempt to burn the archives before
+                                    Agnes can access them.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Amy Temple View -->
+                    <div id="codex-amy" class="hidden h-full overflow-y-auto p-8 no-scrollbar">
+                        <div class="flex items-center gap-6 mb-8">
+                            <div class="relative">
+                                <div
+                                    class="w-20 h-20 rounded-2xl bg-accent overflow-hidden shadow-sm rotate-3 border-4 border-white dark:border-gray-800">
+                                    <img src="{% static 'img/Amy-temple.png' %}" alt="Amy Temple"
+                                        class="w-full h-full object-cover object-top">
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="text-2xl font-serif text-primary dark:text-white leading-none mb-2">
+                                    Amy Temple</h4>
+                                <div class="flex items-center gap-2">
+                                    <span
+                                        class="text-[10px] font-bold uppercase tracking-widest bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-gray-500">Sister</span>
+                                    <span
+                                        class="text-[10px] font-bold uppercase tracking-widest text-purple-500">Family</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-6">
+                            <div>
+                                <h5
+                                    class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-3 border-b border-gray-100 dark:border-gray-700 pb-1">
+                                    Core Motivation</h5>
+                                <p class="text-base text-gray-600 dark:text-gray-400 leading-relaxed font-serif italic">
+                                    "I don't want to be a trophy. I want to be the one who chooses the
+                                    prize."
+                                </p>
+                            </div>
+                            <div>
+                                <h5
+                                    class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-2 border-b border-gray-100 dark:border-gray-700 pb-1">
+                                    AI Recommendation</h5>
+                                <div class="p-3 rounded-xl bg-purple-600 text-white dark:bg-purple-500">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="material-icons-outlined text-xs">auto_awesome</span>
+                                        <span
+                                            class="text-[9px] font-bold uppercase tracking-widest opacity-80">Ghostwriter</span>
+                                    </div>
+                                    <p class="text-[11px] leading-relaxed">Amy is being courted by the
+                                        primary suspect. Use her chapters to gather intel on his social
+                                        circles.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mrs. Temple View -->
+                    <div id="codex-mrs" class="hidden h-full overflow-y-auto p-8 no-scrollbar">
+                        <div class="flex items-center gap-6 mb-8">
+                            <div class="relative">
+                                <div
+                                    class="w-20 h-20 rounded-2xl bg-accent overflow-hidden shadow-sm rotate-3 border-4 border-white dark:border-gray-800">
+                                    <img src="{% static 'img/Elise-temple.png' %}" alt="Mrs. Temple"
+                                        class="w-full h-full object-cover opacity-80 backdrop-grayscale">
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="text-2xl font-serif text-primary dark:text-white leading-none mb-2">
+                                    Mrs. Temple</h4>
+                                <div class="flex items-center gap-2">
+                                    <span
+                                        class="text-[10px] font-bold uppercase tracking-widest bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-gray-500">Mother</span>
+                                    <span
+                                        class="text-[10px] font-bold uppercase tracking-widest text-red-500">Family</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-6">
+                            <div>
+                                <h5
+                                    class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-3 border-b border-gray-100 dark:border-gray-700 pb-1">
+                                    Core Motivation</h5>
+                                <p class="text-base text-gray-600 dark:text-gray-400 leading-relaxed font-serif italic">
+                                    "Silence is the only thing that keeps this house from falling apart."
+                                </p>
+                            </div>
+                            <div>
+                                <h5
+                                    class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-2 border-b border-gray-100 dark:border-gray-700 pb-1">
+                                    AI Recommendation</h5>
+                                <div class="p-3 rounded-xl bg-red-600 text-white dark:bg-red-500">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="material-icons-outlined text-xs">auto_awesome</span>
+                                        <span
+                                            class="text-[9px] font-bold uppercase tracking-widest opacity-80">Ghostwriter</span>
+                                    </div>
+                                    <p class="text-[11px] leading-relaxed">Mrs. Temple has a hidden
+                                        correspondence with Aunt Theodora. This link could bridge the gap
+                                        between the family and the resistance.</p>
                                 </div>
                             </div>
                         </div>
@@ -988,7 +1116,8 @@
                     <div id="codex-mentor" class="hidden h-full overflow-y-auto p-8 custom-scrollbar">
                         <div class="text-center mb-8">
                             <h4 class="text-2xl font-serif text-primary dark:text-white mb-1">Mentor</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Beneath the surface of the
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Beneath the surface of
+                                the
                                 Temple
                                 Dynasty</p>
                             <div class="flex gap-2 justify-center">
@@ -1024,10 +1153,13 @@
                                 <h5 class="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">
                                     Narrative
                                     Arc</h5>
-                                <p class="text-sm text-gray-600 dark:text-gray-400 font-serif italic mb-2">"The
-                                    transmission of logic from father to daughter is rarely a straight line."
+                                <p class="text-sm text-gray-600 dark:text-gray-400 font-serif italic mb-2">
+                                    "The
+                                    transmission of logic from father to daughter is rarely a straight
+                                    line."
                                 </p>
-                                <p class="text-xs text-gray-500">Lucius provides Agnes with "unrestricted" data
+                                <p class="text-xs text-gray-500">Lucius provides Agnes with "unrestricted"
+                                    data
                                     paths
                                     while maintaining a cold facade.</p>
                             </div>
@@ -1037,8 +1169,10 @@
                     <!-- Friend View -->
                     <div id="codex-friend" class="hidden h-full overflow-y-auto p-8 custom-scrollbar">
                         <div class="text-center mb-8">
-                            <h4 class="text-2xl font-serif text-primary dark:text-white mb-1">Friendship</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">The silent anchor in the
+                            <h4 class="text-2xl font-serif text-primary dark:text-white mb-1">Friendship
+                            </h4>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">The silent anchor in
+                                the
                                 storm</p>
                             <div class="flex gap-2 justify-center">
                                 <span
@@ -1074,10 +1208,12 @@
                                 <h5 class="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">
                                     Narrative
                                     Arc</h5>
-                                <p class="text-sm text-gray-600 dark:text-gray-400 font-serif italic mb-2">"In a
+                                <p class="text-sm text-gray-600 dark:text-gray-400 font-serif italic mb-2">
+                                    "In a
                                     world
                                     built on dynasties, a chosen bond is the only true sovereignty."</p>
-                                <p class="text-xs text-gray-500">Aunt Theodora provides the unfiltered advice
+                                <p class="text-xs text-gray-500">Aunt Theodora provides the unfiltered
+                                    advice
                                     Agnes
                                     cannot find within Temple walls.</p>
                             </div>
@@ -1088,7 +1224,8 @@
                     <div id="codex-family" class="hidden h-full overflow-y-auto p-8 custom-scrollbar">
                         <div class="text-center mb-8">
                             <h4 class="text-2xl font-serif text-primary dark:text-white mb-1">Family</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Bound by blood, divided by
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Bound by blood, divided
+                                by
                                 secrets
                             </p>
                             <div class="flex gap-2 justify-center">
@@ -1124,7 +1261,8 @@
                                 <h5 class="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">
                                     Narrative
                                     Arc</h5>
-                                <p class="text-sm text-gray-600 dark:text-gray-400 font-serif italic mb-2">"To
+                                <p class="text-sm text-gray-600 dark:text-gray-400 font-serif italic mb-2">
+                                    "To
                                     protect
                                     the child, one must sometimes execute the innocence."</p>
                                 <p class="text-xs text-gray-500">Elise shield Agnes from the family's true
@@ -1137,7 +1275,6 @@
                 </div>
             </div>
         </div>
-    </section>
     </section>
     <section class="py-24 bg-white dark:bg-surface-dark">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -2003,10 +2140,13 @@
                 theodora: document.getElementById('theodora-hotspot'),
                 elise: document.getElementById('elise-hotspot'),
                 dora: document.getElementById('dora-hotspot'),
+                amy: document.getElementById('amy-hotspot'),
+                mrs: document.getElementById('mrs-hotspot'),
                 mentor: document.getElementById('mentor-label'),
                 friend: document.getElementById('friend-label'),
                 family: document.getElementById('family-label'),
-                familyDora: document.getElementById('family-label-dora')
+                familyDora: document.getElementById('family-label-dora'),
+                familyAmy: document.getElementById('family-label-amy')
             };
 
             const panels = {
@@ -2016,9 +2156,13 @@
                 theodora: document.getElementById('codex-theodora'),
                 elise: document.getElementById('codex-elise'),
                 dora: document.getElementById('codex-dora'),
+                amy: document.getElementById('codex-amy'),
+                mrs: document.getElementById('codex-mrs'),
                 mentor: document.getElementById('codex-mentor'),
                 friend: document.getElementById('codex-friend'),
-                family: document.getElementById('codex-family')
+                family: document.getElementById('codex-family'),
+                familyDora: document.getElementById('codex-family'),
+                familyAmy: document.getElementById('codex-family')
             };
 
             let autoScrollInterval;
