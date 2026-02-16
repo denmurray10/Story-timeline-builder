@@ -146,7 +146,7 @@
                     <a class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-white transition-colors"
                         href="#">Resources</a>
                     <a class="bg-primary text-white dark:bg-white dark:text-primary px-5 py-2.5 rounded-full text-sm font-medium hover:opacity-90 transition-opacity shadow-sm"
-                        href="#">Start Writing</a>
+                        href="{% url 'login' %}">Start Writing</a>
                 </div>
                 <div class="md:hidden flex items-center">
                     <button class="text-primary dark:text-white p-2">
@@ -177,8 +177,8 @@
             </p>
             <div class="reveal slide-up delay-300 flex flex-col sm:flex-row items-center gap-4 mb-20">
                 <a class="bg-primary text-white dark:bg-white dark:text-primary px-8 py-3.5 rounded-full font-medium hover:scale-105 transition-transform duration-200 shadow-md flex items-center gap-2"
-                    href="#">
-                    Try For Free <span class="material-icons-outlined text-sm">arrow_forward</span>
+                    href="{% url 'login' %}">
+                    Start Writing <span class="material-icons-outlined text-sm">arrow_forward</span>
                 </a>
                 <a class="bg-white dark:bg-surface-dark text-primary dark:text-white border border-gray-200 dark:border-border-dark px-8 py-3.5 rounded-full font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm flex items-center gap-2"
                     href="#">
@@ -388,8 +388,8 @@
             </p>
             <div class="flex flex-col sm:flex-row justify-center items-center gap-4 mb-6">
                 <a class="bg-primary text-white dark:bg-white dark:text-primary px-8 py-4 rounded-full font-bold text-lg hover:opacity-90 transition-opacity shadow-md w-full sm:w-auto"
-                    href="#">
-                    Get Started for Free
+                    href="{% url 'login' %}">
+                    Start Writing Now
                 </a>
                 <a class="bg-transparent border border-gray-300 dark:border-gray-600 text-primary dark:text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors w-full sm:w-auto"
                     href="#">

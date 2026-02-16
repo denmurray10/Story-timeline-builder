@@ -7,6 +7,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.files.uploadedfile import UploadedFile
+from .utils.image_processing import compress_image
 
 
 class Book(models.Model):
@@ -53,6 +55,12 @@ class Book(models.Model):
 
     def __str__(self):
         return f"Book {self.series_order}: {self.title}"
+
+    def save(self, *args, **kwargs):
+        # Auto-compress and resize image if it was just uploaded
+        if self.image and isinstance(self.image.file, UploadedFile):
+            self.image = compress_image(self.image, target_type='book_cover')
+        super().save(*args, **kwargs)
 
     def update_word_count(self):
         """Aggregate word count from all events in this book."""
@@ -203,6 +211,12 @@ class Character(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.get_role_display()})"
+
+    def save(self, *args, **kwargs):
+        # Auto-compress and resize profile image if it was just uploaded
+        if self.profile_image and isinstance(self.profile_image.file, UploadedFile):
+            self.profile_image = compress_image(self.profile_image, target_type='character_profile')
+        super().save(*args, **kwargs)
 
 
 class Tag(models.Model):
@@ -751,6 +765,12 @@ class WorldEntry(models.Model):
 
     def __str__(self):
         return f"{self.get_category_display()}: {self.title}"
+
+    def save(self, *args, **kwargs):
+        # Auto-compress and resize world entry image if it was just uploaded
+        if self.image and isinstance(self.image.file, UploadedFile):
+            self.image = compress_image(self.image, target_type='world_image')
+        super().save(*args, **kwargs)
 
 class StoryScanStatus(models.Model):
     """
