@@ -146,7 +146,7 @@
             </div>
         </div>
     </nav>
-    <section class="pt-[258px] pb-20 overflow-hidden">
+    <section class="pt-[258px] pb-20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center">
             <div
                 class="reveal fade-in inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark shadow-sm mb-8">
@@ -166,7 +166,7 @@
                 arcs, and hidden connections within your story.
             </p>
             <div class="reveal slide-up delay-300 flex flex-col sm:flex-row items-center gap-4 mb-20">
-                <a class="bg-primary text-white dark:bg-white dark:text-primary px-8 py-3.5 rounded-full font-medium hover:scale-105 transition-transform duration-200 shadow-lg flex items-center gap-2"
+                <a class="bg-primary text-white dark:bg-white dark:text-primary px-8 py-3.5 rounded-full font-medium hover:scale-105 transition-transform duration-200 shadow-md flex items-center gap-2"
                     href="#">
                     Try For Free <span class="material-icons-outlined text-sm">arrow_forward</span>
                 </a>
@@ -198,52 +198,82 @@
                     through the creative process without stifling your voice.</p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div
-                    class="reveal slide-up delay-100 bg-background-light dark:bg-background-dark p-8 rounded-2xl hover:shadow-card transition-all duration-300 border border-transparent dark:border-border-dark group">
+                <!-- Card 1 -->
+                <div class="reveal slide-up delay-100 group relative">
                     <div
-                        class="w-12 h-12 rounded-full bg-white dark:bg-surface-dark flex items-center justify-center text-yellow-600 mb-6 shadow-sm group-hover:scale-110 transition-transform">
-                        <span class="material-icons-outlined">lightbulb</span>
+                        class="absolute -inset-0.5 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl opacity-0 group-hover:opacity-15 transition duration-500 blur-xl">
                     </div>
-                    <h3 class="text-xl font-bold text-primary dark:text-white mb-3">1. Brainstorm &amp; Map</h3>
-                    <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
-                        Dump your ideas into the Codex. Create character profiles, world-building notes, and
-                        drag-and-drop your plot points onto the timeline.
-                    </p>
+                    <div
+                        class="relative bg-background-light dark:bg-background-dark p-8 rounded-2xl border border-gray-100 dark:border-gray-800 hover:border-yellow-200 dark:hover:border-yellow-900/50 transition-all duration-300 h-full">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-white dark:bg-surface-dark flex items-center justify-center text-yellow-600 mb-6 shadow-sm group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+                            <span class="material-icons-outlined text-3xl">lightbulb</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-primary dark:text-white mb-3 tracking-tight">1. Brainstorm &
+                            Map</h3>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+                            Dump your ideas into the Codex. Create character profiles, world-building notes, and
+                            drag-and-drop your plot points onto the timeline.
+                        </p>
+                    </div>
                 </div>
-                <div
-                    class="reveal slide-up delay-200 bg-background-light dark:bg-background-dark p-8 rounded-2xl hover:shadow-card transition-all duration-300 border border-transparent dark:border-border-dark group">
+
+                <!-- Card 2 -->
+                <div class="reveal slide-up delay-200 group relative">
                     <div
-                        class="w-12 h-12 rounded-full bg-white dark:bg-surface-dark flex items-center justify-center text-yellow-600 mb-6 shadow-sm group-hover:scale-110 transition-transform">
-                        <span class="material-icons-outlined">architecture</span>
+                        class="absolute -inset-0.5 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-2xl opacity-0 group-hover:opacity-15 transition duration-500 blur-xl">
                     </div>
-                    <h3 class="text-xl font-bold text-primary dark:text-white mb-3">2. Outline &amp; Structure</h3>
-                    <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
-                        Convert your timeline into chapter beats. The AI checks for pacing issues and ensures your plot
-                        arcs resolve satisfactorily.
-                    </p>
+                    <div
+                        class="relative bg-background-light dark:bg-background-dark p-8 rounded-2xl border border-gray-100 dark:border-gray-800 hover:border-blue-200 dark:hover:border-blue-900/50 transition-all duration-300 h-full">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-white dark:bg-surface-dark flex items-center justify-center text-blue-600 mb-6 shadow-sm group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
+                            <span class="material-icons-outlined text-3xl">architecture</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-primary dark:text-white mb-3 tracking-tight">2. Outline &
+                            Structure</h3>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+                            Convert your timeline into chapter beats. The AI checks for pacing issues and ensures your
+                            plot arcs resolve satisfactorily.
+                        </p>
+                    </div>
                 </div>
-                <div
-                    class="reveal slide-up delay-300 bg-background-light dark:bg-background-dark p-8 rounded-2xl hover:shadow-card transition-all duration-300 border border-transparent dark:border-border-dark group">
+
+                <!-- Card 3 -->
+                <div class="reveal slide-up delay-300 group relative">
                     <div
-                        class="w-12 h-12 rounded-full bg-white dark:bg-surface-dark flex items-center justify-center text-yellow-600 mb-6 shadow-sm group-hover:scale-110 transition-transform">
-                        <span class="material-icons-outlined">auto_stories</span>
+                        class="absolute -inset-0.5 bg-gradient-to-r from-green-400 to-emerald-500 rounded-2xl opacity-0 group-hover:opacity-15 transition duration-500 blur-xl">
                     </div>
-                    <h3 class="text-xl font-bold text-primary dark:text-white mb-3">3. Draft &amp; Polish</h3>
-                    <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
-                        Write in our distraction-free editor. Stuck? Ask the Ghostwriter to describe a setting or
-                        suggest dialogue based on your character's voice.
-                    </p>
+                    <div
+                        class="relative bg-background-light dark:bg-background-dark p-8 rounded-2xl border border-gray-100 dark:border-gray-800 hover:border-green-200 dark:hover:border-green-900/50 transition-all duration-300 h-full">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-white dark:bg-surface-dark flex items-center justify-center text-green-600 mb-6 shadow-sm group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+                            <span class="material-icons-outlined text-3xl">auto_stories</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-primary dark:text-white mb-3 tracking-tight">3. Draft & Polish
+                        </h3>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+                            Write in our distraction-free editor. Stuck? Ask the Ghostwriter to describe a setting or
+                            suggest dialogue based on your character's voice.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
-    <section class="py-12 bg-white dark:bg-surface-dark overflow-hidden">
+    <section class="py-12 bg-white dark:bg-surface-dark">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
             <div class="reveal fade-in relative w-full">
                 <div
-                    class="relative rounded-xl md:rounded-3xl overflow-hidden shadow-2xl border border-gray-100 dark:border-gray-800">
+                    class="relative rounded-xl md:rounded-3xl overflow-hidden shadow-xl border border-gray-100 dark:border-gray-800">
                     <img src="{% static 'img/relationship_map_figma.png' %}" alt="Relationship Map Interface"
                         class="w-full h-auto block">
+                </div>
+                <!-- Background Glows -->
+                <div
+                    class="absolute -top-10 -right-10 w-40 h-40 bg-yellow-200/50 dark:bg-yellow-600/20 rounded-full blur-3xl -z-10">
+                </div>
+                <div
+                    class="absolute -bottom-10 -left-10 w-60 h-60 bg-purple-200/50 dark:bg-purple-600/20 rounded-full blur-3xl -z-10">
                 </div>
             </div>
         </div>
@@ -272,7 +302,7 @@
                 </div>
                 <div class="w-full md:w-1/2">
                     <div
-                        class="bg-background-light dark:bg-background-dark rounded-xl p-4 shadow-xl border border-gray-100 dark:border-gray-700">
+                        class="bg-background-light dark:bg-background-dark rounded-xl p-4 shadow-lg border border-gray-100 dark:border-gray-700">
                         <div class="bg-white dark:bg-surface-dark rounded-lg shadow-sm overflow-hidden h-96 flex">
                             <div
                                 class="flex-1 p-6 md:p-8 font-serif text-gray-800 dark:text-gray-200 text-sm md:text-base leading-relaxed overflow-y-auto">
@@ -347,7 +377,7 @@
             <p class="text-xl text-gray-600 dark:text-gray-400 mb-10">Join 15,000+ writers who have found their flow.
             </p>
             <div class="flex flex-col sm:flex-row justify-center items-center gap-4 mb-6">
-                <a class="bg-primary text-white dark:bg-white dark:text-primary px-8 py-4 rounded-full font-bold text-lg hover:opacity-90 transition-opacity shadow-lg w-full sm:w-auto"
+                <a class="bg-primary text-white dark:bg-white dark:text-primary px-8 py-4 rounded-full font-bold text-lg hover:opacity-90 transition-opacity shadow-md w-full sm:w-auto"
                     href="#">
                     Get Started for Free
                 </a>
