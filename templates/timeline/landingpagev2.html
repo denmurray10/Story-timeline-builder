@@ -101,13 +101,27 @@
         .delay-400 {
             transition-delay: 400ms;
         }
+
+        /* Nav Padding Scroll Logic */
+        nav {
+            top: 50px !important;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+
+        nav.scrolled {
+            top: 0 !important;
+        }
+
+        .dark nav.scrolled {
+            top: 0 !important;
+        }
     </style>
 </head>
 
 <body
     class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-sans transition-colors duration-300 antialiased selection:bg-accent selection:text-primary">
-    <nav
-        class="fixed w-full z-50 top-0 left-0 transition-all duration-300 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md border-b border-transparent dark:border-border-dark">
+    <nav id="main-nav"
+        class="fixed w-full z-50 left-0 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md border-b border-transparent">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20">
                 <a href="{% url 'landing_page_v2' %}" class="flex-shrink-0 flex items-center cursor-pointer">
@@ -132,7 +146,7 @@
             </div>
         </div>
     </nav>
-    <section class="pt-32 pb-20 overflow-hidden">
+    <section class="pt-[258px] pb-20 overflow-hidden">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center">
             <div
                 class="reveal fade-in inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark shadow-sm mb-8">
@@ -364,7 +378,6 @@
                         <li><a class="hover:text-primary dark:hover:text-white" href="#">Features</a></li>
                         <li><a class="hover:text-primary dark:hover:text-white" href="#">Pricing</a></li>
                         <li><a class="hover:text-primary dark:hover:text-white" href="#">Changelog</a></li>
-                        <li><a class="hover:text-primary dark:hover:text-white" href="#">Download</a></li>
                     </ul>
                 </div>
                 <div>
@@ -387,7 +400,7 @@
             </div>
             <div
                 class="border-t border-gray-200 dark:border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-                <p class="text-sm text-gray-500 dark:text-gray-400">© 2023 Story Timeline Builder. All rights reserved.
+                <p class="text-sm text-gray-500 dark:text-gray-400">© 2026 Story Timeline Builder. All rights reserved.
                 </p>
                 <div class="flex gap-4 text-gray-400">
                     <a class="hover:text-primary dark:hover:text-white transition-colors" href="#"><span
@@ -419,6 +432,18 @@
 
             const revealElements = document.querySelectorAll('.reveal');
             revealElements.forEach(el => observer.observe(el));
+
+            // Nav Scroll Logic
+            const nav = document.getElementById('main-nav');
+            const handleScroll = () => {
+                if (window.scrollY > 10) {
+                    nav.classList.add('scrolled');
+                } else {
+                    nav.classList.remove('scrolled');
+                }
+            };
+            window.addEventListener('scroll', handleScroll);
+            handleScroll(); // Initial check
         });
     </script>
 
