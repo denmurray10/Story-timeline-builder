@@ -136,6 +136,26 @@
             transform: scale(1.1);
             background-color: rgba(255, 255, 255, 0.4);
         }
+
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .no-scrollbar::-webkit-scrollbar,
+        .custom-scrollbar::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+            background: transparent !important;
+            -webkit-appearance: none !important;
+        }
+
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .no-scrollbar,
+        .custom-scrollbar {
+            -ms-overflow-style: none !important;
+            /* IE and Edge */
+            scrollbar-width: none !important;
+            /* Firefox */
+            overflow: -moz-scrollbars-none !important;
+        }
     </style>
 </head>
 
@@ -282,75 +302,842 @@
         </div>
     </section>
     <section class="py-12 bg-white dark:bg-surface-dark">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
-            <div class="reveal fade-in relative w-full">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                <!-- Left Column: Interactive Map Card -->
                 <div
-                    class="relative rounded-xl md:rounded-3xl overflow-hidden shadow-xl border border-gray-100 dark:border-gray-800 group">
-                    <img src="{% static 'img/relationship_map_figma.webp' %}" alt="Relationship Map Interface"
-                        class="w-full h-auto block">
-
-                    <!-- Agnes Temple Hotspot Overlay -->
-                    <div id="agnes-hotspot"
-                        class="map-hotspot absolute top-[47.5%] left-[21.7%] flex flex-col items-center gap-1 z-10"
-                        title="Click for Profile">
-                        <div
-                            class="w-12 h-12 rounded-full border-2 border-white/50 bg-accent dark:bg-yellow-900/40 flex items-center justify-center overflow-hidden shadow-lg relative">
-                            <img src="{% static 'img/Agnes.png' %}" alt="Agnes Temple Profile"
-                                class="w-full h-full object-cover">
-                            <span
-                                class="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full animate-ping opacity-75"></span>
-                        </div>
-                        <span
-                            class="bg-black/60 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded-full font-medium whitespace-nowrap shadow-sm">Agnes
-                            Temple</span>
+                    class="bg-white dark:bg-surface-dark rounded-3xl p-6 shadow-2xl border border-gray-100 dark:border-gray-800 relative z-10">
+                    <div class="flex items-center gap-2 mb-6">
+                        <span class="material-icons-outlined text-gray-400">account_tree</span>
+                        <h3 class="text-sm font-bold uppercase tracking-widest text-gray-900 dark:text-white">
+                            Relationship Map</h3>
                     </div>
 
-                    <!-- Connection Line: Agnes to Lucius -->
-                    <svg class="absolute pointer-events-none overflow-visible"
-                        style="top: calc(47.5% - 70px + 30px); left: calc(21.7% + 34px); width: 150px; height: 80px; z-index: 5;">
-                        <defs>
-                            <marker id="arrowhead" markerWidth="6" markerHeight="4" refX="6" refY="2" orient="auto">
-                                <polygon points="0 0, 6 2, 0 4" fill="#FACC15" />
-                            </marker>
-                        </defs>
-                        <!-- Straight Line Segment 1: Agnes side -->
-                        <path d="M 0 75 L 70 38" stroke="#FACC15" stroke-width="3" fill="none" opacity="0.9" />
-                        <!-- Straight Line Segment 2: Lucius side -->
-                        <path d="M 110 16 L 143 -2" stroke="#FACC15" stroke-width="3" fill="none"
-                            marker-end="url(#arrowhead)" opacity="0.9" />
-                        <!-- Label shifted further 'up' the line -->
-                        <text id="mentor-label" x="90" y="27" text-anchor="middle" alignment-baseline="middle"
-                            font-size="7" fill="black"
-                            class="font-bold uppercase tracking-[0.2em] cursor-pointer hover:fill-blue-600 transition-colors pointer-events-auto"
-                            transform="rotate(-28.3, 90, 27)">
-                            Mentor
-                        </text>
-                    </svg>
+                    <!-- Map Container (Nodes Centered) -->
+                    <div
+                        class="relative w-full h-[500px] bg-gray-50 dark:bg-gray-900/50 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden mb-6">
 
-                    <!-- Lucius Temple Hotspot Overlay -->
-                    <div id="lucius-hotspot" class="map-hotspot absolute flex flex-col items-center gap-1 z-10"
-                        style="top: calc(47.5% - 80px); left: calc(21.7% + 150px);" title="Click for Profile">
-                        <div
-                            class="w-12 h-12 rounded-full border-2 border-white/50 bg-accent dark:bg-yellow-900/40 flex items-center justify-center overflow-hidden shadow-lg relative">
-                            <img src="{% static 'img/Lucius-Temple.png' %}" alt="Lucius Temple Profile"
-                                class="w-full h-full object-cover">
+                        <!-- Connection Line: Agnes to Dora (Family - Purple) -->
+                        <svg class="absolute pointer-events-none overflow-visible"
+                            style="top: calc(47.5% - 30px); left: calc(50% - 146px); width: 130px; height: 75px; z-index: 5;">
+                            <defs>
+                                <marker id="arrowhead-purple-dora" markerWidth="6" markerHeight="4" refX="6" refY="2"
+                                    orient="auto">
+                                    <polygon points="0 0, 6 2, 0 4" fill="#9333EA" />
+                                </marker>
+                            </defs>
+                            <!-- Line from Agnes (Bottom Right) to Dora (Top Left) -->
+                            <path d="M 96 60 L 40 20" stroke="#9333EA" stroke-width="3" fill="none" opacity="0.9" />
+                            <path d="M 12 5 L -10 0" stroke="#9333EA" stroke-width="3" fill="none"
+                                marker-end="url(#arrowhead-purple-dora)" opacity="0.9" />
+                            <!-- Label Family -->
+                            <text id="family-label-dora" x="45" y="35" text-anchor="middle" alignment-baseline="middle"
+                                font-size="7" fill="black"
+                                class="font-bold uppercase tracking-[0.2em] cursor-pointer hover:fill-purple-400 transition-colors pointer-events-auto"
+                                transform="rotate(30, 45, 35)">
+                                Family
+                            </text>
+                        </svg>
+
+                        <!-- Dora Temple Hotspot Overlay -->
+                        <div id="dora-hotspot" class="map-hotspot absolute flex flex-col items-center gap-1 z-10"
+                            style="top: calc(47.5% - 30px); left: calc(50% - 180px); " title="Click for Profile">
+                            <div
+                                class="w-12 h-12 rounded-full border-2 border-white/50 bg-accent dark:bg-yellow-900/40 flex items-center justify-center overflow-hidden shadow-lg relative">
+                                <img src="{% static 'img/Dora.png' %}" alt="Dora Temple Profile"
+                                    class="w-full h-full object-cover object-top">
+                                <span
+                                    class="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full animate-ping opacity-75"></span>
+                            </div>
                             <span
-                                class="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full animate-ping opacity-75"></span>
+                                class="bg-black/60 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded-full font-medium whitespace-nowrap shadow-sm">Dora
+                                Temple</span>
                         </div>
-                        <span
-                            class="bg-black/60 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded-full font-medium whitespace-nowrap shadow-sm">Lucius
-                            Temple</span>
+
+                        <!-- Agnes Temple Hotspot Overlay -->
+                        <div id="agnes-hotspot"
+                            class="map-hotspot absolute top-[calc(47.5%+30px)] left-[calc(50%-50px)] flex flex-col items-center gap-1 z-10"
+                            title="Click for Profile">
+                            <div
+                                class="w-12 h-12 rounded-full border-2 border-white/50 bg-accent dark:bg-yellow-900/40 flex items-center justify-center overflow-hidden shadow-lg relative">
+                                <img src="{% static 'img/Agnes.png' %}" alt="Agnes Temple Profile"
+                                    class="w-full h-full object-cover">
+                                <span
+                                    class="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full animate-ping opacity-75"></span>
+                            </div>
+                            <span
+                                class="bg-black/60 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded-full font-medium whitespace-nowrap shadow-sm">Agnes
+                                Temple</span>
+                        </div>
+
+                        <!-- Connection Line: Agnes to Lucius -->
+                        <svg class="absolute pointer-events-none overflow-visible"
+                            style="top: calc(47.5%); left: calc(50% - 16px); width: 130px; height: 75px; z-index: 5;">
+                            <defs>
+                                <marker id="arrowhead" markerWidth="6" markerHeight="4" refX="6" refY="2" orient="auto">
+                                    <polygon points="0 0, 6 2, 0 4" fill="#FACC15" />
+                                </marker>
+                            </defs>
+                            <!-- Straight Line Segment 1: Agnes side -->
+                            <path d="M 0 54 L 60 28" stroke="#FACC15" stroke-width="3" fill="none" opacity="0.9" />
+                            <!-- Straight Line Segment 2: Lucius side -->
+                            <path d="M 90 15 L 123 0" stroke="#FACC15" stroke-width="3" fill="none"
+                                marker-end="url(#arrowhead)" opacity="0.9" />
+                            <!-- Label shifted further 'up' the line -->
+                            <text id="mentor-label" x="75" y="21" text-anchor="middle" alignment-baseline="middle"
+                                font-size="7" fill="black"
+                                class="font-bold uppercase tracking-[0.2em] cursor-pointer hover:fill-blue-600 transition-colors pointer-events-auto"
+                                transform="rotate(-24, 75, 21)">
+                                Mentor
+                            </text>
+                        </svg>
+
+                        <!-- Lucius Temple Hotspot Overlay -->
+                        <div id="lucius-hotspot" class="map-hotspot absolute flex flex-col items-center gap-1 z-10"
+                            style="top: calc(47.5% - 30px); left: calc(50% + 80px);" title="Click for Profile">
+                            <div
+                                class="w-12 h-12 rounded-full border-2 border-white/50 bg-accent dark:bg-yellow-900/40 flex items-center justify-center overflow-hidden shadow-lg relative">
+                                <img src="{% static 'img/Lucius-Temple.png' %}" alt="Lucius Temple Profile"
+                                    class="w-full h-full object-cover">
+                                <span
+                                    class="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full animate-ping opacity-75"></span>
+                            </div>
+                            <span
+                                class="bg-black/60 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded-full font-medium whitespace-nowrap shadow-sm">Lucius
+                                Temple</span>
+                        </div>
+
+                        <!-- Connection Line: Agnes to Theodora (Friend) -->
+                        <svg class="absolute pointer-events-none overflow-visible"
+                            style="top: calc(47.5% + 45px); left: calc(50% - 16px); width: 130px; height: 95px; z-index: 5;">
+                            <defs>
+                                <marker id="arrowhead-blue" markerWidth="6" markerHeight="4" refX="6" refY="2"
+                                    orient="auto">
+                                    <polygon points="0 0, 6 2, 0 4" fill="#3B82F6" />
+                                </marker>
+                            </defs>
+                            <!-- Straight Line Segment 1: Agnes side -->
+                            <path d="M 0 0 L 60 50" stroke="#3B82F6" stroke-width="3" fill="none" opacity="0.9" />
+                            <!-- Straight Line Segment 2: Theodora side -->
+                            <path d="M 90 70 L 123 77" stroke="#3B82F6" stroke-width="3" fill="none"
+                                marker-end="url(#arrowhead-blue)" opacity="0.9" />
+                            <!-- Label Friend -->
+                            <text id="friend-label" x="75" y="60" text-anchor="middle" alignment-baseline="middle"
+                                font-size="7" fill="black"
+                                class="font-bold uppercase tracking-[0.2em] cursor-pointer hover:fill-blue-400 transition-colors pointer-events-auto"
+                                transform="rotate(25, 75, 60)">
+                                Friend
+                            </text>
+                        </svg>
+
+                        <!-- Aunt Theodora Hotspot Overlay -->
+                        <div id="theodora-hotspot" class="map-hotspot absolute flex flex-col items-center gap-1 z-10"
+                            style="top: calc(47.5% + 100px); left: calc(50% + 80px);" title="Click for Profile">
+                            <div
+                                class="w-12 h-12 rounded-full border-2 border-white/50 bg-accent dark:bg-yellow-900/40 flex items-center justify-center overflow-hidden shadow-lg relative">
+                                <img src="{% static 'img/aunt-theodora.png' %}" alt="Aunt Theodora Profile"
+                                    class="w-full h-full object-cover object-top">
+                                <span
+                                    class="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full animate-ping opacity-75"></span>
+                            </div>
+                            <span
+                                class="bg-black/60 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded-full font-medium whitespace-nowrap shadow-sm">Aunt
+                                Theodora</span>
+                        </div>
+
+                        <!-- Connection Line: Agnes to Elise (Family) -->
+                        <svg class="absolute pointer-events-none overflow-visible"
+                            style="top: calc(47.5% + 45px); left: calc(50% - 146px); width: 130px; height: 95px; z-index: 5;">
+                            <defs>
+                                <marker id="arrowhead-purple" markerWidth="6" markerHeight="4" refX="6" refY="2"
+                                    orient="auto">
+                                    <polygon points="0 0, 6 2, 0 4" fill="#9333EA" />
+                                </marker>
+                            </defs>
+                            <!-- Straight Line Segment 1: Agnes side -->
+                            <path d="M 130 0 L 85 28" stroke="#9333EA" stroke-width="3" fill="none" opacity="0.9" />
+                            <!-- Straight Line Segment 2: Elise side -->
+                            <path d="M 55 47 L 2 80" stroke="#9333EA" stroke-width="3" fill="none"
+                                marker-end="url(#arrowhead-purple)" opacity="0.9" />
+                            <!-- Label Family -->
+                            <text id="family-label" x="70" y="38" text-anchor="middle" alignment-baseline="middle"
+                                font-size="7" fill="black"
+                                class="font-bold uppercase tracking-[0.2em] cursor-pointer hover:fill-purple-400 transition-colors pointer-events-auto"
+                                transform="rotate(-32, 70, 38)">
+                                Family
+                            </text>
+                        </svg>
+
+                        <!-- Elise Temple Hotspot Overlay -->
+                        <div id="elise-hotspot" class="map-hotspot absolute flex flex-col items-center gap-1 z-10"
+                            style="top: calc(47.5% + 100px); left: calc(50% - 180px);" title="Click for Profile">
+                            <div
+                                class="w-12 h-12 rounded-full border-2 border-white/50 bg-accent dark:bg-yellow-900/40 flex items-center justify-center overflow-hidden shadow-lg relative">
+                                <img src="{% static 'img/Elise-temple.png' %}" alt="Elise Temple Profile"
+                                    class="w-full h-full object-cover object-top">
+                                <span
+                                    class="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full animate-ping opacity-75"></span>
+                            </div>
+                            <span
+                                class="bg-black/60 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded-full font-medium whitespace-nowrap shadow-sm">Elise
+                                Temple</span>
+                        </div>
+
+                        <!-- Connection Key (Restored Overlay) -->
+                        <div class="absolute top-4 right-4 z-20 pointer-events-none">
+                            <div
+                                class="bg-white/90 dark:bg-surface-dark/90 backdrop-blur-md p-3 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm pointer-events-auto">
+                                <h4
+                                    class="text-[9px] font-bold uppercase tracking-widest text-gray-400 mb-2 border-b border-gray-100 dark:border-gray-700 pb-1">
+                                    Connection Key</h4>
+                                <div class="space-y-2">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-4 h-0.5 bg-yellow-400 relative">
+                                            <div
+                                                class="absolute right-0 -top-0.5 w-1.5 h-1.5 rounded-full bg-yellow-400">
+                                            </div>
+                                        </div>
+                                        <span
+                                            class="text-[9px] font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Mentor</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-4 h-0.5 bg-blue-500 relative">
+                                            <div class="absolute right-0 -top-0.5 w-1.5 h-1.5 rounded-full bg-blue-500">
+                                            </div>
+                                        </div>
+                                        <span
+                                            class="text-[9px] font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Friend</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-4 h-0.5 bg-purple-600 relative">
+                                            <div
+                                                class="absolute right-0 -top-0.5 w-1.5 h-1.5 rounded-full bg-purple-600">
+                                            </div>
+                                        </div>
+                                        <span
+                                            class="text-[9px] font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Family</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <!-- Background Glows -->
-                <div
-                    class="absolute -top-10 -right-10 w-40 h-40 bg-yellow-200/50 dark:bg-yellow-600/20 rounded-full blur-3xl -z-10">
-                </div>
-                <div
-                    class="absolute -bottom-10 -left-10 w-60 h-60 bg-purple-200/50 dark:bg-purple-600/20 rounded-full blur-3xl -z-10">
+
+                <!-- Right Column: Codex Panel -->
+                <div id="codex-container"
+                    class="relative h-[500px] bg-white dark:bg-surface-dark rounded-2xl border border-gray-100 dark:border-gray-800 shadow-xl overflow-hidden">
+
+                    <!-- Default State: Marketing Text -->
+                    <div id="codex-default" class="h-full overflow-y-auto p-8 custom-scrollbar">
+                        <div
+                            class="flex items-center gap-2 mb-4 text-xs font-bold text-blue-500 uppercase tracking-widest">
+                            <span class="w-8 h-[1px] bg-blue-500"></span> Story Architecture
+                        </div>
+                        <h2 class="text-4xl md:text-5xl font-serif text-primary dark:text-white mb-6 font-bold">
+                            Visualize
+                            the Invisible</h2>
+                        <p class="text-lg text-gray-600 dark:text-gray-400 leading-relaxed mb-8">
+                            Don't lose track of who hates whom. Our dynamic Relationship Map updates automatically as
+                            you
+                            write, visualizing the complex web of interactions.
+                        </p>
+                        <div class="space-y-6">
+                            <div class="flex gap-4">
+                                <div
+                                    class="flex-shrink-0 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center mt-0.5 shadow-sm">
+                                    <span class="material-icons text-white text-sm">check</span>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-gray-900 dark:text-white mb-1">Auto-generated nodes</h4>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Simply introduce a character,
+                                        and they appear on the board.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4">
+                                <div
+                                    class="flex-shrink-0 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center mt-0.5 shadow-sm">
+                                    <span class="material-icons text-white text-sm">check</span>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-gray-900 dark:text-white mb-1">Dynamic tension lines</h4>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Visual cues for conflict
+                                        intensity and relationship type.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dora Temple View -->
+                    <div id="codex-dora" class="hidden h-full overflow-y-auto p-8 custom-scrollbar">
+                        <div class="flex items-center gap-6 mb-8">
+                            <div class="relative">
+                                <div
+                                    class="w-20 h-20 rounded-2xl bg-accent overflow-hidden shadow-sm rotate-3 border-4 border-white dark:border-gray-800">
+                                    <img src="{% static 'img/Dora.png' %}" alt="Dora Temple"
+                                        class="w-full h-full object-cover">
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="text-2xl font-serif text-primary dark:text-white leading-none mb-2">Dora
+                                    Temple</h4>
+                                <div class="flex items-center gap-2">
+                                    <span
+                                        class="text-[10px] font-bold uppercase tracking-widest bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-gray-500">Cousin</span>
+                                    <span
+                                        class="text-[10px] font-bold uppercase tracking-widest text-purple-500">Family</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-6">
+                            <div>
+                                <h5
+                                    class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-3 border-b border-gray-100 dark:border-gray-700 pb-1">
+                                    Core Motivation</h5>
+                                <p class="text-base text-gray-600 dark:text-gray-400 leading-relaxed font-serif italic">
+                                    "I watch the shadows while they watch the light. The truth is always in the corner
+                                    of your eye."
+                                </p>
+                            </div>
+                            <div>
+                                <h5
+                                    class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-3 border-b border-gray-100 dark:border-gray-700 pb-1">
+                                    Relationship Pulse</h5>
+                                <div
+                                    class="p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <div class="flex items-center gap-2">
+                                            <div
+                                                class="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                                                <img src="{% static 'img/Agnes.png' %}"
+                                                    class="w-full h-full object-cover">
+                                            </div>
+                                            <span class="text-sm font-bold text-primary dark:text-white">Agnes
+                                                Temple</span>
+                                        </div>
+                                        <span
+                                            class="text-[8px] px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 uppercase font-bold tracking-tighter">Hidden
+                                            Ally</span>
+                                    </div>
+                                    <div
+                                        class="w-full bg-gray-200 dark:bg-gray-700 h-1 rounded-full overflow-hidden mb-2">
+                                        <div class="bg-purple-400 h-full w-[85%]"></div>
+                                    </div>
+                                    <p class="text-[11px] text-gray-500 leading-snug">Dora provides the keys to the
+                                        locks Agnes didn't know existed.</p>
+                                </div>
+                            </div>
+                            <div>
+                                <h5
+                                    class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-2 border-b border-gray-100 dark:border-gray-700 pb-1">
+                                    AI Recommendation</h5>
+                                <div class="p-3 rounded-xl bg-purple-600 text-white dark:bg-purple-500">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="material-icons-outlined text-xs">auto_awesome</span>
+                                        <span
+                                            class="text-[9px] font-bold uppercase tracking-widest opacity-80">Ghostwriter</span>
+                                    </div>
+                                    <p class="text-[11px] leading-relaxed">Consider exploring Dora's specific knowledge
+                                        of the clock tower mechanism in Chapter 18.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Agnes Temple View -->
+                    <div id="codex-agnes" class="hidden h-full overflow-y-auto p-8 custom-scrollbar">
+                        <div class="flex items-center gap-6 mb-8">
+                            <div class="relative">
+                                <div
+                                    class="w-20 h-20 rounded-2xl bg-accent overflow-hidden shadow-sm rotate-3 border-4 border-white dark:border-gray-800">
+                                    <img src="{% static 'img/Agnes.png' %}" alt="Agnes Temple"
+                                        class="w-full h-full object-cover">
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="text-2xl font-serif text-primary dark:text-white leading-none mb-2">Agnes
+                                    Temple</h4>
+                                <div class="flex items-center gap-2">
+                                    <span
+                                        class="text-[10px] font-bold uppercase tracking-widest bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-gray-500">Protagonist</span>
+                                    <span class="text-[10px] font-bold uppercase tracking-widest text-blue-500">Book
+                                        1</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-8">
+                            <div class="reveal slide-up active">
+                                <h5
+                                    class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-3 border-b border-gray-100 dark:border-gray-800 pb-1">
+                                    Core Motivation</h5>
+                                <p class="text-base text-gray-600 dark:text-gray-400 leading-relaxed font-serif italic">
+                                    "I am not my father's legacy. I am the silence that follows his noise."</p>
+                                <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">Agnes seeks to prove her
+                                    intellectual independence from the Temple dynasty by solving the 'Gilded Cage' case
+                                    using methods her father would deem 'unstructured.'</p>
+                            </div>
+
+                            <div class="reveal slide-up active delay-100">
+                                <h5
+                                    class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-4 border-b border-gray-100 dark:border-gray-800 pb-1">
+                                    Relationship Pulse</h5>
+                                <div class="space-y-4">
+                                    <div
+                                        class="group p-4 rounded-xl bg-background-light dark:bg-gray-800/50 border border-transparent hover:border-accent dark:hover:border-yellow-900/30 transition-all cursor-default">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <div class="flex items-center gap-2">
+                                                <div
+                                                    class="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
+                                                    <span class="material-icons text-[14px] text-gray-400">person</span>
+                                                </div>
+                                                <span class="text-sm font-bold text-primary dark:text-white">Leo
+                                                    Vance</span>
+                                            </div>
+                                            <span
+                                                class="text-[8px] px-2 py-0.5 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 uppercase font-bold tracking-tighter">Complicated</span>
+                                        </div>
+                                        <div
+                                            class="w-full bg-gray-200 dark:bg-gray-700 h-1 rounded-full overflow-hidden mb-2">
+                                            <div class="bg-orange-400 h-full w-[75%]"></div>
+                                        </div>
+                                        <p class="text-[11px] text-gray-500 leading-snug">Intellectual rivals since the
+                                            London Academy. Leo keeps his discovery of the antidote secret from her.</p>
+                                    </div>
+
+                                    <div
+                                        class="group p-4 rounded-xl bg-background-light dark:bg-gray-800/50 border border-transparent hover:border-accent dark:hover:border-yellow-900/30 transition-all cursor-default">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <div class="flex items-center gap-2">
+                                                <div
+                                                    class="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
+                                                    <span
+                                                        class="material-icons text-[14px] text-gray-400">menu_book</span>
+                                                </div>
+                                                <span class="text-sm font-bold text-primary dark:text-white">The
+                                                    Curator</span>
+                                            </div>
+                                            <span
+                                                class="text-[8px] px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 uppercase font-bold tracking-tighter">Mentor</span>
+                                        </div>
+                                        <div
+                                            class="w-full bg-gray-200 dark:bg-gray-700 h-1 rounded-full overflow-hidden mb-2">
+                                            <div class="bg-blue-400 h-full w-[90%]"></div>
+                                        </div>
+                                        <p class="text-[11px] text-gray-500 leading-snug">The only person Agnes truly
+                                            trusts. He provides the contextual breadcrumbs that fuel her investigation.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h5
+                                    class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-2 border-b border-gray-100 dark:border-gray-700 pb-1">
+                                    AI Recommendation</h5>
+                                <div class="p-3 rounded-xl bg-primary text-white dark:bg-white dark:text-primary">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="material-icons-outlined text-xs">auto_awesome</span>
+                                        <span
+                                            class="text-[9px] font-bold uppercase tracking-widest opacity-80">Ghostwriter</span>
+                                    </div>
+                                    <p class="text-[11px] leading-relaxed">Likely to betray The Curator in Chapter 14 to
+                                        save Leo. This creates a major emotional pivot point.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lucius Temple View -->
+                    <div id="codex-lucius" class="hidden h-full overflow-y-auto p-8 custom-scrollbar">
+                        <div class="flex items-center gap-6 mb-8">
+                            <div class="relative">
+                                <div
+                                    class="w-20 h-20 rounded-2xl bg-accent overflow-hidden shadow-sm rotate-3 border-4 border-white dark:border-gray-800">
+                                    <img src="{% static 'img/Lucius-Temple.png' %}" alt="Lucius Temple"
+                                        class="w-full h-full object-cover">
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="text-2xl font-serif text-primary dark:text-white leading-none mb-2">
+                                    Lucius
+                                    Temple</h4>
+                                <div class="flex items-center gap-2">
+                                    <span
+                                        class="text-[10px] font-bold uppercase tracking-widest bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-gray-500">Antagonist
+                                        / Patriarch</span>
+                                    <span class="text-[10px] font-bold uppercase tracking-widest text-red-500">Book
+                                        1</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-8">
+                            <div class="reveal slide-up active">
+                                <h5
+                                    class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-3 border-b border-gray-100 dark:border-gray-700 pb-1">
+                                    Core Motivation</h5>
+                                <p class="text-base text-gray-600 dark:text-gray-400 leading-relaxed font-serif italic">
+                                    "The truth is not a luxury; it is a weapon. And I have spent my life forging
+                                    it."
+                                </p>
+                                <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">Lucius believes that
+                                    order must
+                                    be maintained at any cost. His meticulous archiving of the city's secrets
+                                    has made
+                                    him both the most respected and the most feared man in London.</p>
+                            </div>
+
+                            <div class="reveal slide-up active delay-100">
+                                <h5
+                                    class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-4 border-b border-gray-100 dark:border-gray-800 pb-1">
+                                    Relationship Pulse</h5>
+                                <div class="space-y-4">
+                                    <div
+                                        class="group p-4 rounded-xl bg-background-light dark:bg-gray-800/50 border border-transparent hover:border-accent dark:hover:border-yellow-900/30 transition-all cursor-default">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <div class="flex items-center gap-2">
+                                                <div
+                                                    class="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                                                    <img src="{% static 'img/Agnes.png' %}"
+                                                        class="w-full h-full object-cover">
+                                                </div>
+                                                <span class="text-sm font-bold text-primary dark:text-white">Agnes
+                                                    Temple</span>
+                                            </div>
+                                            <span
+                                                class="text-[8px] px-2 py-0.5 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 uppercase font-bold tracking-tighter">Strained</span>
+                                        </div>
+                                        <div
+                                            class="w-full bg-gray-200 dark:bg-gray-700 h-1 rounded-full overflow-hidden mb-2">
+                                            <div class="bg-red-400 h-full w-[40%]"></div>
+                                        </div>
+                                        <p class="text-[11px] text-gray-500 leading-snug">His daughter. He sees
+                                            her
+                                            rebellion as a threat to the Temple legacy, yet secretly admires her
+                                            intuition.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="p-6 rounded-2xl bg-yellow-500 text-white dark:bg-yellow-600 mt-12">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="material-icons-outlined text-sm">auto_awesome</span>
+                                    <span class="text-[10px] font-bold uppercase tracking-widest opacity-80">AI
+                                        Recommendation</span>
+                                </div>
+                                <p class="text-xs leading-relaxed">Lucius is likely to reveal the true nature of
+                                    the
+                                    'Gilded Cage' to Agnes in Chapter 22, forcing her to choose between truth
+                                    and
+                                    familial loyalty.</p>
+                            </div>
+                        </div>
+                    </div> <!-- Theodora Temple View -->
+                    <div id="codex-theodora" class="hidden h-full overflow-y-auto p-8 custom-scrollbar">
+                        <div class="flex items-center gap-6 mb-8">
+                            <div class="relative">
+                                <div
+                                    class="w-20 h-20 rounded-2xl bg-accent overflow-hidden shadow-sm rotate-3 border-4 border-white dark:border-gray-800">
+                                    <img src="{% static 'img/aunt-theodora.png' %}" alt="Aunt Theodora"
+                                        class="w-full h-full object-cover">
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="text-2xl font-serif text-primary dark:text-white leading-none mb-2">
+                                    Aunt
+                                    Theodora</h4>
+                                <div class="flex items-center gap-2">
+                                    <span
+                                        class="text-[10px] font-bold uppercase tracking-widest bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-gray-500">Confidante</span>
+                                    <span class="text-[10px] font-bold uppercase tracking-widest text-blue-500">Book
+                                        1</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-6">
+                            <div>
+                                <h5
+                                    class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-2 border-b border-gray-100 dark:border-gray-700 pb-1">
+                                    Core Motivation</h5>
+                                <p class="text-base text-gray-600 dark:text-gray-400 leading-relaxed font-serif italic">
+                                    "Order is a cage. True friendship is the key we hide in plain sight."</p>
+                            </div>
+                            <div>
+                                <div>
+                                    <h5
+                                        class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-2 border-b border-gray-100 dark:border-gray-700 pb-1">
+                                        AI Recommendation</h5>
+                                    <div
+                                        class="p-3 rounded-xl bg-blue-500 text-white dark:bg-blue-600 border border-transparent">
+                                        <div class="flex items-center gap-2 mb-1">
+                                            <span class="material-icons-outlined text-xs">auto_awesome</span>
+                                            <span
+                                                class="text-[9px] font-bold uppercase tracking-widest opacity-80">Ghostwriter</span>
+                                        </div>
+                                        <p class="text-[11px] leading-relaxed">Theodora operates on the fringes
+                                            of High London society to protect those who seek to dismantle it.
+                                            Use her to introduce the resistance.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <h5
+                                    class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-2 border-b border-gray-100 dark:border-gray-700 pb-1">
+                                    Relationship Pulse</h5>
+                                <div
+                                    class="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <div class="flex items-center gap-2">
+                                            <div
+                                                class="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                                                <img src="{% static 'img/Agnes.png' %}"
+                                                    class="w-full h-full object-cover">
+                                            </div>
+                                            <span class="text-sm font-bold text-primary dark:text-white">Agnes
+                                                Temple</span>
+                                        </div>
+                                        <span
+                                            class="text-[8px] px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 uppercase font-bold tracking-tighter">Trusted</span>
+                                    </div>
+                                    <div
+                                        class="w-full bg-gray-200 dark:bg-gray-700 h-1 rounded-full overflow-hidden mb-2">
+                                        <div class="bg-blue-400 h-full w-[90%]"></div>
+                                    </div>
+                                    <p class="text-[11px] text-gray-500 leading-snug">The niece she swore to
+                                        protect.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Elise Temple View -->
+                    <div id="codex-elise" class="hidden h-full overflow-y-auto p-8 custom-scrollbar">
+                        <div class="flex items-center gap-6 mb-8">
+                            <div class="relative">
+                                <div
+                                    class="w-20 h-20 rounded-2xl bg-accent overflow-hidden shadow-sm rotate-3 border-4 border-white dark:border-gray-800">
+                                    <img src="{% static 'img/Elise-temple.png' %}" alt="Elise Temple"
+                                        class="w-full h-full object-cover object-top">
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="text-2xl font-serif text-primary dark:text-white leading-none mb-2">
+                                    Elise
+                                    Temple</h4>
+                                <div class="flex items-center gap-2">
+                                    <span
+                                        class="text-[10px] font-bold uppercase tracking-widest bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-gray-500">Matriarch</span>
+                                    <span class="text-[10px] font-bold uppercase tracking-widest text-purple-500">Book
+                                        1</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-6">
+                            <div>
+                                <h5
+                                    class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-2 border-b border-gray-100 dark:border-gray-700 pb-1">
+                                    Core Motivation</h5>
+                                <p class="text-base text-gray-600 dark:text-gray-400 leading-relaxed font-serif italic">
+                                    "The family name is not a gift; it is a fortress that must be defended."</p>
+                            </div>
+                            <div>
+                                <h5
+                                    class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-2 border-b border-gray-100 dark:border-gray-700 pb-1">
+                                    Relationship Pulse</h5>
+                                <div
+                                    class="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 mb-6">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <div class="flex items-center gap-2">
+                                            <div
+                                                class="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                                                <img src="{% static 'img/Agnes.png' %}"
+                                                    class="w-full h-full object-cover">
+                                            </div>
+                                            <span class="text-sm font-bold text-primary dark:text-white">Agnes
+                                                Temple</span>
+                                        </div>
+                                        <span
+                                            class="text-[8px] px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 uppercase font-bold tracking-tighter">Fractured</span>
+                                    </div>
+                                    <div
+                                        class="w-full bg-gray-200 dark:bg-gray-700 h-1 rounded-full overflow-hidden mb-2">
+                                        <div class="bg-purple-400 h-full w-[30%]"></div>
+                                    </div>
+                                    <p class="text-[11px] text-gray-500 leading-snug">A bond broken by silence.
+                                    </p>
+                                </div>
+                            </div>
+                            <div>
+                                <h5
+                                    class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-2 border-b border-gray-100 dark:border-gray-700 pb-1">
+                                    AI Recommendation</h5>
+                                <div class="p-3 rounded-xl bg-purple-600 text-white dark:bg-purple-500">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="material-icons-outlined text-xs">auto_awesome</span>
+                                        <span
+                                            class="text-[9px] font-bold uppercase tracking-widest opacity-80">Ghostwriter</span>
+                                    </div>
+                                    <p class="text-[11px] leading-relaxed">Elise will attempt to burn the
+                                        archives
+                                        before Agnes can access them.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mentor View -->
+                    <div id="codex-mentor" class="hidden h-full overflow-y-auto p-8 custom-scrollbar">
+                        <div class="text-center mb-8">
+                            <h4 class="text-2xl font-serif text-primary dark:text-white mb-1">Mentor</h4>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Beneath the surface of the
+                                Temple
+                                Dynasty</p>
+                            <div class="flex gap-2 justify-center">
+                                <span
+                                    class="text-[9px] px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 font-bold uppercase">Active</span>
+                                <span
+                                    class="text-[9px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-bold uppercase">Public</span>
+                            </div>
+                        </div>
+                        <div class="space-y-6">
+                            <div
+                                class="p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <div class="flex -space-x-2">
+                                        <div
+                                            class="w-8 h-8 rounded-full border-2 border-white dark:border-gray-800 overflow-hidden">
+                                            <img src="{% static 'img/Lucius-Temple.png' %}"
+                                                class="w-full h-full object-cover">
+                                        </div>
+                                        <div
+                                            class="w-8 h-8 rounded-full border-2 border-white dark:border-gray-800 overflow-hidden">
+                                            <img src="{% static 'img/Agnes.png' %}" class="w-full h-full object-cover">
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">Key
+                                            Dynamic</span>
+                                        <span class="text-[10px] text-primary dark:text-white font-medium">Lucius
+                                            &
+                                            Agnes</span>
+                                    </div>
+                                </div>
+                                <h5 class="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">
+                                    Narrative
+                                    Arc</h5>
+                                <p class="text-sm text-gray-600 dark:text-gray-400 font-serif italic mb-2">"The
+                                    transmission of logic from father to daughter is rarely a straight line."
+                                </p>
+                                <p class="text-xs text-gray-500">Lucius provides Agnes with "unrestricted" data
+                                    paths
+                                    while maintaining a cold facade.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Friend View -->
+                    <div id="codex-friend" class="hidden h-full overflow-y-auto p-8 custom-scrollbar">
+                        <div class="text-center mb-8">
+                            <h4 class="text-2xl font-serif text-primary dark:text-white mb-1">Friendship</h4>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">The silent anchor in the
+                                storm</p>
+                            <div class="flex gap-2 justify-center">
+                                <span
+                                    class="text-[9px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-bold uppercase">Trusted</span>
+                                <span
+                                    class="text-[9px] px-2 py-0.5 rounded-full bg-primary text-white font-bold uppercase">9/10
+                                    Trust</span>
+                            </div>
+                        </div>
+                        <div class="space-y-6">
+                            <div
+                                class="p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <div class="flex -space-x-2">
+                                        <div
+                                            class="w-8 h-8 rounded-full border-2 border-white dark:border-gray-800 overflow-hidden">
+                                            <img src="{% static 'img/aunt-theodora.png' %}"
+                                                class="w-full h-full object-cover">
+                                        </div>
+                                        <div
+                                            class="w-8 h-8 rounded-full border-2 border-white dark:border-gray-800 overflow-hidden">
+                                            <img src="{% static 'img/Agnes.png' %}" class="w-full h-full object-cover">
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">Key
+                                            Dynamic</span>
+                                        <span class="text-[10px] text-primary dark:text-white font-medium">Theodora
+                                            &
+                                            Agnes</span>
+                                    </div>
+                                </div>
+                                <h5 class="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">
+                                    Narrative
+                                    Arc</h5>
+                                <p class="text-sm text-gray-600 dark:text-gray-400 font-serif italic mb-2">"In a
+                                    world
+                                    built on dynasties, a chosen bond is the only true sovereignty."</p>
+                                <p class="text-xs text-gray-500">Aunt Theodora provides the unfiltered advice
+                                    Agnes
+                                    cannot find within Temple walls.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Family View -->
+                    <div id="codex-family" class="hidden h-full overflow-y-auto p-8 custom-scrollbar">
+                        <div class="text-center mb-8">
+                            <h4 class="text-2xl font-serif text-primary dark:text-white mb-1">Family</h4>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Bound by blood, divided by
+                                secrets
+                            </p>
+                            <div class="flex gap-2 justify-center">
+                                <span
+                                    class="text-[9px] px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 font-bold uppercase">Strained</span>
+                                <span
+                                    class="text-[9px] px-2 py-0.5 rounded-full bg-red-100 text-red-700 font-bold uppercase">Risk</span>
+                            </div>
+                        </div>
+                        <div class="space-y-6">
+                            <div
+                                class="p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <div class="flex -space-x-2">
+                                        <div
+                                            class="w-8 h-8 rounded-full border-2 border-white dark:border-gray-800 overflow-hidden">
+                                            <img src="{% static 'img/Elise-temple.png' %}"
+                                                class="w-full h-full object-cover">
+                                        </div>
+                                        <div
+                                            class="w-8 h-8 rounded-full border-2 border-white dark:border-gray-800 overflow-hidden">
+                                            <img src="{% static 'img/Agnes.png' %}" class="w-full h-full object-cover">
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">Key
+                                            Dynamic</span>
+                                        <span class="text-[10px] text-primary dark:text-white font-medium">Elise
+                                            &
+                                            Agnes</span>
+                                    </div>
+                                </div>
+                                <h5 class="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">
+                                    Narrative
+                                    Arc</h5>
+                                <p class="text-sm text-gray-600 dark:text-gray-400 font-serif italic mb-2">"To
+                                    protect
+                                    the child, one must sometimes execute the innocence."</p>
+                                <p class="text-xs text-gray-500">Elise shield Agnes from the family's true
+                                    nature, but
+                                    the wall is becoming a prison.</p>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
+    </section>
     </section>
     <section class="py-24 bg-white dark:bg-surface-dark">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -531,6 +1318,350 @@
                     </div>
                     <p class="text-xs leading-relaxed">Their relationship is reaching a breaking point. One will soon
                         have to sacrifice their principles for the other's safety.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Friend Relationship Drawer -->
+    <div id="friend-drawer"
+        class="fixed top-0 right-0 w-80 md:w-96 h-full bg-white dark:bg-surface-dark shadow-2xl transform translate-x-full transition-transform duration-500 z-[100] overflow-y-auto border-l border-gray-200 dark:border-border-dark selection:bg-accent/30">
+        <div
+            class="p-5 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center sticky top-0 bg-white/80 dark:bg-surface-dark/80 backdrop-blur-md z-10">
+            <h3 class="font-bold text-sm uppercase tracking-widest text-gray-500 dark:text-gray-400">Relationship
+                Insight
+            </h3>
+            <button id="close-friend-drawer"
+                class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-400">
+                <span class="material-icons-outlined">close</span>
+            </button>
+        </div>
+        <div class="p-8">
+            <!-- Overlapping Avatars -->
+            <div class="flex justify-center items-center mb-8 h-20 relative">
+                <div class="absolute left-1/2 -translate-x-12 z-10">
+                    <img src="{% static 'img/Agnes.png' %}" alt="Agnes"
+                        class="w-16 h-16 rounded-full border-4 border-white dark:border-surface-dark shadow-lg object-cover">
+                </div>
+                <div class="absolute left-1/2 -translate-x-4 z-20">
+                    <div
+                        class="bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm border border-white/50 uppercase tracking-tighter">
+                        Friend
+                    </div>
+                </div>
+                <div class="absolute left-1/2 translate-x-4 z-10">
+                    <img src="{% static 'img/aunt-theodora.png' %}" alt="Theodora"
+                        class="w-16 h-16 rounded-full border-4 border-white dark:border-surface-dark shadow-lg object-cover">
+                </div>
+            </div>
+
+            <div class="text-center mb-10">
+                <h4 class="text-2xl font-serif text-primary dark:text-white mb-1">Friendship</h4>
+                <p class="text-xs text-gray-500 dark:text-gray-400">The silent anchor in the storm</p>
+
+                <div class="flex gap-2 justify-center mt-4">
+                    <span
+                        class="text-[9px] px-2 py-0.5 rounded-full bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border border-green-100 dark:border-green-800 font-bold uppercase">Active</span>
+                    <span
+                        class="text-[9px] px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-800 font-bold uppercase">Trusted</span>
+                    <span
+                        class="text-[9px] px-2 py-0.5 rounded-full bg-primary text-white font-bold uppercase italic">9/10
+                        Trust</span>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Narrative Arc -->
+                <div class="p-5 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700">
+                    <h5
+                        class="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3 flex items-center gap-2">
+                        <span class="material-icons-outlined text-xs">history_edu</span> Narrative Arc
+                    </h5>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed font-serif italic">
+                        "In a world built on dynasties, a chosen bond is the only true sovereignty."
+                    </p>
+                    <p class="mt-3 text-xs text-gray-500 dark:text-gray-500 leading-relaxed">
+                        Aunt Theodora has been Agnes's confidante since the early London Academy days. She provides a
+                        safe haven and unfiltered advice that Agnes cannot find within the Temple walls.
+                    </p>
+                </div>
+
+                <!-- Deep Intelligence -->
+                <div class="space-y-3">
+                    <div
+                        class="p-3 rounded-xl bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100/50 dark:border-blue-800/30">
+                        <h6
+                            class="text-[9px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-tighter mb-1">
+                            Shared Secret</h6>
+                        <p class="text-[11px] text-gray-600 dark:text-gray-400 italic">"They smuggled the first set of
+                            Academy blueprints out together."</p>
+                    </div>
+
+                    <div
+                        class="p-3 rounded-xl bg-purple-50/50 dark:bg-purple-900/10 border border-purple-100/50 dark:border-purple-800/30">
+                        <h6
+                            class="text-[9px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-tighter mb-1">
+                            Mutual Support</h6>
+                        <p class="text-[11px] text-gray-600 dark:text-gray-400">Theodora funds Agnes's independent
+                            research through a series of shell foundations.</p>
+                    </div>
+                </div>
+
+                <!-- Forecast -->
+                <div class="p-5 rounded-2xl bg-blue-600 text-white mt-12">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="material-icons-outlined text-sm">auto_awesome</span>
+                        <span class="text-[10px] font-bold uppercase tracking-widest opacity-70">AI Prediction</span>
+                    </div>
+                    <p class="text-xs leading-relaxed">Theodora will be called to testify against Lucius. Her loyalty to
+                        Agnes will be tested by the weight of the Temple influence.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Theodora Temple Insight Drawer -->
+    <div id="theodora-drawer"
+        class="fixed top-0 right-0 w-80 md:w-96 h-full bg-white dark:bg-surface-dark shadow-2xl transform translate-x-full transition-transform duration-500 z-[100] overflow-y-auto border-l border-gray-200 dark:border-border-dark selection:bg-accent/30">
+        <!-- Header -->
+        <div
+            class="p-5 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center sticky top-0 bg-white/80 dark:bg-surface-dark/80 backdrop-blur-md z-10">
+            <h3 class="font-bold text-sm uppercase tracking-widest text-gray-500 dark:text-gray-400">Codex: Character
+                Insight</h3>
+            <button id="close-theodora-drawer"
+                class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-400">
+                <span class="material-icons-outlined">close</span>
+            </button>
+        </div>
+
+        <!-- Content -->
+        <div class="p-8">
+            <div class="flex items-center gap-6 mb-10">
+                <div class="relative">
+                    <div
+                        class="w-20 h-20 rounded-2xl bg-accent overflow-hidden shadow-sm rotate-3 border-4 border-white dark:border-gray-800">
+                        <img src="{% static 'img/aunt-theodora.png' %}" alt="Theodora Temple Portrait"
+                            class="w-full h-full object-cover">
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-2xl font-serif text-primary dark:text-white leading-none mb-2">Aunt Theodora</h4>
+                    <div class="flex items-center gap-2">
+                        <span
+                            class="text-[10px] font-bold uppercase tracking-widest bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-gray-500">Confidante</span>
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-blue-500">Book 1</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-8">
+                <div class="reveal slide-up active">
+                    <h5
+                        class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-3 border-b border-gray-100 dark:border-gray-800 pb-1">
+                        Core Motivation</h5>
+                    <p class="text-base text-gray-600 dark:text-gray-400 leading-relaxed font-serif italic">
+                        "Order is a cage. True friendship is the key we hide in plain sight."
+                    </p>
+                    <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">
+                        Theodora operates on the fringes of High London society, using her social standing to protect
+                        those who seek to dismantle the rigid structures of the status quo.
+                    </p>
+                </div>
+
+                <div class="reveal slide-up active delay-100">
+                    <h5
+                        class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-4 border-b border-gray-100 dark:border-gray-800 pb-1">
+                        Relationship Pulse</h5>
+                    <div class="space-y-4">
+                        <div
+                            class="group p-4 rounded-xl bg-background-light dark:bg-gray-800/50 border border-transparent hover:border-accent dark:hover:border-yellow-900/30 transition-all cursor-default">
+                            <div class="flex justify-between items-center mb-2">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-6 h-6 rounded bg-gray-200 dark:bg-gray-700"></div>
+                                    <span class="text-sm font-bold text-primary dark:text-white">Agnes Temple</span>
+                                </div>
+                                <span
+                                    class="text-[8px] px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 uppercase font-bold tracking-tighter">Unbreakable</span>
+                            </div>
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 h-1 rounded-full overflow-hidden mb-2">
+                                <div class="bg-blue-400 h-full w-[95%]"></div>
+                            </div>
+                            <p class="text-[11px] text-gray-500 leading-snug">She sees herself in Agnes's fire. She will
+                                risk her own standing to ensure Agnes has what she needs.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Family Relationship Drawer -->
+    <div id="family-drawer"
+        class="fixed top-0 right-0 w-80 md:w-96 h-full bg-white dark:bg-surface-dark shadow-2xl transform translate-x-full transition-transform duration-500 z-[100] overflow-y-auto border-l border-gray-200 dark:border-border-dark selection:bg-accent/30">
+        <div
+            class="p-5 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center sticky top-0 bg-white/80 dark:bg-surface-dark/80 backdrop-blur-md z-10">
+            <h3 class="font-bold text-sm uppercase tracking-widest text-gray-500 dark:text-gray-400">Relationship
+                Insight
+            </h3>
+            <button id="close-family-drawer"
+                class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-400">
+                <span class="material-icons-outlined">close</span>
+            </button>
+        </div>
+        <div class="p-8">
+            <!-- Overlapping Avatars -->
+            <div class="flex justify-center items-center mb-8 h-20 relative">
+                <div class="absolute left-1/2 -translate-x-12 z-10">
+                    <img src="{% static 'img/Agnes.png' %}" alt="Agnes"
+                        class="w-16 h-16 rounded-full border-4 border-white dark:border-surface-dark shadow-lg object-cover">
+                </div>
+                <div class="absolute left-1/2 -translate-x-4 z-20">
+                    <div
+                        class="bg-purple-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm border border-white/50 uppercase tracking-tighter">
+                        Family
+                    </div>
+                </div>
+                <div class="absolute left-1/2 translate-x-4 z-10">
+                    <img src="{% static 'img/Elise-temple.png' %}" alt="Elise"
+                        class="w-16 h-16 rounded-full border-4 border-white dark:border-surface-dark shadow-lg object-cover object-top">
+                </div>
+            </div>
+
+            <div class="text-center mb-10">
+                <h4 class="text-2xl font-serif text-primary dark:text-white mb-1">Mother & Daughter</h4>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Bound by blood, divided by secrets</p>
+
+                <div class="flex gap-2 justify-center mt-4">
+                    <span
+                        class="text-[9px] px-2 py-0.5 rounded-full bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border border-green-100 dark:border-green-800 font-bold uppercase">Active</span>
+                    <span
+                        class="text-[9px] px-2 py-0.5 rounded-full bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border border-purple-100 dark:border-purple-800 font-bold uppercase">Strained</span>
+                    <span
+                        class="text-[9px] px-2 py-0.5 rounded-full bg-primary text-white font-bold uppercase italic">6/10
+                        Trust</span>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Narrative Arc -->
+                <div class="p-5 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700">
+                    <h5
+                        class="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3 flex items-center gap-2">
+                        <span class="material-icons-outlined text-xs">psychology</span> Narrative Arc
+                    </h5>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed font-serif italic">
+                        "To protect the child, one must sometimes execute the innocence."
+                    </p>
+                    <p class="mt-3 text-xs text-gray-500 dark:text-gray-500 leading-relaxed">
+                        Elise has spent decades building a fortress of lies around Agnes to shield her from the Temple
+                        family's true nature. As Agnes digs deeper, this protective wall begins to feel like a prison.
+                    </p>
+                </div>
+
+                <!-- Deep Intelligence -->
+                <div class="space-y-3">
+                    <div
+                        class="p-3 rounded-xl bg-purple-50/50 dark:bg-purple-900/10 border border-purple-100/50 dark:border-purple-800/30">
+                        <h6
+                            class="text-[9px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-tighter mb-1">
+                            Shared Burden</h6>
+                        <p class="text-[11px] text-gray-600 dark:text-gray-400 italic">"The disappearance of Elias
+                            Temple remains a forbidden topic at dinner."</p>
+                    </div>
+
+                    <div
+                        class="p-3 rounded-xl bg-red-50/50 dark:bg-red-900/10 border border-red-100/50 dark:border-red-800/30">
+                        <h6 class="text-[9px] font-bold text-red-600 dark:text-red-400 uppercase tracking-tighter mb-1">
+                            Generational Trauma</h6>
+                        <p class="text-[11px] text-gray-600 dark:text-gray-400">Elise fears Agnes is inheriting her
+                            faster's "reckless curiosity."</p>
+                    </div>
+                </div>
+
+                <!-- Forecast -->
+                <div class="p-5 rounded-2xl bg-purple-600 text-white mt-12">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="material-icons-outlined text-sm">auto_awesome</span>
+                        <span class="text-[10px] font-bold uppercase tracking-widest opacity-70">AI Prediction</span>
+                    </div>
+                    <p class="text-xs leading-relaxed">Elise will attempt to burn the archives before Agnes can access
+                        them, triggering a final confrontation.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Elise Temple Insight Drawer -->
+    <div id="elise-drawer"
+        class="fixed top-0 right-0 w-80 md:w-96 h-full bg-white dark:bg-surface-dark shadow-2xl transform translate-x-full transition-transform duration-500 z-[100] overflow-y-auto border-l border-gray-200 dark:border-border-dark selection:bg-accent/30">
+        <!-- Header -->
+        <div
+            class="p-5 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center sticky top-0 bg-white/80 dark:bg-surface-dark/80 backdrop-blur-md z-10">
+            <h3 class="font-bold text-sm uppercase tracking-widest text-gray-500 dark:text-gray-400">Codex: Character
+                Insight</h3>
+            <button id="close-elise-drawer"
+                class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-400">
+                <span class="material-icons-outlined">close</span>
+            </button>
+        </div>
+
+        <!-- Content -->
+        <div class="p-8">
+            <div class="flex items-center gap-6 mb-10">
+                <div class="relative">
+                    <div
+                        class="w-20 h-20 rounded-2xl bg-accent overflow-hidden shadow-sm rotate-3 border-4 border-white dark:border-gray-800">
+                        <img src="{% static 'img/Elise-temple.png' %}" alt="Elise Temple Portrait"
+                            class="w-full h-full object-cover object-top">
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-2xl font-serif text-primary dark:text-white leading-none mb-2">Elise Temple</h4>
+                    <div class="flex items-center gap-2">
+                        <span
+                            class="text-[10px] font-bold uppercase tracking-widest bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-gray-500">Matriarch</span>
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-purple-500">Book 1</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-8">
+                <div class="reveal slide-up active">
+                    <h5
+                        class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-3 border-b border-gray-100 dark:border-gray-800 pb-1">
+                        Core Motivation</h5>
+                    <p class="text-base text-gray-600 dark:text-gray-400 leading-relaxed font-serif italic">
+                        "The family name is not a gift; it is a fortress that must be defended."
+                    </p>
+                    <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">
+                        Elise is the silent architect of the Temple family's public image. She sacrifices her own
+                        happiness to ensure the family's survival, even if it means becoming the villain in her
+                        daughter's story.
+                    </p>
+                </div>
+
+                <div class="reveal slide-up active delay-100">
+                    <h5
+                        class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-4 border-b border-gray-100 dark:border-gray-800 pb-1">
+                        Relationship Pulse</h5>
+                    <div class="space-y-4">
+                        <div
+                            class="group p-4 rounded-xl bg-background-light dark:bg-gray-800/50 border border-transparent hover:border-accent dark:hover:border-yellow-900/30 transition-all cursor-default">
+                            <div class="flex justify-between items-center mb-2">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-6 h-6 rounded bg-gray-200 dark:bg-gray-700"></div>
+                                    <span class="text-sm font-bold text-primary dark:text-white">Agnes Temple</span>
+                                </div>
+                                <span
+                                    class="text-[8px] px-2 py-0.5 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 uppercase font-bold tracking-tighter">Fractured</span>
+                            </div>
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 h-1 rounded-full overflow-hidden mb-2">
+                                <div class="bg-red-400 h-full w-[40%]"></div>
+                            </div>
+                            <p class="text-[11px] text-gray-500 leading-snug">Elise loves Agnes deeply, but Agnes views
+                                Elise as an obstacle to the truth.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -865,71 +1996,88 @@
                 });
             }
 
-            // Relationship Drawer Toggle
-            const agnesHotspot = document.getElementById('agnes-hotspot');
-            const luciusHotspot = document.getElementById('lucius-hotspot');
-            const mentorLabel = document.getElementById('mentor-label');
-
-            const closeDrawer = document.getElementById('close-drawer');
-            const closeLuciusDrawer = document.getElementById('close-lucius-drawer');
-            const closeMentorDrawer = document.getElementById('close-mentor-drawer');
-
-            const agnesDrawer = document.getElementById('agnes-drawer');
-            const luciusDrawer = document.getElementById('lucius-drawer');
-            const mentorDrawer = document.getElementById('mentor-drawer');
-
-            const closeAllDrawers = () => {
-                if (agnesDrawer) agnesDrawer.classList.add('translate-x-full');
-                if (luciusDrawer) luciusDrawer.classList.add('translate-x-full');
-                if (mentorDrawer) mentorDrawer.classList.add('translate-x-full');
-                document.body.classList.remove('drawer-open');
+            // Codex Panel Logic
+            const hotspots = {
+                agnes: document.getElementById('agnes-hotspot'),
+                lucius: document.getElementById('lucius-hotspot'),
+                theodora: document.getElementById('theodora-hotspot'),
+                elise: document.getElementById('elise-hotspot'),
+                dora: document.getElementById('dora-hotspot'),
+                mentor: document.getElementById('mentor-label'),
+                friend: document.getElementById('friend-label'),
+                family: document.getElementById('family-label'),
+                familyDora: document.getElementById('family-label-dora')
             };
 
-            if (agnesHotspot && agnesDrawer) {
-                agnesHotspot.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    closeAllDrawers();
-                    document.body.classList.add('drawer-open');
-                    agnesDrawer.classList.remove('translate-x-full');
-                });
-            }
+            const panels = {
+                default: document.getElementById('codex-default'),
+                agnes: document.getElementById('codex-agnes'),
+                lucius: document.getElementById('codex-lucius'),
+                theodora: document.getElementById('codex-theodora'),
+                elise: document.getElementById('codex-elise'),
+                dora: document.getElementById('codex-dora'),
+                mentor: document.getElementById('codex-mentor'),
+                friend: document.getElementById('codex-friend'),
+                family: document.getElementById('codex-family')
+            };
 
-            if (luciusHotspot && luciusDrawer) {
-                luciusHotspot.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    closeAllDrawers();
-                    document.body.classList.add('drawer-open');
-                    luciusDrawer.classList.remove('translate-x-full');
-                });
-            }
+            let autoScrollInterval;
 
-            if (mentorLabel && mentorDrawer) {
-                mentorLabel.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    closeAllDrawers();
-                    document.body.classList.add('drawer-open');
-                    mentorDrawer.classList.remove('translate-x-full');
-                });
-            }
+            const startAutoScroll = (panel) => {
+                clearInterval(autoScrollInterval);
+                if (!panel) return;
 
-            if (closeDrawer) closeDrawer.addEventListener('click', closeAllDrawers);
-            if (closeLuciusDrawer) closeLuciusDrawer.addEventListener('click', closeAllDrawers);
-            if (closeMentorDrawer) closeMentorDrawer.addEventListener('click', closeAllDrawers);
+                const scrollSpeed = 1; // Pixels per step
+                const scrollDelay = 50; // Milliseconds per step
 
-            // Close on outside click
-            document.addEventListener('click', (e) => {
-                if (document.body.classList.contains('drawer-open')) {
-                    const hotspotClicked = (agnesHotspot && agnesHotspot.contains(e.target)) ||
-                        (luciusHotspot && luciusHotspot.contains(e.target)) ||
-                        (mentorLabel && mentorLabel.contains(e.target));
+                autoScrollInterval = setInterval(() => {
+                    if (panel.matches(':hover')) return; // Pause on hover
 
-                    const drawerClicked = (agnesDrawer && agnesDrawer.contains(e.target)) ||
-                        (luciusDrawer && luciusDrawer.contains(e.target)) ||
-                        (mentorDrawer && mentorDrawer.contains(e.target));
-
-                    if (!hotspotClicked && !drawerClicked) {
-                        closeAllDrawers();
+                    if (panel.scrollTop + panel.clientHeight >= panel.scrollHeight) {
+                        // Optional: loop back to top or stop? Let's stop naturally, or maybe reset
+                        // For now, let's just stop at the bottom. To loop: panel.scrollTop = 0;
+                        clearInterval(autoScrollInterval); // Stop at bottom
+                    } else {
+                        panel.scrollTop += scrollSpeed;
                     }
+                }, scrollDelay);
+            };
+
+            const activatePanel = (name) => {
+                const targetPanel = panels[name];
+                const isAlreadyOpen = targetPanel && !targetPanel.classList.contains('hidden');
+
+                // Stop previous auto-scroll
+                clearInterval(autoScrollInterval);
+
+                Object.values(panels).forEach(p => {
+                    if (p) {
+                        p.classList.add('hidden');
+                        p.scrollTop = 0; // Reset scroll position
+                    }
+                });
+
+                if (isAlreadyOpen && name !== 'default') {
+                    if (panels.default) panels.default.classList.remove('hidden');
+                } else {
+                    if (targetPanel) {
+                        targetPanel.classList.remove('hidden');
+                        // Start auto-scroll after a short delay to let user settle
+                        setTimeout(() => startAutoScroll(targetPanel), 1000);
+                    } else if (panels.default) {
+                        panels.default.classList.remove('hidden');
+                    }
+                }
+            };
+
+            Object.entries(hotspots).forEach(([name, element]) => {
+                if (element) {
+                    element.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        let target = name;
+                        if (name === 'familyDora') target = 'family';
+                        activatePanel(target);
+                    });
                 }
             });
         });
