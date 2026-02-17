@@ -3548,7 +3548,8 @@
                         </div>
                     </div>
 
-                    <div class="inline-flex items-center gap-2 text-amber-600 font-bold text-sm cursor-pointer group">
+                    <div id="generate-report-btn"
+                        class="inline-flex items-center gap-2 text-amber-600 font-bold text-sm cursor-pointer group">
                         RUN FULL MANUSCRIPT AUDIT <span
                             class="material-icons-outlined transform group-hover:translate-x-1 transition-transform">analytics</span>
                     </div>
@@ -3685,7 +3686,7 @@
                                     <h5
                                         class="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none">
                                         Active Style Rules</h5>
-                                    <span
+                                    <span id="add-style-rule-btn"
                                         class="text-[8px] text-blue-500 font-bold uppercase cursor-pointer hover:underline">+
                                         New Rule</span>
                                 </div>
@@ -3829,16 +3830,17 @@
                                     <h4
                                         class="text-[11px] font-bold text-gray-900 dark:text-white uppercase tracking-widest leading-none mb-1">
                                         Narrative Co-Pilot</h4>
-                                    <div class="flex items-center gap-2">
+                                    <div id="chat-model-selector" class="flex items-center gap-2 cursor-pointer group">
                                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                        <span class="text-[9px] text-gray-400 font-medium">MODEL: CLAUDE 3.5
-                                            SONNET</span>
+                                        <span id="chat-model-text"
+                                            class="text-[9px] text-gray-400 font-medium group-hover:text-violet-500 transition-colors uppercase">MODEL:
+                                            CLAUDE 3.5 SONNET</span>
                                     </div>
                                 </div>
                             </div>
                             <div class="flex items-center gap-2">
-                                <div
-                                    class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1 text-[9px] font-bold text-gray-500 cursor-pointer flex items-center gap-1">
+                                <div id="chat-context-selector"
+                                    class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1 text-[9px] font-bold text-gray-500 cursor-pointer flex items-center gap-1 hover:border-violet-400 transition-colors">
                                     CONTEXT: CURRENT SCENE <span
                                         class="material-icons-outlined text-[10px]">expand_more</span>
                                 </div>
@@ -3871,12 +3873,12 @@
 
                                     <!-- Extract Tools -->
                                     <div class="flex gap-2">
-                                        <button
+                                        <button id="chat-extract-codex-btn"
                                             class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-violet-900/40 border border-violet-200 dark:border-violet-700 text-[9px] font-bold text-violet-600 dark:text-violet-400 hover:bg-violet-50 transition-colors">
                                             <span class="material-icons-outlined text-[12px]">add_circle</span> EXTRACT
                                             TO CODEX
                                         </button>
-                                        <button
+                                        <button id="chat-extract-beat-btn"
                                             class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-violet-900/40 border border-violet-200 dark:border-violet-700 text-[9px] font-bold text-violet-600 dark:text-violet-400 hover:bg-violet-50 transition-colors">
                                             <span class="material-icons-outlined text-[12px]">edit_note</span> ADD AS
                                             BEAT
@@ -4086,7 +4088,7 @@
                                                 The Betrayal</span>
                                             <span class="text-[9px] text-gray-400 italic">(+1,204 words)</span>
                                         </div>
-                                        <button
+                                        <button id="restore-revision-btn"
                                             class="text-[9px] font-bold text-indigo-600 hover:underline">RESTORE</button>
                                     </div>
                                     <div
@@ -4151,10 +4153,12 @@
                         <!-- Panel Footer -->
                         <div
                             class="px-6 py-4 bg-gray-50 dark:bg-black/30 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center">
-                            <div class="flex items-center gap-2">
-                                <img src="{% static 'img/Agnes.webp' %}"
-                                    class="w-6 h-6 rounded-full object-cover grayscale opacity-50">
-                                <span class="text-[9px] text-gray-500 font-bold uppercase">PEN NAME: A.L. TEMPLE</span>
+                            <div id="pen-name-selector" class="flex items-center gap-2 cursor-pointer group">
+                                <img id="pen-name-avatar" src="{% static 'img/Agnes.webp' %}"
+                                    class="w-6 h-6 rounded-full object-cover grayscale opacity-50 group-hover:opacity-100 transition-opacity">
+                                <span id="pen-name-text"
+                                    class="text-[9px] text-gray-500 font-bold uppercase group-hover:text-indigo-500 transition-colors">PEN
+                                    NAME: A.L. TEMPLE</span>
                             </div>
                             <span class="material-icons-outlined text-xs text-gray-400 cursor-pointer">more_vert</span>
                         </div>
@@ -4210,9 +4214,10 @@
                     </div>
 
                     <div class="flex gap-4">
-                        <div
-                            class="bg-emerald-500 text-white px-8 py-3 rounded-full text-sm font-bold uppercase tracking-widest hover:bg-emerald-600 cursor-pointer shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-2">
-                            EXPORT NOW <span class="material-icons-outlined">download</span>
+                        <div id="export-action-btn"
+                            class="bg-emerald-500 text-white px-8 py-3 rounded-full text-sm font-bold uppercase tracking-widest hover:bg-emerald-600 cursor-pointer shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-2 group">
+                            EXPORT NOW <span
+                                class="material-icons-outlined group-hover:translate-y-0.5 transition-transform">download</span>
                         </div>
                     </div>
                 </div>
@@ -4231,21 +4236,21 @@
                                     class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-3 block">Choose
                                     Format</label>
                                 <div class="grid grid-cols-3 gap-3">
-                                    <div
-                                        class="p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 flex flex-col items-center gap-2 cursor-pointer">
+                                    <div id="export-format-docx"
+                                        class="export-option p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 flex flex-col items-center gap-2 cursor-pointer transition-all">
                                         <span
                                             class="material-icons-outlined text-emerald-600 text-xl">description</span>
                                         <span
                                             class="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 uppercase">.DOCX</span>
                                     </div>
-                                    <div
-                                        class="p-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-white/5 flex flex-col items-center gap-2 cursor-pointer hover:border-emerald-300 transition-colors">
+                                    <div id="export-format-pdf"
+                                        class="export-option p-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-white/5 flex flex-col items-center gap-2 cursor-pointer hover:border-emerald-300 transition-all">
                                         <span
                                             class="material-icons-outlined text-gray-400 text-xl">picture_as_pdf</span>
                                         <span class="text-[10px] font-bold text-gray-500 uppercase">.PDF</span>
                                     </div>
-                                    <div
-                                        class="p-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-white/5 flex flex-col items-center gap-2 cursor-pointer hover:border-emerald-300 transition-colors">
+                                    <div id="export-format-epub"
+                                        class="export-option p-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-white/5 flex flex-col items-center gap-2 cursor-pointer hover:border-emerald-300 transition-all">
                                         <span class="material-icons-outlined text-gray-400 text-xl">book</span>
                                         <span class="text-[10px] font-bold text-gray-500 uppercase">.EPUB</span>
                                     </div>
@@ -5432,6 +5437,146 @@
                     });
                 }
             });
+
+            // --- New Section Demos ---
+
+            // 1. Deep Manuscript Audit Demo
+            const auditBtn = document.getElementById('generate-report-btn');
+            if (auditBtn) {
+                auditBtn.addEventListener('click', function () {
+                    const originalText = this.innerHTML;
+                    this.style.pointerEvents = 'none';
+                    this.innerHTML = `GENERATING AUDIT... <span class="material-icons-outlined animate-spin text-sm">sync</span>`;
+
+                    setTimeout(() => {
+                        this.innerHTML = `AUDIT COMPLETE <span class="material-icons-outlined text-sm">check_circle</span>`;
+                        this.classList.remove('text-amber-600');
+                        this.classList.add('text-emerald-500');
+
+                        setTimeout(() => {
+                            this.innerHTML = originalText;
+                            this.classList.remove('text-emerald-500');
+                            this.classList.add('text-amber-600');
+                            this.style.pointerEvents = 'auto';
+                        }, 2000);
+                    }, 1500);
+                });
+            }
+
+            // 2. AI Collaboration Demos
+            const modelSelector = document.getElementById('chat-model-selector');
+            const modelText = document.getElementById('chat-model-text');
+            const models = ["CLAUDE 3.5 SONNET", "GPT-4O", "GEMINI 1.5 PRO", "LLAMA 3 (70B)"];
+            let currentModelIdx = 0;
+
+            if (modelSelector && modelText) {
+                modelSelector.addEventListener('click', () => {
+                    currentModelIdx = (currentModelIdx + 1) % models.length;
+                    modelText.innerText = `MODEL: ${models[currentModelIdx]}`;
+                    modelText.classList.add('animate-pulse');
+                    setTimeout(() => modelText.classList.remove('animate-pulse'), 500);
+                });
+            }
+
+            const contextSelector = document.getElementById('chat-context-selector');
+            const contexts = ["CURRENT SCENE", "FULL MANUSCRIPT", "THE CODEX", "SERIES BIBLE"];
+            let currentContextIdx = 0;
+
+            if (contextSelector) {
+                contextSelector.addEventListener('click', () => {
+                    currentContextIdx = (currentContextIdx + 1) % contexts.length;
+                    contextSelector.innerHTML = `CONTEXT: ${contexts[currentContextIdx]} <span class="material-icons-outlined text-[10px]">expand_more</span>`;
+                });
+            }
+
+            const extractBtns = [
+                document.getElementById('chat-extract-codex-btn'),
+                document.getElementById('chat-extract-beat-btn')
+            ];
+            extractBtns.forEach(btn => {
+                if (btn) {
+                    btn.addEventListener('click', function () {
+                        const originalText = this.innerHTML;
+                        this.innerHTML = `SAVED <span class="material-icons-outlined text-[12px]">done</span>`;
+                        this.classList.add('bg-emerald-50', 'text-emerald-600', 'border-emerald-200');
+                        setTimeout(() => {
+                            this.innerHTML = originalText;
+                            this.classList.remove('bg-emerald-50', 'text-emerald-600', 'border-emerald-200');
+                        }, 1500);
+                    });
+                }
+            });
+
+            // 3. Drafting Studio Demos
+            const restoreBtn = document.getElementById('restore-revision-btn');
+            if (restoreBtn) {
+                restoreBtn.addEventListener('click', function () {
+                    const row = this.closest('div.p-3');
+                    const originalBg = row.style.backgroundColor;
+                    row.classList.add('ring-2', 'ring-indigo-500', 'ring-inset', 'bg-indigo-50/50');
+                    this.innerText = "RESTORED!";
+                    setTimeout(() => {
+                        row.classList.remove('ring-2', 'ring-indigo-500', 'ring-inset', 'bg-indigo-50/50');
+                        this.innerText = "RESTORE";
+                    }, 2000);
+                });
+            }
+
+            const penNameSelector = document.getElementById('pen-name-selector');
+            const penNameText = document.getElementById('pen-name-text');
+            const names = ["A.L. TEMPLE", "AARON TEMPLE (PRIVATE)"];
+            let nameIdx = 0;
+
+            if (penNameSelector && penNameText) {
+                penNameSelector.addEventListener('click', () => {
+                    nameIdx = (nameIdx + 1) % names.length;
+                    penNameText.innerText = `PEN NAME: ${names[nameIdx]}`;
+                });
+            }
+
+            // 4. Export & Publishing Demos
+            const exportOptions = document.querySelectorAll('.export-option');
+            exportOptions.forEach(opt => {
+                opt.addEventListener('click', function () {
+                    exportOptions.forEach(o => {
+                        o.classList.remove('border-2', 'border-emerald-500', 'bg-emerald-50', 'dark:bg-emerald-900/20');
+                        o.classList.add('border', 'border-gray-100', 'dark:border-gray-800', 'bg-gray-50', 'dark:bg-white/5');
+                        const icon = o.querySelector('.material-icons-outlined');
+                        const text = o.querySelector('span:last-child');
+                        if (icon) icon.classList.replace('text-emerald-600', 'text-gray-400');
+                        if (text) text.classList.replace('text-emerald-700', 'text-gray-500');
+                        if (text) text.classList.remove('dark:text-emerald-300');
+                    });
+
+                    this.classList.remove('border', 'border-gray-100', 'dark:border-gray-800', 'bg-gray-50', 'dark:bg-white/5');
+                    this.classList.add('border-2', 'border-emerald-500', 'bg-emerald-50', 'dark:bg-emerald-900/20');
+                    const activeIcon = this.querySelector('.material-icons-outlined');
+                    const activeText = this.querySelector('span:last-child');
+                    if (activeIcon) activeIcon.classList.replace('text-gray-400', 'text-emerald-600');
+                    if (activeText) activeText.classList.replace('text-gray-500', 'text-emerald-700');
+                    if (activeText) activeText.classList.add('dark:text-emerald-300');
+                });
+            });
+
+            const exportBtn = document.getElementById('export-action-btn');
+            if (exportBtn) {
+                exportBtn.addEventListener('click', function () {
+                    const originalHtml = this.innerHTML;
+                    this.style.pointerEvents = 'none';
+                    this.innerHTML = `FORMATTING... <span class="material-icons-outlined animate-spin">sync</span>`;
+
+                    setTimeout(() => {
+                        this.innerHTML = `DOWNLOAD READY <span class="material-icons-outlined">file_download</span>`;
+                        this.classList.replace('bg-emerald-500', 'bg-blue-600');
+
+                        setTimeout(() => {
+                            this.innerHTML = originalHtml;
+                            this.classList.replace('bg-blue-600', 'bg-emerald-500');
+                            this.style.pointerEvents = 'auto';
+                        }, 2500);
+                    }, 2000);
+                });
+            }
         });
     </script>
 
