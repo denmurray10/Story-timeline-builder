@@ -599,6 +599,24 @@
 
                 <div class="nav-section-title">Scenes</div>
                 <a href="{% url 'timeline_view' %}" class="nav-item-link"><i class="bi bi-geo-alt"></i> Timeline</a>
+
+                <div class="nav-section-title">Production</div>
+                <a href="#" class="nav-item-link" onclick="switchSidebarTab('audit')">
+                    <i class="bi bi-clipboard-check text-amber-500"></i>
+                    <span>Style Audit</span>
+                </a>
+                <a href="#" class="nav-item-link" onclick="switchSidebarTab('team')">
+                    <i class="bi bi-people-fill text-indigo-500"></i>
+                    <span>Team Studio</span>
+                </a>
+                <a href="#" class="nav-item-link" onclick="switchSidebarTab('scrapbook')">
+                    <i class="bi bi-journal-bookmark text-violet-500"></i>
+                    <span>Scrapbook</span>
+                </a>
+                <a href="#" class="nav-item-link" onclick="switchSidebarTab('export')">
+                    <i class="bi bi-file-earmark-arrow-up text-emerald-500"></i>
+                    <span>Export & Publish</span>
+                </a>
             </nav>
 
             <div class="mt-auto pt-4">
@@ -689,14 +707,29 @@
                 title="Ghostwriter">
                 <i class="bi bi-stars"></i>
             </div>
-            <div class="sidebar-icon" title="Map">
+            <div class="sidebar-icon" id="icon-audit" onclick="switchSidebarTab('audit')" title="AI Audit">
+                <i class="bi bi-clipboard-check"></i>
+            </div>
+            <div class="sidebar-icon" id="icon-team" onclick="switchSidebarTab('team')" title="Collaboration">
+                <i class="bi bi-people-fill"></i>
+            </div>
+            <div class="sidebar-icon" id="icon-scrapbook" onclick="switchSidebarTab('scrapbook')" title="Scrapbook">
+                <i class="bi bi-journal-bookmark"></i>
+            </div>
+            <div class="sidebar-icon" id="icon-export" onclick="switchSidebarTab('export')" title="Export">
+                <i class="bi bi-file-earmark-arrow-up"></i>
+            </div>
+            <div class="sidebar-icon" id="icon-map" onclick="switchSidebarTab('map')" title="Relationship Map">
                 <i class="bi bi-diagram-3"></i>
             </div>
-            <div class="sidebar-icon" title="Timeline">
+            <div class="sidebar-icon" id="icon-timeline" onclick="switchSidebarTab('timeline')"
+                title="Project Timeline">
                 <i class="bi bi-clock-history"></i>
             </div>
-            <div class="sidebar-icon" title="Settings">
-                <i class="bi bi-gear"></i>
+            <div class="mt-auto mb-4">
+                <div class="sidebar-icon" title="Settings">
+                    <i class="bi bi-gear"></i>
+                </div>
             </div>
         </div>
 
@@ -778,6 +811,213 @@
                     </div>
                 </div>
             </div>
+
+            <!-- AI Audit Tab -->
+            <div id="sidebar-tab-audit" style="display: none;">
+                <div class="writing-sidebar-header">
+                    <span>Style & Voice Audit</span>
+                    <i class="bi bi-x-lg cursor-pointer small" onclick="closeSidebarRight()"></i>
+                </div>
+                <div class="writing-sidebar-content">
+                    <div class="sidebar-card">
+                        <h6 class="text-uppercase small fw-bold text-amber-600 mb-3">Manuscript Health</h6>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="small fw-medium">Readability</span>
+                            <span class="badge bg-emerald-100 text-emerald-700">SMOOTH</span>
+                        </div>
+                        <div class="progress mb-3" style="height: 4px;">
+                            <div class="progress-bar bg-emerald-500" style="width: 85%"></div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="small fw-medium">Voice Match</span>
+                            <span class="badge bg-blue-100 text-blue-700">CONSISTENT</span>
+                        </div>
+                        <div class="progress mb-4" style="height: 4px;">
+                            <div class="progress-bar bg-blue-500" style="width: 88%"></div>
+                        </div>
+
+                        <div class="p-3 rounded bg-light border">
+                            <p class="small text-muted mb-0 italic">"The emotional arc in this chapter is strong, but
+                                sentence length in Scene 2 is 40% higher than your series benchmark."</p>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-card">
+                        <h6 class="text-uppercase small fw-bold text-muted mb-3">Genre Benchmarks</h6>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between small mb-1">
+                                <span>Raymond Chandler</span>
+                                <span class="fw-bold">82%</span>
+                            </div>
+                            <div class="progress" style="height: 4px;">
+                                <div class="progress-bar bg-amber-400" style="width: 82%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="d-flex justify-content-between small mb-1">
+                                <span>Stephen King</span>
+                                <span class="fw-bold">64%</span>
+                            </div>
+                            <div class="progress" style="height: 4px;">
+                                <div class="progress-bar bg-gray-300" style="width: 64%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team & Collaboration Tab -->
+            <div id="sidebar-tab-team" style="display: none;">
+                <div class="writing-sidebar-header">
+                    <span>Production Studio</span>
+                    <i class="bi bi-x-lg cursor-pointer small" onclick="closeSidebarRight()"></i>
+                </div>
+                <div class="writing-sidebar-content">
+                    <div class="sidebar-card">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="text-uppercase small fw-bold text-indigo-600 mb-0">Team Access</h6>
+                            <button class="btn btn-link btn-sm p-0 text-decoration-none">+ INVITE</button>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <div class="p-2 rounded border bg-light flex-grow-1">
+                                <span class="badge bg-emerald-500 rounded-circle p-1 me-1">JD</span>
+                                <span class="small">Editor (Jane)</span>
+                            </div>
+                            <div class="p-2 rounded border bg-light flex-grow-1">
+                                <span class="badge bg-blue-500 rounded-circle p-1 me-1">MK</span>
+                                <span class="small">Beta (Mike)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-card">
+                        <h6 class="text-uppercase small fw-bold text-muted mb-3">Revision History</h6>
+                        <div class="list-group list-group-flush">
+                            <div
+                                class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center bg-transparent">
+                                <div>
+                                    <div class="small fw-bold">Ch. {{ chapter.chapter_number }}: Current</div>
+                                    <div class="text-muted" style="font-size: 0.7rem;">Saved 2 mins ago</div>
+                                </div>
+                                <span class="badge bg-indigo-100 text-indigo-700">ACTIVE</span>
+                            </div>
+                            <a href="#"
+                                class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center bg-transparent text-decoration-none">
+                                <div>
+                                    <div class="small fw-bold">Original Draft</div>
+                                    <div class="text-muted" style="font-size: 0.7rem;">Yesterday at 11:45 PM</div>
+                                </div>
+                                <button class="btn btn-sm btn-outline-indigo py-0 px-2"
+                                    style="font-size: 0.7rem;">RESTORE</button>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scrapbook Tab -->
+            <div id="sidebar-tab-scrapbook" style="display: none;">
+                <div class="writing-sidebar-header">
+                    <span>Scrapbook & Snippets</span>
+                    <i class="bi bi-x-lg cursor-pointer small" onclick="closeSidebarRight()"></i>
+                </div>
+                <div class="writing-sidebar-content">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="text-uppercase small fw-bold text-muted mb-0">Saved Snippets</h6>
+                        <button class="btn btn-sm btn-dark"><i class="bi bi-plus-lg"></i></button>
+                    </div>
+                    <div class="sidebar-card bg-amber-50 border-amber-100 mb-2">
+                        <p class="small text-dark mb-0 italic">"The rain tasted like iron and old pennies..."</p>
+                    </div>
+                    <div class="sidebar-card bg-blue-50 border-blue-100 mb-2">
+                        <p class="small text-dark mb-0 italic">"Metaphor regarding the shifting tides of Agnes's
+                            soul..."</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Export Tab -->
+            <div id="sidebar-tab-export" style="display: none;">
+                <div class="writing-sidebar-header">
+                    <span>Export & Publishing</span>
+                    <i class="bi bi-x-lg cursor-pointer small" onclick="closeSidebarRight()"></i>
+                </div>
+                <div class="writing-sidebar-content">
+                    <div class="sidebar-card">
+                        <h6 class="text-uppercase small fw-bold text-emerald-600 mb-3">Manuscript Export</h6>
+                        <div class="row g-2 mb-4">
+                            <div class="col-4">
+                                <div
+                                    class="p-2 border rounded text-center cursor-pointer border-emerald-500 bg-emerald-50">
+                                    <i class="bi bi-file-earmark-word d-block mb-1 text-emerald-600"></i>
+                                    <span class="x-small fw-bold">.DOCX</span>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="p-2 border rounded text-center cursor-pointer hover-bg-light">
+                                    <i class="bi bi-file-earmark-pdf d-block mb-1 text-muted"></i>
+                                    <span class="x-small fw-bold text-muted">.PDF</span>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="p-2 border rounded text-center cursor-pointer hover-bg-light">
+                                    <i class="bi bi-book d-block mb-1 text-muted"></i>
+                                    <span class="x-small fw-bold text-muted">.EPUB</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-check form-switch small mb-3">
+                            <input class="form-check-input" type="checkbox" checked id="switchExportFM">
+                            <label class="form-check-label" for="switchExportFM">Standard Manuscript Format</label>
+                        </div>
+
+                        <button class="btn btn-emerald w-100 fw-bold border-0 shadow-sm"
+                            style="background-color: #10b981; color: white;">
+                            GENERATE DOWNLOAD
+                        </button>
+                    </div>
+
+                    <div class="p-3 border rounded border-dashed text-muted x-small font-serif leading-relaxed">
+                        AARON TEMPLE — "THE GILDED CAGE" — PAGE 1<br><br>
+                        Agnes sat by the window. The reflection of the city lights danced against the cold
+                        glass. She knew the secret was safe...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Map Tab Placeholder -->
+            <div id="sidebar-tab-map" style="display: none;">
+                <div class="writing-sidebar-header">
+                    <span>Relationship Map</span>
+                    <i class="bi bi-x-lg cursor-pointer small" onclick="closeSidebarRight()"></i>
+                </div>
+                <div class="writing-sidebar-content">
+                    <div class="text-center py-5">
+                        <i class="bi bi-diagram-3 fs-1 text-muted opacity-20"></i>
+                        <p class="small mt-3">Visualizing character dynamics...</p>
+                        <a href="{% url 'timeline_view' %}" class="btn btn-sm btn-outline-primary mt-2">Open Full
+                            Map</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Timeline Tab Placeholder -->
+            <div id="sidebar-tab-timeline" style="display: none;">
+                <div class="writing-sidebar-header">
+                    <span>Project Timeline</span>
+                    <i class="bi bi-x-lg cursor-pointer small" onclick="closeSidebarRight()"></i>
+                </div>
+                <div class="writing-sidebar-content">
+                    <div class="text-center py-5">
+                        <i class="bi bi-clock-history fs-1 text-muted opacity-20"></i>
+                        <p class="small mt-3">Loading story events...</p>
+                        <a href="{% url 'timeline_view' %}" class="btn btn-sm btn-outline-primary mt-2">Open Full
+                            Timeline</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </aside>
 </div>
@@ -827,7 +1067,10 @@
     // Sidebar Tab Switching
     window.switchSidebarTab = function (tab) {
         const sidebar = document.getElementById('sidebar-right');
-        const isCurrentActive = document.getElementById(`icon-${tab}`).classList.contains('active');
+        const icon = document.getElementById(`icon-${tab}`);
+        if (!icon) return;
+
+        const isCurrentActive = icon.classList.contains('active');
 
         if (isCurrentActive && sidebar.classList.contains('expanded')) {
             closeSidebarRight();
@@ -835,12 +1078,12 @@
         }
 
         document.querySelectorAll('.sidebar-icon').forEach(i => i.classList.remove('active'));
-        document.getElementById('sidebar-tab-cast').style.display = 'none';
-        document.getElementById('sidebar-tab-ghostwriter').style.display = 'none';
+        document.querySelectorAll('[id^="sidebar-tab-"]').forEach(t => t.style.display = 'none');
 
         sidebar.classList.add('expanded');
-        document.getElementById(`icon-${tab}`).classList.add('active');
-        document.getElementById(`sidebar-tab-${tab}`).style.display = 'block';
+        icon.classList.add('active');
+        const targetTab = document.getElementById(`sidebar-tab-${tab}`);
+        if (targetTab) targetTab.style.display = 'block';
     }
 
     window.closeSidebarRight = function () {
