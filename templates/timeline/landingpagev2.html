@@ -173,6 +173,33 @@
                     formatBubble.classList.add('hidden');
                 }
             });
+
+            // Writing Mode Hierarchical Logic
+            window.switchPillState = function (state) {
+                const states = ['standard-tools', 'ai-main', 'ai-drafting', 'ai-refine', 'ai-analysis'];
+                states.forEach(s => {
+                    const el = document.getElementById(`pill-${s}`);
+                    if (el) {
+                        el.classList.add('hidden');
+                        el.classList.remove('flex');
+                    }
+                });
+
+                const target = document.getElementById(`pill-${state}`);
+                const pill = document.getElementById('writing-pill');
+
+                if (target) {
+                    target.classList.remove('hidden');
+                    target.classList.add('flex');
+                }
+
+                // Visual transition for AI modes
+                if (state !== 'standard-tools') {
+                    pill.classList.add('bg-blue-50/50', 'border-blue-100');
+                } else {
+                    pill.classList.remove('bg-blue-50/50', 'border-blue-100');
+                }
+            };
         });
     </script>
     <style>
@@ -223,6 +250,54 @@
 
         .delay-400 {
             transition-delay: 400ms;
+        }
+
+        /* Hero Zen Mode Styles */
+        #hero-left-sidebar,
+        #hero-right-sidebar {
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* In Zen Mode, hide sidebars by default and make them absolute */
+        .hero-zen-active #hero-left-sidebar {
+            position: absolute !important;
+            left: 0;
+            top: 0;
+            height: 100%;
+            transform: translateX(-100%) translateX(2px);
+            z-index: 50;
+        }
+
+        .hero-zen-active #hero-left-sidebar:hover {
+            transform: translateX(0);
+        }
+
+        .hero-zen-active #hero-right-sidebar {
+            position: absolute !important;
+            right: 0;
+            top: 0;
+            height: 100%;
+            transform: translateX(100%) translateX(-2px);
+            z-index: 50;
+        }
+
+        .hero-zen-active #hero-right-sidebar:hover {
+            transform: translateX(0);
+        }
+
+        /* Ensure editor fills space when sidebars are absolute */
+        .hero-zen-active #mockup-writing-surface {
+            padding-left: 10%;
+            padding-right: 10%;
+        }
+
+        /* Hide secondary floating elements in Zen */
+        .hero-zen-active #agnes-panel,
+        .hero-zen-active #format-bubble,
+        .hero-zen-active #ghostwriter-ask-popup {
+            opacity: 0 !important;
+            pointer-events: none !important;
+            transition: all 0.3s ease;
         }
 
         /* Nav Padding Scroll Logic */
@@ -415,11 +490,11 @@
                 </a>
             </div>
             <div class="reveal slide-up delay-400 relative w-full max-w-7xl mx-auto">
-                <div
+                <div id="hero-writing-mockup"
                     class="relative rounded-xl md:rounded-3xl overflow-hidden transform scale-105 md:scale-110 bg-white dark:bg-surface-dark shadow-2xl border border-gray-200 dark:border-gray-800 aspect-[16/10] flex flex-col font-sans">
                     <!-- Top Bar (Mac Style) -->
                     <div
-                        class="h-8 bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-800 flex items-center px-4 gap-1.5 shrink-0">
+                        class="h-8 bg-gray-50 dark:bg-surface-dark border-b border-gray-200 dark:border-white/5 flex items-center px-4 gap-1.5 shrink-0">
                         <div class="w-2.5 h-2.5 rounded-full bg-red-400/50"></div>
                         <div class="w-2.5 h-2.5 rounded-full bg-yellow-400/50"></div>
                         <div class="w-2.5 h-2.5 rounded-full bg-green-400/50"></div>
@@ -427,53 +502,245 @@
                             — WRITING MODE</div>
                     </div>
 
-                    <div class="flex flex-1 overflow-hidden">
-                        <!-- Left Nav -->
-                        <div
-                            class="w-12 bg-gray-50 dark:bg-gray-900/50 border-r border-gray-200 dark:border-gray-800 flex flex-col items-center py-6 gap-6 shrink-0 lg:w-16">
-                            <span class="material-icons-outlined text-gray-400 text-lg">auto_stories</span>
-                            <span class="material-icons-outlined text-blue-500 text-lg">edit_note</span>
-                            <span class="material-icons-outlined text-gray-400 text-lg">account_tree</span>
-                            <span class="material-icons-outlined text-gray-400 text-lg">collections_bookmark</span>
-                            <div class="mt-auto">
-                                <span class="material-icons-outlined text-gray-300 text-lg">settings</span>
+                    <div class="flex flex-1 overflow-hidden relative">
+                        <!-- Left Nav (Story OS Production Bar) -->
+                        <div id="hero-left-sidebar"
+                            class="w-12 bg-gray-50 dark:bg-black border-r border-gray-200 dark:border-white/5 flex flex-col items-center py-6 gap-8 shrink-0 lg:w-16 transition-all duration-500 z-40">
+                            <div class="group relative cursor-pointer" title="Story Bible">
+                                <span
+                                    class="material-icons-outlined text-gray-400 group-hover:text-blue-500 transition-colors text-lg">menu_book</span>
+                                <div
+                                    class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap">
+                                    Codex Wiki</div>
+                            </div>
+                            <div class="relative cursor-pointer" title="Manuscript">
+                                <span class="material-icons-outlined text-blue-500 text-lg">edit_note</span>
+                                <div
+                                    class="absolute -right-1 top-0 w-1.5 h-1.5 bg-blue-500 rounded-full border-2 border-gray-50 animate-pulse">
+                                </div>
+                            </div>
+                            <div class="group relative cursor-pointer" title="Version History">
+                                <span
+                                    class="material-icons-outlined text-gray-400 group-hover:text-blue-500 transition-colors text-lg">history</span>
+                                <div
+                                    class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap">
+                                    Draft Management</div>
+                            </div>
+                            <div class="group relative cursor-pointer" title="Analysis">
+                                <span
+                                    class="material-icons-outlined text-gray-400 group-hover:text-blue-500 transition-colors text-lg">analytics</span>
+                                <div
+                                    class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap">
+                                    Deep Analysis</div>
+                            </div>
+                            <div class="group relative cursor-pointer" title="Publishing">
+                                <span
+                                    class="material-icons-outlined text-gray-400 group-hover:text-blue-500 transition-colors text-lg">file_download</span>
+                                <div
+                                    class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap">
+                                    Export & Publish</div>
+                            </div>
+                            <div class="mt-auto flex flex-col items-center gap-6">
+                                <div id="hero-zen-toggle" class="cursor-pointer group relative" title="Zen Mode">
+                                    <span
+                                        class="material-icons-outlined text-gray-400 group-hover:text-blue-500 transition-colors text-lg">self_improvement</span>
+                                    <div
+                                        class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap">
+                                        Zen Mode</div>
+                                </div>
+                                <div id="hero-theme-toggle" class="cursor-pointer group relative" title="Toggle Theme">
+                                    <span
+                                        class="material-icons-outlined text-gray-400 group-hover:text-blue-500 transition-colors text-lg">dark_mode</span>
+                                    <div
+                                        class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap">
+                                        Toggle Theme</div>
+                                </div>
+                                <span
+                                    class="material-icons-outlined text-gray-300 text-lg cursor-pointer hover:text-gray-500 transition-colors">settings</span>
                             </div>
                         </div>
 
                         <!-- Main Editor -->
-                        <div class="flex-1 flex flex-col bg-[#F9F8F6] dark:bg-[#1A1A1A] overflow-hidden relative">
+                        <div
+                            class="flex-1 flex flex-col bg-background-light dark:bg-background-dark overflow-hidden relative">
                             <!-- Editor Header -->
                             <div
-                                class="h-12 flex items-center justify-between px-8 border-b border-gray-200/50 dark:border-gray-800 shrink-0">
-                                <div class="text-[11px] font-bold text-gray-400 tracking-widest uppercase">Chapter 14:
-                                    The Cathedral of Dust</div>
-                                <div class="flex gap-4">
-                                    <div class="h-2 w-16 bg-gray-200 dark:bg-gray-800 rounded-full"></div>
-                                    <div class="h-2 w-12 bg-gray-200 dark:bg-gray-800 rounded-full"></div>
+                                class="h-12 flex items-center justify-between px-8 border-b border-gray-200/50 dark:border-white/5 shrink-0">
+                                <div class="text-[11px] font-bold text-gray-400 tracking-[0.2em] uppercase">Draft v2.4 /
+                                    ch_14 / scene_03</div>
+                                <div class="flex gap-4 items-center">
+                                    <div class="text-[10px] font-bold text-blue-500/60 tracking-wider">SYNC ACTIVE</div>
+                                    <div class="h-1.5 w-12 bg-blue-100 dark:bg-blue-900/30 rounded-full"></div>
                                 </div>
                             </div>
 
                             <!-- Writing Pad -->
                             <div id="mockup-writing-surface"
-                                class="flex-1 overflow-y-auto p-12 md:p-20 lg:p-24 custom-scrollbar selection:bg-blue-200/50 dark:selection:bg-blue-500/30">
-                                <div class="max-w-xl mx-auto">
+                                class="flex-1 overflow-y-auto pt-32 pb-24 px-12 md:px-20 lg:px-24 custom-scrollbar selection:bg-blue-200/50 dark:selection:bg-blue-500/30">
+                                <div class="max-w-xl mx-auto relative">
+                                    <!-- Floating Multi-Stage Writing Pill -->
+                                    <div id="writing-pill"
+                                        class="absolute -top-20 left-1/2 -translate-x-1/2 h-11 flex items-center gap-4 px-6 bg-white dark:bg-surface-dark rounded-full shadow-2xl border border-gray-100 dark:border-white/5 z-30 whitespace-nowrap transition-all duration-300">
+
+                                        <!-- STAGE 1: Standard Tools -->
+                                        <div id="pill-standard-tools" class="flex items-center gap-4 h-full">
+                                            <div
+                                                class="flex items-center gap-3 pr-4 border-r border-gray-100 dark:border-white/5 h-6">
+                                                <div
+                                                    class="flex items-center gap-1 cursor-pointer hover:text-blue-500 transition-colors">
+                                                    <span
+                                                        class="text-[11px] font-bold text-gray-700 dark:text-gray-300">Lora</span>
+                                                    <span
+                                                        class="material-icons-outlined text-[14px] text-gray-400">expand_more</span>
+                                                </div>
+                                                <div
+                                                    class="flex items-center gap-1 cursor-pointer hover:text-blue-500 transition-colors border-l border-gray-100 dark:border-gray-800 pl-3">
+                                                    <span
+                                                        class="text-[11px] font-bold text-gray-700 dark:text-gray-300">18</span>
+                                                    <span
+                                                        class="material-icons-outlined text-[14px] text-gray-400">expand_more</span>
+                                                </div>
+                                            </div>
+                                            <div
+                                                class="flex items-center gap-3 pr-4 border-r border-gray-100 dark:border-gray-800 h-6">
+                                                <button
+                                                    class="text-[10px] font-black text-gray-400 hover:text-blue-500 transition-colors tracking-tighter">H1</button>
+                                                <button
+                                                    class="text-[10px] font-black text-gray-400 hover:text-blue-500 transition-colors tracking-tighter">H2</button>
+                                                <button
+                                                    class="text-[10px] font-black text-gray-400 hover:text-blue-500 transition-colors tracking-tighter">H3</button>
+                                            </div>
+                                            <div
+                                                class="flex items-center gap-3 pr-4 border-r border-gray-100 dark:border-gray-800 h-6">
+                                                <span
+                                                    class="material-icons-outlined text-[18px] text-gray-500 hover:text-blue-500 cursor-pointer">format_bold</span>
+                                                <span
+                                                    class="material-icons-outlined text-[18px] text-gray-500 hover:text-blue-500 cursor-pointer">format_italic</span>
+                                            </div>
+                                            <!-- Narrative Engine Entry -->
+                                            <button onclick="switchPillState('ai-main')"
+                                                class="flex items-center gap-2 text-blue-500 hover:text-blue-600 transition-colors group">
+                                                <span
+                                                    class="material-icons-outlined text-[16px] group-hover:rotate-12 transition-transform">psychology</span>
+                                                <span class="text-[10px] font-black tracking-widest uppercase">Narrative
+                                                    Engine</span>
+                                            </button>
+                                        </div>
+
+                                        <!-- STAGE 2: AI Main Menu -->
+                                        <div id="pill-ai-main"
+                                            class="hidden items-center gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300 h-full">
+                                            <button onclick="switchPillState('standard-tools')"
+                                                class="p-1 px-2 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-400 hover:text-gray-600 transition-colors">
+                                                <span class="material-icons-outlined text-[14px]">arrow_back</span>
+                                            </button>
+                                            <div class="flex items-center gap-2">
+                                                <div onclick="switchPillState('ai-drafting')"
+                                                    class="flex items-center gap-2 px-3 py-1 rounded-lg bg-blue-500 text-white text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-blue-600 shadow-sm transition-all whitespace-nowrap">
+                                                    <span
+                                                        class="material-icons-outlined text-[14px]">auto_fix_high</span>
+                                                    Drafting
+                                                </div>
+                                                <div onclick="switchPillState('ai-refine')"
+                                                    class="flex items-center gap-2 px-3 py-1 rounded-lg border border-gray-100 dark:border-gray-800 text-gray-600 dark:text-gray-300 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-all whitespace-nowrap">
+                                                    <span class="material-icons-outlined text-[14px]">flare</span>
+                                                    Refinement
+                                                </div>
+                                                <div onclick="switchPillState('ai-analysis')"
+                                                    class="flex items-center gap-2 px-3 py-1 rounded-lg border border-gray-100 dark:border-gray-800 text-gray-600 dark:text-gray-300 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-all whitespace-nowrap">
+                                                    <span class="material-icons-outlined text-[14px]">analytics</span>
+                                                    Analysis
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- STAGE 3: AI Drafting Sub-Menu -->
+                                        <div id="pill-ai-drafting"
+                                            class="hidden items-center gap-3 animate-in fade-in slide-in-from-right-2 duration-300 h-full">
+                                            <button onclick="switchPillState('ai-main')"
+                                                class="p-1 px-2 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-400 hover:text-gray-600 transition-colors">
+                                                <span class="material-icons-outlined text-[14px]">arrow_back</span>
+                                            </button>
+                                            <div class="flex items-center gap-2">
+                                                <div
+                                                    class="px-3 py-1 rounded-lg border border-blue-200 bg-blue-50 text-blue-600 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-blue-100 shadow-sm transition-all whitespace-nowrap">
+                                                    Guided Draft</div>
+                                                <div
+                                                    class="px-3 py-1 rounded-lg border border-gray-100 text-gray-600 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-gray-50 transition-all whitespace-nowrap">
+                                                    Expand</div>
+                                                <div
+                                                    class="px-3 py-1 rounded-lg border border-gray-100 text-gray-600 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-gray-50 transition-all whitespace-nowrap">
+                                                    Dialogue Polish</div>
+                                            </div>
+                                        </div>
+
+                                        <!-- STAGE 4: AI Refinement Sub-Menu -->
+                                        <div id="pill-ai-refine"
+                                            class="hidden items-center gap-3 animate-in fade-in slide-in-from-right-2 duration-300 h-full">
+                                            <button onclick="switchPillState('ai-main')"
+                                                class="p-1 px-2 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-400 hover:text-gray-600 transition-colors">
+                                                <span class="material-icons-outlined text-[14px]">arrow_back</span>
+                                            </button>
+                                            <div class="flex items-center gap-2">
+                                                <div
+                                                    class="px-3 py-1 rounded-lg border border-gray-100 text-gray-600 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-gray-50 transition-all whitespace-nowrap">
+                                                    Show Don't Tell</div>
+                                                <div
+                                                    class="px-3 py-1 rounded-lg border border-gray-100 text-gray-600 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-gray-50 transition-all whitespace-nowrap">
+                                                    Sensory Detail</div>
+                                                <div
+                                                    class="px-3 py-1 rounded-lg border border-gray-100 text-gray-600 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-gray-50 transition-all whitespace-nowrap">
+                                                    Continuity Check</div>
+                                            </div>
+                                        </div>
+
+                                        <!-- STAGE 5: AI Analysis Sub-Menu -->
+                                        <div id="pill-ai-analysis"
+                                            class="hidden items-center gap-3 animate-in fade-in slide-in-from-right-2 duration-300 h-full">
+                                            <button onclick="switchPillState('ai-main')"
+                                                class="p-1 px-2 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-400 hover:text-gray-600 transition-colors">
+                                                <span class="material-icons-outlined text-[14px]">arrow_back</span>
+                                            </button>
+                                            <div class="flex items-center gap-2">
+                                                <div
+                                                    class="px-3 py-1 rounded-lg border border-gray-100 text-gray-600 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-gray-50 transition-all whitespace-nowrap">
+                                                    Pacing Pulse</div>
+                                                <div
+                                                    class="px-3 py-1 rounded-lg border border-gray-100 text-gray-600 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-gray-50 transition-all whitespace-nowrap">
+                                                    Active Voice</div>
+                                                <div
+                                                    class="px-3 py-1 rounded-lg border border-gray-100 text-gray-600 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-gray-50 transition-all whitespace-nowrap">
+                                                    Repetition Check</div>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <h1
-                                        class="text-3xl md:text-4xl font-serif text-primary dark:text-white mb-8 font-bold leading-tight">
-                                        Beyond the Ash Gates</h1>
+                                        class="text-3xl md:text-custom font-serif text-primary dark:text-white mb-10 font-bold leading-tight">
+                                        The Cathedral of Dust</h1>
                                     <div
-                                        class="space-y-6 text-gray-700 dark:text-gray-300 leading-relaxed text-sm md:text-base selection:bg-blue-100 dark:selection:bg-blue-900/30">
-                                        <p>The wind didn't just howl across the plains; it whispered names ELENA had
-                                            forgotten. She adjusted her grip on the relic, feeling the hum of the cold
-                                            stone against her palm. Ahead, the spires of the cathedral tore at the grey
-                                            sky like the teeth of a dying giant.</p>
-                                        <p>“We shouldn't be here,” <span
-                                                class="text-blue-500 border-b border-blue-200 dark:border-blue-800/50 cursor-help transition-colors hover:bg-blue-50 dark:hover:bg-blue-900/10 px-0.5 animate-pulse-subtle">Leo</span>
-                                            muttered, his voice barely audible over the crunch of frost underfoot. He
-                                            didn't look back to see if she was following. He never did.</p>
-                                        <p>Elena stopped. The cathedral wasn't just old; it was <span
-                                                class="bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200 px-1 rounded animate-pulse-subtle">waiting</span>.
-                                            She could feel the narrative threads coiling around her ankles, puller her
-                                            toward the massive obsidian doors. This was where the silence lived.</p>
+                                        class="space-y-8 text-gray-700 dark:text-gray-300 leading-[1.8] text-lg md:text-[18px] selection:bg-blue-100 dark:selection:bg-blue-900/30">
+                                        <p>The wind didn’t just howl across the plains; it whispered names <span
+                                                class="font-bold tracking-tight">ELENA</span>
+                                            had spent a decade trying to bury. It carried the scent of ozone and ancient
+                                            parchment,
+                                            the distinctive musk of the Void. She adjusted her grip on the <span
+                                                class="bg-blue-50 dark:bg-blue-900/10 px-1 border-b border-blue-200 dark:border-blue-800">Vorpal
+                                                Relic</span>,
+                                            the cold stone pulsing with a faint, rhythmic thrum against her palm—a
+                                            heartbeat that wasn't hers.</p>
+
+                                        <p>Ahead, the spires of the cathedral tore at the bruised sky like the rusted
+                                            teeth
+                                            of a dying giant. The architecture was <span
+                                                class="highlight-active">shifting</span>; her fingers traced a glyph on
+                                            the
+                                            doorframe that hadn't been there a moment ago.</p>
+
+                                        <p>“It knows we're here, <span class="text-blue-500 font-medium">Leo</span>,”
+                                            Elena whispered.
+                                            “It's rewriting the interior as we speak. We're not just walking into ruins;
+                                            we're walking into a
+                                            memory that doesn't want to be forgotten.”</p>
                                     </div>
                                 </div>
                             </div>
@@ -521,8 +788,8 @@
                         </div>
 
                         <!-- Right AI Sidebar -->
-                        <div
-                            class="w-64 bg-white dark:bg-surface-dark border-l border-gray-200 dark:border-gray-800 hidden lg:flex flex-col p-6 shrink-0">
+                        <div id="hero-right-sidebar"
+                            class="w-64 bg-white dark:bg-surface-dark border-l border-gray-200 dark:border-white/5 hidden lg:flex flex-col p-6 shrink-0 transition-all duration-500 z-40">
                             <div class="flex items-center gap-2 mb-8">
                                 <span class="material-icons-outlined text-blue-500 text-lg">psychology</span>
                                 <span
@@ -531,158 +798,220 @@
                             </div>
 
                             <div class="space-y-6">
+                                <!-- AI Insight Card -->
                                 <div id="codex-insight-card"
-                                    class="p-4 rounded-xl bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100/50 dark:border-blue-900/20 relative overflow-hidden group transition-all duration-500">
+                                    class="p-4 rounded-xl bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100/50 dark:border-blue-900/20 relative overflow-hidden group transition-all duration-300">
                                     <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
                                     <div id="codex-insight-title"
                                         class="text-[10px] font-bold text-blue-600 dark:text-blue-400 mb-1 tracking-wider uppercase">
-                                        Structure Analysis</div>
+                                        Narrative Pulse</div>
                                     <div id="codex-insight-text"
                                         class="text-xs text-gray-700 dark:text-gray-300 font-medium leading-relaxed">
-                                        Pacing is slowing in this scene. Consider introducing a conflict anchor.</div>
+                                        Pacing is **High**. Tension peaked at line 42. Consider a sensory decompression
+                                        beat here.
+                                    </div>
+                                    <!-- Mini Graph Mockup -->
+                                    <div class="mt-3 h-8 flex items-end gap-1">
+                                        <div class="flex-1 bg-blue-200 h-[20%] rounded-t-sm opacity-50"></div>
+                                        <div class="flex-1 bg-blue-200 h-[40%] rounded-t-sm opacity-50"></div>
+                                        <div class="flex-1 bg-blue-200 h-[30%] rounded-t-sm opacity-50"></div>
+                                        <div class="flex-1 bg-blue-500 h-[90%] rounded-t-sm"></div>
+                                        <div class="flex-1 bg-blue-200 h-[50%] rounded-t-sm opacity-50"></div>
+                                        <div class="flex-1 bg-blue-200 h-[40%] rounded-t-sm opacity-50"></div>
+                                    </div>
                                 </div>
 
-                                <div id="mockup-ghostwriter-panel"
-                                    class="hover:bg-gray-50 dark:hover:bg-gray-900/50 p-3 rounded-xl transition-all duration-500 cursor-pointer border border-transparent hover:border-gray-100 dark:hover:border-gray-800">
-                                    <div class="flex items-center gap-2 mb-2">
-                                        <span
-                                            class="material-icons-outlined text-[14px] text-gray-400">auto_awesome</span>
-                                        <span
-                                            class="text-[10px] font-bold text-gray-400 tracking-wider">GHOSTWRITER</span>
-                                    </div>
-                                    <div id="ghostwriter-bars">
-                                        <div class="h-2 w-full bg-gray-100 dark:bg-gray-800 rounded-full mb-1"></div>
-                                        <div class="h-2 w-[70%] bg-gray-100 dark:bg-gray-800 rounded-full"></div>
-                                    </div>
-                                    <div id="ghostwriter-suggestion"
-                                        class="hidden animate-in fade-in slide-in-from-bottom-2 duration-700">
+                                <!-- Character Heatmap -->
+                                <div class="px-1">
+                                    <div class="text-[10px] font-bold text-gray-400 mb-3 tracking-widest uppercase">
+                                        Scene Appearances</div>
+                                    <div class="flex gap-2">
                                         <div
-                                            class="text-[11px] text-gray-700 dark:text-gray-300 font-medium leading-[1.4] italic">
-                                            "Consider intensifying the atmospheric detail of the 'ash gates' to heighten
-                                            the existential stakes of Elena's arrival."</div>
+                                            class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 border-2 border-blue-500 flex items-center justify-center text-[10px] font-bold text-blue-500">
+                                            ET</div>
+                                        <div
+                                            class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 border-2 border-transparent flex items-center justify-center text-[10px] font-bold text-gray-400">
+                                            LH</div>
+                                        <div
+                                            class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 border-2 border-accent flex items-center justify-center">
+                                            <span class="material-icons-outlined text-xs text-accent">add</span>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800">
-                                    <div class="text-[10px] font-bold text-gray-400 tracking-wider mb-4 uppercase">
-                                        Scene Analytics</div>
-                                    <div class="space-y-4">
-                                        <!-- Tempo -->
-                                        <div>
-                                            <div class="flex justify-between items-center mb-1.5">
+                                <!-- Passive/Active Check -->
+                                <div class="p-4 rounded-xl border border-gray-100 dark:border-gray-800">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-[10px] font-bold text-gray-400 uppercase">Prose Density</span>
+                                        <span class="text-[10px] font-bold text-green-500">92%</span>
+                                    </div>
+                                    <div class="h-1 w-full bg-gray-50 dark:bg-gray-800 rounded-full overflow-hidden">
+                                        <div class="h-full bg-green-500 w-[92%]"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="mockup-ghostwriter-panel"
+                                class="hover:bg-gray-50 dark:hover:bg-gray-900/50 p-3 rounded-xl transition-all duration-500 cursor-pointer border border-transparent hover:border-gray-100 dark:hover:border-gray-800">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="material-icons-outlined text-[14px] text-gray-400">auto_awesome</span>
+                                    <span class="text-[10px] font-bold text-gray-400 tracking-wider">GHOSTWRITER</span>
+                                </div>
+                                <div id="ghostwriter-bars">
+                                    <div class="h-2 w-full bg-gray-100 dark:bg-gray-800 rounded-full mb-1"></div>
+                                    <div class="h-2 w-[70%] bg-gray-100 dark:bg-gray-800 rounded-full"></div>
+                                </div>
+                                <div id="ghostwriter-suggestion"
+                                    class="hidden animate-in fade-in slide-in-from-bottom-2 duration-700">
+                                    <div
+                                        class="text-[11px] text-gray-700 dark:text-gray-300 font-medium leading-[1.4] italic">
+                                        "Elena's fingers brushed the glyph, and for a heartbeat, the cathedral
+                                        breathed back, its stone lungs filled with the dust of forgotten gods."
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800">
+                                <div class="text-[10px] font-bold text-gray-400 tracking-wider mb-4 uppercase">
+                                    Scene Analytics</div>
+                                <div class="space-y-4">
+                                    <!-- Tempo -->
+                                    <div>
+                                        <div class="flex justify-between items-center mb-1.5">
+                                            <span class="text-[10px] text-gray-500 uppercase font-medium">Tempo</span>
+                                            <span id="tempo-label"
+                                                class="text-[10px] text-primary dark:text-white font-bold">Stable</span>
+                                        </div>
+                                        <div class="gauge-bar">
+                                            <div id="tempo-gauge" class="gauge-fill bg-blue-400" style="width: 45%;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Flow -->
+                                    <div>
+                                        <div class="flex justify-between items-center mb-1.5">
+                                            <span class="text-[10px] text-gray-500 uppercase font-medium">Flow
+                                                Rating</span>
+                                            <span id="flow-label" class="text-[10px] text-blue-500 font-bold">64%</span>
+                                        </div>
+                                        <div class="gauge-bar">
+                                            <div id="flow-gauge" class="gauge-fill bg-blue-500" style="width: 64%;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Cast -->
+                                    <div class="pt-2">
+                                        <div class="text-[10px] text-gray-500 uppercase font-medium mb-2">In Scene
+                                        </div>
+                                        <div class="flex -space-x-2">
+                                            <div
+                                                class="w-6 h-6 rounded-full border-2 border-white dark:border-surface-dark bg-accent overflow-hidden">
+                                                <img src="{% static 'img/Elena.webp' %}"
+                                                    class="w-full h-full object-cover">
+                                            </div>
+                                            <div
+                                                class="w-6 h-6 rounded-full border-2 border-white dark:border-surface-dark bg-gray-200 overflow-hidden flex items-center justify-center">
                                                 <span
-                                                    class="text-[10px] text-gray-500 uppercase font-medium">Tempo</span>
-                                                <span id="tempo-label"
-                                                    class="text-[10px] text-primary dark:text-white font-bold">Stable</span>
+                                                    class="material-icons-outlined text-[10px] text-gray-500">person</span>
                                             </div>
-                                            <div class="gauge-bar">
-                                                <div id="tempo-gauge" class="gauge-fill bg-blue-400"
-                                                    style="width: 45%;"></div>
+                                            <div id="cast-added"
+                                                class="opacity-0 transition-opacity duration-1000 w-6 h-6 rounded-full border-2 border-white dark:border-surface-dark bg-accent overflow-hidden">
+                                                <img src="{% static 'img/Agnes.webp' %}"
+                                                    class="w-full h-full object-cover">
                                             </div>
-                                        </div>
-                                        <!-- Flow -->
-                                        <div>
-                                            <div class="flex justify-between items-center mb-1.5">
-                                                <span class="text-[10px] text-gray-500 uppercase font-medium">Flow
-                                                    Rating</span>
-                                                <span id="flow-label"
-                                                    class="text-[10px] text-blue-500 font-bold">64%</span>
-                                            </div>
-                                            <div class="gauge-bar">
-                                                <div id="flow-gauge" class="gauge-fill bg-blue-500" style="width: 64%;">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <!-- Cast -->
-                                        <div class="pt-2">
-                                            <div class="text-[10px] text-gray-500 uppercase font-medium mb-2">In Scene
-                                            </div>
-                                            <div class="flex -space-x-2">
-                                                <div
-                                                    class="w-6 h-6 rounded-full border-2 border-white dark:border-surface-dark bg-accent overflow-hidden">
-                                                    <img src="{% static 'img/Elena.webp' %}"
-                                                        class="w-full h-full object-cover">
-                                                </div>
-                                                <div
-                                                    class="w-6 h-6 rounded-full border-2 border-white dark:border-surface-dark bg-gray-200 overflow-hidden flex items-center justify-center">
-                                                    <span
-                                                        class="material-icons-outlined text-[10px] text-gray-500">person</span>
-                                                </div>
-                                                <div id="cast-added"
-                                                    class="opacity-0 transition-opacity duration-1000 w-6 h-6 rounded-full border-2 border-white dark:border-surface-dark bg-accent overflow-hidden">
-                                                    <img src="{% static 'img/Agnes.webp' %}"
-                                                        class="w-full h-full object-cover">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800">
-                                    <div class="text-[10px] font-bold text-gray-400 tracking-wider mb-4 uppercase">
-                                        Timeline Anchors</div>
-                                    <div class="flex items-center gap-3">
-                                        <div
-                                            class="w-6 h-6 rounded bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                                            <span
-                                                class="material-icons-outlined text-purple-500 text-[14px]">event</span>
-                                        </div>
-                                        <div class="text-[11px] text-gray-600 dark:text-gray-400">Arrival at Ash Gates
                                         </div>
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800">
+                                <div class="text-[10px] font-bold text-gray-400 tracking-wider mb-4 uppercase">Timeline
+                                    Anchors</div>
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="w-6 h-6 rounded bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                                        <span class="material-icons-outlined text-purple-500 text-[14px]">event</span>
+                                    </div>
+                                    <div class="text-[11px] text-gray-600 dark:text-gray-400">Arrival at Ash Gates</div>
+                                </div>
+                            </div>
+                        </div> <!-- End Sidebar -->
+                    </div> <!-- End Wrapper -->
+                    <!-- Footer Bar -->
+                    <div
+                        class="h-10 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 flex items-center px-6 justify-between shrink-0">
+                        <div class="flex items-center gap-6">
+                            <div class="flex items-center gap-2">
+                                <span class="material-icons-outlined text-[14px] text-gray-400">description</span>
+                                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">14,204
+                                    Words</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="material-icons-outlined text-[14px] text-gray-400">schedule</span>
+                                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">42m
+                                    Read</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="flex items-center gap-2 px-3 py-1 bg-gray-50 dark:bg-gray-800 rounded-full border border-gray-100 dark:border-gray-800">
+                                <div class="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+                                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Style Guide
+                                    Active: DARK FANTASY PROSE</span>
+                            </div>
+                            <span class="material-icons-outlined text-gray-300 text-[18px]">more_horiz</span>
                         </div>
                     </div>
-                </div>
+                </div> <!-- End Main Editor -->
+            </div> <!-- End Left Sidebar + Editor flex -->
 
-                <!-- Formatting Bubble (Simulated) -->
-                <div id="format-bubble" class="hidden absolute pointer-events-auto">
-                    <div
-                        class="bg-primary dark:bg-white text-white dark:text-primary px-3 py-1.5 rounded-lg shadow-xl flex items-center gap-4 animate-in zoom-in-95 duration-200">
-                        <button class="hover:text-blue-400 transition-colors"><span
-                                class="material-icons-outlined text-sm">format_bold</span></button>
-                        <button class="hover:text-blue-400 transition-colors"><span
-                                class="material-icons-outlined text-sm">format_italic</span></button>
-                        <div class="h-4 w-[1px] bg-white/20 dark:bg-primary/20"></div>
-                        <div class="flex items-center gap-2">
-                            <button
-                                class="text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded hover:bg-white/10"
-                                onclick="simulateTextSize('small')">A</button>
-                            <button
-                                class="text-[12px] font-bold w-5 h-5 flex items-center justify-center rounded border border-white/20"
-                                onclick="simulateTextSize('large')">A</button>
-                        </div>
-                        <div class="h-4 w-[1px] bg-white/20 dark:bg-primary/20"></div>
-                        <button class="hover:text-blue-400 transition-colors"><span
-                                class="material-icons-outlined text-sm">link</span></button>
-                    </div>
-                    <div class="w-2 h-2 bg-primary dark:bg-white rotate-45 mx-auto -mt-1 shadow-sm"></div>
-                </div>
-
-                <!-- Ghostwriter Rewrite Popup (Simulated) -->
-                <div id="ghostwriter-ask-popup" class="hidden absolute pointer-events-auto">
-                    <div
-                        class="bg-primary dark:bg-white text-white dark:text-primary px-4 py-2 rounded-xl shadow-2xl flex items-center gap-3 whitespace-nowrap animate-in zoom-in-95 duration-200">
-                        <span class="material-icons-outlined text-sm">auto_awesome</span>
-                        <span class="text-[11px] font-bold tracking-wide">Rewrite this for me?</span>
-                        <div class="h-4 w-[1px] bg-white/20 dark:bg-primary/20"></div>
-                        <button id="btn-accept-rewrite"
-                            class="text-[11px] font-bold hover:text-blue-400 dark:hover:text-blue-600 transition-colors">Yes</button>
-                        <button onclick="document.getElementById('ghostwriter-ask-popup').classList.add('hidden')"
-                            class="text-[11px] font-bold opacity-50 hover:opacity-100 transition-opacity">No</button>
-                    </div>
-                    <!-- Bubble Arrow -->
-                    <div class="w-2 h-2 bg-primary dark:bg-white rotate-45 mx-auto -mt-1 shadow-sm"></div>
-                </div>
-
+            <!-- Formatting Bubble (Simulated) -->
+            <div id="format-bubble" class="hidden absolute pointer-events-auto">
                 <div
-                    class="absolute -top-10 -left-10 w-40 h-40 bg-yellow-200/50 dark:bg-yellow-600/20 rounded-full blur-3xl -z-10">
+                    class="bg-primary dark:bg-white text-white dark:text-primary px-3 py-1.5 rounded-lg shadow-xl flex items-center gap-4 animate-in zoom-in-95 duration-200">
+                    <button class="hover:text-blue-400 transition-colors"><span
+                            class="material-icons-outlined text-sm">format_bold</span></button>
+                    <button class="hover:text-blue-400 transition-colors"><span
+                            class="material-icons-outlined text-sm">format_italic</span></button>
+                    <div class="h-4 w-[1px] bg-white/20 dark:bg-primary/20"></div>
+                    <div class="flex items-center gap-2">
+                        <button
+                            class="text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded hover:bg-white/10"
+                            onclick="simulateTextSize('small')">A</button>
+                        <button
+                            class="text-[12px] font-bold w-5 h-5 flex items-center justify-center rounded border border-white/20"
+                            onclick="simulateTextSize('large')">A</button>
+                    </div>
+                    <div class="h-4 w-[1px] bg-white/20 dark:bg-primary/20"></div>
+                    <button class="hover:text-blue-400 transition-colors"><span
+                            class="material-icons-outlined text-sm">link</span></button>
                 </div>
-                <div
-                    class="absolute -bottom-10 -right-10 w-60 h-60 bg-purple-200/50 dark:bg-purple-600/20 rounded-full blur-3xl -z-10">
-                </div>
+                <div class="w-2 h-2 bg-primary dark:bg-white rotate-45 mx-auto -mt-1 shadow-sm"></div>
             </div>
+
+            <!-- Ghostwriter Rewrite Popup (Simulated) -->
+            <div id="ghostwriter-ask-popup" class="hidden absolute pointer-events-auto">
+                <div
+                    class="bg-primary dark:bg-white text-white dark:text-primary px-4 py-2 rounded-xl shadow-2xl flex items-center gap-3 whitespace-nowrap animate-in zoom-in-95 duration-200">
+                    <span class="material-icons-outlined text-sm">auto_awesome</span>
+                    <span class="text-[11px] font-bold tracking-wide">Rewrite this for me?</span>
+                    <div class="h-4 w-[1px] bg-white/20 dark:bg-primary/20"></div>
+                    <button id="btn-accept-rewrite"
+                        class="text-[11px] font-bold hover:text-blue-400 dark:hover:text-blue-600 transition-colors">Yes</button>
+                    <button onclick="document.getElementById('ghostwriter-ask-popup').classList.add('hidden')"
+                        class="text-[11px] font-bold opacity-50 hover:opacity-100 transition-opacity">No</button>
+                </div>
+                <!-- Bubble Arrow -->
+                <div class="w-2 h-2 bg-primary dark:bg-white rotate-45 mx-auto -mt-1 shadow-sm"></div>
+            </div>
+
+            <div
+                class="absolute -top-10 -left-10 w-40 h-40 bg-yellow-200/50 dark:bg-yellow-600/20 rounded-full blur-3xl -z-10">
+            </div>
+            <div
+                class="absolute -bottom-10 -right-10 w-60 h-60 bg-purple-200/50 dark:bg-purple-600/20 rounded-full blur-3xl -z-10">
+            </div>
+        </div>
         </div>
     </section>
     <section class="py-24 bg-white dark:bg-surface-dark relative">
@@ -3234,6 +3563,46 @@
             if (themeBtn && mockup) {
                 themeBtn.addEventListener('click', () => {
                     mockup.classList.toggle('dark');
+                });
+            }
+
+            // Hero Mockup Theme Toggle
+            const heroThemeToggle = document.getElementById('hero-theme-toggle');
+            const heroMockup = document.getElementById('hero-writing-mockup');
+
+            if (heroThemeToggle && heroMockup) {
+                heroThemeToggle.addEventListener('click', () => {
+                    const isDark = heroMockup.classList.toggle('dark');
+                    const icon = heroThemeToggle.querySelector('.material-icons-outlined');
+                    if (icon) {
+                        icon.textContent = isDark ? 'light_mode' : 'dark_mode';
+                    }
+                });
+            }
+
+            // Hero Mockup Zen Toggle
+            const heroZenToggle = document.getElementById('hero-zen-toggle');
+            const heroLeftSidebar = document.getElementById('hero-left-sidebar');
+            const heroRightSidebar = document.getElementById('hero-right-sidebar');
+
+            if (heroZenToggle && heroMockup) {
+                heroZenToggle.addEventListener('click', () => {
+                    const isZen = heroMockup.classList.toggle('hero-zen-active');
+                    const icon = heroZenToggle.querySelector('.material-icons-outlined');
+                    if (icon) {
+                        icon.classList.toggle('text-blue-500', isZen);
+                    }
+
+                    // Hide popups when entering Zen mode
+                    if (isZen) {
+                        const askPopup = document.getElementById('ghostwriter-ask-popup');
+                        const formatBubble = document.getElementById('format-bubble');
+                        const writingPill = document.getElementById('writing-pill');
+                        if (askPopup) askPopup.classList.add('hidden');
+                        if (formatBubble) formatBubble.classList.add('hidden');
+                        // Pill is handled via CSS opacity for smooth transition, 
+                        // but we can ensure it's hidden if needed
+                    }
                 });
             }
 

@@ -138,6 +138,7 @@ def landing_page_v2(request):
     return render(request, 'timeline/landingpagev2.html')
 
 
+
 # ============== Authentication Views ==============
 
 def register(request):
