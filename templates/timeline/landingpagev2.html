@@ -406,17 +406,46 @@
         }
 
         .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: transparent;
+            background: rgba(147, 51, 234, 0.2);
             border-radius: 10px;
-            transition: background 0.3s ease;
         }
 
         .custom-scrollbar:hover::-webkit-scrollbar-thumb {
-            background: rgba(0, 0, 0, 0.1);
+            background: rgba(147, 51, 234, 0.4);
         }
 
-        .dark .custom-scrollbar:hover::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.1);
+        @keyframes bounce-slow {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes pulse-slow {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.9;
+                transform: scale(0.98);
+            }
+        }
+
+        .animate-bounce-slow {
+            animation: bounce-slow 3s infinite ease-in-out;
+        }
+
+        .animate-pulse-slow {
+            animation: pulse-slow 4s infinite ease-in-out;
         }
 
         .no-scrollbar::-webkit-scrollbar {
@@ -794,131 +823,180 @@
                             </div>
 
                             <!-- Writing Pad -->
-                            <div id="mockup-writing-surface"
-                                class="flex-1 overflow-y-auto pt-[104px] pb-24 px-12 md:px-20 lg:px-24 custom-scrollbar selection:bg-blue-200/50 dark:selection:bg-blue-500/30">
-                                <div class="max-w-xl mx-auto relative">
-                                    <h1
-                                        class="text-3xl md:text-custom font-serif text-primary dark:text-white mb-10 font-bold leading-tight">
-                                        The Cathedral of Dust</h1>
-                                    <div id="editable-mockup"
-                                        class="space-y-6 text-gray-700 dark:text-gray-300 leading-[1.7] text-[15px] selection:bg-blue-100 dark:selection:bg-blue-900/30">
-                                        <p
-                                            data-goal="The wind did not merely howl across the plains; it whispered the names Elena had spent a decade trying to bury. It carried the scent of ozone and ancient parchment, the unmistakable musk of the Void. She tightened her grip on the Vorpal Relic, the cold stone pulsing with a faint, rhythmic thrum against her palm—a heartbeat that was not her own.">
-                                            The wind <span class="style-suggestion" data-wrong="didn’t just"
-                                                data-right="did not merely"
-                                                data-reason="I think 'did not merely' adds much more atmospheric weight here than 'didn't just'. It sets the dark tone perfectly.">didn’t
-                                                just</span> howl
-                                            across the plains; it whispered <span class="grammar-error"
-                                                data-wrong="names" data-right="the names"
-                                                data-reason="Missing a definite article here. 'The names' feels more grounded in the prose.">names</span>
-                                            <span class="style-suggestion" data-wrong="ELENA" data-right="Elena"
-                                                data-reason="Let's keep the character names in standard casing for a cleaner look, unless they're shouting!">ELENA</span>
-                                            had spent a
-                                            decade trying to bury. It carried the scent of ozone and ancient parchment,
-                                            the <span class="style-suggestion" data-wrong="distinctive"
-                                                data-right="unmistakable"
-                                                data-reason="Try 'unmistakable'—it's a bit sharper and conveys a sense of dread that 'distinctive' lacks.">distinctive</span>
-                                            musk of the Void. She <span class="style-suggestion" data-wrong="adjusted"
-                                                data-right="tightened"
-                                                data-reason="Changing 'adjusted' to 'tightened' makes her reaction feel much more visceral and tense.">adjusted</span>
-                                            her grip on the <span
-                                                class="bg-blue-50 dark:bg-blue-900/10 px-1 border-b border-blue-200 dark:border-blue-800">Vorpal
-                                                Relic</span>, the cold stone pulsing with a faint, rhythmic thrum
-                                            against her palm—a heartbeat that <span class="grammar-error"
-                                                data-wrong="wasn't hers" data-right="was not her own"
-                                                data-reason="Formalizing this contraction gives the sentence a more haunting, deliberate rhythm.">wasn't
-                                                hers</span>.
-                                        </p>
+                            <div class="flex-1 flex overflow-hidden">
+                                <!-- Marker Gutter (Timeline Navigation) -->
+                                <div
+                                    class="w-10 border-r border-gray-100 dark:border-white/5 flex flex-col items-center py-40 gap-4 opacity-50">
+                                    <div class="w-1 h-32 bg-gray-100 dark:bg-gray-800 rounded-full relative">
+                                        <div class="absolute top-8 left-0 w-full h-4 bg-red-400 rounded-full cursor-help"
+                                            title="Plot Hole detected"></div>
+                                        <div class="absolute top-20 left-0 w-full h-2 bg-blue-400 rounded-full cursor-help"
+                                            title="Character Note"></div>
+                                    </div>
+                                    <span class="material-icons-outlined text-[14px] text-gray-300">expand_more</span>
+                                </div>
 
-                                        <p
-                                            data-goal="Ahead, the cathedral spires tore at the bruised sky like the rusted teeth of a dying giant. The architecture was shifting; her fingers brushed a glyph on the doorframe that had not been there a moment before. A strange flickering moved in the shadows, a darkness that seemed to draw breath.">
-                                            Ahead, the <span class="style-suggestion"
-                                                data-wrong="spires of the cathedral" data-right="cathedral spires"
-                                                data-reason="'Cathedral spires' has a better punch to it. It keeps the focus on the scale of the structure.">spires
-                                                of the cathedral</span>
-                                            tore at the bruised sky like the rusted teeth of a dying giant. The
-                                            architecture was <span class="highlight-active">shifting</span>; her fingers
-                                            <span class="style-suggestion" data-wrong="traced" data-right="brushed"
-                                                data-reason="'Brushed' is a more delicate verb. It makes the discovery of the glyph feel accidental and eerie.">traced</span>
-                                            a glyph on the
-                                            doorframe that <span class="grammar-error"
-                                                data-wrong="had'nt been there a moment ago"
-                                                data-right="had not been there a moment before"
-                                                data-reason="A couple of quick fixes here: correcting the contraction and smoothing out the timing for a better 'memory' feel.">had'nt
-                                                been there a
-                                                moment ago</span>. <span class="style-suggestion"
-                                                data-wrong="There was a strange flickering in the shadows"
-                                                data-right="A strange flickering moved in the shadows"
-                                                data-reason="Let's get the flickering moving! It makes the scene feel alive and much more threatening.">There
-                                                was a <span class="spelling-error" data-wrong="starnge"
-                                                    data-right="strange"
-                                                    data-reason="Just a quick typo here—happens to the best of us!">starnge</span>
-                                                flickering in the
-                                                shadows</span>, a darkness that seemed to <span class="style-suggestion"
-                                                data-wrong="breathe" data-right="draw breath"
-                                                data-reason="'Draw breath' sounds more active and ominous than 'breathe' in this context.">breathe</span>.
-                                        </p>
+                                <div id="mockup-writing-surface"
+                                    class="flex-1 overflow-y-auto pt-[104px] pb-24 px-12 md:px-20 lg:px-24 custom-scrollbar selection:bg-blue-200/50 dark:selection:bg-blue-500/30">
+                                    <div class="max-w-xl mx-auto relative">
+                                        <h1
+                                            class="text-3xl md:text-custom font-serif text-primary dark:text-white mb-10 font-bold leading-tight">
+                                            The Cathedral of Dust</h1>
+                                        <div id="editable-mockup"
+                                            class="space-y-6 text-gray-700 dark:text-gray-300 leading-[1.7] text-[15px] selection:bg-blue-100 dark:selection:bg-blue-900/30">
+                                            <p
+                                                data-goal="The wind did not merely howl across the plains; it whispered the names Elena had spent a decade trying to bury. It carried the scent of ozone and ancient parchment, the unmistakable musk of the Void. She tightened her grip on the Vorpal Relic, the cold stone pulsing with a faint, rhythmic thrum against her palm—a heartbeat that was not her own.">
+                                                The wind <span class="style-suggestion" data-wrong="didn’t just"
+                                                    data-right="did not merely"
+                                                    data-reason="I think 'did not merely' adds much more atmospheric weight here than 'didn't just'. It sets the dark tone perfectly.">didn’t
+                                                    just</span> howl
+                                                across the plains; it whispered <span class="grammar-error"
+                                                    data-wrong="names" data-right="the names"
+                                                    data-reason="Missing a definite article here. 'The names' feels more grounded in the prose.">names</span>
+                                                <span class="style-suggestion" data-wrong="ELENA" data-right="Elena"
+                                                    data-reason="Let's keep the character names in standard casing for a cleaner look, unless they're shouting!">ELENA</span>
+                                                had spent a
+                                                decade trying to bury. It carried the scent of ozone and ancient
+                                                parchment,
+                                                the <span class="style-suggestion" data-wrong="distinctive"
+                                                    data-right="unmistakable"
+                                                    data-reason="Try 'unmistakable'—it's a bit sharper and conveys a sense of dread that 'distinctive' lacks.">distinctive</span>
+                                                musk of the Void. She <span class="style-suggestion"
+                                                    data-wrong="adjusted" data-right="tightened"
+                                                    data-reason="Changing 'adjusted' to 'tightened' makes her reaction feel much more visceral and tense.">adjusted</span>
+                                                her grip on the <span
+                                                    class="bg-blue-50 dark:bg-blue-900/10 px-1 border-b border-blue-200 dark:border-blue-800">Vorpal
+                                                    Relic</span>, the cold stone pulsing with a faint, rhythmic thrum
+                                                against her palm—a heartbeat that <span class="grammar-error"
+                                                    data-wrong="wasn't hers" data-right="was not her own"
+                                                    data-reason="Formalizing this contraction gives the sentence a more haunting, deliberate rhythm.">wasn't
+                                                    hers</span>.
+                                            </p>
 
-                                        <p
-                                            data-goal="“It knows we're here, Leo,” Elena whispered. “It's rewriting the interior as we speak. We're not just walking into ruins; we're walking into a memory that does not want to be forgotten.”">
-                                            “It knows we're here, <span
-                                                class="text-blue-500 font-medium font-bold">Leo</span>,” Elena
-                                            whispered. “It's rewriting the interior as we speak. We're not just walking
-                                            into ruins; we're walking into a memory that <span class="grammar-error"
-                                                data-wrong="doesn't" data-right="does not"
-                                                data-reason="I'd suggest expanding 'doesn't' to 'does not'—it keeps the dialogue feeling serious and weighty.">doesn't</span>
-                                            want to be
-                                            forgotten.”</p>
+                                            <p
+                                                data-goal="Ahead, the cathedral spires tore at the bruised sky like the rusted teeth of a dying giant. The architecture was shifting; her fingers brushed a glyph on the doorframe that had not been there a moment before. A strange flickering moved in the shadows, a darkness that seemed to draw breath.">
+                                                Ahead, the <span class="style-suggestion"
+                                                    data-wrong="spires of the cathedral" data-right="cathedral spires"
+                                                    data-reason="'Cathedral spires' has a better punch to it. It keeps the focus on the scale of the structure.">spires
+                                                    of the cathedral</span>
+                                                tore at the bruised sky like the rusted teeth of a dying giant. The
+                                                architecture was <span class="highlight-active">shifting</span>; her
+                                                fingers
+                                                <span class="style-suggestion" data-wrong="traced" data-right="brushed"
+                                                    data-reason="'Brushed' is a more delicate verb. It makes the discovery of the glyph feel accidental and eerie.">traced</span>
+                                                a glyph on the
+                                                doorframe that <span class="grammar-error"
+                                                    data-wrong="had'nt been there a moment ago"
+                                                    data-right="had not been there a moment before"
+                                                    data-reason="A couple of quick fixes here: correcting the contraction and smoothing out the timing for a better 'memory' feel.">had'nt
+                                                    been there a
+                                                    moment ago</span>. <span class="style-suggestion"
+                                                    data-wrong="There was a strange flickering in the shadows"
+                                                    data-right="A strange flickering moved in the shadows"
+                                                    data-reason="Let's get the flickering moving! It makes the scene feel alive and much more threatening.">There
+                                                    was a <span class="spelling-error" data-wrong="starnge"
+                                                        data-right="strange"
+                                                        data-reason="Just a quick typo here—happens to the best of us!">starnge</span>
+                                                    flickering in the
+                                                    shadows</span>, a darkness that seemed to <span
+                                                    class="style-suggestion" data-wrong="breathe"
+                                                    data-right="draw breath"
+                                                    data-reason="'Draw breath' sounds more active and ominous than 'breathe' in this context.">breathe</span>.
+                                            </p>
 
-                                        <p
-                                            data-goal="Leo did not answer at once. He was staring at the moss-covered steps. The stone here was ancient, older than the First Empire, yet it felt as though it were being watched by them. Every scrape of his boot rang through the hollow arches like a physical blow.">
-                                            Leo <span class="grammar-error" data-wrong="didn't answer immediately"
-                                                data-right="did not answer at once"
-                                                data-reason="'Did not answer at once' feels a bit more natural for his character in this moment.">didn't
-                                                answer immediately</span>.
-                                            He was staring at the <span class="spelling-error"
-                                                data-wrong="moss-coverred" data-right="moss-covered"
-                                                data-reason="Spelling check: 'covered' only needs one 'r' at the end.">moss-coverred</span>
-                                            steps. The stone here was ancient, older than the First Empire, yet it felt
-                                            <span class="style-suggestion"
-                                                data-wrong="as if it was being watched by them"
-                                                data-right="as though it were being watched by them"
-                                                data-reason="Using 'as though' and the subjunctive 'were' really amps up the gothic atmosphere here.">as
-                                                if it was being
-                                                watched by them</span>. Every scrape of his boot <span
-                                                class="style-suggestion" data-wrong="echoed" data-right="rang"
-                                                data-reason="'Rang' is such a cold, physical verb. It works well with the 'hollow arches' imagery.">echoed</span>
-                                            through the
-                                            hollow arches like a physical blow.
-                                        </p>
+                                            <p
+                                                data-goal="“It knows we're here, Leo,” Elena whispered. “It's rewriting the interior as we speak. We're not just walking into ruins; we're walking into a memory that does not want to be forgotten.”">
+                                                “It knows we're here, <span
+                                                    class="text-blue-500 font-medium font-bold">Leo</span>,” Elena
+                                                whispered. “It's rewriting the interior as we speak. We're not just
+                                                walking
+                                                into ruins; we're walking into a memory that <span class="grammar-error"
+                                                    data-wrong="doesn't" data-right="does not"
+                                                    data-reason="I'd suggest expanding 'doesn't' to 'does not'—it keeps the dialogue feeling serious and weighty.">doesn't</span>
+                                                want to be
+                                                forgotten.”</p>
 
-                                        <p
-                                            data-goal="The air thickened with the metallic tang of dried blood. Elena felt the Relic’s weight increasing. It was no longer merely lead and stone; it was the burden of a thousand lost souls, all of them screaming at once in the silence of her mind.">
-                                            The air <span class="style-suggestion" data-wrong="grew thick"
-                                                data-right="thickened"
-                                                data-reason="Small tweak: 'thickened' is more direct and hits harder.">grew
-                                                thick</span> with the metallic tang of dried blood. Elena felt the <span
-                                                class="grammar-error" data-wrong="Relics" data-right="Relic’s"
-                                                data-reason="Just needs an apostrophe here to show the Relic's weight.">Relics</span>
-                                            weight
-                                            increasing. It <span class="style-suggestion"
-                                                data-wrong="wasn't just lead and stone anymore"
-                                                data-right="was no longer merely lead and stone"
-                                                data-reason="This change makes the Relic's burden feel more ancient and heavy.">wasn't
-                                                just lead and stone
-                                                anymore</span>; it was the <span class="style-suggestion"
-                                                data-wrong="weight" data-right="burden"
-                                                data-reason="'Burden' has such a great thematic connection to those 'thousand lost souls'.">weight</span>
-                                            of a thousand
-                                            lost souls, <span class="style-suggestion" data-wrong="and theyr'e all"
-                                                data-right="all of them"
-                                                data-reason="Removing 'and they're all' and using 'all of them' instead focuses the ending on the souls themselves.">and
-                                                theyr'e all</span> screaming
-                                            at once in the silence of her mind.</p>
+                                            <p
+                                                data-goal="Leo did not answer at once. He was staring at the moss-covered steps. The stone here was ancient, older than the First Empire, yet it felt as though it were being watched by them. Every scrape of his boot rang through the hollow arches like a physical blow.">
+                                                Leo <span class="grammar-error" data-wrong="didn't answer immediately"
+                                                    data-right="did not answer at once"
+                                                    data-reason="'Did not answer at once' feels a bit more natural for his character in this moment.">didn't
+                                                    answer immediately</span>.
+                                                He was staring at the <span class="spelling-error"
+                                                    data-wrong="moss-coverred" data-right="moss-covered"
+                                                    data-reason="Spelling check: 'covered' only needs one 'r' at the end.">moss-coverred</span>
+                                                steps. The stone here was ancient, older than the First Empire, yet it
+                                                felt
+                                                <span class="style-suggestion"
+                                                    data-wrong="as if it was being watched by them"
+                                                    data-right="as though it were being watched by them"
+                                                    data-reason="Using 'as though' and the subjunctive 'were' really amps up the gothic atmosphere here.">as
+                                                    if it was being
+                                                    watched by them</span>. Every scrape of his boot <span
+                                                    class="style-suggestion" data-wrong="echoed" data-right="rang"
+                                                    data-reason="'Rang' is such a cold, physical verb. It works well with the 'hollow arches' imagery.">echoed</span>
+                                                through the
+                                                hollow arches like a physical blow.
+                                            </p>
+
+                                            <p
+                                                data-goal="The air thickened with the metallic tang of dried blood. Elena felt the Relic’s weight increasing. It was no longer merely lead and stone; it was the burden of a thousand lost souls, all of them screaming at once in the silence of her mind.">
+                                                The air <span class="style-suggestion" data-wrong="grew thick"
+                                                    data-right="thickened"
+                                                    data-reason="Small tweak: 'thickened' is more direct and hits harder.">grew
+                                                    thick</span> with the metallic tang of dried blood. Elena felt the
+                                                <span class="grammar-error" data-wrong="Relics" data-right="Relic’s"
+                                                    data-reason="Just needs an apostrophe here to show the Relic's weight.">Relics</span>
+                                                weight
+                                                increasing. It <span class="style-suggestion"
+                                                    data-wrong="wasn't just lead and stone anymore"
+                                                    data-right="was no longer merely lead and stone"
+                                                    data-reason="This change makes the Relic's burden feel more ancient and heavy.">wasn't
+                                                    just lead and stone
+                                                    anymore</span>; it was the <span class="style-suggestion"
+                                                    data-wrong="weight" data-right="burden"
+                                                    data-reason="'Burden' has such a great thematic connection to those 'thousand lost souls'.">weight</span>
+                                                of a thousand
+                                                lost souls, <span class="style-suggestion" data-wrong="and theyr'e all"
+                                                    data-right="all of them"
+                                                    data-reason="Removing 'and they're all' and using 'all of them' instead focuses the ending on the souls themselves.">and
+                                                    theyr'e all</span> screaming
+                                                at once in the silence of her mind.
+                                            </p>
+                                            <p class="mt-8 text-gray-500 italic text-sm">
+                                                The scent of <span
+                                                    class="bg-red-100 dark:bg-red-900/30 border-b border-red-500 text-red-700 dark:text-red-400 px-0.5 cursor-help"
+                                                    title="Plot Hole: Character is anosmic according to Chapter 2">ozone</span>
+                                                became a physical weight.
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
+                            </div> <!-- Closes flex-1 flex row wrapper (Line 797) -->
+
+                            <!-- Timeline Navigation Bar -->
+                            <div
+                                class="h-10 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-black/20 flex items-center px-6 gap-4 shrink-0 mt-auto">
+                                <span class="material-icons-outlined text-[16px] text-gray-400">query_builder</span>
+                                <div class="flex-1 h-1 bg-gray-200 dark:bg-gray-800 rounded-full relative">
+                                    <div
+                                        class="absolute inset-y-0 left-0 w-1/3 bg-blue-500/30 rounded-full border-r-2 border-blue-500">
+                                    </div>
+                                    <!-- Timeline Markers -->
+                                    <div
+                                        class="absolute left-[10%] top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-gray-400 rounded-full">
+                                    </div>
+                                    <div
+                                        class="absolute left-[33%] top-1/2 -translate-y-1/2 w-2 h-2 bg-red-500 rounded-full shadow-[0_0_8px_rgba(239,68,68,0.5)]">
+                                    </div>
+                                    <div
+                                        class="absolute left-[60%] top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-gray-400 rounded-full">
+                                    </div>
+                                </div>
+                                <div class="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">Chapter
+                                    14 : The Voids Echo</div>
                             </div>
-                        </div>
+                        </div> <!-- Closes Main Editor column wrapper (Line 638) -->
 
 
 
@@ -998,7 +1076,8 @@
                             <div
                                 class="flex items-center gap-2 px-3 py-1 bg-gray-50 dark:bg-gray-800 rounded-full border border-gray-100 dark:border-gray-800">
                                 <div class="w-1.5 h-1.5 rounded-full bg-green-500"></div>
-                                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Style Guide
+                                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Style
+                                    Guide
                                     Active: DARK FANTASY PROSE</span>
                             </div>
                             <span class="material-icons-outlined text-gray-300 text-[18px]">more_horiz</span>
@@ -1072,7 +1151,8 @@
                                     <span
                                         class="text-[10px] text-green-600 dark:text-green-400 font-bold uppercase tracking-wider group-hover:underline">Ask
                                         Penn to rewrite</span>
-                                    <span class="text-[10px] text-green-700/60 dark:text-green-400/60">Polish the entire
+                                    <span class="text-[10px] text-green-700/60 dark:text-green-400/60">Polish the
+                                        entire
                                         section in one click</span>
                                 </button>
                             </div>
@@ -2810,6 +2890,261 @@
         </div>
 
     </section>
+
+    <!-- World-Building & Story Bible Section -->
+    <section class="py-24 bg-gray-50 dark:bg-black overflow-hidden border-y border-gray-100 dark:border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row items-center gap-16">
+                <!-- Left Content: Feature List -->
+                <div class="reveal slide-up w-full md:w-1/2">
+                    <div
+                        class="flex items-center gap-2 mb-4 text-xs font-bold text-purple-500 uppercase tracking-widest">
+                        <span class="w-8 h-[1px] bg-purple-500"></span> Story Organization
+                    </div>
+                    <h2
+                        class="text-4xl md:text-[3.5rem] font-serif text-primary dark:text-white mb-6 font-bold leading-tight">
+                        Intelligent
+                        Story Bible</h2>
+                    <p class="text-gray-600 dark:text-gray-400 text-lg mb-8 leading-relaxed">
+                        Transition from chaos to a structured **shared universe**. The Codex is more than a wiki—it's
+                        the
+                        automated repository of your story's soul, tracking every thread so you never lose the path.
+                    </p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+                        <div class="flex flex-col gap-3">
+                            <div
+                                class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                                <span class="material-icons-outlined text-purple-500">menu_book</span>
+                            </div>
+                            <h4 class="font-bold text-gray-900 dark:text-white">Centralized Wiki</h4>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Deep-link characters, locations,
+                                factions, and lore in a unified, searchable archive.</p>
+                        </div>
+                        <div class="flex flex-col gap-3">
+                            <div
+                                class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                                <span class="material-icons-outlined text-purple-500">grid_view</span>
+                            </div>
+                            <h4 class="font-bold text-gray-900 dark:text-white">Appearance Heatmaps</h4>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Automated tracking of entity mentions
+                                across scenes with density visualization.</p>
+                        </div>
+                        <div class="flex flex-col gap-3">
+                            <div
+                                class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                                <span class="material-icons-outlined text-purple-500">hub</span>
+                            </div>
+                            <h4 class="font-bold text-gray-900 dark:text-white">Reputation Systems</h4>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Track dynamic faction shifts and
+                                evolving character reputation across the series.</p>
+                        </div>
+                        <div class="flex flex-col gap-3">
+                            <div
+                                class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                                <span class="material-icons-outlined text-purple-500">layers</span>
+                            </div>
+                            <h4 class="font-bold text-gray-900 dark:text-white">Series Support</h4>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Scale from a single scene to a shared
+                                universe with cross-book library synchronization.</p>
+                        </div>
+                    </div>
+
+                    <div class="inline-flex items-center gap-2 text-purple-500 font-bold text-sm cursor-pointer group">
+                        EXPLORE THE CODEX <span
+                            class="material-icons-outlined transform group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                    </div>
+                </div>
+
+                <!-- Right Content: Codex Visualization Mockup -->
+                <div class="reveal slide-left delay-200 w-full md:w-1/2 relative">
+                    <div
+                        class="bg-white dark:bg-surface-dark rounded-2xl border border-gray-100 dark:border-gray-800 shadow-2xl overflow-hidden min-h-[550px] flex flex-col">
+                        <!-- Bible Header -->
+                        <div
+                            class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between bg-gray-50/50 dark:bg-black/20">
+                            <div class="flex items-center gap-4">
+                                <div class="w-8 h-8 rounded bg-purple-500/10 flex items-center justify-center">
+                                    <span class="material-icons-outlined text-purple-500 text-sm">auto_stories</span>
+                                </div>
+                                <div>
+                                    <h5
+                                        class="text-xs font-bold text-primary dark:text-white uppercase tracking-widest">
+                                        The Codex</h5>
+                                    <p class="text-[9px] text-gray-400 uppercase tracking-tighter">Universe: The Temple
+                                        Dynasty</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="px-2 py-1 rounded bg-green-500/10 text-green-500 text-[8px] font-bold border border-green-500/20">
+                                    SYNC:
+                                    BOOK 1-3</div>
+                                <span class="material-icons-outlined text-gray-400 text-sm">search</span>
+                            </div>
+                        </div>
+
+                        <!-- Sidebar + Bible Content -->
+                        <div class="flex flex-1 overflow-hidden">
+                            <!-- Mini Navigation -->
+                            <div
+                                class="w-14 border-r border-gray-100 dark:border-gray-800 flex flex-col items-center py-6 gap-8 shrink-0 bg-gray-50/30 dark:bg-black/10">
+                                <div class="relative group cursor-pointer">
+                                    <span class="material-icons-outlined text-purple-500 text-lg">person_pin</span>
+                                    <div
+                                        class="absolute left-full ml-4 px-2 py-1 bg-gray-900 text-white text-[8px] rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+                                        Characters</div>
+                                </div>
+                                <div class="relative group cursor-pointer">
+                                    <span
+                                        class="material-icons-outlined text-gray-300 text-lg hover:text-purple-400 transition-colors">place</span>
+                                </div>
+                                <div class="relative group cursor-pointer">
+                                    <span
+                                        class="material-icons-outlined text-gray-300 text-lg hover:text-purple-400 transition-colors">groups</span>
+                                </div>
+                                <div class="relative group cursor-pointer">
+                                    <span
+                                        class="material-icons-outlined text-gray-300 text-lg hover:text-purple-400 transition-colors">inventory_2</span>
+                                </div>
+                            </div>
+
+                            <!-- Content Area -->
+                            <div class="flex-1 p-8 overflow-y-auto custom-scrollbar">
+                                <!-- Character Template Header -->
+                                <div class="flex items-start justify-between mb-10">
+                                    <div class="flex gap-5">
+                                        <div
+                                            class="w-20 h-20 rounded-2xl bg-purple-100 dark:bg-purple-900/30 overflow-hidden border border-purple-200 dark:border-purple-800/50 shadow-inner">
+                                            <img src="{% static 'img/Agnes.webp' %}" class="w-full h-full object-cover">
+                                        </div>
+                                        <div class="pt-2">
+                                            <h3
+                                                class="text-2xl font-serif text-primary dark:text-white mb-2 leading-none">
+                                                Agnes Temple
+                                            </h3>
+                                            <div class="flex gap-2">
+                                                <span
+                                                    class="text-[9px] px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 font-bold uppercase tracking-widest">Protagonist</span>
+                                                <span
+                                                    class="text-[9px] px-2 py-0.5 rounded-full bg-purple-500 text-white font-bold uppercase tracking-widest shadow-sm">Active</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="text-right pt-2">
+                                        <span
+                                            class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2">Reputation</span>
+                                        <div class="flex gap-1.5 justify-end">
+                                            <div
+                                                class="w-5 h-1.5 bg-purple-500 rounded-full shadow-[0_0_8px_rgba(147,51,234,0.3)]">
+                                            </div>
+                                            <div
+                                                class="w-5 h-1.5 bg-purple-500 rounded-full shadow-[0_0_8px_rgba(147,51,234,0.3)]">
+                                            </div>
+                                            <div
+                                                class="w-5 h-1.5 bg-purple-500 rounded-full shadow-[0_0_8px_rgba(147,51,234,0.3)]">
+                                            </div>
+                                            <div class="w-5 h-1.5 bg-gray-200 dark:bg-gray-800 rounded-full"></div>
+                                        </div>
+                                        <p class="text-[8px] text-purple-500 font-bold mt-2 uppercase tracking-tighter">
+                                            Rising: Chapter 14 Breakthrough</p>
+                                    </div>
+                                </div>
+
+                                <!-- Heatmap Visualization Section -->
+                                <div
+                                    class="mb-10 p-5 bg-gray-50/50 dark:bg-black/20 rounded-2xl border border-gray-100 dark:border-gray-800">
+                                    <h5
+                                        class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+                                        <span class="material-icons-outlined text-sm">grid_view</span> Appearance
+                                        Density Heatmap
+                                    </h5>
+                                    <div class="flex gap-1.5 h-16 items-end">
+                                        <!-- Mock chapters density -->
+                                        <div class="flex-1 bg-purple-100 dark:bg-purple-900/20 rounded h-[20%] transition-all hover:h-[30%]"
+                                            title="CH 1"></div>
+                                        <div class="flex-1 bg-purple-300 dark:bg-purple-800/40 rounded h-[45%] transition-all hover:h-[55%]"
+                                            title="CH 2"></div>
+                                        <div class="flex-1 bg-purple-500 dark:bg-purple-700/60 rounded h-[80%] transition-all hover:h-[90%]"
+                                            title="CH 3"></div>
+                                        <div class="flex-1 bg-purple-600 dark:bg-purple-600/80 rounded h-[100%] transition-all hover:h-full"
+                                            title="CH 4"></div>
+                                        <div class="flex-1 bg-purple-200 dark:bg-purple-900/10 rounded h-[30%] transition-all hover:h-[40%]"
+                                            title="CH 5"></div>
+                                        <div class="flex-1 bg-purple-400 dark:bg-purple-800/30 rounded h-[60%] transition-all hover:h-[70%]"
+                                            title="CH 6"></div>
+                                        <div class="flex-1 bg-purple-700 rounded h-[90%] transition-all hover:scale-y-110 shadow-lg"
+                                            title="CH 7"></div>
+                                        <div class="flex-1 bg-purple-100 dark:bg-purple-900/10 rounded h-[15%]"
+                                            title="CH 8"></div>
+                                        <div class="flex-1 bg-purple-500 dark:bg-purple-700/60 rounded h-[75%]"
+                                            title="CH 9"></div>
+                                        <div class="flex-1 bg-purple-300 dark:bg-purple-800/40 rounded h-[40%]"
+                                            title="CH 10"></div>
+                                        <div class="flex-1 bg-purple-600 rounded h-[85%]" title="CH 11"></div>
+                                        <div class="flex-1 bg-purple-200 rounded h-[25%]" title="CH 12"></div>
+                                    </div>
+                                    <div
+                                        class="flex justify-between mt-4 text-[9px] text-gray-400 font-bold tracking-widest">
+                                        <span>CH 1</span>
+                                        <span class="opacity-50">NARRATIVE DENSITY BY CHAPTER</span>
+                                        <span>CH 24</span>
+                                    </div>
+                                </div>
+
+                                <!-- Custom Templates -->
+                                <div class="grid grid-cols-2 gap-6">
+                                    <div
+                                        class="p-5 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-surface-dark shadow-sm">
+                                        <h6
+                                            class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                            <span class="material-icons-outlined text-sm">record_voice_over</span> Voice
+                                            Sheet
+                                        </h6>
+                                        <div class="space-y-3">
+                                            <div class="flex justify-between text-[11px] items-center">
+                                                <span class="text-gray-500">Vocabulary</span>
+                                                <span
+                                                    class="text-primary dark:text-white font-bold px-2 py-0.5 bg-gray-50 dark:bg-gray-800 rounded">Academic</span>
+                                            </div>
+                                            <div class="flex justify-between text-[11px] items-center">
+                                                <span class="text-gray-500">Punctuation</span>
+                                                <span
+                                                    class="text-primary dark:text-white font-bold px-2 py-0.5 bg-gray-50 dark:bg-gray-800 rounded">Meticulous</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="p-5 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-surface-dark shadow-sm">
+                                        <h6
+                                            class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                            <span class="material-icons-outlined text-sm">flag</span> Primary Goal
+                                        </h6>
+                                        <p class="text-[11px] text-gray-600 dark:text-gray-400 italic leading-relaxed">
+                                            "To decouple my identity from the family's legacy without losing the people
+                                            I love."</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Floating Notification (Series Support) -->
+                        <div class="absolute bottom-6 right-6 animate-pulse-slow">
+                            <div
+                                class="bg-primary dark:bg-white text-white dark:text-primary px-5 py-2.5 rounded-full shadow-2xl text-[10px] font-bold flex items-center gap-2 border border-blue-400/20">
+                                <span class="material-icons-outlined text-sm">cloud_sync</span>
+                                SERIES UPDATE: CO-HERO SYNCED TO SHARED UNIVERSE
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Decorative Background Elements -->
+                    <div class="absolute -top-10 -right-10 w-64 h-64 bg-purple-500/5 rounded-full blur-3xl -z-10"></div>
+                    <div class="absolute -bottom-10 -left-10 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl -z-10"></div>
+                </div>
+            </div>
+        </div>
+    </section>
     <section class="py-24 bg-white dark:bg-surface-dark">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col-reverse md:flex-row items-center gap-16">
@@ -2853,31 +3188,54 @@
                 <div class="reveal slide-up delay-200 w-full md:w-1/2">
                     <div id="writing-pad-mockup"
                         class="bg-background-light dark:bg-background-dark rounded-xl p-4 shadow-lg border border-gray-100 dark:border-gray-700 transition-colors duration-500">
-                        <div class="bg-white dark:bg-surface-dark rounded-lg shadow-sm overflow-hidden h-96 flex">
-                            <div
-                                class="flex-1 p-6 md:p-8 font-serif text-gray-800 dark:text-gray-200 text-sm md:text-base leading-[1.4rem] overflow-y-auto">
-                                <div class="flex items-center gap-2 mb-4 opacity-30">
-                                    <div class="w-2 h-2 rounded-full bg-gray-400"></div>
-                                    <div class="w-2 h-2 rounded-full bg-gray-400"></div>
+                        <div
+                            class="bg-white dark:bg-surface-dark rounded-lg shadow-sm overflow-hidden h-96 flex flex-col">
+                            <div class="flex-1 flex overflow-hidden">
+                                <div
+                                    class="flex-1 p-6 md:p-8 font-serif text-gray-800 dark:text-gray-200 text-sm md:text-base leading-[1.4rem] overflow-y-auto">
+                                    <div class="flex items-center gap-2 mb-4 opacity-30">
+                                        <div class="w-2 h-2 rounded-full bg-gray-400"></div>
+                                        <div class="w-2 h-2 rounded-full bg-gray-400"></div>
+                                    </div>
+                                    <div
+                                        class="text-xs text-gray-400 font-sans mb-4 text-center uppercase tracking-widest">
+                                        Chapter 4: The Arrival</div>
+                                    <p class="mb-4">The rain lashed against the cobblestones, turning the narrow streets
+                                        of
+                                        London into rivers of shadow. Holmes stood by the window, his silhouette cut
+                                        sharply
+                                        against the gaslight outside.</p>
+                                    <p class="mb-4">"You see, Watson," he murmured, without turning around. "The absence
+                                        of
+                                        evidence is not the evidence of <span
+                                            class="bg-red-100 dark:bg-red-900/30 border-b border-red-500 text-red-700 dark:text-red-400 px-0.5"
+                                            title="Plot Hole: Watson mentioned evidence in Ch 2">absence</span>."</p>
                                 </div>
-                                <div class="text-xs text-gray-400 font-sans mb-4 text-center uppercase tracking-widest">
-                                    Chapter 4: The Arrival</div>
-                                <p class="mb-4">The rain lashed against the cobblestones, turning the narrow streets of
-                                    London into rivers of shadow. Holmes stood by the window, his silhouette cut sharply
-                                    against the gaslight outside.</p>
-                                <p class="mb-4">"You see, Watson," he murmured, without turning around. "The absence of
-                                    evidence is not the evidence of <span
-                                        class="bg-red-100 dark:bg-red-900/30 border-b border-red-500 text-red-700 dark:text-red-400 px-0.5"
-                                        title="Plot Hole: Watson mentioned evidence in Ch 2">absence</span>."</p>
+                                <div id="mockup-sidebar"
+                                    class="w-10 bg-orange-50/50 dark:bg-black/40 border-l border-orange-100 dark:border-white/5 flex flex-col items-center py-4 gap-6 shrink-0 transition-all duration-500">
+                                    <span class="material-icons-outlined text-[16px] text-orange-400">psychology</span>
+                                    <span class="material-icons-outlined text-[16px] text-gray-400">person</span>
+                                    <span class="material-icons-outlined text-[16px] text-gray-400">push_pin</span>
+                                    <div class="mt-auto mb-2">
+                                        <span
+                                            class="material-icons-outlined text-[16px] text-gray-300">help_outline</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div id="mockup-sidebar"
-                                class="w-10 bg-orange-50/50 dark:bg-black/40 border-l border-orange-100 dark:border-white/5 flex flex-col items-center py-4 gap-6 shrink-0 transition-all duration-500">
-                                <span class="material-icons-outlined text-[16px] text-orange-400">psychology</span>
-                                <span class="material-icons-outlined text-[16px] text-gray-400">person</span>
-                                <span class="material-icons-outlined text-[16px] text-gray-400">push_pin</span>
-                                <div class="mt-auto mb-2">
-                                    <span class="material-icons-outlined text-[16px] text-gray-300">help_outline</span>
+                            <!-- Timeline Navigation bar -->
+                            <div
+                                class="h-8 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-black/20 flex items-center px-4 gap-3 shrink-0">
+                                <span class="material-icons-outlined text-[14px] text-gray-400">query_builder</span>
+                                <div class="flex-1 h-0.5 bg-gray-200 dark:bg-gray-800 rounded-full relative">
+                                    <div
+                                        class="absolute inset-y-0 left-0 w-1/4 bg-blue-500/30 rounded-full border-r border-blue-500">
+                                    </div>
+                                    <div
+                                        class="absolute left-[25%] top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-red-500 rounded-full shadow-[0_0_6px_rgba(239,68,68,0.4)]">
+                                    </div>
                                 </div>
+                                <div class="text-[8px] font-bold text-gray-400 uppercase tracking-tighter">Timeline
+                                    Active</div>
                             </div>
                         </div>
                     </div>
