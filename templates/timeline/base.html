@@ -12,6 +12,7 @@
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
 
+    <link rel="stylesheet" href="{% static 'css/fonts.css' %}">
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
 
     <style>
@@ -470,9 +471,11 @@
     {% endif %}
     {% endif %}
 
+    {% block full_layout %}
     <div class="container-fluid">
         <div class="row">
             {% if user.is_authenticated or request.resolver_match.url_name == 'home_preview' %}
+            {% block sidebar_block %}
             <div class="col-md-2 d-none d-md-block sidebar">
                 <div class="sidebar-logo text-center my-4">
                     <img src="{% static 'img/logo.png' %}" alt="Story Timeline Builder Logo"
@@ -572,6 +575,7 @@
                     {% endif %}
                 </nav>
             </div>
+            {% endblock sidebar_block %}
             {% endif %}
 
             <div
@@ -586,6 +590,7 @@
                 <div class="page-container">
                     {% if user.is_authenticated and request.resolver_match.url_name != 'home_preview' %}
                     <!-- Universal greeting header -->
+                    {% block dashboard_header %}
                     <div class="d-flex justify-content-end align-items-center mb-3">
                         {% block top_header_actions %}{% endblock %}
                         <div class="dropdown ms-3">
@@ -613,6 +618,7 @@
                             </ul>
                         </div>
                     </div>
+                    {% endblock dashboard_header %}
                     {% endif %}
 
                     {% block content %}{% endblock %}
@@ -620,6 +626,7 @@
             </div>
         </div>
     </div>
+    {% endblock full_layout %}
 
     {% if request.resolver_match.url_name != "login" %}
     <footer class="footer text-center py-3 mt-4">

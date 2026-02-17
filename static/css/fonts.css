@@ -1,0 +1,42 @@
+/* DM Serif Display */
+@font-face {
+    font-family: 'DM Serif Display';
+    src: url('../fonts/DM_Serif_Display/DMSerifDisplay-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'DM Serif Display';
+    src: url('../fonts/DM_Serif_Display/DMSerifDisplay-Italic.ttf') format('truetype');
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
+}
+
+/* Inter */
+@font-face {
+    font-family: 'Inter';
+    src: url('../fonts/Inter/Inter-VariableFont_opsz,wght.ttf') format('truetype');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Inter';
+    src: url('../fonts/Inter/Inter-Italic-VariableFont_opsz,wght.ttf') format('truetype');
+    font-weight: 100 900;
+    font-style: italic;
+    font-display: swap;
+}
+
+/* Montserrat (Optional but included in zip) */
+@font-face {
+    font-family: 'Montserrat';
+    src: url('../fonts/Montserrat/Montserrat-VariableFont_wght.ttf') format('truetype');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}

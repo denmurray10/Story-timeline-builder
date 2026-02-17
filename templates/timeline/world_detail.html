@@ -1,86 +1,281 @@
 {% extends 'timeline/base.html' %}
+{% load static %}
 
-{% block title %}{{ entry.title }} - World Wiki{% endblock %}
+{% block title %}{{ entry.title }} - World Codex{% endblock %}
 
-{% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-1">
-                <li class="breadcrumb-item"><a href="{% url 'world_list' %}" class="text-decoration-none">World Wiki</a>
-                </li>
-                <li class="breadcrumb-item"><a href="{% url 'world_list' %}?category={{ entry.category }}"
-                        class="text-decoration-none">{{ entry.get_category_display }}</a></li>
-                <li class="breadcrumb-item active">{{ entry.title }}</li>
-            </ol>
-        </nav>
-        <h1 class="fw-bold mb-0">{{ entry.title }}</h1>
-    </div>
-    <div class="btn-group shadow-sm">
-        <a href="{% url 'world_edit' entry.pk %}" class="btn btn-outline-secondary">
-            <i class="bi bi-pencil"></i> Edit
-        </a>
-        <a href="{% url 'world_delete' entry.pk %}" class="btn btn-outline-danger">
-            <i class="bi bi-trash"></i> Delete
-        </a>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-lg-8">
-        <div class="card shadow-sm border-0 rounded-4 mb-4">
-            {% if entry.image %}
-            <img src="{{ entry.image.url }}" class="card-img-top rounded-top-4" alt="{{ entry.title }}"
-                style="max-height: 350px; object-fit: cover;">
-            {% endif %}
-            <div class="card-body p-4 p-md-5">
-                <div class="world-content">
-                    {{ entry.content|linebreaks }}
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-4">
-        <div class="card shadow-sm border-0 rounded-4 mb-4">
-            <div class="card-header bg-light border-0 py-3">
-                <h6 class="mb-0 fw-bold"><i class="bi bi-info-circle me-2"></i>Details</h6>
-            </div>
-            <div class="card-body">
-                <div class="mb-3">
-                    <span class="small text-muted d-block">Category</span>
-                    <span class="badge bg-primary-subtle text-primary rounded-pill mt-1">{{ entry.get_category_display
-                        }}</span>
-                </div>
-                {% if entry.book %}
-                <div class="mb-3">
-                    <span class="small text-muted d-block">Linked Book</span>
-                    <a href="{% url 'book_detail' entry.book.pk %}" class="text-decoration-none fw-medium">
-                        {{ entry.book.title }}
-                    </a>
-                </div>
-                {% endif %}
-                <div class="mb-3">
-                    <span class="small text-muted d-block">Created</span>
-                    <span class="small">{{ entry.created_at|date:"M d, Y" }}</span>
-                </div>
-                <div>
-                    <span class="small text-muted d-block">Last Updated</span>
-                    <span class="small">{{ entry.updated_at|date:"M d, Y H:i" }}</span>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
+{% block extra_css %}
+<!-- Material Symbols & Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    "primary": "#136dec",
+                    "background-light": "#F5F3F0",
+                    "charcoal": "#2C3E50",
+                },
+                fontFamily: {
+                    "display": ['"DM Serif Display"', "serif"],
+                    "sans": ['"Inter"', "sans-serif"],
+                },
+            },
+        },
+    }
+</script>
 <style>
-    .world-content {
-        font-size: 1.1rem;
-        line-height: 1.8;
-        color: #2c3e50;
+    body {
+        font-family: "Inter", sans-serif;
     }
 
-    .breadcrumb-item a {
-        color: var(--accent);
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    .font-serif-display {
+        font-family: "DM Serif Display", serif;
+    }
+
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+
+    .material-symbols-outlined.fill {
+        font-variation-settings: 'FILL' 1;
+    }
+
+    .container-fluid {
+        padding: 0 !important;
+    }
+
+    .row {
+        margin: 0 !important;
+    }
+
+    aside a {
+        text-decoration: none !important;
+    }
+
+    .prose-world p {
+        margin-bottom: 1.5rem;
+        line-height: 1.8;
+        font-size: 1.125rem;
     }
 </style>
+{% endblock %}
+
+{% block full_layout %}
+<div class="bg-background-light text-charcoal min-h-screen flex overflow-hidden w-full">
+    <!-- Sidebar (Same as list page for consistency) -->
+    <aside class="w-64 bg-[#EBE9E6] border-r border-[#D8D4CE] flex flex-col justify-between shrink-0 h-screen z-20">
+        <div class="flex flex-col gap-6 p-6">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="bg-primary/10 flex items-center justify-center rounded-lg size-10 text-primary">
+                    <span class="material-symbols-outlined fill">menu_book</span>
+                </div>
+                <div class="flex flex-col">
+                    <h1 class="text-charcoal text-lg font-bold font-serif-display leading-tight">World Codex</h1>
+                    <p class="text-slate-500 text-xs font-medium">{{ user.username }}'s Story Bible</p>
+                </div>
+            </div>
+            <nav class="flex flex-col gap-2">
+                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-charcoal hover:bg-white/60 transition-colors group"
+                    href="{% url 'world_list' %}">
+                    <span class="material-symbols-outlined text-slate-500 group-hover:text-primary">folder_open</span>
+                    <span class="text-sm font-bold">All Archives</span>
+                </a>
+                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-charcoal hover:bg-white/60 transition-colors group {% if entry.category == 'location' %}bg-white shadow-sm ring-1 ring-black/5 text-primary{% endif %}"
+                    href="{% url 'world_list' %}?category=location">
+                    <span
+                        class="material-symbols-outlined {% if entry.category == 'location' %}fill{% endif %} text-slate-500 group-hover:text-primary">map</span>
+                    <span class="text-sm font-medium">Locations</span>
+                </a>
+                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-charcoal hover:bg-white/60 transition-colors group"
+                    href="{% url 'character_list' %}">
+                    <span class="material-symbols-outlined text-slate-500 group-hover:text-primary">person</span>
+                    <span class="text-sm font-medium">Characters</span>
+                </a>
+                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-charcoal hover:bg-white/60 transition-colors group {% if entry.category == 'item' %}bg-white shadow-sm ring-1 ring-black/5 text-primary{% endif %}"
+                    href="{% url 'world_list' %}?category=item">
+                    <span
+                        class="material-symbols-outlined {% if entry.category == 'item' %}fill{% endif %} text-slate-500 group-hover:text-primary">inventory_2</span>
+                    <span class="text-sm font-medium">Items</span>
+                </a>
+                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-charcoal hover:bg-white/60 transition-colors group {% if entry.category == 'lore' %}bg-white shadow-sm ring-1 ring-black/5 text-primary{% endif %}"
+                    href="{% url 'world_list' %}?category=lore">
+                    <span
+                        class="material-symbols-outlined {% if entry.category == 'lore' %}fill{% endif %} text-slate-500 group-hover:text-primary">history_edu</span>
+                    <span class="text-sm font-medium">Lore & History</span>
+                </a>
+                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-charcoal hover:bg-white/60 transition-colors group {% if entry.category == 'faction' %}bg-white shadow-sm ring-1 ring-black/5 text-primary{% endif %}"
+                    href="{% url 'world_list' %}?category=faction">
+                    <span
+                        class="material-symbols-outlined {% if entry.category == 'faction' %}fill{% endif %} text-slate-500 group-hover:text-primary">groups</span>
+                    <span class="text-sm font-medium">Factions</span>
+                </a>
+                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-charcoal hover:bg-white/60 transition-colors group"
+                    href="{% url 'dashboard' %}">
+                    <span class="material-symbols-outlined text-slate-500 group-hover:text-primary">arrow_back</span>
+                    <span class="text-sm font-medium">Back to Studio</span>
+                </a>
+            </nav>
+        </div>
+        <div class="p-6 border-t border-[#D8D4CE]">
+            <div class="flex items-center gap-3">
+                <div class="size-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
+                    {{ user.username|first|upper }}
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-sm font-bold text-charcoal">{{ user.username }}</span>
+                    <form action="{% url 'logout' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit"
+                            class="text-xs text-slate-500 hover:text-red-500 bg-transparent border-0 p-0">Logout</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Content Area -->
+    <main class="flex-1 overflow-y-auto bg-[#F5F3F0]">
+        <!-- Top Toolbar -->
+        <div
+            class="h-20 px-8 flex items-center justify-between border-b border-[#E0DCD6] bg-background-light/80 backdrop-blur-sm sticky top-0 z-10">
+            <div class="flex items-center gap-4">
+                <a href="{% url 'world_list' %}"
+                    class="size-10 rounded-full flex items-center justify-center text-slate-500 hover:bg-black/5 hover:text-charcoal transition-colors">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                </a>
+                <nav class="hidden md:flex items-center gap-2 text-sm text-slate-400 font-medium">
+                    <a href="{% url 'world_list' %}"
+                        class="hover:text-charcoal transition-colors no-underline">Codex</a>
+                    <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+                    <span class="text-slate-500">{{ entry.get_category_display }}</span>
+                </nav>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="{% url 'world_edit' entry.pk %}"
+                    class="flex items-center gap-2 px-4 py-2 rounded-lg border border-[#D8D4CE] bg-white text-sm font-bold text-charcoal hover:bg-slate-50 transition-all shadow-sm no-underline">
+                    <span class="material-symbols-outlined text-[18px]">edit</span>
+                    Edit Entry
+                </a>
+                <a href="{% url 'world_delete' entry.pk %}"
+                    class="size-10 rounded-lg border border-red-100 bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-100 transition-all"
+                    title="Delete Entry">
+                    <span class="material-symbols-outlined">delete</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="max-w-5xl mx-auto p-8 md:p-12">
+            <!-- Entry Header -->
+            <div class="mb-12">
+                <div class="flex items-center gap-3 mb-6">
+                    <span
+                        class="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider">{{
+                        entry.get_category_display }}</span>
+                    {% if entry.book %}
+                    <span
+                        class="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold uppercase tracking-wider">{{
+                        entry.book.title }}</span>
+                    {% endif %}
+                </div>
+                <h1 class="text-5xl md:text-6xl font-serif-display font-bold text-charcoal leading-[1.1] mb-8">{{
+                    entry.title }}</h1>
+
+                <div class="flex items-center gap-6 py-4 border-y border-[#E0DCD6]">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-slate-400 text-[20px]">calendar_today</span>
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-tight">Created {{
+                            entry.created_at|date:"d M Y" }}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-slate-400 text-[20px]">update</span>
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-tight">Updated {{
+                            entry.updated_at|timesince }} ago</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col lg:flex-row gap-12">
+                <!-- Main Content -->
+                <div class="flex-1">
+                    {% if entry.image %}
+                    <div class="mb-10 rounded-2xl overflow-hidden shadow-lg aspect-video">
+                        <img src="{{ entry.image.url }}" class="w-full h-full object-cover" alt="{{ entry.title }}">
+                    </div>
+                    {% endif %}
+
+                    <div class="prose-world font-sans text-charcoal">
+                        {{ entry.content|linebreaks }}
+                    </div>
+                </div>
+
+                <!-- Side Information -->
+                <aside class="w-full lg:w-72 shrink-0">
+                    <div class="sticky top-32 flex flex-col gap-6">
+                        <!-- AI Insights Card -->
+                        <div class="bg-charcoal text-white rounded-xl p-6 shadow-xl relative overflow-hidden group">
+                            <div class="relative z-10">
+                                <div class="flex items-center gap-2 mb-4 text-primary">
+                                    <span class="material-symbols-outlined fill text-[20px]">auto_awesome</span>
+                                    <span class="text-xs font-bold uppercase tracking-widest text-primary/80">AI
+                                        Insights</span>
+                                </div>
+                                <h4 class="text-lg font-serif-display mb-3">Ghostwriter Intel</h4>
+                                <p class="text-slate-300 text-xs leading-relaxed mb-4">Click to generate a deep-scan
+                                    analysis of how this <strong>{{ entry.title }}</strong> impacts your overall series
+                                    architecture.</p>
+                                <button
+                                    class="w-full py-2.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 text-xs font-bold transition-all">Generate
+                                    Analysis</button>
+                            </div>
+                            <!-- Decorative pattern -->
+                            <div
+                                class="absolute -bottom-6 -right-6 size-32 rounded-full bg-primary/20 blur-3xl group-hover:size-40 transition-all">
+                            </div>
+                        </div>
+
+                        <!-- Data Points -->
+                        <div class="bg-white rounded-xl border border-[#D8D4CE] p-6 shadow-sm">
+                            <h4
+                                class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-5 border-b border-slate-100 pb-3">
+                                Related Data</h4>
+                            <div class="flex flex-col gap-4">
+                                {% if entry.book %}
+                                <div>
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Source
+                                        Book</span>
+                                    <a href="{% url 'book_detail' entry.book.pk %}"
+                                        class="text-sm font-semibold text-primary hover:underline no-underline">{{
+                                        entry.book.title }}</a>
+                                </div>
+                                {% endif %}
+                                <div>
+                                    <span
+                                        class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Archivist</span>
+                                    <span class="text-sm font-semibold text-charcoal">{{ user.username }}</span>
+                                </div>
+                                <div>
+                                    <span
+                                        class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Visibility</span>
+                                    <span class="flex items-center gap-1.5 text-sm font-semibold text-green-600">
+                                        <span class="size-1.5 rounded-full bg-green-500"></span>
+                                        Universal
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </main>
+</div>
 {% endblock %}
