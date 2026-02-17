@@ -4,12 +4,24 @@ from PIL import Image
 def optimize_static_images():
     static_dir = r"c:\Users\denni\OneDrive\Documents\Vs projects\Story-timeline-builder\Story-timeline-builder-1\static\img"
     
+    # Define portrait size
+    PORTRAIT_SIZE = (800, 800)
+    
     images_to_process = [
         # (filename, target_size, target_format)
-        ('Elena.png', (128, 128), 'WEBP'),
-        ('logo.png', (None, 128), 'WEBP'), # Height 128, maintain aspect
-        ('hero_mockup.png', (1600, None), 'WEBP'), # Width 1600, maintain aspect
+        ('Elena.png', (400, 400), 'WEBP'),
+        ('logo.png', (None, 256), 'WEBP'), 
+        ('hero_mockup.png', (1600, None), 'WEBP'),
         ('relationship_map_figma.png', (1600, None), 'WEBP'),
+        # Character Portraits - many are 8MB+ PNGs
+        ('Agnes.png', PORTRAIT_SIZE, 'WEBP'),
+        ('Lucius-Temple.png', PORTRAIT_SIZE, 'WEBP'),
+        ('aunt-theodora.png', PORTRAIT_SIZE, 'WEBP'),
+        ('Elise-temple.png', PORTRAIT_SIZE, 'WEBP'),
+        ('Amy-temple.png', PORTRAIT_SIZE, 'WEBP'),
+        ('Mrs.Temple.png', PORTRAIT_SIZE, 'WEBP'),
+        ('Dora-new.png', PORTRAIT_SIZE, 'WEBP'),
+        ('Agnes_alt.png', PORTRAIT_SIZE, 'WEBP'),
     ]
 
     print("🚀 Optimizing static assets...")
@@ -35,13 +47,17 @@ def optimize_static_images():
                     elif target_h and not target_w:
                         target_w = int((target_h / h) * w)
                     
+                    # For portraits, we use thumbnail to maintain aspect but fit in the size
                     if target_w < w or target_h < h:
-                        img = img.resize((target_w, target_h), Image.Resampling.LANCZOS)
-                        print(f"  ✅ Resized {filename} to {target_w}x{target_h}")
+                        img.thumbnail((target_w, target_h), Image.Resampling.LANCZOS)
+                        print(f"  ✅ Resized {filename} to {img.width}x{img.height}")
 
-                # Convert to RGBA for WebP if it has transparency
-                if img.mode != 'RGBA':
+                # Convert to RGB (standard) or keep RGBA if needed
+                # WebP supports Alpha, so let's keep it if original has it
+                if img.mode in ('RGBA', 'P'):
                     img = img.convert('RGBA')
+                else:
+                    img = img.convert('RGB')
                 
                 img.save(output_path, format=fmt, quality=80, method=6)
                 original_size = os.path.getsize(input_path) / 1024
