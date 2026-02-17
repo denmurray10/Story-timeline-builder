@@ -51,6 +51,129 @@
                 },
             },
         };
+        // Hero Mockup Interactivity: Selection -> Toolbar -> Analytics -> Rewrite
+        document.addEventListener('DOMContentLoaded', function () {
+            const writingSurface = document.getElementById('mockup-writing-surface');
+            const ghostwriterPanel = document.getElementById('mockup-ghostwriter-panel');
+            const ghostwriterBars = document.getElementById('ghostwriter-bars');
+            const ghostwriterSuggestion = document.getElementById('ghostwriter-suggestion');
+            const insightCard = document.getElementById('codex-insight-card');
+            const insightTitle = document.getElementById('codex-insight-title');
+            const insightText = document.getElementById('codex-insight-text');
+            const askPopup = document.getElementById('ghostwriter-ask-popup');
+            const formatBubble = document.getElementById('format-bubble');
+            const acceptBtn = document.getElementById('btn-accept-rewrite');
+            const mockupContainer = formatBubble ? formatBubble.parentElement : null;
+
+            const flowGauge = document.getElementById('flow-gauge');
+            const flowLabel = document.getElementById('flow-label');
+            const tempoGauge = document.getElementById('tempo-gauge');
+            const tempoLabel = document.getElementById('tempo-label');
+            const castAdded = document.getElementById('cast-added');
+
+            let lastSelectionRange = null;
+
+            window.simulateTextSize = function (size) {
+                if (lastSelectionRange) {
+                    const span = document.createElement('span');
+                    span.style.fontSize = size === 'large' ? '1.25em' : '0.85em';
+                    span.classList.add('transition-all', 'duration-500');
+                    lastSelectionRange.surroundContents(span);
+                    formatBubble.classList.add('hidden');
+                }
+            };
+
+            if (writingSurface && mockupContainer) {
+                writingSurface.addEventListener('mouseup', function (e) {
+                    const selection = window.getSelection();
+                    const text = selection.toString().trim();
+
+                    if (text.length > 5) {
+                        lastSelectionRange = selection.getRangeAt(0).cloneRange();
+
+                        const rect = selection.getRangeAt(0).getBoundingClientRect();
+                        const parentRect = mockupContainer.getBoundingClientRect();
+
+                        // 1. Show Formatting Bubble (Relative to mockup container)
+                        formatBubble.style.left = `${rect.left - parentRect.left + (rect.width / 2) - 60}px`;
+                        formatBubble.style.top = `${rect.top - parentRect.top - 45}px`;
+                        formatBubble.classList.remove('hidden');
+
+                        // 2. Update Analytics
+                        if (flowGauge) {
+                            flowGauge.style.width = '42%';
+                            flowLabel.innerText = '42%';
+                            flowLabel.classList.add('text-red-500');
+                        }
+                        if (tempoGauge) {
+                            tempoGauge.style.width = '80%';
+                            tempoLabel.innerText = 'Fast';
+                            tempoLabel.classList.add('text-yellow-500');
+                        }
+
+                        // 3. Update The Guide
+                        if (insightCard) {
+                            insightCard.classList.add('ring-2', 'ring-blue-500/20', 'bg-blue-100/30');
+                            insightTitle.innerText = "Narrative Polish";
+                            insightText.innerText = "The pacing here is erratic. Consider smoothing the transition to highlight character interiority.";
+                        }
+
+                        // 4. Show the Ghostwriter Popup
+                        setTimeout(() => {
+                            askPopup.style.left = `${rect.left - parentRect.left + (rect.width / 2) - 80}px`;
+                            askPopup.style.top = `${rect.top - parentRect.top + rect.height + 10}px`;
+                            askPopup.classList.remove('hidden');
+                        }, 400);
+
+                        if (ghostwriterPanel) ghostwriterPanel.classList.add('ring-2', 'ring-blue-500/10');
+                    }
+                });
+            }
+
+            if (acceptBtn) {
+                acceptBtn.addEventListener('click', function () {
+                    if (lastSelectionRange) {
+                        const replacement = document.createElement('span');
+                        replacement.className = 'text-blue-600 dark:text-blue-400 font-medium animate-in fade-in duration-1000';
+                        replacement.innerText = "The wind whispered names Elena had spent years trying to bury.";
+
+                        lastSelectionRange.deleteContents();
+                        lastSelectionRange.insertNode(replacement);
+
+                        askPopup.classList.add('hidden');
+                        formatBubble.classList.add('hidden');
+
+                        if (flowGauge) {
+                            flowGauge.style.width = '92%';
+                            flowLabel.innerText = '92%';
+                            flowLabel.classList.remove('text-red-500');
+                            flowLabel.classList.add('text-green-600');
+                        }
+                        if (tempoGauge) {
+                            tempoGauge.style.width = '55%';
+                            tempoLabel.innerText = 'Ideal';
+                            tempoLabel.classList.remove('text-yellow-500');
+                        }
+                        if (castAdded) castAdded.classList.remove('opacity-0');
+
+                        if (ghostwriterPanel) {
+                            ghostwriterBars.classList.add('hidden');
+                            ghostwriterSuggestion.classList.remove('hidden');
+                            ghostwriterPanel.classList.add('bg-green-50/30', 'dark:bg-green-900/10', 'border-green-100/50', 'dark:border-green-800/30');
+                        }
+
+                        window.getSelection().removeAllRanges();
+                    }
+                });
+            }
+
+            document.addEventListener('mousedown', function (e) {
+                if (askPopup && !askPopup.contains(e.target) && !formatBubble.contains(e.target) && !writingSurface.contains(e.target)) {
+                    askPopup.classList.add('hidden');
+                    formatBubble.classList.add('hidden');
+                }
+            });
+        });
     </script>
     <style>
         .glass-panel {
@@ -156,6 +279,81 @@
             /* Firefox */
             overflow: -moz-scrollbars-none !important;
         }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes pulse-subtle {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.8;
+                transform: scale(1.05);
+            }
+        }
+
+        .animate-pulse-subtle {
+            animation: pulse-subtle 4s ease-in-out infinite;
+        }
+
+        /* Ghostwriter Rewrite Popup */
+        #ghostwriter-ask-popup {
+            filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.1));
+            z-index: 100;
+        }
+
+        .highlight-active {
+            background-color: rgba(59, 130, 246, 0.2);
+            border-bottom: 2px solid rgba(59, 130, 246, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .text-rewriting {
+            transition: opacity 0.5s ease;
+            opacity: 0;
+        }
+
+        /* Formatting Bubble */
+        #format-bubble {
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+            z-index: 110;
+        }
+
+        /* Analytics Gauges */
+        .gauge-bar {
+            height: 4px;
+            background: #e5e7eb;
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .dark .gauge-bar {
+            background: #374151;
+        }
+
+        .gauge-fill {
+            height: 100%;
+            transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
     </style>
 </head>
 
@@ -217,10 +415,267 @@
                 </a>
             </div>
             <div class="reveal slide-up delay-400 relative w-full max-w-7xl mx-auto">
-                <div class="relative rounded-xl md:rounded-3xl overflow-hidden transform scale-105 md:scale-110">
-                    <img src="{% static 'img/hero_mockup.webp' %}" alt="Story Timeline Builder Interface"
-                        class="w-full h-auto block">
+                <div
+                    class="relative rounded-xl md:rounded-3xl overflow-hidden transform scale-105 md:scale-110 bg-white dark:bg-surface-dark shadow-2xl border border-gray-200 dark:border-gray-800 aspect-[16/10] flex flex-col font-sans">
+                    <!-- Top Bar (Mac Style) -->
+                    <div
+                        class="h-8 bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-800 flex items-center px-4 gap-1.5 shrink-0">
+                        <div class="w-2.5 h-2.5 rounded-full bg-red-400/50"></div>
+                        <div class="w-2.5 h-2.5 rounded-full bg-yellow-400/50"></div>
+                        <div class="w-2.5 h-2.5 rounded-full bg-green-400/50"></div>
+                        <div class="mx-auto text-[10px] text-gray-400 font-medium tracking-wide">STORY TIMELINE BUILDER
+                            — WRITING MODE</div>
+                    </div>
+
+                    <div class="flex flex-1 overflow-hidden">
+                        <!-- Left Nav -->
+                        <div
+                            class="w-12 bg-gray-50 dark:bg-gray-900/50 border-r border-gray-200 dark:border-gray-800 flex flex-col items-center py-6 gap-6 shrink-0 lg:w-16">
+                            <span class="material-icons-outlined text-gray-400 text-lg">auto_stories</span>
+                            <span class="material-icons-outlined text-blue-500 text-lg">edit_note</span>
+                            <span class="material-icons-outlined text-gray-400 text-lg">account_tree</span>
+                            <span class="material-icons-outlined text-gray-400 text-lg">collections_bookmark</span>
+                            <div class="mt-auto">
+                                <span class="material-icons-outlined text-gray-300 text-lg">settings</span>
+                            </div>
+                        </div>
+
+                        <!-- Main Editor -->
+                        <div class="flex-1 flex flex-col bg-[#F9F8F6] dark:bg-[#1A1A1A] overflow-hidden relative">
+                            <!-- Editor Header -->
+                            <div
+                                class="h-12 flex items-center justify-between px-8 border-b border-gray-200/50 dark:border-gray-800 shrink-0">
+                                <div class="text-[11px] font-bold text-gray-400 tracking-widest uppercase">Chapter 14:
+                                    The Cathedral of Dust</div>
+                                <div class="flex gap-4">
+                                    <div class="h-2 w-16 bg-gray-200 dark:bg-gray-800 rounded-full"></div>
+                                    <div class="h-2 w-12 bg-gray-200 dark:bg-gray-800 rounded-full"></div>
+                                </div>
+                            </div>
+
+                            <!-- Writing Pad -->
+                            <div id="mockup-writing-surface"
+                                class="flex-1 overflow-y-auto p-12 md:p-20 lg:p-24 custom-scrollbar selection:bg-blue-200/50 dark:selection:bg-blue-500/30">
+                                <div class="max-w-xl mx-auto">
+                                    <h1
+                                        class="text-3xl md:text-4xl font-serif text-primary dark:text-white mb-8 font-bold leading-tight">
+                                        Beyond the Ash Gates</h1>
+                                    <div
+                                        class="space-y-6 text-gray-700 dark:text-gray-300 leading-relaxed text-sm md:text-base selection:bg-blue-100 dark:selection:bg-blue-900/30">
+                                        <p>The wind didn't just howl across the plains; it whispered names ELENA had
+                                            forgotten. She adjusted her grip on the relic, feeling the hum of the cold
+                                            stone against her palm. Ahead, the spires of the cathedral tore at the grey
+                                            sky like the teeth of a dying giant.</p>
+                                        <p>“We shouldn't be here,” <span
+                                                class="text-blue-500 border-b border-blue-200 dark:border-blue-800/50 cursor-help transition-colors hover:bg-blue-50 dark:hover:bg-blue-900/10 px-0.5 animate-pulse-subtle">Leo</span>
+                                            muttered, his voice barely audible over the crunch of frost underfoot. He
+                                            didn't look back to see if she was following. He never did.</p>
+                                        <p>Elena stopped. The cathedral wasn't just old; it was <span
+                                                class="bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200 px-1 rounded animate-pulse-subtle">waiting</span>.
+                                            She could feel the narrative threads coiling around her ankles, puller her
+                                            toward the massive obsidian doors. This was where the silence lived.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Floating Character Overlay (Desktop) -->
+                            <div id="agnes-panel"
+                                class="absolute right-6 top-20 w-64 hidden xl:block animate-float group/agnes">
+                                <div
+                                    class="bg-white/90 dark:bg-surface-dark/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 p-5 overflow-hidden relative">
+                                    <!-- Close/Accept Button -->
+                                    <button onclick="document.getElementById('agnes-panel').style.display='none'"
+                                        class="absolute top-3 right-3 p-1 rounded-full text-gray-300 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all opacity-0 group-hover/agnes:opacity-100">
+                                        <span class="material-icons-outlined text-[16px]">close</span>
+                                    </button>
+                                    <div class="flex items-center gap-3 mb-4">
+                                        <div class="w-10 h-10 rounded-xl bg-accent overflow-hidden shadow-sm">
+                                            <img src="{% static 'img/Agnes.webp' %}" class="w-full h-full object-cover">
+                                        </div>
+                                        <div>
+                                            <div class="text-xs font-bold text-primary dark:text-white">Agnes Temple
+                                            </div>
+                                            <div class="text-[10px] text-blue-500 font-medium tracking-wide uppercase">
+                                                Mentor</div>
+                                        </div>
+                                    </div>
+                                    <div class="space-y-3">
+                                        <div
+                                            class="h-1.5 w-full bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                                            <div class="h-full bg-blue-500 w-[85%]"></div>
+                                        </div>
+                                        <p class="text-[11px] text-gray-500 dark:text-gray-400 italic leading-snug">
+                                            "Power isn't found in the light, Elena. It's forged in the spaces between
+                                            heartbeats."</p>
+                                        <div class="flex gap-2 pt-2">
+                                            <div
+                                                class="h-5 px-2 bg-gray-50 dark:bg-gray-800 rounded-md border border-gray-200/50 dark:border-gray-700 flex items-center text-[10px] text-gray-400 italic">
+                                                Analytical</div>
+                                            <div
+                                                class="h-5 px-2 bg-gray-50 dark:bg-gray-800 rounded-md border border-gray-200/50 dark:border-gray-700 flex items-center text-[10px] text-gray-400 italic">
+                                                Stoic</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right AI Sidebar -->
+                        <div
+                            class="w-64 bg-white dark:bg-surface-dark border-l border-gray-200 dark:border-gray-800 hidden lg:flex flex-col p-6 shrink-0">
+                            <div class="flex items-center gap-2 mb-8">
+                                <span class="material-icons-outlined text-blue-500 text-lg">psychology</span>
+                                <span
+                                    class="text-xs font-bold tracking-widest text-primary dark:text-white uppercase">Codex
+                                    Insight</span>
+                            </div>
+
+                            <div class="space-y-6">
+                                <div id="codex-insight-card"
+                                    class="p-4 rounded-xl bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100/50 dark:border-blue-900/20 relative overflow-hidden group transition-all duration-500">
+                                    <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
+                                    <div id="codex-insight-title"
+                                        class="text-[10px] font-bold text-blue-600 dark:text-blue-400 mb-1 tracking-wider uppercase">
+                                        Structure Analysis</div>
+                                    <div id="codex-insight-text"
+                                        class="text-xs text-gray-700 dark:text-gray-300 font-medium leading-relaxed">
+                                        Pacing is slowing in this scene. Consider introducing a conflict anchor.</div>
+                                </div>
+
+                                <div id="mockup-ghostwriter-panel"
+                                    class="hover:bg-gray-50 dark:hover:bg-gray-900/50 p-3 rounded-xl transition-all duration-500 cursor-pointer border border-transparent hover:border-gray-100 dark:hover:border-gray-800">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span
+                                            class="material-icons-outlined text-[14px] text-gray-400">auto_awesome</span>
+                                        <span
+                                            class="text-[10px] font-bold text-gray-400 tracking-wider">GHOSTWRITER</span>
+                                    </div>
+                                    <div id="ghostwriter-bars">
+                                        <div class="h-2 w-full bg-gray-100 dark:bg-gray-800 rounded-full mb-1"></div>
+                                        <div class="h-2 w-[70%] bg-gray-100 dark:bg-gray-800 rounded-full"></div>
+                                    </div>
+                                    <div id="ghostwriter-suggestion"
+                                        class="hidden animate-in fade-in slide-in-from-bottom-2 duration-700">
+                                        <div
+                                            class="text-[11px] text-gray-700 dark:text-gray-300 font-medium leading-[1.4] italic">
+                                            "Consider intensifying the atmospheric detail of the 'ash gates' to heighten
+                                            the existential stakes of Elena's arrival."</div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800">
+                                    <div class="text-[10px] font-bold text-gray-400 tracking-wider mb-4 uppercase">
+                                        Scene Analytics</div>
+                                    <div class="space-y-4">
+                                        <!-- Tempo -->
+                                        <div>
+                                            <div class="flex justify-between items-center mb-1.5">
+                                                <span
+                                                    class="text-[10px] text-gray-500 uppercase font-medium">Tempo</span>
+                                                <span id="tempo-label"
+                                                    class="text-[10px] text-primary dark:text-white font-bold">Stable</span>
+                                            </div>
+                                            <div class="gauge-bar">
+                                                <div id="tempo-gauge" class="gauge-fill bg-blue-400"
+                                                    style="width: 45%;"></div>
+                                            </div>
+                                        </div>
+                                        <!-- Flow -->
+                                        <div>
+                                            <div class="flex justify-between items-center mb-1.5">
+                                                <span class="text-[10px] text-gray-500 uppercase font-medium">Flow
+                                                    Rating</span>
+                                                <span id="flow-label"
+                                                    class="text-[10px] text-blue-500 font-bold">64%</span>
+                                            </div>
+                                            <div class="gauge-bar">
+                                                <div id="flow-gauge" class="gauge-fill bg-blue-500" style="width: 64%;">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Cast -->
+                                        <div class="pt-2">
+                                            <div class="text-[10px] text-gray-500 uppercase font-medium mb-2">In Scene
+                                            </div>
+                                            <div class="flex -space-x-2">
+                                                <div
+                                                    class="w-6 h-6 rounded-full border-2 border-white dark:border-surface-dark bg-accent overflow-hidden">
+                                                    <img src="{% static 'img/Elena.webp' %}"
+                                                        class="w-full h-full object-cover">
+                                                </div>
+                                                <div
+                                                    class="w-6 h-6 rounded-full border-2 border-white dark:border-surface-dark bg-gray-200 overflow-hidden flex items-center justify-center">
+                                                    <span
+                                                        class="material-icons-outlined text-[10px] text-gray-500">person</span>
+                                                </div>
+                                                <div id="cast-added"
+                                                    class="opacity-0 transition-opacity duration-1000 w-6 h-6 rounded-full border-2 border-white dark:border-surface-dark bg-accent overflow-hidden">
+                                                    <img src="{% static 'img/Agnes.webp' %}"
+                                                        class="w-full h-full object-cover">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800">
+                                    <div class="text-[10px] font-bold text-gray-400 tracking-wider mb-4 uppercase">
+                                        Timeline Anchors</div>
+                                    <div class="flex items-center gap-3">
+                                        <div
+                                            class="w-6 h-6 rounded bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                                            <span
+                                                class="material-icons-outlined text-purple-500 text-[14px]">event</span>
+                                        </div>
+                                        <div class="text-[11px] text-gray-600 dark:text-gray-400">Arrival at Ash Gates
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
+                <!-- Formatting Bubble (Simulated) -->
+                <div id="format-bubble" class="hidden absolute pointer-events-auto">
+                    <div
+                        class="bg-primary dark:bg-white text-white dark:text-primary px-3 py-1.5 rounded-lg shadow-xl flex items-center gap-4 animate-in zoom-in-95 duration-200">
+                        <button class="hover:text-blue-400 transition-colors"><span
+                                class="material-icons-outlined text-sm">format_bold</span></button>
+                        <button class="hover:text-blue-400 transition-colors"><span
+                                class="material-icons-outlined text-sm">format_italic</span></button>
+                        <div class="h-4 w-[1px] bg-white/20 dark:bg-primary/20"></div>
+                        <div class="flex items-center gap-2">
+                            <button
+                                class="text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded hover:bg-white/10"
+                                onclick="simulateTextSize('small')">A</button>
+                            <button
+                                class="text-[12px] font-bold w-5 h-5 flex items-center justify-center rounded border border-white/20"
+                                onclick="simulateTextSize('large')">A</button>
+                        </div>
+                        <div class="h-4 w-[1px] bg-white/20 dark:bg-primary/20"></div>
+                        <button class="hover:text-blue-400 transition-colors"><span
+                                class="material-icons-outlined text-sm">link</span></button>
+                    </div>
+                    <div class="w-2 h-2 bg-primary dark:bg-white rotate-45 mx-auto -mt-1 shadow-sm"></div>
+                </div>
+
+                <!-- Ghostwriter Rewrite Popup (Simulated) -->
+                <div id="ghostwriter-ask-popup" class="hidden absolute pointer-events-auto">
+                    <div
+                        class="bg-primary dark:bg-white text-white dark:text-primary px-4 py-2 rounded-xl shadow-2xl flex items-center gap-3 whitespace-nowrap animate-in zoom-in-95 duration-200">
+                        <span class="material-icons-outlined text-sm">auto_awesome</span>
+                        <span class="text-[11px] font-bold tracking-wide">Rewrite this for me?</span>
+                        <div class="h-4 w-[1px] bg-white/20 dark:bg-primary/20"></div>
+                        <button id="btn-accept-rewrite"
+                            class="text-[11px] font-bold hover:text-blue-400 dark:hover:text-blue-600 transition-colors">Yes</button>
+                        <button onclick="document.getElementById('ghostwriter-ask-popup').classList.add('hidden')"
+                            class="text-[11px] font-bold opacity-50 hover:opacity-100 transition-opacity">No</button>
+                    </div>
+                    <!-- Bubble Arrow -->
+                    <div class="w-2 h-2 bg-primary dark:bg-white rotate-45 mx-auto -mt-1 shadow-sm"></div>
+                </div>
+
                 <div
                     class="absolute -top-10 -left-10 w-40 h-40 bg-yellow-200/50 dark:bg-yellow-600/20 rounded-full blur-3xl -z-10">
                 </div>
