@@ -638,8 +638,7 @@
                         <div
                             class="flex-1 flex flex-col bg-background-light dark:bg-background-dark overflow-hidden relative">
                             <!-- Responsive Multi-Stage Writing Pill (Centered relative to text) -->
-                            <div
-                                class="absolute inset-x-0 top-12 flex justify-center pointer-events-none z-50 lg:pr-64">
+                            <div class="absolute inset-x-0 top-[70px] flex justify-center pointer-events-none z-50">
                                 <div id="writing-pill"
                                     class="pointer-events-auto h-11 flex items-center gap-4 px-6 bg-white dark:bg-surface-dark rounded-full shadow-2xl border border-gray-100 dark:border-white/5 whitespace-nowrap transition-all duration-300">
 
@@ -650,9 +649,14 @@
                                             <div
                                                 class="flex items-center gap-1 cursor-pointer hover:text-blue-500 transition-colors">
                                                 <span
-                                                    class="text-[11px] font-bold text-gray-700 dark:text-gray-300">Lora</span>
+                                                    class="text-[11px] font-bold text-gray-700 dark:text-gray-300">OpenDyslexic</span>
                                                 <span
                                                     class="material-icons-outlined text-[14px] text-gray-400">expand_more</span>
+                                            </div>
+                                            <div
+                                                class="flex items-center gap-1 cursor-pointer hover:text-blue-500 transition-colors">
+                                                <span
+                                                    class="material-icons-outlined text-[16px] text-gray-500">format_line_spacing</span>
                                             </div>
                                             <div
                                                 class="flex items-center gap-1 cursor-pointer hover:text-blue-500 transition-colors border-l border-gray-100 dark:border-gray-800 pl-3">
@@ -677,6 +681,10 @@
                                                 class="material-icons-outlined text-[18px] text-gray-500 hover:text-blue-500 cursor-pointer">format_bold</span>
                                             <span
                                                 class="material-icons-outlined text-[18px] text-gray-500 hover:text-blue-500 cursor-pointer">format_italic</span>
+                                            <span
+                                                class="material-icons-outlined text-[18px] text-gray-400 hover:text-blue-500 cursor-pointer">format_list_bulleted</span>
+                                            <span
+                                                class="material-icons-outlined text-[18px] text-gray-400 hover:text-blue-500 cursor-pointer">format_quote</span>
                                         </div>
                                         <!-- Narrative Engine Entry -->
                                         <button onclick="switchPillState('ai-main')"
@@ -787,7 +795,7 @@
 
                             <!-- Writing Pad -->
                             <div id="mockup-writing-surface"
-                                class="flex-1 overflow-y-auto pt-36 pb-24 px-12 md:px-20 lg:px-24 custom-scrollbar selection:bg-blue-200/50 dark:selection:bg-blue-500/30">
+                                class="flex-1 overflow-y-auto pt-[104px] pb-24 px-12 md:px-20 lg:px-24 custom-scrollbar selection:bg-blue-200/50 dark:selection:bg-blue-500/30">
                                 <div class="max-w-xl mx-auto relative">
                                     <h1
                                         class="text-3xl md:text-custom font-serif text-primary dark:text-white mb-10 font-bold leading-tight">
@@ -914,150 +922,62 @@
 
 
 
-                        <!-- Right AI Sidebar -->
+                        <!-- Right Nav (AI & Intelligence Bar) -->
                         <div id="hero-right-sidebar"
-                            class="w-64 bg-white dark:bg-surface-dark border-l border-gray-200 dark:border-white/5 hidden lg:flex flex-col p-6 shrink-0 transition-all duration-500 z-40">
-                            <div class="flex items-center gap-2 mb-8">
-                                <span class="material-icons-outlined text-green-600 text-lg">insights</span>
+                            class="w-12 bg-gray-50 dark:bg-black border-l border-gray-200 dark:border-white/5 flex flex-col items-center py-6 gap-8 shrink-0 lg:w-16 transition-all duration-500 z-40">
+                            <!-- Tactical AI -->
+                            <div class="group relative cursor-pointer" title="AI Assistant">
+                                <span class="material-icons-outlined text-green-500 text-lg">history_edu</span>
+                                <div
+                                    class="absolute right-full mr-2 px-2 py-1 bg-gray-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap">
+                                    AI Assistant</div>
+                            </div>
+                            <!-- Editorial Insights -->
+                            <div class="group relative cursor-pointer" title="Insights">
                                 <span
-                                    class="text-xs font-bold tracking-widest text-primary dark:text-white uppercase">Editorial
-                                    Insights</span>
+                                    class="material-icons-outlined text-gray-400 group-hover:text-blue-500 transition-colors text-lg">insights</span>
+                                <div
+                                    class="absolute right-full mr-2 px-2 py-1 bg-gray-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap">
+                                    Editorial Insights</div>
                             </div>
-
-                            <div class="space-y-6">
-                                <!-- AI Insight Card -->
-                                <div id="codex-insight-card"
-                                    class="p-4 rounded-xl bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100/50 dark:border-blue-900/20 relative overflow-hidden group transition-all duration-300">
-                                    <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
-                                    <div id="codex-insight-title"
-                                        class="text-[10px] font-bold text-blue-600 dark:text-blue-400 mb-1 tracking-wider uppercase">
-                                        Narrative Pulse</div>
-                                    <div id="codex-insight-text"
-                                        class="text-xs text-gray-700 dark:text-gray-300 font-medium leading-relaxed">
-                                        Pacing is **High**. Tension peaked at line 42. Consider a sensory decompression
-                                        beat here.
-                                    </div>
-                                    <!-- Mini Graph Mockup -->
-                                    <div class="mt-3 h-8 flex items-end gap-1">
-                                        <div class="flex-1 bg-blue-200 h-[20%] rounded-t-sm opacity-50"></div>
-                                        <div class="flex-1 bg-blue-200 h-[40%] rounded-t-sm opacity-50"></div>
-                                        <div class="flex-1 bg-blue-200 h-[30%] rounded-t-sm opacity-50"></div>
-                                        <div class="flex-1 bg-blue-500 h-[90%] rounded-t-sm"></div>
-                                        <div class="flex-1 bg-blue-200 h-[50%] rounded-t-sm opacity-50"></div>
-                                        <div class="flex-1 bg-blue-200 h-[40%] rounded-t-sm opacity-50"></div>
-                                    </div>
-                                </div>
-
-                                <!-- Character Heatmap -->
-                                <div class="px-1">
-                                    <div class="text-[10px] font-bold text-gray-400 mb-3 tracking-widest uppercase">
-                                        Scene Appearances</div>
-                                    <div class="flex gap-2">
-                                        <div
-                                            class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 border-2 border-blue-500 flex items-center justify-center text-[10px] font-bold text-blue-500">
-                                            ET</div>
-                                        <div
-                                            class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 border-2 border-transparent flex items-center justify-center text-[10px] font-bold text-gray-400">
-                                            LH</div>
-                                        <div
-                                            class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 border-2 border-accent flex items-center justify-center">
-                                            <span class="material-icons-outlined text-xs text-accent">add</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Passive/Active Check -->
-                                <div class="p-4 rounded-xl border border-gray-100 dark:border-gray-800">
-                                    <div class="flex justify-between items-center mb-2">
-                                        <span class="text-[10px] font-bold text-gray-400 uppercase">Prose Density</span>
-                                        <span class="text-[10px] font-bold text-green-500">92%</span>
-                                    </div>
-                                    <div class="h-1 w-full bg-gray-50 dark:bg-gray-800 rounded-full overflow-hidden">
-                                        <div class="h-full bg-green-500 w-[92%]"></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div id="mockup-ghostwriter-panel"
-                                class="hover:bg-gray-50 dark:hover:bg-gray-900/50 p-3 rounded-xl transition-all duration-500 cursor-pointer border border-transparent hover:border-gray-100 dark:hover:border-gray-800">
-                                <div class="flex items-center gap-2 mb-2">
-                                    <span class="material-icons-outlined text-[14px] text-green-600">history_edu</span>
-                                    <span class="text-[10px] font-bold text-green-600 tracking-wider">PENN</span>
-                                </div>
-                                <div id="ghostwriter-bars">
-                                    <div class="h-2 w-full bg-gray-100 dark:bg-gray-800 rounded-full mb-1"></div>
-                                    <div class="h-2 w-[70%] bg-gray-100 dark:bg-gray-800 rounded-full"></div>
-                                </div>
-                                <div id="ghostwriter-suggestion"
-                                    class="hidden animate-in fade-in slide-in-from-bottom-2 duration-700">
-                                    <div
-                                        class="text-[11px] text-gray-700 dark:text-gray-300 font-medium leading-[1.4] italic">
-                                        "Elena's fingers brushed the glyph, and for a heartbeat, the cathedral
-                                        breathed back, its stone lungs filled with the dust of forgotten gods."
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800">
-                                <div class="text-[10px] font-bold text-gray-400 tracking-wider mb-4 uppercase">
+                            <!-- Scene Analytics -->
+                            <div class="group relative cursor-pointer" title="Analytics">
+                                <span
+                                    class="material-icons-outlined text-gray-400 group-hover:text-blue-500 transition-colors text-lg">equalizer</span>
+                                <div
+                                    class="absolute right-full mr-2 px-2 py-1 bg-gray-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap">
                                     Scene Analytics</div>
-                                <div class="space-y-4">
-                                    <!-- Tempo -->
-                                    <div>
-                                        <div class="flex justify-between items-center mb-1.5">
-                                            <span class="text-[10px] text-gray-500 uppercase font-medium">Tempo</span>
-                                            <span id="tempo-label"
-                                                class="text-[10px] text-primary dark:text-white font-bold">Stable</span>
-                                        </div>
-                                        <div class="gauge-bar">
-                                            <div id="tempo-gauge" class="gauge-fill bg-blue-400" style="width: 45%;">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- Flow -->
-                                    <div>
-                                        <div class="flex justify-between items-center mb-1.5">
-                                            <span class="text-[10px] text-gray-500 uppercase font-medium">Flow
-                                                Rating</span>
-                                            <span id="flow-label" class="text-[10px] text-blue-500 font-bold">64%</span>
-                                        </div>
-                                        <div class="gauge-bar">
-                                            <div id="flow-gauge" class="gauge-fill bg-blue-500" style="width: 64%;">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- Cast -->
-                                    <div class="pt-2">
-                                        <div class="text-[10px] text-gray-500 uppercase font-medium mb-2">In Scene
-                                        </div>
-                                        <div class="flex -space-x-2">
-                                            <div
-                                                class="w-6 h-6 rounded-full border-2 border-white dark:border-surface-dark bg-accent overflow-hidden">
-                                                <img src="{% static 'img/Elena.webp' %}"
-                                                    class="w-full h-full object-cover">
-                                            </div>
-                                            <div
-                                                class="w-6 h-6 rounded-full border-2 border-white dark:border-surface-dark bg-gray-200 overflow-hidden flex items-center justify-center">
-                                                <span
-                                                    class="material-icons-outlined text-[10px] text-gray-500">person</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                            </div>
+                            <!-- Sticky Notes -->
+                            <div class="group relative cursor-pointer" title="Comments">
+                                <span
+                                    class="material-icons-outlined text-gray-400 group-hover:text-blue-500 transition-colors text-lg">comment</span>
+                                <div
+                                    class="absolute right-full mr-2 px-2 py-1 bg-gray-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap">
+                                    Sticky Notes</div>
+                            </div>
+                            <!-- Timeline Anchors -->
+                            <div class="group relative cursor-pointer" title="Timeline Anchors">
+                                <span
+                                    class="material-icons-outlined text-gray-400 group-hover:text-blue-500 transition-colors text-lg">anchor</span>
+                                <div
+                                    class="absolute right-full mr-2 px-2 py-1 bg-gray-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap">
+                                    Timeline Anchors</div>
                             </div>
 
-                            <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800">
-                                <div class="text-[10px] font-bold text-gray-400 tracking-wider mb-4 uppercase">Timeline
-                                    Anchors</div>
-                                <div class="flex items-center gap-3">
+                            <div class="mt-auto flex flex-col items-center gap-6">
+                                <div class="group relative cursor-pointer" title="Focus Mode">
+                                    <span
+                                        class="material-icons-outlined text-gray-400 group-hover:text-blue-500 transition-colors text-lg">fullscreen</span>
                                     <div
-                                        class="w-6 h-6 rounded bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                                        <span class="material-icons-outlined text-purple-500 text-[14px]">event</span>
-                                    </div>
-                                    <div class="text-[11px] text-gray-600 dark:text-gray-400">Arrival at Ash Gates</div>
+                                        class="absolute right-full mr-2 px-2 py-1 bg-gray-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap">
+                                        Toggle Full-screen</div>
                                 </div>
+                                <span
+                                    class="material-icons-outlined text-gray-300 text-lg cursor-pointer hover:text-gray-500 transition-colors">help_outline</span>
                             </div>
-                        </div> <!-- End Sidebar -->
+                        </div>
+                        <!-- End Sidebar -->
                     </div> <!-- End Wrapper -->
                     <!-- Footer Bar -->
                     <div
@@ -2901,9 +2821,26 @@
                         Immersion</h2>
                     <p class="text-gray-600 dark:text-gray-400 text-lg mb-8 leading-[1.4rem]">
                         The Minimalist Writing Pad eliminates cognitive load by removing superfluous interface elements.
-                        When narrative continuity requires verification, a contextual drawer provides immediate access
-                        to your Codex indices without breaking your flow state.
+                        Toggle <strong>Zen Mode</strong> for a full-screen focus with customizable typography—including
+                        <strong>dyslexia-friendly fonts</strong> and precise <strong>spacing controls</strong>.
                     </p>
+                    <div class="space-y-4 mb-8">
+                        <div class="flex items-center gap-3">
+                            <span class="material-icons-outlined text-blue-500 text-sm">check_circle</span>
+                            <span class="text-sm text-gray-600 dark:text-gray-400"><strong>Rich Text:</strong>
+                                formatting tools for bold, italic, headings, quotes, and lists.</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="material-icons-outlined text-blue-500 text-sm">check_circle</span>
+                            <span class="text-sm text-gray-600 dark:text-gray-400"><strong>Split Panels:</strong> Pin
+                                Manuscript and Chat side-by-side for seamless multi-view workflows.</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="material-icons-outlined text-blue-500 text-sm">check_circle</span>
+                            <span class="text-sm text-gray-600 dark:text-gray-400"><strong>Highlighter:</strong> Track
+                                notes and plot holes with integrated timeline navigation.</span>
+                        </div>
+                    </div>
                     <div class="flex gap-4">
                         <button id="zen-mode-btn"
                             class="bg-primary text-white dark:bg-white dark:text-primary px-6 py-2 rounded-lg text-sm font-medium">Zen
@@ -2929,36 +2866,17 @@
                                     London into rivers of shadow. Holmes stood by the window, his silhouette cut sharply
                                     against the gaslight outside.</p>
                                 <p class="mb-4">"You see, Watson," he murmured, without turning around. "The absence of
-                                    evidence is not the evidence of absence."</p>
+                                    evidence is not the evidence of <span
+                                        class="bg-red-100 dark:bg-red-900/30 border-b border-red-500 text-red-700 dark:text-red-400 px-0.5"
+                                        title="Plot Hole: Watson mentioned evidence in Ch 2">absence</span>."</p>
                             </div>
                             <div id="mockup-sidebar"
-                                class="w-1/3 bg-orange-50/50 dark:bg-orange-900/10 border-l border-orange-100 dark:border-orange-900/30 p-3 hidden sm:block transition-all duration-500">
-                                <div
-                                    class="bg-white dark:bg-surface-dark rounded border border-orange-100 dark:border-orange-900/30 p-2 mb-2 shadow-sm">
-                                    <div class="flex items-center gap-1 mb-1">
-                                        <span class="w-2 h-2 bg-orange-400 rounded-full"></span>
-                                        <h5 class="text-[10px] font-bold uppercase text-gray-500 dark:text-gray-400">
-                                            Tone Suggestion</h5>
-                                    </div>
-                                    <p class="text-[10px] text-gray-600 dark:text-gray-400 leading-tight">Consider
-                                        increasing the pacing here. The dialogue is snappy, but the descriptive beats
-                                        are slowing down the tension.</p>
-                                </div>
-                                <div
-                                    class="bg-white dark:bg-surface-dark rounded border border-gray-100 dark:border-gray-700 p-2 shadow-sm">
-                                    <div class="flex items-center gap-1 mb-1">
-                                        <span class="material-icons-outlined text-[12px] text-blue-500">person</span>
-                                        <h5 class="text-[10px] font-bold text-gray-700 dark:text-gray-300">Sherlock
-                                            Holmes</h5>
-                                    </div>
-                                    <div class="bg-gray-50 dark:bg-gray-800 rounded px-1.5 py-1 mb-1">
-                                        <span class="text-[9px] text-gray-500 dark:text-gray-400 block">Status:
-                                            Agitated</span>
-                                    </div>
-                                    <div class="bg-gray-50 dark:bg-gray-800 rounded px-1.5 py-1">
-                                        <span class="text-[9px] text-gray-500 dark:text-gray-400 block">Loc: 221B Baker
-                                            St</span>
-                                    </div>
+                                class="w-10 bg-orange-50/50 dark:bg-black/40 border-l border-orange-100 dark:border-white/5 flex flex-col items-center py-4 gap-6 shrink-0 transition-all duration-500">
+                                <span class="material-icons-outlined text-[16px] text-orange-400">psychology</span>
+                                <span class="material-icons-outlined text-[16px] text-gray-400">person</span>
+                                <span class="material-icons-outlined text-[16px] text-gray-400">push_pin</span>
+                                <div class="mt-auto mb-2">
+                                    <span class="material-icons-outlined text-[16px] text-gray-300">help_outline</span>
                                 </div>
                             </div>
                         </div>
