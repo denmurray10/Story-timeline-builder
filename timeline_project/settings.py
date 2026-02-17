@@ -141,6 +141,9 @@ STATICFILES_DIRS = [
 # Simplified static file serving for Heroku
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+# Add cache headers to static files (1 year)
+WHITENOISE_MAX_AGE = 31536000
+
 
 # Media files (User uploads)
 
