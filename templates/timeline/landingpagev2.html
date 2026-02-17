@@ -292,12 +292,61 @@
         }
 
         /* Hide secondary floating elements in Zen */
-        .hero-zen-active #agnes-panel,
         .hero-zen-active #format-bubble,
-        .hero-zen-active #ghostwriter-ask-popup {
+        .hero-zen-active #ghostwriter-ask-popup,
+        .hero-zen-active #grammar-popup {
             opacity: 0 !important;
             pointer-events: none !important;
             transition: all 0.3s ease;
+        }
+
+        /* Grammarly-style Highlights */
+        .grammar-error {
+            text-decoration: underline wavy #ff4d4d;
+            text-decoration-thickness: 1.5px;
+            text-underline-offset: 4px;
+            cursor: pointer;
+        }
+
+        .spelling-error {
+            text-decoration: underline wavy #ff4d4d;
+            text-decoration-thickness: 1.5px;
+            text-underline-offset: 4px;
+            cursor: pointer;
+        }
+
+        .style-suggestion {
+            background-color: rgba(147, 51, 234, 0.1);
+            border-bottom: 2px solid rgba(147, 51, 234, 0.3);
+            cursor: pointer;
+        }
+
+        /* Walkthrough sequential logic */
+        .walkthrough-inactive {
+            text-decoration: none !important;
+            background-color: transparent !important;
+            border-bottom: none !important;
+            cursor: default !important;
+            pointer-events: none !important;
+        }
+
+        .spelling-error {
+            text-decoration: underline wavy #fac120;
+            text-decoration-thickness: 1.5px;
+            text-underline-offset: 4px;
+            cursor: pointer;
+        }
+
+        /* Style Suggestions */
+        .style-suggestion {
+            background-color: rgba(139, 92, 246, 0.08);
+            /* Soft purple */
+            border-bottom: 1.5px dashed #8b5cf6;
+            cursor: help;
+        }
+
+        .dark .style-suggestion {
+            background-color: rgba(139, 92, 246, 0.15);
         }
 
         /* Nav Padding Scroll Logic */
@@ -335,24 +384,36 @@
             background-color: rgba(255, 255, 255, 0.4);
         }
 
-        /* Hide scrollbar for Chrome, Safari and Opera */
-        .no-scrollbar::-webkit-scrollbar,
+        /* Custom Scrollbar - Hidden by default, slim on hover */
         .custom-scrollbar::-webkit-scrollbar {
-            display: none !important;
-            width: 0 !important;
-            height: 0 !important;
-            background: transparent !important;
-            -webkit-appearance: none !important;
+            width: 4px;
         }
 
-        /* Hide scrollbar for IE, Edge and Firefox */
-        .no-scrollbar,
-        .custom-scrollbar {
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: transparent;
+            border-radius: 10px;
+            transition: background 0.3s ease;
+        }
+
+        .custom-scrollbar:hover::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .dark .custom-scrollbar:hover::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none !important;
+        }
+
+        .no-scrollbar {
             -ms-overflow-style: none !important;
-            /* IE and Edge */
             scrollbar-width: none !important;
-            /* Firefox */
-            overflow: -moz-scrollbars-none !important;
         }
 
         @keyframes float {
@@ -503,6 +564,7 @@
                     </div>
 
                     <div class="flex flex-1 overflow-hidden relative">
+
                         <!-- Left Nav (Story OS Production Bar) -->
                         <div id="hero-left-sidebar"
                             class="w-12 bg-gray-50 dark:bg-black border-r border-gray-200 dark:border-white/5 flex flex-col items-center py-6 gap-8 shrink-0 lg:w-16 transition-all duration-500 z-40">
@@ -563,9 +625,146 @@
                         <!-- Main Editor -->
                         <div
                             class="flex-1 flex flex-col bg-background-light dark:bg-background-dark overflow-hidden relative">
+                            <!-- Responsive Multi-Stage Writing Pill (Centered relative to text) -->
+                            <div
+                                class="absolute inset-x-0 top-12 flex justify-center pointer-events-none z-50 lg:pr-64">
+                                <div id="writing-pill"
+                                    class="pointer-events-auto h-11 flex items-center gap-4 px-6 bg-white dark:bg-surface-dark rounded-full shadow-2xl border border-gray-100 dark:border-white/5 whitespace-nowrap transition-all duration-300">
+
+                                    <!-- STAGE 1: Standard Tools -->
+                                    <div id="pill-standard-tools" class="flex items-center gap-4 h-full">
+                                        <div
+                                            class="flex items-center gap-3 pr-4 border-r border-gray-100 dark:border-white/5 h-6">
+                                            <div
+                                                class="flex items-center gap-1 cursor-pointer hover:text-blue-500 transition-colors">
+                                                <span
+                                                    class="text-[11px] font-bold text-gray-700 dark:text-gray-300">Lora</span>
+                                                <span
+                                                    class="material-icons-outlined text-[14px] text-gray-400">expand_more</span>
+                                            </div>
+                                            <div
+                                                class="flex items-center gap-1 cursor-pointer hover:text-blue-500 transition-colors border-l border-gray-100 dark:border-gray-800 pl-3">
+                                                <span
+                                                    class="text-[11px] font-bold text-gray-700 dark:text-gray-300">18</span>
+                                                <span
+                                                    class="material-icons-outlined text-[14px] text-gray-400">expand_more</span>
+                                            </div>
+                                        </div>
+                                        <div
+                                            class="flex items-center gap-3 pr-4 border-r border-gray-100 dark:border-gray-800 h-6">
+                                            <button
+                                                class="text-[10px] font-black text-gray-400 hover:text-blue-500 transition-colors tracking-tighter">H1</button>
+                                            <button
+                                                class="text-[10px] font-black text-gray-400 hover:text-blue-500 transition-colors tracking-tighter">H2</button>
+                                            <button
+                                                class="text-[10px] font-black text-gray-400 hover:text-blue-500 transition-colors tracking-tighter">H3</button>
+                                        </div>
+                                        <div
+                                            class="flex items-center gap-3 pr-4 border-r border-gray-100 dark:border-gray-800 h-6">
+                                            <span
+                                                class="material-icons-outlined text-[18px] text-gray-500 hover:text-blue-500 cursor-pointer">format_bold</span>
+                                            <span
+                                                class="material-icons-outlined text-[18px] text-gray-500 hover:text-blue-500 cursor-pointer">format_italic</span>
+                                        </div>
+                                        <!-- Narrative Engine Entry -->
+                                        <button onclick="switchPillState('ai-main')"
+                                            class="flex items-center gap-2 text-green-600 hover:text-green-700 transition-colors group">
+                                            <span
+                                                class="material-icons-outlined text-[16px] group-hover:rotate-12 transition-transform">history_edu</span>
+                                            <span class="text-[10px] font-black tracking-widest uppercase">Penn</span>
+                                        </button>
+                                    </div>
+
+                                    <!-- STAGE 2: AI Main Menu -->
+                                    <div id="pill-ai-main"
+                                        class="hidden items-center gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300 h-full">
+                                        <button onclick="switchPillState('standard-tools')"
+                                            class="p-1 px-2 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-400 hover:text-gray-600 transition-colors">
+                                            <span class="material-icons-outlined text-[14px]">arrow_back</span>
+                                        </button>
+                                        <div class="flex items-center gap-2">
+                                            <div onclick="switchPillState('ai-drafting')"
+                                                class="flex items-center gap-2 px-3 py-1 rounded-lg bg-green-600 text-white text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-green-700 shadow-sm transition-all whitespace-nowrap">
+                                                <span class="material-icons-outlined text-[14px]">menu_book</span>
+                                                Drafting
+                                            </div>
+                                            <div onclick="switchPillState('ai-refine')"
+                                                class="flex items-center gap-2 px-3 py-1 rounded-lg border border-gray-100 dark:border-gray-800 text-gray-600 dark:text-gray-300 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-all whitespace-nowrap">
+                                                <span class="material-icons-outlined text-[14px]">diamond</span>
+                                                Refinement
+                                            </div>
+                                            <div onclick="switchPillState('ai-analysis')"
+                                                class="flex items-center gap-2 px-3 py-1 rounded-lg border border-gray-100 dark:border-gray-800 text-gray-600 dark:text-gray-300 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-all whitespace-nowrap">
+                                                <span class="material-icons-outlined text-[14px]">analytics</span>
+                                                Analysis
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- STAGE 3: AI Drafting Sub-Menu -->
+                                    <div id="pill-ai-drafting"
+                                        class="hidden items-center gap-3 animate-in fade-in slide-in-from-right-2 duration-300 h-full">
+                                        <button onclick="switchPillState('ai-main')"
+                                            class="p-1 px-2 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-400 hover:text-gray-600 transition-colors">
+                                            <span class="material-icons-outlined text-[14px]">arrow_back</span>
+                                        </button>
+                                        <div class="flex items-center gap-2">
+                                            <div
+                                                class="px-3 py-1 rounded-lg border border-blue-200 bg-blue-50 text-blue-600 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-blue-100 shadow-sm transition-all whitespace-nowrap">
+                                                Guided Draft</div>
+                                            <div
+                                                class="px-3 py-1 rounded-lg border border-gray-100 text-gray-600 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-gray-50 transition-all whitespace-nowrap">
+                                                Expand</div>
+                                            <div
+                                                class="px-3 py-1 rounded-lg border border-gray-100 text-gray-600 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-gray-50 transition-all whitespace-nowrap">
+                                                Dialogue Polish</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- STAGE 4: AI Refinement Sub-Menu -->
+                                    <div id="pill-ai-refine"
+                                        class="hidden items-center gap-3 animate-in fade-in slide-in-from-right-2 duration-300 h-full">
+                                        <button onclick="switchPillState('ai-main')"
+                                            class="p-1 px-2 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-400 hover:text-gray-600 transition-colors">
+                                            <span class="material-icons-outlined text-[14px]">arrow_back</span>
+                                        </button>
+                                        <div class="flex items-center gap-2">
+                                            <div
+                                                class="px-3 py-1 rounded-lg border border-gray-100 text-gray-600 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-gray-50 transition-all whitespace-nowrap">
+                                                Show Don't Tell</div>
+                                            <div
+                                                class="px-3 py-1 rounded-lg border border-gray-100 text-gray-600 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-gray-50 transition-all whitespace-nowrap">
+                                                Sensory Detail</div>
+                                            <div
+                                                class="px-3 py-1 rounded-lg border border-gray-100 text-gray-600 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-gray-50 transition-all whitespace-nowrap">
+                                                Continuity Check</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- STAGE 5: AI Analysis Sub-Menu -->
+                                    <div id="pill-ai-analysis"
+                                        class="hidden items-center gap-3 animate-in fade-in slide-in-from-right-2 duration-300 h-full">
+                                        <button onclick="switchPillState('ai-main')"
+                                            class="p-1 px-2 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-400 hover:text-gray-600 transition-colors">
+                                            <span class="material-icons-outlined text-[14px]">arrow_back</span>
+                                        </button>
+                                        <div class="flex items-center gap-2">
+                                            <div
+                                                class="px-3 py-1 rounded-lg border border-gray-100 text-gray-600 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-gray-50 transition-all whitespace-nowrap">
+                                                Pacing Pulse</div>
+                                            <div
+                                                class="px-3 py-1 rounded-lg border border-gray-100 text-gray-600 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-gray-50 transition-all whitespace-nowrap">
+                                                Active Voice</div>
+                                            <div
+                                                class="px-3 py-1 rounded-lg border border-gray-100 text-gray-600 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-gray-50 transition-all whitespace-nowrap">
+                                                Repetition Check</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <!-- Editor Header -->
                             <div
-                                class="h-12 flex items-center justify-between px-8 border-b border-gray-200/50 dark:border-white/5 shrink-0">
+                                class="h-10 flex items-center justify-between px-8 border-b border-gray-200/50 dark:border-white/5 shrink-0">
                                 <div class="text-[11px] font-bold text-gray-400 tracking-[0.2em] uppercase">Draft v2.4 /
                                     ch_14 / scene_03</div>
                                 <div class="flex gap-4 items-center">
@@ -576,225 +775,141 @@
 
                             <!-- Writing Pad -->
                             <div id="mockup-writing-surface"
-                                class="flex-1 overflow-y-auto pt-32 pb-24 px-12 md:px-20 lg:px-24 custom-scrollbar selection:bg-blue-200/50 dark:selection:bg-blue-500/30">
+                                class="flex-1 overflow-y-auto pt-36 pb-24 px-12 md:px-20 lg:px-24 custom-scrollbar selection:bg-blue-200/50 dark:selection:bg-blue-500/30">
                                 <div class="max-w-xl mx-auto relative">
-                                    <!-- Floating Multi-Stage Writing Pill -->
-                                    <div id="writing-pill"
-                                        class="absolute -top-20 left-1/2 -translate-x-1/2 h-11 flex items-center gap-4 px-6 bg-white dark:bg-surface-dark rounded-full shadow-2xl border border-gray-100 dark:border-white/5 z-30 whitespace-nowrap transition-all duration-300">
-
-                                        <!-- STAGE 1: Standard Tools -->
-                                        <div id="pill-standard-tools" class="flex items-center gap-4 h-full">
-                                            <div
-                                                class="flex items-center gap-3 pr-4 border-r border-gray-100 dark:border-white/5 h-6">
-                                                <div
-                                                    class="flex items-center gap-1 cursor-pointer hover:text-blue-500 transition-colors">
-                                                    <span
-                                                        class="text-[11px] font-bold text-gray-700 dark:text-gray-300">Lora</span>
-                                                    <span
-                                                        class="material-icons-outlined text-[14px] text-gray-400">expand_more</span>
-                                                </div>
-                                                <div
-                                                    class="flex items-center gap-1 cursor-pointer hover:text-blue-500 transition-colors border-l border-gray-100 dark:border-gray-800 pl-3">
-                                                    <span
-                                                        class="text-[11px] font-bold text-gray-700 dark:text-gray-300">18</span>
-                                                    <span
-                                                        class="material-icons-outlined text-[14px] text-gray-400">expand_more</span>
-                                                </div>
-                                            </div>
-                                            <div
-                                                class="flex items-center gap-3 pr-4 border-r border-gray-100 dark:border-gray-800 h-6">
-                                                <button
-                                                    class="text-[10px] font-black text-gray-400 hover:text-blue-500 transition-colors tracking-tighter">H1</button>
-                                                <button
-                                                    class="text-[10px] font-black text-gray-400 hover:text-blue-500 transition-colors tracking-tighter">H2</button>
-                                                <button
-                                                    class="text-[10px] font-black text-gray-400 hover:text-blue-500 transition-colors tracking-tighter">H3</button>
-                                            </div>
-                                            <div
-                                                class="flex items-center gap-3 pr-4 border-r border-gray-100 dark:border-gray-800 h-6">
-                                                <span
-                                                    class="material-icons-outlined text-[18px] text-gray-500 hover:text-blue-500 cursor-pointer">format_bold</span>
-                                                <span
-                                                    class="material-icons-outlined text-[18px] text-gray-500 hover:text-blue-500 cursor-pointer">format_italic</span>
-                                            </div>
-                                            <!-- Narrative Engine Entry -->
-                                            <button onclick="switchPillState('ai-main')"
-                                                class="flex items-center gap-2 text-blue-500 hover:text-blue-600 transition-colors group">
-                                                <span
-                                                    class="material-icons-outlined text-[16px] group-hover:rotate-12 transition-transform">psychology</span>
-                                                <span class="text-[10px] font-black tracking-widest uppercase">Narrative
-                                                    Engine</span>
-                                            </button>
-                                        </div>
-
-                                        <!-- STAGE 2: AI Main Menu -->
-                                        <div id="pill-ai-main"
-                                            class="hidden items-center gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300 h-full">
-                                            <button onclick="switchPillState('standard-tools')"
-                                                class="p-1 px-2 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-400 hover:text-gray-600 transition-colors">
-                                                <span class="material-icons-outlined text-[14px]">arrow_back</span>
-                                            </button>
-                                            <div class="flex items-center gap-2">
-                                                <div onclick="switchPillState('ai-drafting')"
-                                                    class="flex items-center gap-2 px-3 py-1 rounded-lg bg-blue-500 text-white text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-blue-600 shadow-sm transition-all whitespace-nowrap">
-                                                    <span
-                                                        class="material-icons-outlined text-[14px]">auto_fix_high</span>
-                                                    Drafting
-                                                </div>
-                                                <div onclick="switchPillState('ai-refine')"
-                                                    class="flex items-center gap-2 px-3 py-1 rounded-lg border border-gray-100 dark:border-gray-800 text-gray-600 dark:text-gray-300 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-all whitespace-nowrap">
-                                                    <span class="material-icons-outlined text-[14px]">flare</span>
-                                                    Refinement
-                                                </div>
-                                                <div onclick="switchPillState('ai-analysis')"
-                                                    class="flex items-center gap-2 px-3 py-1 rounded-lg border border-gray-100 dark:border-gray-800 text-gray-600 dark:text-gray-300 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-all whitespace-nowrap">
-                                                    <span class="material-icons-outlined text-[14px]">analytics</span>
-                                                    Analysis
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- STAGE 3: AI Drafting Sub-Menu -->
-                                        <div id="pill-ai-drafting"
-                                            class="hidden items-center gap-3 animate-in fade-in slide-in-from-right-2 duration-300 h-full">
-                                            <button onclick="switchPillState('ai-main')"
-                                                class="p-1 px-2 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-400 hover:text-gray-600 transition-colors">
-                                                <span class="material-icons-outlined text-[14px]">arrow_back</span>
-                                            </button>
-                                            <div class="flex items-center gap-2">
-                                                <div
-                                                    class="px-3 py-1 rounded-lg border border-blue-200 bg-blue-50 text-blue-600 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-blue-100 shadow-sm transition-all whitespace-nowrap">
-                                                    Guided Draft</div>
-                                                <div
-                                                    class="px-3 py-1 rounded-lg border border-gray-100 text-gray-600 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-gray-50 transition-all whitespace-nowrap">
-                                                    Expand</div>
-                                                <div
-                                                    class="px-3 py-1 rounded-lg border border-gray-100 text-gray-600 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-gray-50 transition-all whitespace-nowrap">
-                                                    Dialogue Polish</div>
-                                            </div>
-                                        </div>
-
-                                        <!-- STAGE 4: AI Refinement Sub-Menu -->
-                                        <div id="pill-ai-refine"
-                                            class="hidden items-center gap-3 animate-in fade-in slide-in-from-right-2 duration-300 h-full">
-                                            <button onclick="switchPillState('ai-main')"
-                                                class="p-1 px-2 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-400 hover:text-gray-600 transition-colors">
-                                                <span class="material-icons-outlined text-[14px]">arrow_back</span>
-                                            </button>
-                                            <div class="flex items-center gap-2">
-                                                <div
-                                                    class="px-3 py-1 rounded-lg border border-gray-100 text-gray-600 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-gray-50 transition-all whitespace-nowrap">
-                                                    Show Don't Tell</div>
-                                                <div
-                                                    class="px-3 py-1 rounded-lg border border-gray-100 text-gray-600 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-gray-50 transition-all whitespace-nowrap">
-                                                    Sensory Detail</div>
-                                                <div
-                                                    class="px-3 py-1 rounded-lg border border-gray-100 text-gray-600 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-gray-50 transition-all whitespace-nowrap">
-                                                    Continuity Check</div>
-                                            </div>
-                                        </div>
-
-                                        <!-- STAGE 5: AI Analysis Sub-Menu -->
-                                        <div id="pill-ai-analysis"
-                                            class="hidden items-center gap-3 animate-in fade-in slide-in-from-right-2 duration-300 h-full">
-                                            <button onclick="switchPillState('ai-main')"
-                                                class="p-1 px-2 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-400 hover:text-gray-600 transition-colors">
-                                                <span class="material-icons-outlined text-[14px]">arrow_back</span>
-                                            </button>
-                                            <div class="flex items-center gap-2">
-                                                <div
-                                                    class="px-3 py-1 rounded-lg border border-gray-100 text-gray-600 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-gray-50 transition-all whitespace-nowrap">
-                                                    Pacing Pulse</div>
-                                                <div
-                                                    class="px-3 py-1 rounded-lg border border-gray-100 text-gray-600 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-gray-50 transition-all whitespace-nowrap">
-                                                    Active Voice</div>
-                                                <div
-                                                    class="px-3 py-1 rounded-lg border border-gray-100 text-gray-600 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-gray-50 transition-all whitespace-nowrap">
-                                                    Repetition Check</div>
-                                            </div>
-                                        </div>
-                                    </div>
                                     <h1
                                         class="text-3xl md:text-custom font-serif text-primary dark:text-white mb-10 font-bold leading-tight">
                                         The Cathedral of Dust</h1>
-                                    <div
-                                        class="space-y-8 text-gray-700 dark:text-gray-300 leading-[1.8] text-lg md:text-[18px] selection:bg-blue-100 dark:selection:bg-blue-900/30">
-                                        <p>The wind didn’t just howl across the plains; it whispered names <span
-                                                class="font-bold tracking-tight">ELENA</span>
-                                            had spent a decade trying to bury. It carried the scent of ozone and ancient
-                                            parchment,
-                                            the distinctive musk of the Void. She adjusted her grip on the <span
+                                    <div id="editable-mockup"
+                                        class="space-y-6 text-gray-700 dark:text-gray-300 leading-[1.7] text-[15px] selection:bg-blue-100 dark:selection:bg-blue-900/30">
+                                        <p
+                                            data-goal="The wind did not merely howl across the plains; it whispered the names Elena had spent a decade trying to bury. It carried the scent of ozone and ancient parchment, the unmistakable musk of the Void. She tightened her grip on the Vorpal Relic, the cold stone pulsing with a faint, rhythmic thrum against her palm—a heartbeat that was not her own.">
+                                            The wind <span class="style-suggestion" data-wrong="didn’t just"
+                                                data-right="did not merely"
+                                                data-reason="I think 'did not merely' adds much more atmospheric weight here than 'didn't just'. It sets the dark tone perfectly.">didn’t
+                                                just</span> howl
+                                            across the plains; it whispered <span class="grammar-error"
+                                                data-wrong="names" data-right="the names"
+                                                data-reason="Missing a definite article here. 'The names' feels more grounded in the prose.">names</span>
+                                            <span class="style-suggestion" data-wrong="ELENA" data-right="Elena"
+                                                data-reason="Let's keep the character names in standard casing for a cleaner look, unless they're shouting!">ELENA</span>
+                                            had spent a
+                                            decade trying to bury. It carried the scent of ozone and ancient parchment,
+                                            the <span class="style-suggestion" data-wrong="distinctive"
+                                                data-right="unmistakable"
+                                                data-reason="Try 'unmistakable'—it's a bit sharper and conveys a sense of dread that 'distinctive' lacks.">distinctive</span>
+                                            musk of the Void. She <span class="style-suggestion" data-wrong="adjusted"
+                                                data-right="tightened"
+                                                data-reason="Changing 'adjusted' to 'tightened' makes her reaction feel much more visceral and tense.">adjusted</span>
+                                            her grip on the <span
                                                 class="bg-blue-50 dark:bg-blue-900/10 px-1 border-b border-blue-200 dark:border-blue-800">Vorpal
-                                                Relic</span>,
-                                            the cold stone pulsing with a faint, rhythmic thrum against her palm—a
-                                            heartbeat that wasn't hers.</p>
+                                                Relic</span>, the cold stone pulsing with a faint, rhythmic thrum
+                                            against her palm—a heartbeat that <span class="grammar-error"
+                                                data-wrong="wasn't hers" data-right="was not her own"
+                                                data-reason="Formalizing this contraction gives the sentence a more haunting, deliberate rhythm.">wasn't
+                                                hers</span>.
+                                        </p>
 
-                                        <p>Ahead, the spires of the cathedral tore at the bruised sky like the rusted
-                                            teeth
-                                            of a dying giant. The architecture was <span
-                                                class="highlight-active">shifting</span>; her fingers traced a glyph on
-                                            the
-                                            doorframe that hadn't been there a moment ago.</p>
+                                        <p
+                                            data-goal="Ahead, the cathedral spires tore at the bruised sky like the rusted teeth of a dying giant. The architecture was shifting; her fingers brushed a glyph on the doorframe that had not been there a moment before. A strange flickering moved in the shadows, a darkness that seemed to draw breath.">
+                                            Ahead, the <span class="style-suggestion"
+                                                data-wrong="spires of the cathedral" data-right="cathedral spires"
+                                                data-reason="'Cathedral spires' has a better punch to it. It keeps the focus on the scale of the structure.">spires
+                                                of the cathedral</span>
+                                            tore at the bruised sky like the rusted teeth of a dying giant. The
+                                            architecture was <span class="highlight-active">shifting</span>; her fingers
+                                            <span class="style-suggestion" data-wrong="traced" data-right="brushed"
+                                                data-reason="'Brushed' is a more delicate verb. It makes the discovery of the glyph feel accidental and eerie.">traced</span>
+                                            a glyph on the
+                                            doorframe that <span class="grammar-error"
+                                                data-wrong="had'nt been there a moment ago"
+                                                data-right="had not been there a moment before"
+                                                data-reason="A couple of quick fixes here: correcting the contraction and smoothing out the timing for a better 'memory' feel.">had'nt
+                                                been there a
+                                                moment ago</span>. <span class="style-suggestion"
+                                                data-wrong="There was a strange flickering in the shadows"
+                                                data-right="A strange flickering moved in the shadows"
+                                                data-reason="Let's get the flickering moving! It makes the scene feel alive and much more threatening.">There
+                                                was a <span class="spelling-error" data-wrong="starnge"
+                                                    data-right="strange"
+                                                    data-reason="Just a quick typo here—happens to the best of us!">starnge</span>
+                                                flickering in the
+                                                shadows</span>, a darkness that seemed to <span class="style-suggestion"
+                                                data-wrong="breathe" data-right="draw breath"
+                                                data-reason="'Draw breath' sounds more active and ominous than 'breathe' in this context.">breathe</span>.
+                                        </p>
 
-                                        <p>“It knows we're here, <span class="text-blue-500 font-medium">Leo</span>,”
-                                            Elena whispered.
-                                            “It's rewriting the interior as we speak. We're not just walking into ruins;
-                                            we're walking into a
-                                            memory that doesn't want to be forgotten.”</p>
-                                    </div>
-                                </div>
-                            </div>
+                                        <p
+                                            data-goal="“It knows we're here, Leo,” Elena whispered. “It's rewriting the interior as we speak. We're not just walking into ruins; we're walking into a memory that does not want to be forgotten.”">
+                                            “It knows we're here, <span
+                                                class="text-blue-500 font-medium font-bold">Leo</span>,” Elena
+                                            whispered. “It's rewriting the interior as we speak. We're not just walking
+                                            into ruins; we're walking into a memory that <span class="grammar-error"
+                                                data-wrong="doesn't" data-right="does not"
+                                                data-reason="I'd suggest expanding 'doesn't' to 'does not'—it keeps the dialogue feeling serious and weighty.">doesn't</span>
+                                            want to be
+                                            forgotten.”</p>
 
-                            <!-- Floating Character Overlay (Desktop) -->
-                            <div id="agnes-panel"
-                                class="absolute right-6 top-20 w-64 hidden xl:block animate-float group/agnes">
-                                <div
-                                    class="bg-white/90 dark:bg-surface-dark/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 p-5 overflow-hidden relative">
-                                    <!-- Close/Accept Button -->
-                                    <button onclick="document.getElementById('agnes-panel').style.display='none'"
-                                        class="absolute top-3 right-3 p-1 rounded-full text-gray-300 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all opacity-0 group-hover/agnes:opacity-100">
-                                        <span class="material-icons-outlined text-[16px]">close</span>
-                                    </button>
-                                    <div class="flex items-center gap-3 mb-4">
-                                        <div class="w-10 h-10 rounded-xl bg-accent overflow-hidden shadow-sm">
-                                            <img src="{% static 'img/Agnes.webp' %}" class="w-full h-full object-cover">
-                                        </div>
-                                        <div>
-                                            <div class="text-xs font-bold text-primary dark:text-white">Agnes Temple
-                                            </div>
-                                            <div class="text-[10px] text-blue-500 font-medium tracking-wide uppercase">
-                                                Mentor</div>
-                                        </div>
-                                    </div>
-                                    <div class="space-y-3">
-                                        <div
-                                            class="h-1.5 w-full bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-                                            <div class="h-full bg-blue-500 w-[85%]"></div>
-                                        </div>
-                                        <p class="text-[11px] text-gray-500 dark:text-gray-400 italic leading-snug">
-                                            "Power isn't found in the light, Elena. It's forged in the spaces between
-                                            heartbeats."</p>
-                                        <div class="flex gap-2 pt-2">
-                                            <div
-                                                class="h-5 px-2 bg-gray-50 dark:bg-gray-800 rounded-md border border-gray-200/50 dark:border-gray-700 flex items-center text-[10px] text-gray-400 italic">
-                                                Analytical</div>
-                                            <div
-                                                class="h-5 px-2 bg-gray-50 dark:bg-gray-800 rounded-md border border-gray-200/50 dark:border-gray-700 flex items-center text-[10px] text-gray-400 italic">
-                                                Stoic</div>
-                                        </div>
+                                        <p
+                                            data-goal="Leo did not answer at once. He was staring at the moss-covered steps. The stone here was ancient, older than the First Empire, yet it felt as though it were being watched by them. Every scrape of his boot rang through the hollow arches like a physical blow.">
+                                            Leo <span class="grammar-error" data-wrong="didn't answer immediately"
+                                                data-right="did not answer at once"
+                                                data-reason="'Did not answer at once' feels a bit more natural for his character in this moment.">didn't
+                                                answer immediately</span>.
+                                            He was staring at the <span class="spelling-error"
+                                                data-wrong="moss-coverred" data-right="moss-covered"
+                                                data-reason="Spelling check: 'covered' only needs one 'r' at the end.">moss-coverred</span>
+                                            steps. The stone here was ancient, older than the First Empire, yet it felt
+                                            <span class="style-suggestion"
+                                                data-wrong="as if it was being watched by them"
+                                                data-right="as though it were being watched by them"
+                                                data-reason="Using 'as though' and the subjunctive 'were' really amps up the gothic atmosphere here.">as
+                                                if it was being
+                                                watched by them</span>. Every scrape of his boot <span
+                                                class="style-suggestion" data-wrong="echoed" data-right="rang"
+                                                data-reason="'Rang' is such a cold, physical verb. It works well with the 'hollow arches' imagery.">echoed</span>
+                                            through the
+                                            hollow arches like a physical blow.
+                                        </p>
+
+                                        <p
+                                            data-goal="The air thickened with the metallic tang of dried blood. Elena felt the Relic’s weight increasing. It was no longer merely lead and stone; it was the burden of a thousand lost souls, all of them screaming at once in the silence of her mind.">
+                                            The air <span class="style-suggestion" data-wrong="grew thick"
+                                                data-right="thickened"
+                                                data-reason="Small tweak: 'thickened' is more direct and hits harder.">grew
+                                                thick</span> with the metallic tang of dried blood. Elena felt the <span
+                                                class="grammar-error" data-wrong="Relics" data-right="Relic’s"
+                                                data-reason="Just needs an apostrophe here to show the Relic's weight.">Relics</span>
+                                            weight
+                                            increasing. It <span class="style-suggestion"
+                                                data-wrong="wasn't just lead and stone anymore"
+                                                data-right="was no longer merely lead and stone"
+                                                data-reason="This change makes the Relic's burden feel more ancient and heavy.">wasn't
+                                                just lead and stone
+                                                anymore</span>; it was the <span class="style-suggestion"
+                                                data-wrong="weight" data-right="burden"
+                                                data-reason="'Burden' has such a great thematic connection to those 'thousand lost souls'.">weight</span>
+                                            of a thousand
+                                            lost souls, <span class="style-suggestion" data-wrong="and theyr'e all"
+                                                data-right="all of them"
+                                                data-reason="Removing 'and they're all' and using 'all of them' instead focuses the ending on the souls themselves.">and
+                                                theyr'e all</span> screaming
+                                            at once in the silence of her mind.</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
+
+
                         <!-- Right AI Sidebar -->
                         <div id="hero-right-sidebar"
                             class="w-64 bg-white dark:bg-surface-dark border-l border-gray-200 dark:border-white/5 hidden lg:flex flex-col p-6 shrink-0 transition-all duration-500 z-40">
                             <div class="flex items-center gap-2 mb-8">
-                                <span class="material-icons-outlined text-blue-500 text-lg">psychology</span>
+                                <span class="material-icons-outlined text-green-600 text-lg">insights</span>
                                 <span
-                                    class="text-xs font-bold tracking-widest text-primary dark:text-white uppercase">Codex
-                                    Insight</span>
+                                    class="text-xs font-bold tracking-widest text-primary dark:text-white uppercase">Editorial
+                                    Insights</span>
                             </div>
 
                             <div class="space-y-6">
@@ -854,8 +969,8 @@
                             <div id="mockup-ghostwriter-panel"
                                 class="hover:bg-gray-50 dark:hover:bg-gray-900/50 p-3 rounded-xl transition-all duration-500 cursor-pointer border border-transparent hover:border-gray-100 dark:hover:border-gray-800">
                                 <div class="flex items-center gap-2 mb-2">
-                                    <span class="material-icons-outlined text-[14px] text-gray-400">auto_awesome</span>
-                                    <span class="text-[10px] font-bold text-gray-400 tracking-wider">GHOSTWRITER</span>
+                                    <span class="material-icons-outlined text-[14px] text-green-600">history_edu</span>
+                                    <span class="text-[10px] font-bold text-green-600 tracking-wider">PENN</span>
                                 </div>
                                 <div id="ghostwriter-bars">
                                     <div class="h-2 w-full bg-gray-100 dark:bg-gray-800 rounded-full mb-1"></div>
@@ -914,11 +1029,6 @@
                                                 <span
                                                     class="material-icons-outlined text-[10px] text-gray-500">person</span>
                                             </div>
-                                            <div id="cast-added"
-                                                class="opacity-0 transition-opacity duration-1000 w-6 h-6 rounded-full border-2 border-white dark:border-surface-dark bg-accent overflow-hidden">
-                                                <img src="{% static 'img/Agnes.webp' %}"
-                                                    class="w-full h-full object-cover">
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -961,57 +1071,113 @@
                             </div>
                             <span class="material-icons-outlined text-gray-300 text-[18px]">more_horiz</span>
                         </div>
+                    </div> <!-- End Main Editor -->
+                </div> <!-- End Left Sidebar + Editor flex -->
+
+                <!-- Formatting Bubble (Simulated) -->
+                <div id="format-bubble" class="hidden absolute pointer-events-auto">
+                    <div
+                        class="bg-primary dark:bg-white text-white dark:text-primary px-3 py-1.5 rounded-lg shadow-xl flex items-center gap-4 animate-in zoom-in-95 duration-200">
+                        <button class="hover:text-blue-400 transition-colors"><span
+                                class="material-icons-outlined text-sm">format_bold</span></button>
+                        <button class="hover:text-blue-400 transition-colors"><span
+                                class="material-icons-outlined text-sm">format_italic</span></button>
+                        <div class="h-4 w-[1px] bg-white/20 dark:bg-primary/20"></div>
+                        <div class="flex items-center gap-2">
+                            <button
+                                class="text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded hover:bg-white/10"
+                                onclick="simulateTextSize('small')">A</button>
+                            <button
+                                class="text-[12px] font-bold w-5 h-5 flex items-center justify-center rounded border border-white/20"
+                                onclick="simulateTextSize('large')">A</button>
+                        </div>
+                        <div class="h-4 w-[1px] bg-white/20 dark:bg-primary/20"></div>
+                        <button class="hover:text-blue-400 transition-colors"><span
+                                class="material-icons-outlined text-sm">link</span></button>
                     </div>
-                </div> <!-- End Main Editor -->
-            </div> <!-- End Left Sidebar + Editor flex -->
+                    <div class="w-2 h-2 bg-primary dark:bg-white rotate-45 mx-auto -mt-1 shadow-sm"></div>
+                </div>
 
-            <!-- Formatting Bubble (Simulated) -->
-            <div id="format-bubble" class="hidden absolute pointer-events-auto">
-                <div
-                    class="bg-primary dark:bg-white text-white dark:text-primary px-3 py-1.5 rounded-lg shadow-xl flex items-center gap-4 animate-in zoom-in-95 duration-200">
-                    <button class="hover:text-blue-400 transition-colors"><span
-                            class="material-icons-outlined text-sm">format_bold</span></button>
-                    <button class="hover:text-blue-400 transition-colors"><span
-                            class="material-icons-outlined text-sm">format_italic</span></button>
-                    <div class="h-4 w-[1px] bg-white/20 dark:bg-primary/20"></div>
-                    <div class="flex items-center gap-2">
-                        <button
-                            class="text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded hover:bg-white/10"
-                            onclick="simulateTextSize('small')">A</button>
-                        <button
-                            class="text-[12px] font-bold w-5 h-5 flex items-center justify-center rounded border border-white/20"
-                            onclick="simulateTextSize('large')">A</button>
+                <!-- Grammar Correction Popup (Penn Redesign) -->
+                <div id="grammar-popup"
+                    class="hidden absolute z-50 animate-in fade-in zoom-in-95 duration-300 pointer-events-auto">
+                    <div
+                        class="bg-white dark:bg-gray-900 rounded-[2rem] shadow-[0_30px_60px_rgba(0,0,0,0.12)] border border-gray-100 dark:border-gray-800 p-8 w-[320px] min-h-[320px] flex flex-col justify-between relative selection:bg-green-100">
+                        <!-- Decorative Header -->
+                        <div class="flex items-center justify-between mb-6">
+                            <span
+                                class="text-[11px] font-black text-green-600 dark:text-green-400 uppercase tracking-[0.2em]">Penn's
+                                Note</span>
+                            <button onclick="document.getElementById('grammar-popup').classList.add('hidden')"
+                                class="w-6 h-6 flex items-center justify-center rounded-full hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                <span class="material-icons-outlined text-[14px] text-gray-400">close</span>
+                            </button>
+                        </div>
+
+                        <!-- Main Suggestion -->
+                        <div class="mb-5">
+                            <div
+                                class="flex flex-col gap-3 p-4 bg-gray-50 dark:bg-gray-800/40 rounded-xl mb-4 border border-gray-100 dark:border-gray-800/60">
+                                <span id="grammar-wrong" class="text-xs text-gray-400 line-through opacity-60"></span>
+                                <div class="flex items-center gap-2">
+                                    <span class="w-1 h-3 bg-green-500 rounded-full"></span>
+                                    <span id="grammar-right"
+                                        class="text-sm font-bold text-gray-900 dark:text-gray-100"></span>
+                                </div>
+                            </div>
+
+                            <div id="grammar-reason"
+                                class="text-[13px] text-gray-600 dark:text-gray-400 leading-relaxed font-serif italic pl-1 pr-2">
+                            </div>
+                        </div>
+
+                        <!-- Options Section -->
+                        <div class="space-y-4">
+                            <!-- Full Rewrite Shortcut (Green Theme) -->
+                            <div id="full-rewrite-option"
+                                class="p-3 bg-green-50 dark:bg-green-900/10 rounded-xl border border-green-100 dark:border-green-800/30 group cursor-pointer transition-all hover:border-green-300">
+                                <button id="rewrite-paragraph-btn" class="w-full text-left flex flex-col gap-1">
+                                    <span
+                                        class="text-[10px] text-green-600 dark:text-green-400 font-bold uppercase tracking-wider group-hover:underline">Ask
+                                        Penn to rewrite</span>
+                                    <span class="text-[10px] text-green-700/60 dark:text-green-400/60">Polish the entire
+                                        section in one click</span>
+                                </button>
+                            </div>
+
+                            <div class="flex gap-2">
+                                <button onclick="document.getElementById('grammar-popup').classList.add('hidden')"
+                                    class="flex-1 py-2.5 text-[10px] font-bold text-gray-400 uppercase hover:text-gray-600 dark:hover:text-gray-200 transition-colors tracking-widest bg-gray-50 dark:bg-gray-800 rounded-lg">Skip</button>
+                                <button
+                                    class="flex-1 py-2.5 bg-green-600 hover:bg-green-700 text-white text-[10px] font-bold uppercase tracking-widest rounded-lg shadow-lg shadow-green-500/20 transition-all hover:-translate-y-0.5"
+                                    id="fix-btn-ui">Apply</button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="h-4 w-[1px] bg-white/20 dark:bg-primary/20"></div>
-                    <button class="hover:text-blue-400 transition-colors"><span
-                            class="material-icons-outlined text-sm">link</span></button>
                 </div>
-                <div class="w-2 h-2 bg-primary dark:bg-white rotate-45 mx-auto -mt-1 shadow-sm"></div>
-            </div>
 
-            <!-- Ghostwriter Rewrite Popup (Simulated) -->
-            <div id="ghostwriter-ask-popup" class="hidden absolute pointer-events-auto">
+                <!-- Ghostwriter Rewrite Popup (Simulated) -->
+                <div id="ghostwriter-ask-popup" class="hidden absolute pointer-events-auto">
+                    <div
+                        class="bg-primary dark:bg-white text-white dark:text-primary px-4 py-2 rounded-xl shadow-2xl flex items-center gap-3 whitespace-nowrap animate-in zoom-in-95 duration-200">
+                        <span class="text-[11px] font-bold tracking-wide">Rewrite this for me?</span>
+                        <div class="h-4 w-[1px] bg-white/20 dark:bg-primary/20"></div>
+                        <button id="btn-accept-rewrite"
+                            class="text-[11px] font-bold hover:text-blue-400 dark:hover:text-blue-600 transition-colors">Yes</button>
+                        <button onclick="document.getElementById('ghostwriter-ask-popup').classList.add('hidden')"
+                            class="text-[11px] font-bold opacity-50 hover:opacity-100 transition-opacity">No</button>
+                    </div>
+                    <!-- Bubble Arrow -->
+                    <div class="w-2 h-2 bg-primary dark:bg-white rotate-45 mx-auto -mt-1 shadow-sm"></div>
+                </div>
+
                 <div
-                    class="bg-primary dark:bg-white text-white dark:text-primary px-4 py-2 rounded-xl shadow-2xl flex items-center gap-3 whitespace-nowrap animate-in zoom-in-95 duration-200">
-                    <span class="material-icons-outlined text-sm">auto_awesome</span>
-                    <span class="text-[11px] font-bold tracking-wide">Rewrite this for me?</span>
-                    <div class="h-4 w-[1px] bg-white/20 dark:bg-primary/20"></div>
-                    <button id="btn-accept-rewrite"
-                        class="text-[11px] font-bold hover:text-blue-400 dark:hover:text-blue-600 transition-colors">Yes</button>
-                    <button onclick="document.getElementById('ghostwriter-ask-popup').classList.add('hidden')"
-                        class="text-[11px] font-bold opacity-50 hover:opacity-100 transition-opacity">No</button>
+                    class="absolute -top-10 -left-10 w-40 h-40 bg-yellow-200/50 dark:bg-yellow-600/20 rounded-full blur-3xl -z-10">
                 </div>
-                <!-- Bubble Arrow -->
-                <div class="w-2 h-2 bg-primary dark:bg-white rotate-45 mx-auto -mt-1 shadow-sm"></div>
+                <div
+                    class="absolute -bottom-10 -right-10 w-60 h-60 bg-purple-200/50 dark:bg-purple-600/20 rounded-full blur-3xl -z-10">
+                </div>
             </div>
-
-            <div
-                class="absolute -top-10 -left-10 w-40 h-40 bg-yellow-200/50 dark:bg-yellow-600/20 rounded-full blur-3xl -z-10">
-            </div>
-            <div
-                class="absolute -bottom-10 -right-10 w-60 h-60 bg-purple-200/50 dark:bg-purple-600/20 rounded-full blur-3xl -z-10">
-            </div>
-        </div>
         </div>
     </section>
     <section class="py-24 bg-white dark:bg-surface-dark relative">
@@ -3600,7 +3766,7 @@
                         const writingPill = document.getElementById('writing-pill');
                         if (askPopup) askPopup.classList.add('hidden');
                         if (formatBubble) formatBubble.classList.add('hidden');
-                        // Pill is handled via CSS opacity for smooth transition, 
+                        // Pill is handled via CSS opacity for smooth transition,
                         // but we can ensure it's hidden if needed
                     }
                 });
@@ -3611,6 +3777,194 @@
                     mockup.classList.toggle('zen-mode-active');
                 });
             }
+
+            // --- sequential Walkthrough Logic (Penn) ---
+            const grammarPopup = document.getElementById('grammar-popup');
+            const grammarWrong = document.getElementById('grammar-wrong');
+            const grammarRight = document.getElementById('grammar-right');
+            const grammarReason = document.getElementById('grammar-reason');
+            const rewriteParaBtn = document.getElementById('rewrite-paragraph-btn');
+            const fullRewriteOption = document.getElementById('full-rewrite-option');
+            const fixBtnUi = document.getElementById('fix-btn-ui');
+            let currentErrorElement = null;
+
+            // Initialize walkthrough
+            const allErrors = document.querySelectorAll('.grammar-error, .spelling-error, .style-suggestion');
+            allErrors.forEach((el, index) => {
+                if (index > 0) el.classList.add('walkthrough-inactive');
+            });
+
+            function showGrammarPopup(el, isRewrite = false) {
+                if (el.classList.contains('walkthrough-inactive') && !isRewrite) return;
+
+                currentErrorElement = el;
+
+                if (isRewrite) {
+                    grammarWrong.innerText = "Draft Phase";
+                    grammarRight.innerText = "Penn's Revision";
+                    grammarReason.innerHTML = `"I've smoothed out the rest of this paragraph to match the tone we've established. Shall we move on?"`;
+                    if (fullRewriteOption) fullRewriteOption.classList.add('hidden');
+                } else {
+                    grammarWrong.innerText = el.getAttribute('data-wrong');
+                    grammarRight.innerText = el.getAttribute('data-right');
+                    grammarReason.innerHTML = `"${el.getAttribute('data-reason')}"`;
+                    if (fullRewriteOption) fullRewriteOption.classList.remove('hidden');
+                }
+
+                const rect = el.getBoundingClientRect();
+                const parentRect = heroMockup.getBoundingClientRect();
+
+                // Show temporarily to get height
+                grammarPopup.classList.remove('hidden');
+                const popupHeight = grammarPopup.offsetHeight;
+
+                grammarPopup.style.left = `${rect.left - parentRect.left + (rect.width / 2) - 160}px`;
+                grammarPopup.style.top = `${rect.top - parentRect.top - popupHeight - 20}px`;
+            }
+
+            allErrors.forEach(el => {
+                el.addEventListener('mouseenter', () => showGrammarPopup(el));
+            });
+
+            window.addEventListener('resize', () => grammarPopup.classList.add('hidden'));
+
+            window.applyFullParagraphRewrite = function (para) {
+                if (!para) return;
+                const goalText = para.getAttribute('data-goal');
+                if (!goalText) return;
+
+                para.innerHTML = goalText;
+                para.classList.add('text-green-600', 'dark:text-green-400', 'transition-all', 'duration-700');
+                grammarPopup.classList.add('hidden');
+
+                setTimeout(() => {
+                    para.classList.remove('text-green-600', 'dark:text-green-400');
+                    unlockNextInCategory(para);
+                }, 1000);
+            };
+
+            window.applyCorrection = function () {
+                if (currentErrorElement) {
+                    const parentPara = currentErrorElement.closest('p');
+
+                    if (currentErrorElement.id === 'penn-rewrite-trigger') {
+                        applyFullParagraphRewrite(parentPara);
+                        return;
+                    }
+
+                    const right = currentErrorElement.getAttribute('data-right');
+                    currentErrorElement.innerText = right;
+                    currentErrorElement.classList.remove('grammar-error', 'spelling-error', 'style-suggestion');
+                    currentErrorElement.classList.add('text-green-600', 'dark:text-green-400', 'font-medium', 'transition-all', 'duration-700');
+
+                    const fixedEl = currentErrorElement;
+                    grammarPopup.classList.add('hidden');
+
+                    // Find next error in sequence
+                    let foundCurrent = false;
+                    let nextError = null;
+                    allErrors.forEach(el => {
+                        if (el === fixedEl) {
+                            foundCurrent = true;
+                        } else if (foundCurrent && !nextError && el.classList.contains('walkthrough-inactive')) {
+                            nextError = el;
+                        }
+                    });
+
+                    if (nextError) {
+                        setTimeout(() => {
+                            nextError.classList.remove('walkthrough-inactive');
+                            // Optional: auto-scroll to next error?
+                        }, 800);
+                    }
+
+                    setTimeout(() => {
+                        fixedEl.classList.remove('text-green-600', 'dark:text-green-400');
+                        checkParagraphStatus(parentPara, fixedEl);
+                    }, 1000);
+                }
+            };
+
+            function checkParagraphStatus(para, lastFixedEl) {
+                const remainingErrorsInPara = para.querySelectorAll('.grammar-error, .spelling-error, .style-suggestion');
+                const hasPendingInactive = Array.from(remainingErrorsInPara).some(el => el.classList.contains('walkthrough-inactive'));
+
+                if (remainingErrorsInPara.length === 0 || (!Array.from(remainingErrorsInPara).some(el => !el.classList.contains('walkthrough-inactive')) && hasPendingInactive)) {
+                    const activeInPara = Array.from(remainingErrorsInPara).filter(el => !el.classList.contains('walkthrough-inactive'));
+
+                    if (activeInPara.length === 0) {
+                        const nextInactiveInPara = para.querySelector('.walkthrough-inactive');
+                        if (nextInactiveInPara) {
+                            nextInactiveInPara.classList.remove('walkthrough-inactive');
+                            return;
+                        }
+
+                        const currentText = para.innerText.replace(/\s+/g, ' ').trim();
+                        const goalText = (para.getAttribute('data-goal') || "").replace(/\s+/g, ' ').trim();
+
+                        if (goalText && currentText !== goalText) {
+                            const trigger = document.createElement('span');
+                            trigger.id = 'penn-rewrite-trigger';
+                            trigger.className = 'bg-blue-50 dark:bg-blue-900/20 px-1 border-b-2 border-blue-500 cursor-pointer animate-pulse ml-1';
+                            trigger.innerText = "[Complete Paragraph]";
+                            para.appendChild(trigger);
+                            showGrammarPopup(trigger, true);
+                        } else {
+                            unlockNextInCategory(para);
+                        }
+                    } else {
+                        unlockNextInGlobal(lastFixedEl);
+                    }
+                } else {
+                    unlockNextInGlobal(lastFixedEl);
+                }
+            }
+
+            function unlockNextInGlobal(lastFixedEl) {
+                let foundCurrent = false;
+                let nextError = null;
+                const allErrorsArray = Array.from(document.querySelectorAll('.grammar-error, .spelling-error, .style-suggestion'));
+
+                for (let el of allErrorsArray) {
+                    if (el === lastFixedEl) {
+                        foundCurrent = true;
+                    } else if (foundCurrent && el.classList.contains('walkthrough-inactive')) {
+                        nextError = el;
+                        break;
+                    }
+                }
+
+                if (nextError) nextError.classList.remove('walkthrough-inactive');
+            }
+
+            function unlockNextInCategory(currentPara) {
+                const nextPara = currentPara.nextElementSibling;
+                if (nextPara && nextPara.tagName === 'P') {
+                    const firstError = nextPara.querySelector('.walkthrough-inactive');
+                    if (firstError) {
+                        firstError.classList.remove('walkthrough-inactive');
+                    } else {
+                        unlockNextInCategory(nextPara);
+                    }
+                }
+            }
+
+            if (rewriteParaBtn) {
+                rewriteParaBtn.addEventListener('click', () => {
+                    if (currentErrorElement) {
+                        applyFullParagraphRewrite(currentErrorElement.closest('p'));
+                    }
+                });
+            }
+
+            if (grammarRight) grammarRight.addEventListener('click', applyCorrection);
+            if (fixBtnUi) fixBtnUi.addEventListener('click', applyCorrection);
+
+            document.addEventListener('mousedown', (e) => {
+                if (grammarPopup && !grammarPopup.contains(e.target) && !e.target.closest('.grammar-error') && !e.target.closest('.spelling-error') && !e.target.closest('.style-suggestion') && e.target.id !== 'penn-rewrite-trigger' && e.target.id !== 'rewrite-paragraph-btn') {
+                    grammarPopup.classList.add('hidden');
+                }
+            });
 
             // Codex Panel Logic
             const hotspots = {
