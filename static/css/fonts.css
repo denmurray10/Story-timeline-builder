@@ -31,12 +31,3 @@
     font-style: italic;
     font-display: swap;
 }
-
-/* Montserrat (Optional but included in zip) */
-@font-face {
-    font-family: 'Montserrat';
-    src: url('../fonts/Montserrat/Montserrat-VariableFont_wght.ttf') format('truetype');
-    font-weight: 100 900;
-    font-style: normal;
-    font-display: swap;
-}
