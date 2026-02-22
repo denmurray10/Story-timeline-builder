@@ -1287,8 +1287,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid lg:grid-cols-2 gap-16 items-center">
                 <!-- Left Column: Interactive Map Card -->
-                <div
-                    class="reveal slide-up bg-white dark:bg-surface-dark rounded-3xl p-6 shadow-2xl border border-gray-100 dark:border-gray-800 relative z-10">
+                <div class="reveal slide-up relative z-10">
                     <div class="flex items-center gap-2 mb-6">
                         <span class="material-icons-outlined text-gray-400">account_tree</span>
                         <h3 class="text-sm font-bold uppercase tracking-widest text-gray-900 dark:text-white">
@@ -1297,7 +1296,7 @@
 
                     <!-- Map Container (Nodes Centered) -->
                     <div
-                        class="relative w-full h-[500px] bg-gray-50 dark:bg-gray-900/50 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden mb-6">
+                        class="relative w-full h-[500px] bg-gray-50 dark:bg-gray-900/50 rounded-2xl overflow-hidden mb-6">
 
                         <!-- Connection Line: Agnes to Dora (Family - Purple) -->
                         <svg class="absolute pointer-events-none overflow-visible connection-line family-connection"
@@ -1357,7 +1356,7 @@
                             <!-- Label shifted further 'up' the line -->
                             <text id="mentor-label" x="75" y="21" text-anchor="middle" alignment-baseline="middle"
                                 font-size="7" fill="black"
-                                class="font-bold uppercase tracking-[0.2em] cursor-pointer hover:fill-blue-600 transition-colors pointer-events-auto"
+                                class="font-bold uppercase tracking-[0.2em] cursor-pointer hover:fill-yellow-400 transition-colors pointer-events-auto"
                                 transform="rotate(-24, 75, 21)">
                                 Mentor
                             </text>
@@ -1558,7 +1557,7 @@
 
                 <!-- Right Column: Codex Panel -->
                 <div id="codex-container"
-                    class="reveal slide-up delay-200 relative h-[500px] bg-white dark:bg-surface-dark rounded-2xl border border-gray-100 dark:border-gray-800 shadow-xl overflow-hidden">
+                    class="reveal slide-up delay-200 relative h-[500px] overflow-hidden rounded-2xl transition-all duration-500">
 
                     <!-- Default State: Marketing Text -->
                     <div id="codex-default" class="h-full overflow-y-auto p-8 custom-scrollbar">
@@ -4885,7 +4884,7 @@
 
     <!-- Character Insight Drawer (Slides in from right) -->
     <div id="agnes-drawer"
-        class="fixed top-0 right-0 w-80 md:w-96 h-full bg-white dark:bg-surface-dark shadow-2xl transform translate-x-full transition-transform duration-500 z-[100] overflow-y-auto border-l border-gray-200 dark:border-border-dark selection:bg-accent/30">
+        class="fixed top-0 right-0 w-80 md:w-96 h-full bg-white dark:bg-surface-dark shadow-2xl transform translate-x-full transition-transform duration-500 z-[100] overflow-y-auto selection:bg-accent/30">
         <!-- Header -->
         <div
             class="p-5 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center sticky top-0 bg-white/80 dark:bg-surface-dark/80 backdrop-blur-md z-10">
@@ -4990,7 +4989,7 @@
 
     <!-- Lucius Temple Insight Drawer -->
     <div id="lucius-drawer"
-        class="fixed top-0 right-0 w-80 md:w-96 h-full bg-white dark:bg-surface-dark shadow-2xl transform translate-x-full transition-transform duration-500 z-[100] overflow-y-auto border-l border-gray-200 dark:border-border-dark selection:bg-accent/30">
+        class="fixed top-0 right-0 w-80 md:w-96 h-full bg-white dark:bg-surface-dark shadow-2xl transform translate-x-full transition-transform duration-500 z-[100] overflow-y-auto selection:bg-accent/30">
         <!-- Header -->
         <div
             class="p-5 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center sticky top-0 bg-white/80 dark:bg-surface-dark/80 backdrop-blur-md z-10">
@@ -5448,6 +5447,7 @@
             const activatePanel = (name) => {
                 const targetPanel = panels[name];
                 const isAlreadyOpen = targetPanel && !targetPanel.classList.contains('hidden');
+                const codexContainer = document.getElementById('codex-container');
 
                 // Stop previous auto-scroll
                 clearInterval(autoScrollInterval);
@@ -5461,13 +5461,22 @@
 
                 if (isAlreadyOpen && name !== 'default') {
                     if (panels.default) panels.default.classList.remove('hidden');
+                    // Remove card styling if going back to default
+                    codexContainer.classList.remove('bg-white', 'dark:bg-surface-dark', 'border', 'border-gray-100', 'dark:border-gray-800', 'shadow-xl');
                 } else {
                     if (targetPanel) {
                         targetPanel.classList.remove('hidden');
+                        // Add card styling if opening a specific character or specialized view
+                        if (name !== 'default') {
+                            codexContainer.classList.add('bg-white', 'dark:bg-surface-dark', 'border', 'border-gray-100', 'dark:border-gray-800', 'shadow-xl');
+                        } else {
+                            codexContainer.classList.remove('bg-white', 'dark:bg-surface-dark', 'border', 'border-gray-100', 'dark:border-gray-800', 'shadow-xl');
+                        }
                         // Start auto-scroll after a short delay to let user settle
                         setTimeout(() => startAutoScroll(targetPanel), 1000);
                     } else if (panels.default) {
                         panels.default.classList.remove('hidden');
+                        codexContainer.classList.remove('bg-white', 'dark:bg-surface-dark', 'border', 'border-gray-100', 'dark:border-gray-800', 'shadow-xl');
                     }
                 }
             };
