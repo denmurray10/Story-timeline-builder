@@ -117,8 +117,61 @@
         </div>
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-                <!-- Left: CTA Section -->
-                <div class="order-1 text-center lg:text-left">
+                <!-- Right: Visual Section (Moves to Left on LG) -->
+                <div class="relative order-2 lg:order-1">
+                    <div
+                        class="relative bg-white dark:bg-surface-dark rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 p-8 md:p-12 transform -rotate-1 transition-transform hover:rotate-0 duration-500 overflow-hidden">
+                        <div class="ink-blot"></div>
+                        <div class="font-serif text-lg leading-loose text-gray-800 dark:text-gray-200 opacity-60">
+                            <h3 class="font-bold text-2xl mb-6 text-primary dark:text-white">A Narrative Collapse</h3>
+                            <p class="mb-4">The inkwell shattered. Across the page, the carefully mapped foundations of
+                                the world began to blur and bleed into one another.</p>
+                            <p class="mb-4">Logic failed. The characters froze mid-sentence, waiting for the architect
+                                to fix the broken strings of the universe.</p>
+                        </div>
+                        <div class="mt-8 relative h-32 w-full opacity-30">
+                            <svg class="w-full h-full" viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg">
+                                <path class="text-gray-400 dark:text-gray-600" d="M 20 60 Q 100 20, 180 60 T 300 60"
+                                    fill="none" stroke="currentColor" stroke-dasharray="8,8" stroke-width="3"></path>
+                                <circle class="fill-current text-primary dark:text-white" cx="20" cy="60" r="6">
+                                </circle>
+                                <circle class="fill-current text-primary dark:text-white" cx="180" cy="60" r="6">
+                                </circle>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="absolute -bottom-10 -right-6 md:-right-10 z-20 max-w-xs w-full">
+                        <div
+                            class="glass-panel border border-white/20 dark:border-gray-700/50 rounded-2xl p-4 shadow-card backdrop-blur-md">
+                            <div class="flex items-start gap-4">
+                                <div class="relative flex-shrink-0">
+                                    <div
+                                        class="w-12 h-12 rounded-full bg-[#8B5CF6] flex items-center justify-center text-white shadow-lg">
+                                        <span class="material-symbols-outlined text-2xl">auto_awesome</span>
+                                    </div>
+                                    <span
+                                        class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 border-2 border-white dark:border-surface-dark rounded-full"></span>
+                                </div>
+                                <div class="flex-1">
+                                    <div
+                                        class="bg-white dark:bg-gray-800 rounded-lg rounded-tl-none p-3 shadow-sm border border-gray-100 dark:border-gray-700 relative">
+                                        <p class="text-sm text-gray-700 dark:text-gray-300 italic leading-relaxed">
+                                            "Something went wrong on the backend. I'm trying to re-bind the manuscript,
+                                            but we may need a moment."</p>
+                                    </div>
+                                    <div class="mt-2 flex gap-2">
+                                        <span
+                                            class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Penn
+                                            - Digital Assistant</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Left: CTA Section (Moves to Right on LG) -->
+                <div class="order-1 lg:order-2 text-center lg:text-left mb-12 lg:mb-0">
                     <div
                         class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800/30 shadow-sm mb-6">
                         <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
@@ -157,59 +210,6 @@
                                 <span class="material-symbols-outlined text-sm">flag</span>
                                 Report a Plot Hole
                             </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right: Visual Section -->
-                <div class="relative order-2">
-                    <div
-                        class="relative bg-white dark:bg-surface-dark rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 p-8 md:p-12 transform rotate-1 transition-transform hover:rotate-0 duration-500 overflow-hidden">
-                        <div class="ink-blot"></div>
-                        <div class="font-serif text-lg leading-loose text-gray-800 dark:text-gray-200 opacity-60">
-                            <h3 class="font-bold text-2xl mb-6 text-primary dark:text-white">A Narrative Collapse</h3>
-                            <p class="mb-4">The inkwell shattered. Across the page, the carefully mapped foundations of
-                                the world began to blur and bleed into one another.</p>
-                            <p class="mb-4">Logic failed. The characters froze mid-sentence, waiting for the architect
-                                to fix the broken strings of the universe.</p>
-                        </div>
-                        <div class="mt-8 relative h-32 w-full opacity-30">
-                            <svg class="w-full h-full" viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg">
-                                <path class="text-gray-400 dark:text-gray-600" d="M 20 60 Q 100 20, 180 60 T 300 60"
-                                    fill="none" stroke="currentColor" stroke-dasharray="8,8" stroke-width="3"></path>
-                                <circle class="fill-current text-primary dark:text-white" cx="20" cy="60" r="6">
-                                </circle>
-                                <circle class="fill-current text-primary dark:text-white" cx="180" cy="60" r="6">
-                                </circle>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="absolute -bottom-10 -left-6 md:-left-10 z-20 max-w-xs w-full">
-                        <div
-                            class="glass-panel border border-white/20 dark:border-gray-700/50 rounded-2xl p-4 shadow-card backdrop-blur-md">
-                            <div class="flex items-start gap-4">
-                                <div class="relative flex-shrink-0">
-                                    <div
-                                        class="w-12 h-12 rounded-full bg-[#8B5CF6] flex items-center justify-center text-white shadow-lg">
-                                        <span class="material-symbols-outlined text-2xl">auto_awesome</span>
-                                    </div>
-                                    <span
-                                        class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 border-2 border-white dark:border-surface-dark rounded-full"></span>
-                                </div>
-                                <div class="flex-1">
-                                    <div
-                                        class="bg-white dark:bg-gray-800 rounded-lg rounded-tl-none p-3 shadow-sm border border-gray-100 dark:border-gray-700 relative">
-                                        <p class="text-sm text-gray-700 dark:text-gray-300 italic leading-relaxed">
-                                            "Something went wrong on the backend. I'm trying to re-bind the manuscript,
-                                            but we may need a moment."</p>
-                                    </div>
-                                    <div class="mt-2 flex gap-2">
-                                        <span
-                                            class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Ghostwriter
-                                            AI</span>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
