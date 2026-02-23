@@ -138,6 +138,13 @@ def landing_page_v2(request):
     return render(request, 'timeline/landingpagev2.html')
 
 
+def pricing_page(request):
+    """
+    Renders the pricing page.
+    """
+    return render(request, 'timeline/pricing.html')
+
+
 
 # ============== Authentication Views ==============
 

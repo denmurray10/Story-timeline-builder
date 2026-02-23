@@ -19,6 +19,7 @@ urlpatterns = [
     path('landing-pagev2/', views.landing_page_v2, name='landing_page_v2'),
     path('landingpagev2/', views.landing_page_v2),
     path('landingpagev2.html', views.landing_page_v2),
+    path('pricing/', views.pricing_page, name='pricing'),
     
     # Books
     path('books/', views.book_list, name='book_list'),
