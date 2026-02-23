@@ -15,7 +15,16 @@ class UserRegisterForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ["first_name", "last_name", "username", "email", "password1", "password2"]
+        fields = ["first_name", "last_name", "username", "email"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["first_name"].widget.attrs.update({"placeholder": "Dennis"})
+        self.fields["last_name"].widget.attrs.update({"placeholder": "Murray"})
+        self.fields["email"].widget.attrs.update({"placeholder": "writer@example.com"})
+        self.fields["username"].widget.attrs.update({"placeholder": "dmurray10"})
+        self.fields["password1"].widget.attrs.update({"placeholder": "••••••••••••"})
+        self.fields["password2"].widget.attrs.update({"placeholder": "••••••••••••"})
 
     def save(self, commit=True):
         """Save the user with first/last name and email set."""
