@@ -154,19 +154,23 @@
                                     Updates</button>
                                 <button data-filter="new"
                                     class="filter-btn w-full text-left px-4 py-2 rounded-full text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary dark:hover:text-white text-sm font-medium transition-colors flex justify-between items-center group">Features
+                                    <!-- prettier-ignore -->
                                     <span
-                                        class="bg-gray-100 dark:bg-gray-700 text-gray-500 text-xs px-2 py-0.5 rounded-full group-hover:bg-white dark:group-hover:bg-gray-600">{{
-                                        features_count }}</span></button>
+                                        class="bg-gray-100 dark:bg-gray-700 text-gray-500 text-xs px-2 py-0.5 rounded-full group-hover:bg-white dark:group-hover:bg-gray-600">{{ features_count  }}</span>
+                                </button>
                                 <button data-filter="improvement"
                                     class="filter-btn w-full text-left px-4 py-2 rounded-full text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary dark:hover:text-white text-sm font-medium transition-colors flex justify-between items-center group">Improvements
+                                    <!-- prettier-ignore -->
                                     <span
-                                        class="bg-gray-100 dark:bg-gray-700 text-gray-500 text-xs px-2 py-0.5 rounded-full group-hover:bg-white dark:group-hover:bg-gray-600">{{
-                                        improvements_count }}</span></button>
+                                        class="bg-gray-100 dark:bg-gray-700 text-gray-500 text-xs px-2 py-0.5 rounded-full group-hover:bg-white dark:group-hover:bg-gray-600">{{ improvements_count  }}</span>
+                                </button>
                                 <button data-filter="fix"
                                     class="filter-btn w-full text-left px-4 py-2 rounded-full text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary dark:hover:text-white text-sm font-medium transition-colors flex justify-between items-center group">Bug
-                                    Fixes <span
-                                        class="bg-gray-100 dark:bg-gray-700 text-gray-500 text-xs px-2 py-0.5 rounded-full group-hover:bg-white dark:group-hover:bg-gray-600">{{
-                                        fixes_count }}</span></button>
+                                    Fixes
+                                    <!-- prettier-ignore -->
+                                    <span
+                                        class="bg-gray-100 dark:bg-gray-700 text-gray-500 text-xs px-2 py-0.5 rounded-full group-hover:bg-white dark:group-hover:bg-gray-600">{{ fixes_count  }}</span>
+                                </button>
                             </nav>
                         </div>
                         <div
@@ -202,20 +206,26 @@
                                 <div
                                     class="flex flex-col sm:flex-row sm:items-baseline justify-between mb-6 border-b border-gray-100 dark:border-gray-800 pb-4">
                                     <div class="flex items-center gap-3">
-                                        <h2 class="text-2xl font-serif font-bold text-primary dark:text-white">{% if
-                                            entry.version %}{{ entry.version }}{% endif %}</h2>
-                                        {% if forloop.first %}<span
-                                            class="px-2 py-1 bg-green-100 text-green-800 text-xs font-bold uppercase rounded-full tracking-wider dark:bg-green-900/30 dark:text-green-400">Latest</span>{%
-                                        endif %}
+                                        <h2 class="text-2xl font-serif font-bold text-primary dark:text-white">
+                                            {% if entry.version %}
+                                            {{ entry.version }}
+                                            {% endif %}
+                                        </h2>
+                                        {% if forloop.first %}
+                                        <span
+                                            class="px-2 py-1 bg-green-100 text-green-800 text-xs font-bold uppercase rounded-full tracking-wider dark:bg-green-900/30 dark:text-green-400">
+                                            Latest
+                                        </span>
+                                        {% endif %}
                                     </div>
-                                    <span class="font-serif text-gray-500 dark:text-gray-400 italic mt-2 sm:mt-0">{{
-                                        entry.date|date:"F d, Y" }}</span>
+                                    <!-- prettier-ignore -->
+                                    <span class="font-serif text-gray-500 dark:text-gray-400 italic mt-2 sm:mt-0">{{ entry.date|date:"F d, Y"  }}</span>
                                 </div>
                                 <div class="mb-6">
                                     <h3 class="text-xl font-bold text-primary dark:text-white mb-2">{{ entry.title }}
                                     </h3>
-                                    <div class="text-gray-600 dark:text-gray-300 leading-relaxed">{{
-                                        entry.description|linebreaksbr }}</div>
+                                    <!-- prettier-ignore -->
+                                    <div class="text-gray-600 dark:text-gray-300 leading-relaxed">{{ entry.description|linebreaksbr  }}</div>
                                 </div>
                                 <div class="flex flex-wrap gap-2 mb-4">
                                     {% if entry.category == 'new' %}
