@@ -27,7 +27,7 @@
                 <div class="text-center text-white mb-3">
                     <div class="spinner-border mb-2" role="status"></div>
                     <div class="fw-bold">Import in Progress...</div>
-                    <small class="d-block mb-3">Please wait while AI analyzes your book.</small>
+                    <small class="d-block mb-3">Please wait while AI analyses your book.</small>
 
                     <form action="{% url 'book_delete' book.pk %}" method="post" class="d-inline">
                         {% csrf_token %}
@@ -182,7 +182,7 @@
                                 clearInterval(checkStatus);
                                 if ("Notification" in window && Notification.permission === "granted") {
                                     new Notification("Import Complete!", {
-                                        body: `Your book has been successfully analyzed. Refresh the page to view it.`
+                                        body: `Your book has been successfully analysed. Refresh the page to view it.`
                                     });
                                 } else {
                                     alert(`Success! Book analysis is complete. The page will now reload.`);

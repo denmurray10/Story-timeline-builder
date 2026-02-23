@@ -233,14 +233,14 @@
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // Apply colors from data attributes to avoid CSS linting errors
+        // Apply colours from data attributes to avoid CSS linting errors
         document.querySelectorAll('.js-color-apply').forEach(el => {
-            const color = el.getAttribute('data-color');
-            if (color) {
+            const colour = el.getAttribute('data-color');
+            if (colour) {
                 if (el.classList.contains('tag-badge-solid')) {
-                    el.style.backgroundColor = color;
+                    el.style.backgroundColor = colour;
                 } else {
-                    el.style.backgroundColor = color;
+                    el.style.backgroundColor = colour;
                 }
             }
         });
