@@ -79,6 +79,10 @@ def handler500(request):
     """Custom 500 error handler."""
     return render(request, '500.html', status=500)
 
+def manuscripts_preview(request):
+    """Temporary view to preview the new manuscripts design."""
+    return render(request, 'timeline/manuscripts.html')
+
 class CustomLoginView(DjangoLoginView):
     """
     Login view that adds daily AI-generated quotes to the context.

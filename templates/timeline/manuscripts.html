@@ -1,0 +1,461 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Story Timeline Builder - Manuscript Manager V2</title>
+    <meta content="Manage your manuscripts and track AI insights." name="description" />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&amp;family=Inter:wght@300;400;500;600;700&amp;family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#1A1A1A", // Very dark grey
+                        accent: "#F4EBD9", // Warm parchment
+                        "warm-white": "#FDFCF8", // The story bible page color
+                        "background-light": "#F2F0EB", // Outer background
+                        "surface-light": "#FFFFFF",
+                        "text-main": "#262626",
+                        "text-muted": "#666666",
+                        "border-subtle": "#E5E5E5",
+                        "highlight": "#D4A373", // A warm highlight color
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['DM Serif Display', 'serif'],
+                        display: ['Playfair Display', 'serif'],
+                    }
+                },
+            },
+        };
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-balance {
+                text-wrap: balance;
+            }
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+            .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            nav {
+                transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+            }
+            nav.scrolled {
+                background-color: rgba(242, 240, 235, 0.95);
+                backdrop-filter: blur(12px);
+                border-bottom: 1px solid rgba(0,0,0,0.05);
+            }
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light text-text-main font-sans antialiased min-h-screen flex flex-col relative overflow-x-hidden selection:bg-primary selection:text-white">
+    <nav id="main-nav"
+        class="fixed w-full z-50 top-0 left-0 bg-background-light/90 backdrop-blur-md border-b border-transparent transition-all duration-500">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <a href="{% url 'landing_page_v2' %}" class="flex-shrink-0 flex items-center cursor-pointer">
+                    <img src="{% static 'img/logo.webp' %}" alt="Story Timeline Builder"
+                        style="height: 3.5rem; width: auto;">
+                </a>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a class="text-sm font-medium text-gray-600 hover:text-primary transition-colors"
+                        href="{% url 'coming_soon' %}">Features</a>
+                    <a class="text-sm font-medium text-gray-600 hover:text-primary transition-colors"
+                        href="{% url 'pricing' %}">Pricing</a>
+                    <a class="text-sm font-medium text-gray-600 hover:text-primary transition-colors"
+                        href="{% url 'coming_soon' %}">Resources</a>
+                    <a class="bg-primary text-white px-5 py-2.5 rounded-full text-sm font-medium hover:opacity-90 transition-opacity shadow-sm"
+                        href="{% url 'login' %}">Start Writing</a>
+                </div>
+                <div class="md:hidden flex items-center">
+                    <button class="text-primary p-2">
+                        <span class="material-icons-outlined">menu</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="h-20"></div> <!-- Spacer for fixed nav -->
+    <main class="relative z-10 flex-grow w-full px-4 md:px-8 py-8 md:py-10 max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 h-full">
+            <div class="lg:col-span-8 flex flex-col gap-6">
+                <div class="flex justify-between items-end mb-2">
+                    <div>
+                        <h1 class="font-serif text-4xl text-primary mb-2">Your Manuscripts</h1>
+                        <p class="text-text-muted font-light">Manage your active projects and archives.</p>
+                    </div>
+                    <button
+                        class="bg-primary text-white px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2 text-sm font-medium">
+                        <span class="material-symbols-outlined text-lg">add</span>
+                        New Project
+                    </button>
+                </div>
+                <div class="flex gap-4 border-b border-border-subtle pb-4 overflow-x-auto scrollbar-hide">
+                    <button class="text-primary font-semibold border-b-2 border-primary pb-4 -mb-4.5 px-2">Active Works
+                        (3)</button>
+                    <button
+                        class="text-text-muted hover:text-primary transition-colors pb-4 -mb-4.5 px-2">Completed</button>
+                    <button
+                        class="text-text-muted hover:text-primary transition-colors pb-4 -mb-4.5 px-2">Archives</button>
+                </div>
+                <div class="space-y-4">
+                    <div
+                        class="bg-warm-white rounded-xl border border-border-subtle shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden group">
+                        <div class="flex flex-col md:flex-row p-5 gap-6 items-start md:items-center">
+                            <div
+                                class="w-full md:w-24 h-32 bg-gray-200 rounded-md shadow-inner flex-shrink-0 relative overflow-hidden group-hover:scale-[1.02] transition-transform">
+                                <div class="absolute inset-0 bg-cover bg-center" style="background-color: #2c3e50;">
+                                </div>
+                                <div
+                                    class="absolute inset-0 flex items-center justify-center text-white/20 font-serif text-4xl">
+                                    1</div>
+                            </div>
+                            <div class="flex-grow min-w-0">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h3
+                                            class="font-serif text-2xl text-primary leading-tight group-hover:text-highlight transition-colors cursor-pointer">
+                                            The Silent Clockwork</h3>
+                                        <div class="flex items-center gap-3 mt-1 text-sm text-text-muted">
+                                            <span
+                                                class="bg-accent/50 px-2 py-0.5 rounded text-xs font-medium tracking-wide uppercase text-primary/80">Steampunk
+                                                / Mystery</span>
+                                            <span>•</span>
+                                            <span>Edited 2 hours ago</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button
+                                            class="p-2 text-text-muted hover:text-primary rounded-full hover:bg-gray-100 transition-colors">
+                                            <span class="material-symbols-outlined">edit</span>
+                                        </button>
+                                        <button
+                                            class="p-2 text-text-muted hover:text-primary rounded-full hover:bg-gray-100 transition-colors">
+                                            <span class="material-symbols-outlined">more_vert</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span class="font-medium text-text-main">Draft 2 Progress</span>
+                                        <span class="text-text-muted">65,400 / 90,000 words</span>
+                                    </div>
+                                    <div class="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                                        <div class="bg-primary h-1.5 rounded-full" style="width: 72%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="bg-accent/20 border-t border-border-subtle/50 px-5 py-3 flex flex-col md:flex-row gap-4 md:items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-highlight text-lg fill-1">psychology</span>
+                                <span class="text-xs font-bold uppercase tracking-wider text-primary">Deep
+                                    Intelligence:</span>
+                                <span class="text-sm text-text-main">2 critical plot inconsistencies detected.</span>
+                            </div>
+                            <button
+                                class="text-xs font-semibold text-primary hover:text-highlight transition-colors flex items-center gap-1 group/btn">
+                                View Insights
+                                <span
+                                    class="material-symbols-outlined text-sm group-hover/btn:translate-x-0.5 transition-transform">arrow_forward</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-warm-white rounded-xl border border-border-subtle shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden group">
+                        <div class="flex flex-col md:flex-row p-5 gap-6 items-start md:items-center">
+                            <div
+                                class="w-full md:w-24 h-32 bg-gray-200 rounded-md shadow-inner flex-shrink-0 relative overflow-hidden group-hover:scale-[1.02] transition-transform">
+                                <div class="absolute inset-0 bg-cover bg-center" style="background-color: #8e44ad;">
+                                </div>
+                                <div
+                                    class="absolute inset-0 flex items-center justify-center text-white/20 font-serif text-4xl">
+                                    2</div>
+                            </div>
+                            <div class="flex-grow min-w-0">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h3
+                                            class="font-serif text-2xl text-primary leading-tight group-hover:text-highlight transition-colors cursor-pointer">
+                                            Echoes of Aethelgard</h3>
+                                        <div class="flex items-center gap-3 mt-1 text-sm text-text-muted">
+                                            <span
+                                                class="bg-accent/50 px-2 py-0.5 rounded text-xs font-medium tracking-wide uppercase text-primary/80">High
+                                                Fantasy</span>
+                                            <span>•</span>
+                                            <span>Edited yesterday</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button
+                                            class="p-2 text-text-muted hover:text-primary rounded-full hover:bg-gray-100 transition-colors">
+                                            <span class="material-symbols-outlined">edit</span>
+                                        </button>
+                                        <button
+                                            class="p-2 text-text-muted hover:text-primary rounded-full hover:bg-gray-100 transition-colors">
+                                            <span class="material-symbols-outlined">more_vert</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span class="font-medium text-text-main">Planning Phase</span>
+                                        <span class="text-text-muted">12 Characters • 5 Locations</span>
+                                    </div>
+                                    <div class="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                                        <div class="bg-primary h-1.5 rounded-full" style="width: 15%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="bg-accent/20 border-t border-border-subtle/50 px-5 py-3 flex flex-col md:flex-row gap-4 md:items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-green-600 text-lg">check_circle</span>
+                                <span class="text-xs font-bold uppercase tracking-wider text-primary">Deep
+                                    Intelligence:</span>
+                                <span class="text-sm text-text-main">Character arc for "Elara" is fully
+                                    optimized.</span>
+                            </div>
+                            <button
+                                class="text-xs font-semibold text-primary hover:text-highlight transition-colors flex items-center gap-1 group/btn">
+                                View Insights
+                                <span
+                                    class="material-symbols-outlined text-sm group-hover/btn:translate-x-0.5 transition-transform">arrow_forward</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-warm-white rounded-xl border border-border-subtle shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden group">
+                        <div class="flex flex-col md:flex-row p-5 gap-6 items-start md:items-center">
+                            <div
+                                class="w-full md:w-24 h-32 bg-gray-200 rounded-md shadow-inner flex-shrink-0 relative overflow-hidden group-hover:scale-[1.02] transition-transform">
+                                <div class="absolute inset-0 bg-cover bg-center" style="background-color: #c0392b;">
+                                </div>
+                                <div
+                                    class="absolute inset-0 flex items-center justify-center text-white/20 font-serif text-4xl">
+                                    3</div>
+                            </div>
+                            <div class="flex-grow min-w-0">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h3
+                                            class="font-serif text-2xl text-primary leading-tight group-hover:text-highlight transition-colors cursor-pointer">
+                                            Protocol: Gemini</h3>
+                                        <div class="flex items-center gap-3 mt-1 text-sm text-text-muted">
+                                            <span
+                                                class="bg-accent/50 px-2 py-0.5 rounded text-xs font-medium tracking-wide uppercase text-primary/80">Sci-Fi
+                                                Thriller</span>
+                                            <span>•</span>
+                                            <span>Edited 3 days ago</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button
+                                            class="p-2 text-text-muted hover:text-primary rounded-full hover:bg-gray-100 transition-colors">
+                                            <span class="material-symbols-outlined">edit</span>
+                                        </button>
+                                        <button
+                                            class="p-2 text-text-muted hover:text-primary rounded-full hover:bg-gray-100 transition-colors">
+                                            <span class="material-symbols-outlined">more_vert</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span class="font-medium text-text-main">First Draft Complete</span>
+                                        <span class="text-text-muted">Waiting for review</span>
+                                    </div>
+                                    <div class="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                                        <div class="bg-green-600 h-1.5 rounded-full" style="width: 100%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="bg-accent/20 border-t border-border-subtle/50 px-5 py-3 flex flex-col md:flex-row gap-4 md:items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-yellow-600 text-lg">warning</span>
+                                <span class="text-xs font-bold uppercase tracking-wider text-primary">Deep
+                                    Intelligence:</span>
+                                <span class="text-sm text-text-main">Pacing slows significantly in Act 2.</span>
+                            </div>
+                            <button
+                                class="text-xs font-semibold text-primary hover:text-highlight transition-colors flex items-center gap-1 group/btn">
+                                View Insights
+                                <span
+                                    class="material-symbols-outlined text-sm group-hover/btn:translate-x-0.5 transition-transform">arrow_forward</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="lg:col-span-4 pl-0 lg:pl-4">
+                <div
+                    class="sticky top-28 bg-white border border-border-subtle rounded-2xl shadow-sm overflow-hidden flex flex-col max-h-[calc(100vh-140px)]">
+                    <div class="p-5 border-b border-border-subtle bg-accent/10">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="material-symbols-outlined text-primary">auto_awesome</span>
+                            <h2 class="font-serif text-xl text-primary">Ghostwriter Consultant</h2>
+                        </div>
+                        <p class="text-xs text-text-muted">Real-time narrative analysis across your universe.</p>
+                    </div>
+                    <div class="overflow-y-auto p-5 space-y-6 scrollbar-hide">
+                        <div
+                            class="relative pl-4 border-l-2 border-primary/20 hover:border-highlight transition-colors group">
+                            <div
+                                class="absolute -left-[5px] top-0 w-2.5 h-2.5 rounded-full bg-white border-2 border-primary group-hover:border-highlight">
+                            </div>
+                            <span class="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-1 block">Just
+                                now • Silent Clockwork</span>
+                            <p class="text-sm text-text-main leading-relaxed">
+                                <span class="font-semibold text-primary">Protagonist A</span> is reaching peak emotional
+                                tension in Chapter 14. Consider mirroring this with the weather descriptions.
+                            </p>
+                            <div class="mt-2 flex gap-2">
+                                <button
+                                    class="text-[10px] border border-border-subtle px-2 py-1 rounded hover:bg-gray-50 text-text-muted hover:text-primary transition-colors">Apply
+                                    Suggestion</button>
+                            </div>
+                        </div>
+                        <div
+                            class="relative pl-4 border-l-2 border-primary/20 hover:border-highlight transition-colors group">
+                            <div
+                                class="absolute -left-[5px] top-0 w-2.5 h-2.5 rounded-full bg-white border-2 border-primary group-hover:border-highlight">
+                            </div>
+                            <span class="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-1 block">15m
+                                ago • Echoes of Aethelgard</span>
+                            <p class="text-sm text-text-main leading-relaxed">
+                                New location <span class="font-semibold text-primary">The Sunken Spire</span> added to
+                                the Story Bible. Automatically linked to faction: The Drowned Gods.
+                            </p>
+                        </div>
+                        <div
+                            class="relative pl-4 border-l-2 border-primary/20 hover:border-highlight transition-colors group">
+                            <div
+                                class="absolute -left-[5px] top-0 w-2.5 h-2.5 rounded-full bg-white border-2 border-primary group-hover:border-highlight">
+                            </div>
+                            <span class="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-1 block">2h
+                                ago • Protocol: Gemini</span>
+                            <p class="text-sm text-text-main leading-relaxed">
+                                Warning: <span class="font-semibold text-primary">Act 2 Pacing</span> is 15% slower than
+                                genre average.
+                            </p>
+                            <div class="bg-red-50 p-2 rounded mt-2 border border-red-100">
+                                <div class="flex items-start gap-2">
+                                    <span class="material-symbols-outlined text-red-500 text-xs mt-0.5">error</span>
+                                    <p class="text-xs text-red-700 italic">"The dialogue in scene 4 drags the momentum."
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="relative pl-4 border-l-2 border-primary/20 hover:border-highlight transition-colors group">
+                            <div
+                                class="absolute -left-[5px] top-0 w-2.5 h-2.5 rounded-full bg-white border-2 border-primary group-hover:border-highlight">
+                            </div>
+                            <span class="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-1 block">5h
+                                ago • General</span>
+                            <p class="text-sm text-text-main leading-relaxed">
+                                Daily writing goal achieved. You've written <span class="font-bold">2,400 words</span>
+                                today across all projects. Keep the momentum!
+                            </p>
+                        </div>
+                    </div>
+                    <div class="p-3 border-t border-border-subtle bg-gray-50 text-center">
+                        <button
+                            class="text-xs font-semibold text-primary hover:text-highlight transition-colors uppercase tracking-widest">View
+                            Full Report</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer class="bg-background-light pt-20 pb-10 relative z-10 border-t border-border-subtle/50 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-16">
+                <div class="col-span-2 lg:col-span-2">
+                    <div class="flex items-center mb-4">
+                        <img src="{% static 'img/logo.webp' %}" alt="Story Timeline Builder"
+                            style="height: 3.5rem; width: auto;">
+                    </div>
+                    <p class="text-sm text-gray-500 max-w-xs mb-6">
+                        Architecting narrative worlds through a synthesis of structured planning, contextual
+                        intelligence, and uncompromised creative flow.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-primary mb-4">Product</h4>
+                    <ul class="space-y-3 text-sm text-gray-600">
+                        <li><a class="hover:text-primary" href="{% url 'coming_soon' %}">Features</a></li>
+                        <li><a class="hover:text-primary" href="{% url 'pricing' %}">Pricing</a></li>
+                        <li><a class="hover:text-primary" href="{% url 'changelog' %}">Changelog</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-primary mb-4">Resources</h4>
+                    <ul class="space-y-3 text-sm text-gray-600">
+                        <li><a class="hover:text-primary" href="{% url 'coming_soon' %}">Community</a></li>
+                        <li><a class="hover:text-primary" href="{% url 'coming_soon' %}">Help Center</a></li>
+                        <li><a class="hover:text-primary" href="{% url 'coming_soon' %}">Blog</a></li>
+                        <li><a class="hover:text-primary" href="{% url 'coming_soon' %}">Writers Guide</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-primary mb-4">Legal</h4>
+                    <ul class="space-y-3 text-sm text-gray-600">
+                        <li><a class="hover:text-primary" href="{% url 'coming_soon' %}">Privacy Policy</a></li>
+                        <li><a class="hover:text-primary" href="{% url 'coming_soon' %}">Terms of Service</a></li>
+                        <li><a class="hover:text-primary" href="{% url 'coming_soon' %}">Cookie Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-200 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-sm text-gray-500">© 2026 Story Timeline Builder. All rights reserved.</p>
+                <div class="flex gap-4 text-gray-400">
+                    <a class="hover:text-primary transition-colors" href="{% url 'coming_soon' %}">
+                        <span class="material-icons-outlined">flutter_dash</span>
+                    </a>
+                    <a class="hover:text-primary transition-colors" href="{% url 'coming_soon' %}">
+                        <span class="material-icons-outlined">code</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const nav = document.getElementById('main-nav');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 20) {
+                    nav.classList.add('scrolled');
+                } else {
+                    nav.classList.remove('scrolled');
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>

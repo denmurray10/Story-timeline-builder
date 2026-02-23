@@ -445,14 +445,14 @@
                 id="card-writing-mode" style="border-radius: 20px;">
                 <div class="dash-card-header d-flex align-items-center text-white mb-3">
                     <i class="bi bi-grip-vertical drag-handle me-2"></i>
-                    <span class="badge bg-primary">Writing Mode</span>
+                    <span class="badge bg-dark">Writing Mode</span>
                 </div>
                 <div class="px-2">
                     <h3 class="mb-2 fw-bold">Continue Your Manuscript</h3>
                     <p class="opacity-75 mb-4">Jump back into your last edited chapter. Distraction-free, AI-powered
                         writing awaits.</p>
                     <a href="{% url 'writing_mode_latest' %}"
-                        class="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow">
+                        class="btn btn-dark w-100 rounded-pill py-3 fw-bold shadow">
                         <i class="bi bi-pencil-square me-2"></i> Start Writing Now
                     </a>
                 </div>
@@ -690,14 +690,14 @@
 
                     modeLabel.textContent = "Writer Mode";
                     modeIcon.textContent = "✍️";
-                    modeLabel.classList.add('text-primary');
+                    modeLabel.classList.add('text-dark');
                 } else { // ARCHITECT MODE ACTIVE (Standard Dashboard)
                     writerModeContainer.style.display = 'none'; // Hide New
                     if (writerWidgets) writerWidgets.style.display = 'flex'; // Show Old
 
                     modeLabel.textContent = "Architect View";
                     modeIcon.textContent = "📐";
-                    modeLabel.classList.remove('text-primary');
+                    modeLabel.classList.remove('text-dark');
                 }
 
                 // Persist state
@@ -955,7 +955,7 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <div class="dash-book-title">Book {{ book.series_order }}: {{ book.title }}</div>
                                 <span
-                                    class="dash-status-pill badge {% if book.status|lower == 'importing' %}bg-info{% elif book.status|lower == 'drafting' %}bg-warning text-dark{% elif book.status|lower == 'complete' or book.status|lower == 'published' %}bg-success{% elif book.status|lower == 'editing' %}bg-primary{% else %}bg-secondary{% endif %}">
+                                    class="dash-status-pill badge {% if book.status|lower == 'importing' %}bg-info{% elif book.status|lower == 'drafting' %}bg-warning text-dark{% elif book.status|lower == 'complete' or book.status|lower == 'published' %}bg-success{% elif book.status|lower == 'editing' %}bg-dark{% else %}bg-secondary{% endif %}">
                                     {{ book.get_status_display }}
                                 </span>
                             </div>
@@ -1008,7 +1008,7 @@
                 {% elif element.type == 'event' %}
                 <div class="p-2 rounded-3 border bg-white"
                     style="border-style: dashed; flex: 1 1 auto; border-color: #6366f1;">
-                    <span class="badge bg-primary">Key Event</span>
+                    <span class="badge bg-dark">Key Event</span>
                     <div class="mt-1 fw-bold" style="font-size: 0.9rem;">{{ element.content }}</div>
                 </div>
                 {% elif element.type == 'motivation' %}
