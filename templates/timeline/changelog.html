@@ -78,13 +78,27 @@
         .dark .timeline-line {
             background-color: #333;
         }
+
+        /* Nav Padding Scroll Logic */
+        nav {
+            top: 50px !important;
+            transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+        }
+
+        nav.scrolled {
+            top: 0 !important;
+        }
+
+        .dark nav.scrolled {
+            top: 0 !important;
+        }
     </style>
 </head>
 
 <body
     class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-sans transition-colors duration-300 antialiased selection:bg-accent selection:text-primary">
-    <nav
-        class="fixed w-full z-50 top-0 left-0 transition-all duration-300 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md border-b border-transparent dark:border-border-dark">
+    <nav id="main-nav"
+        class="fixed w-full z-50 left-0 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md border-b border-transparent dark:border-border-dark">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20">
                 <a href="{% url 'landing_page_v2' %}" class="flex-shrink-0 flex items-center gap-2 cursor-pointer">
@@ -109,11 +123,17 @@
             </div>
         </div>
     </nav>
-    <main class="pt-32 pb-20 min-h-screen">
+    <main class="pt-[200px] pb-20 min-h-screen">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16 relative">
+            <div class="text-center mb-16 relative flex flex-col items-center">
                 <div
                     class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-accent/30 rounded-full blur-3xl -z-10 opacity-50">
+                </div>
+                <div
+                    class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark shadow-sm mb-8">
+                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                    <span class="text-xs font-semibold tracking-wide uppercase text-gray-500 dark:text-gray-400">v2.4.1
+                        Latest</span>
                 </div>
                 <h1 class="text-5xl md:text-6xl font-serif text-primary dark:text-white mb-4 leading-tight">Changelog
                 </h1>
@@ -129,28 +149,21 @@
                                 class="font-serif text-lg font-bold mb-4 text-primary dark:text-white border-b border-gray-200 dark:border-gray-800 pb-2">
                                 Filter Updates</h3>
                             <nav class="space-y-2">
-                                <button
-                                    class="w-full text-left px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium transition-colors">
-                                    All Updates
-                                </button>
-                                <button
-                                    class="w-full text-left px-4 py-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary dark:hover:text-white text-sm font-medium transition-colors flex justify-between items-center group">
-                                    Features
+                                <button data-filter="all"
+                                    class="filter-btn w-full text-left px-4 py-2 rounded-full bg-primary text-white text-sm font-medium transition-colors">All
+                                    Updates</button>
+                                <button data-filter="new"
+                                    class="filter-btn w-full text-left px-4 py-2 rounded-full text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary dark:hover:text-white text-sm font-medium transition-colors flex justify-between items-center group">Features
                                     <span
-                                        class="bg-gray-100 dark:bg-gray-700 text-gray-500 text-xs px-2 py-0.5 rounded-full group-hover:bg-white dark:group-hover:bg-gray-600">{{ features_count }}</span>
-                                </button>
-                                <button
-                                    class="w-full text-left px-4 py-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary dark:hover:text-white text-sm font-medium transition-colors flex justify-between items-center group">
-                                    Improvements
+                                        class="bg-gray-100 dark:bg-gray-700 text-gray-500 text-xs px-2 py-0.5 rounded-full group-hover:bg-white dark:group-hover:bg-gray-600">{{ features_count }}</span></button>
+                                <button data-filter="improvement"
+                                    class="filter-btn w-full text-left px-4 py-2 rounded-full text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary dark:hover:text-white text-sm font-medium transition-colors flex justify-between items-center group">Improvements
                                     <span
-                                        class="bg-gray-100 dark:bg-gray-700 text-gray-500 text-xs px-2 py-0.5 rounded-full group-hover:bg-white dark:group-hover:bg-gray-600">{{ improvements_count }}</span>
-                                </button>
-                                <button
-                                    class="w-full text-left px-4 py-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary dark:hover:text-white text-sm font-medium transition-colors flex justify-between items-center group">
-                                    Bug Fixes
-                                    <span
-                                        class="bg-gray-100 dark:bg-gray-700 text-gray-500 text-xs px-2 py-0.5 rounded-full group-hover:bg-white dark:group-hover:bg-gray-600">{{ fixes_count }}</span>
-                                </button>
+                                        class="bg-gray-100 dark:bg-gray-700 text-gray-500 text-xs px-2 py-0.5 rounded-full group-hover:bg-white dark:group-hover:bg-gray-600">{{ improvements_count }}</span></button>
+                                <button data-filter="fix"
+                                    class="filter-btn w-full text-left px-4 py-2 rounded-full text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary dark:hover:text-white text-sm font-medium transition-colors flex justify-between items-center group">Bug
+                                    Fixes <span
+                                        class="bg-gray-100 dark:bg-gray-700 text-gray-500 text-xs px-2 py-0.5 rounded-full group-hover:bg-white dark:group-hover:bg-gray-600">{{ fixes_count }}</span></button>
                             </nav>
                         </div>
                         <div
@@ -160,10 +173,10 @@
                                 to your inbox.</p>
                             <form class="space-y-2">
                                 <input
-                                    class="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none"
+                                    class="w-full px-3 py-2 rounded-full border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none"
                                     placeholder="Email address" type="email" />
                                 <button
-                                    class="w-full bg-primary text-white dark:bg-white dark:text-primary px-3 py-2 rounded-md text-sm font-medium hover:opacity-90 transition-opacity">Subscribe</button>
+                                    class="w-full bg-primary text-white dark:bg-white dark:text-primary px-3 py-2 rounded-full text-sm font-medium hover:opacity-90 transition-opacity">Subscribe</button>
                             </form>
                         </div>
                     </div>
@@ -171,7 +184,7 @@
                 <div class="flex-1 max-w-3xl">
                     <div class="relative space-y-12 pl-4 md:pl-0">
                         {% for entry in entries %}
-                        <div class="timeline-item relative pl-0 md:pl-12">
+                        <div class="timeline-item relative pl-0 md:pl-12" data-category="{{ entry.category }}">
                             <div
                                 class="hidden md:block absolute left-2 top-8 w-3 h-3 {% if forloop.first %}bg-primary dark:bg-white{% else %}bg-gray-300 dark:bg-gray-600{% endif %} rounded-full border-4 border-background-light dark:border-background-dark z-10 box-content">
                             </div>
@@ -186,12 +199,14 @@
                                     class="flex flex-col sm:flex-row sm:items-baseline justify-between mb-6 border-b border-gray-100 dark:border-gray-800 pb-4">
                                     <div class="flex items-center gap-3">
                                         <h2 class="text-2xl font-serif font-bold text-primary dark:text-white">{% if entry.version %}{{ entry.version }}{% endif %}</h2>
-                                        {% if forloop.first %}<span class="px-2 py-1 bg-green-100 text-green-800 text-xs font-bold uppercase rounded-full tracking-wider dark:bg-green-900/30 dark:text-green-400">Latest</span>{% endif %}
+                                        {% if forloop.first %}<span
+                                            class="px-2 py-1 bg-green-100 text-green-800 text-xs font-bold uppercase rounded-full tracking-wider dark:bg-green-900/30 dark:text-green-400">Latest</span>{% endif %}
                                     </div>
                                     <span class="font-serif text-gray-500 dark:text-gray-400 italic mt-2 sm:mt-0">{{ entry.date|date:"F d, Y" }}</span>
                                 </div>
                                 <div class="mb-6">
-                                    <h3 class="text-xl font-bold text-primary dark:text-white mb-2">{{ entry.title }}</h3>
+                                    <h3 class="text-xl font-bold text-primary dark:text-white mb-2">{{ entry.title }}
+                                    </h3>
                                     <div class="text-gray-600 dark:text-gray-300 leading-relaxed">{{ entry.description|linebreaksbr }}</div>
                                 </div>
                                 <div class="flex flex-wrap gap-2 mb-4">
@@ -241,7 +256,7 @@
         </div>
         </div>
     </main>
-        <footer class="bg-background-light dark:bg-background-dark pt-20 pb-10 relative">
+    <footer class="bg-background-light dark:bg-background-dark pt-20 pb-10 relative">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-16">
                 <div class="col-span-2 lg:col-span-2">
@@ -257,40 +272,109 @@
                 <div>
                     <h4 class="font-bold text-primary dark:text-white mb-4">Product</h4>
                     <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
-                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'landing_page_v2' %}">Features</a></li>
-                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'pricing' %}">Pricing</a></li>
-                        <li><a class="hover:text-primary dark:hover:text-white font-bold text-primary dark:text-white" href="{% url 'changelog' %}">Changelog</a></li>
-                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Download</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white"
+                                href="{% url 'landing_page_v2' %}">Features</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'pricing' %}">Pricing</a>
+                        </li>
+                        <li><a class="hover:text-primary dark:hover:text-white font-bold text-primary dark:text-white"
+                                href="{% url 'changelog' %}">Changelog</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white"
+                                href="{% url 'coming_soon' %}">Download</a></li>
                     </ul>
                 </div>
                 <div>
                     <h4 class="font-bold text-primary dark:text-white mb-4">Resources</h4>
                     <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
-                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Community</a></li>
-                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Help Center</a></li>
-                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Blog</a></li>
-                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Writers Guide</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white"
+                                href="{% url 'coming_soon' %}">Community</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Help
+                                Center</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Blog</a>
+                        </li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Writers
+                                Guide</a></li>
                     </ul>
                 </div>
                 <div>
                     <h4 class="font-bold text-primary dark:text-white mb-4">Legal</h4>
                     <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
-                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Privacy Policy</a></li>
-                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Terms of Service</a></li>
-                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Cookie Policy</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Privacy
+                                Policy</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Terms of
+                                Service</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Cookie
+                                Policy</a></li>
                     </ul>
                 </div>
             </div>
-            <div class="border-t border-gray-200 dark:border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-                <p class="text-sm text-gray-500 dark:text-gray-400">&#169; 2026 Story Timeline Builder. All rights reserved.</p>
+            <div
+                class="border-t border-gray-200 dark:border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-sm text-gray-500 dark:text-gray-400">&#169; 2026 Story Timeline Builder. All rights
+                    reserved.</p>
                 <div class="flex gap-4 text-gray-400">
-                    <a class="hover:text-primary dark:hover:text-white transition-colors" href="{% url 'coming_soon' %}"><span class="material-icons-outlined">flutter_dash</span></a>
-                    <a class="hover:text-primary dark:hover:text-white transition-colors" href="{% url 'coming_soon' %}"><span class="material-icons-outlined">code</span></a>
+                    <a class="hover:text-primary dark:hover:text-white transition-colors"
+                        href="{% url 'coming_soon' %}"><span class="material-icons-outlined">flutter_dash</span></a>
+                    <a class="hover:text-primary dark:hover:text-white transition-colors"
+                        href="{% url 'coming_soon' %}"><span class="material-icons-outlined">code</span></a>
                 </div>
             </div>
         </div>
     </footer>
 
+    <script>
+        // Nav Scroll Logic
+        const nav = document.getElementById('main-nav');
+        const handleScroll = () => {
+            if (window.scrollY > 10) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        };
+        window.addEventListener('scroll', handleScroll);
+        handleScroll();
+    </script>
+
+
+    <script>
+        // Filter functionality
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const filter = btn.dataset.filter;
+
+                // Update active button styles
+                document.querySelectorAll('.filter-btn').forEach(b => {
+                    b.classList.remove('bg-primary', 'text-white');
+                    b.classList.add('text-gray-600', 'dark:text-gray-400');
+                });
+                btn.classList.add('bg-primary', 'text-white');
+                btn.classList.remove('text-gray-600', 'dark:text-gray-400');
+
+                // Filter timeline items
+                document.querySelectorAll('.timeline-item').forEach(item => {
+                    const cat = item.dataset.category;
+                    if (filter === 'all') {
+                        item.style.display = '';
+                    } else if (filter === 'improvement') {
+                        // Include both 'improvement' and 'ai' categories
+                        item.style.display = (cat === 'improvement' || cat === 'ai') ? '' : 'none';
+                    } else {
+                        item.style.display = (cat === filter) ? '' : 'none';
+                    }
+                });
+
+                // Update timeline lines visibility
+                const visibleItems = document.querySelectorAll('.timeline-item:not([style*="display: none"])');
+                document.querySelectorAll('.timeline-line').forEach(line => line.style.display = 'none');
+                visibleItems.forEach((item, idx) => {
+                    if (idx < visibleItems.length - 1) {
+                        const line = item.querySelector('.timeline-line');
+                        if (line) line.style.display = '';
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 
 </html>
