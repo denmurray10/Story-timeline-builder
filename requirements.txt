@@ -27,3 +27,6 @@ openai==1.93.0
 # Cloud Media Storage (Heroku)
 cloudinary==1.40.0
 django-cloudinary-storage==0.3.0
+
+# Social Authentication
+django-allauth>=65.0,<66.0

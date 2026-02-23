@@ -151,7 +151,7 @@
     </nav>
 
     <!-- ── HERO ────────────────────────────────────────── -->
-    <section class="pt-44 pb-20 bg-background-light dark:bg-background-dark overflow-hidden">
+    <section class="pt-[258px] pb-20 bg-background-light dark:bg-background-dark overflow-hidden">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center">
             <div
                 class="reveal fade-in inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark shadow-sm mb-8">
@@ -161,7 +161,7 @@
             <h1
                 class="reveal slide-up delay-100 text-5xl md:text-7xl font-serif text-primary dark:text-white mb-6 leading-tight max-w-4xl mx-auto">
                 Invest in Your<br /><span
-                    class="font-display italic font-normal text-gray-500 dark:text-gray-400">Masterpiece</span>
+                    class="font-display italic font-normal text-gray-500 dark:text-gray-400">masterpiece</span>
             </h1>
             <p
                 class="reveal slide-up delay-200 text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-10 leading-[1.4rem] font-light">
@@ -204,7 +204,7 @@
                         <span class="text-4xl font-serif text-primary dark:text-white annual-price hidden">£0</span>
                         <span class="text-gray-500 dark:text-gray-400"> / forever</span>
                     </div>
-                    <a class="block w-full text-center bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-primary dark:text-white py-3 rounded-lg font-medium transition-colors mb-8"
+                    <a class="block w-full text-center bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-primary dark:text-white py-3 rounded-full font-medium transition-colors mb-8"
                         href="{% url 'login' %}">
                         Get Started
                     </a>
@@ -243,7 +243,7 @@
                         <span class="text-4xl font-serif text-primary dark:text-white annual-price hidden">£12</span>
                         <span class="text-gray-500 dark:text-gray-400"> / month</span>
                     </div>
-                    <a class="block w-full text-center bg-primary hover:bg-gray-800 dark:bg-white dark:hover:bg-gray-200 text-white dark:text-primary py-3 rounded-lg font-medium transition-colors mb-8 shadow-lg"
+                    <a class="block w-full text-center bg-primary hover:bg-gray-800 dark:bg-white dark:hover:bg-gray-200 text-white dark:text-primary py-3 rounded-full font-medium transition-colors mb-8 shadow-lg"
                         href="{% url 'login' %}">
                         Start Free Trial
                     </a>
@@ -282,7 +282,7 @@
                         <span class="text-4xl font-serif text-primary dark:text-white annual-price hidden">£23</span>
                         <span class="text-gray-500 dark:text-gray-400"> / month</span>
                     </div>
-                    <a class="block w-full text-center bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-primary dark:text-white py-3 rounded-lg font-medium transition-colors mb-8"
+                    <a class="block w-full text-center bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-primary dark:text-white py-3 rounded-full font-medium transition-colors mb-8"
                         href="{% url 'coming_soon' %}">
                         Contact Sales
                     </a>
@@ -656,9 +656,11 @@
                         <li><a class="hover:text-primary dark:hover:text-white transition-colors"
                                 href="{% url 'pricing' %}">Pricing</a>
                         </li>
-                        <li><a class="hover:text-primary dark:hover:text-white transition-colors" href="{% url 'coming_soon' %}">Changelog</a>
+                        <li><a class="hover:text-primary dark:hover:text-white transition-colors"
+                                href="{% url 'coming_soon' %}">Changelog</a>
                         </li>
-                        <li><a class="hover:text-primary dark:hover:text-white transition-colors" href="{% url 'coming_soon' %}">Download</a>
+                        <li><a class="hover:text-primary dark:hover:text-white transition-colors"
+                                href="{% url 'coming_soon' %}">Download</a>
                         </li>
                     </ul>
                 </div>
@@ -666,23 +668,30 @@
                     <h4 class="font-bold text-primary dark:text-white mb-4 text-sm uppercase tracking-widest">Resources
                     </h4>
                     <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
-                        <li><a class="hover:text-primary dark:hover:text-white transition-colors" href="{% url 'coming_soon' %}">Community</a>
+                        <li><a class="hover:text-primary dark:hover:text-white transition-colors"
+                                href="{% url 'coming_soon' %}">Community</a>
                         </li>
-                        <li><a class="hover:text-primary dark:hover:text-white transition-colors" href="{% url 'coming_soon' %}">Help
+                        <li><a class="hover:text-primary dark:hover:text-white transition-colors"
+                                href="{% url 'coming_soon' %}">Help
                                 Center</a></li>
-                        <li><a class="hover:text-primary dark:hover:text-white transition-colors" href="{% url 'coming_soon' %}">Blog</a></li>
-                        <li><a class="hover:text-primary dark:hover:text-white transition-colors" href="{% url 'coming_soon' %}">Writers
+                        <li><a class="hover:text-primary dark:hover:text-white transition-colors"
+                                href="{% url 'coming_soon' %}">Blog</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white transition-colors"
+                                href="{% url 'coming_soon' %}">Writers
                                 Guide</a></li>
                     </ul>
                 </div>
                 <div>
                     <h4 class="font-bold text-primary dark:text-white mb-4 text-sm uppercase tracking-widest">Legal</h4>
                     <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
-                        <li><a class="hover:text-primary dark:hover:text-white transition-colors" href="{% url 'coming_soon' %}">Privacy
+                        <li><a class="hover:text-primary dark:hover:text-white transition-colors"
+                                href="{% url 'coming_soon' %}">Privacy
                                 Policy</a></li>
-                        <li><a class="hover:text-primary dark:hover:text-white transition-colors" href="{% url 'coming_soon' %}">Terms of
+                        <li><a class="hover:text-primary dark:hover:text-white transition-colors"
+                                href="{% url 'coming_soon' %}">Terms of
                                 Service</a></li>
-                        <li><a class="hover:text-primary dark:hover:text-white transition-colors" href="{% url 'coming_soon' %}">Cookie
+                        <li><a class="hover:text-primary dark:hover:text-white transition-colors"
+                                href="{% url 'coming_soon' %}">Cookie
                                 Policy</a></li>
                     </ul>
                 </div>
