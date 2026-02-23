@@ -104,9 +104,18 @@
             transition-delay: 0.5s;
         }
 
-        /* Nav scroll behaviour */
-        #main-nav.scrolled {
-            border-color: rgba(0, 0, 0, 0.06);
+        /* Nav scroll behaviour (matching homepage) */
+        nav {
+            top: 50px !important;
+            transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+        }
+
+        nav.scrolled {
+            top: 0 !important;
+        }
+
+        .dark nav.scrolled {
+            top: 0 !important;
         }
     </style>
 </head>
@@ -143,7 +152,7 @@
     </nav>
 
     <!-- ── HERO ────────────────────────────────────────── -->
-    <section class="pt-[200px] pb-20 min-h-[80vh] flex items-center">
+    <section class="pt-[258px] pb-10 bg-background-light dark:bg-background-dark">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center">
 
             <!-- Status badge -->
@@ -154,36 +163,31 @@
                     Soon</span>
             </div>
 
-            <!-- Floating book icon -->
-            <div class="reveal fade-in delay-100 relative mb-10 animate-float">
-                <div class="relative w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center">
-                    <div
-                        class="absolute inset-0 bg-primary/5 rounded-full blur-2xl transform scale-150 animate-pulse-slow">
-                    </div>
-                    <span
-                        class="material-icons-outlined text-6xl sm:text-7xl text-primary/80 dark:text-white/80">menu_book</span>
-                    <span
-                        class="material-icons-outlined absolute -top-3 text-4xl sm:text-5xl text-amber-600/60 dark:text-amber-400/60"
-                        style="transform: translateY(8px);">park</span>
-                </div>
-            </div>
-
             <!-- Heading -->
             <h1
-                class="reveal slide-up delay-200 text-5xl md:text-7xl font-serif text-primary dark:text-white mb-6 leading-tight max-w-4xl mx-auto">
+                class="reveal slide-up delay-100 text-5xl md:text-7xl font-serif text-primary dark:text-white mb-6 leading-tight max-w-4xl mx-auto">
                 The Future of Fiction<br />
-                <span class="font-display italic font-normal text-gray-500 dark:text-gray-400">is Being
-                    Written.</span>
+                <span class="font-display italic font-normal text-gray-600 dark:text-gray-300">is being
+                    written.</span>
             </h1>
 
             <!-- Subtitle -->
             <p
-                class="reveal slide-up delay-300 text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-12 leading-relaxed">
+                class="reveal slide-up delay-200 text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-10 leading-[1.4rem]">
                 Your AI Ghostwriter is almost ready. Be the first to architect your masterpiece.
             </p>
+        </div>
+    </section>
 
+    <!-- Transition 1: Hero to Waitlist -->
+    <div class="h-32 bg-gradient-to-b from-background-light to-white dark:from-background-dark dark:to-surface-dark">
+    </div>
+
+    <!-- ── WAITLIST SECTION ────────────────────────────── -->
+    <section class="py-20 bg-white dark:bg-surface-dark relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center">
             <!-- Waitlist card -->
-            <div class="reveal slide-up delay-400 w-full max-w-md mx-auto">
+            <div class="reveal slide-up delay-300 w-full max-w-md mx-auto">
                 <div
                     class="bg-white dark:bg-surface-dark p-8 sm:p-10 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-card">
                     <h2 class="text-primary dark:text-white font-serif text-2xl mb-2">Join the Waitlist</h2>
@@ -197,7 +201,7 @@
                                 id="email" name="email" placeholder="writer@example.com" type="email" />
                         </div>
                         <button
-                            class="w-full bg-primary text-white dark:bg-white dark:text-primary py-3 px-4 rounded-full font-medium hover:opacity-90 transition-all duration-300 shadow-md text-sm tracking-wide flex items-center justify-center gap-2 group"
+                            class="w-full bg-primary text-white dark:bg-white dark:text-primary py-3.5 px-4 rounded-full font-medium hover:opacity-90 transition-all duration-300 shadow-md text-sm tracking-wide flex items-center justify-center gap-2 group"
                             type="button">
                             Request Early Access
                             <span
@@ -208,15 +212,13 @@
             </div>
 
             <!-- Trust line -->
-            <p class="reveal fade-in delay-500 mt-6 text-xs text-gray-400 dark:text-gray-500">No credit card required.
+            <p class="reveal fade-in delay-400 mt-6 text-xs text-gray-400 dark:text-gray-500">No credit card required.
                 Cancel any time.</p>
-
         </div>
     </section>
 
-    <!-- Transition: Content to Footer -->
-    <div
-        class="h-32 bg-gradient-to-b from-background-light to-background-light dark:from-background-dark dark:to-background-dark">
+    <!-- Transition 2: Waitlist to Footer -->
+    <div class="h-32 bg-gradient-to-b from-white to-background-light dark:from-surface-dark dark:to-background-dark">
     </div>
 
     <!-- ── FOOTER (matching homepage) ──────────────────── -->
@@ -299,11 +301,17 @@
             allReveals.forEach(el => el.classList.add('active'));
         }
 
-        // ── Nav scroll behaviour ─────────────────────────
-        window.addEventListener('scroll', () => {
-            const nav = document.getElementById('main-nav');
-            if (nav) nav.classList.toggle('scrolled', window.scrollY > 20);
-        });
+        // ── Nav scroll behaviour (matching homepage) ──────
+        const nav = document.getElementById('main-nav');
+        const handleScroll = () => {
+            if (window.scrollY > 10) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        };
+        window.addEventListener('scroll', handleScroll);
+        handleScroll(); // Initial check
     </script>
 </body>
 
