@@ -11,11 +11,12 @@
     }
 
     body {
-        background: radial-gradient(circle at top, #e5edff 0, #f5f7fb 45%, #f5f7fb 100%);
+        background-color: #F2F0EB;
     }
 
     .main-content {
         padding: 0 !important;
+        background-color: #F2F0EB !important;
     }
 
     .auth-wrapper {
@@ -23,69 +24,106 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        background-color: #F2F0EB;
     }
 
     .auth-card {
-        max-width: 420px;
+        max-width: 500px;
         width: 100%;
-        border-radius: 18px;
-        box-shadow: 0 18px 45px rgba(15, 23, 42, 0.15);
-        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+        border: 1px solid #E5E5E5;
+        background-color: white;
     }
 
     .auth-logo {
-        font-family: "DM Sans", system-ui, -apple-system, sans-serif;
-        font-weight: 700;
-        letter-spacing: -0.02em;
-        color: #0f172a;
+        font-family: 'DM Serif Display', serif;
+        font-weight: 400;
+        font-size: 1.5rem;
+        color: #333333;
     }
 
     .auth-logo i {
-        color: #6366f1;
-        margin-right: 6px;
+        color: #333333;
+        margin-right: 8px;
     }
 
-    .auth-card label {
+    /* Style the labels to match Coming Soon page */
+    .form-label {
         display: block;
-        width: 100%;
-        margin-bottom: 0.25rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #6B7280;
+        /* text-gray-500 */
+        margin-bottom: 0.5rem;
+        margin-left: 0.25rem;
     }
 
-    /* Rounded, full-width inputs inside auth card */
-    .auth-card .form-control,
+    /* Style the inputs to match Coming Soon page */
     .auth-card input,
     .auth-card select,
-    .auth-card textarea {
-        border-radius: 5px !important;
+    .auth-card .form-control {
+        display: block;
         width: 100%;
-        box-sizing: border-box;
-        border: 1px solid rgba(0, 0, 0, 0.16) !important;
-        padding: 5px 5px 5px 15px !important;
-        font-size: 14px !important;
+        border-radius: 0.5rem !important;
+        /* rounded-lg */
+        border: 1px solid #E5E7EB !important;
+        /* border-gray-200 */
+        background-color: #F2F0EB !important;
+        /* background-light */
+        padding: 0.875rem 1rem !important;
+        /* py-3.5 px-4 */
+        color: #111827 !important;
+        /* text-gray-900 */
+        font-size: 0.875rem !important;
+        /* text-sm */
+        transition: all 0.2s ease;
+    }
+
+    .auth-card input:focus {
+        border-color: #333333 !important;
+        box-shadow: 0 0 0 1px #333333 !important;
+        outline: none;
     }
 </style>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    primary: "#333333",
+                    "background-light": "#F2F0EB",
+                },
+                fontFamily: {
+                    sans: ['Inter', 'sans-serif'],
+                    serif: ['DM Serif Display', 'serif'],
+                },
+            }
+        }
+    }
+</script>
 {% endblock %}
 
 {% block content %}
 <div class="auth-wrapper">
     <div class="auth-card bg-white p-4 p-md-5">
-        <!-- Logo + product name -->
-        <div class="mb-3">
-            <div class="auth-logo mb-1">
-                <i class="bi bi-book"></i> Story Timeline Builder
-            </div>
-            <div class="text-muted small">
-                Create your account to start planning your stories.
-            </div>
+        <div class="mb-8 text-center pt-4">
+            <h1 class="font-serif text-primary text-4xl mb-2">Create Account</h1>
+            <p class="text-gray-500 font-light text-sm tracking-tight">
+                Architect your story universe.
+            </p>
         </div>
         <!-- Registration form -->
 
         {% if form.non_field_errors %}
-            <div class="alert alert-danger">
-                {% for error in form.non_field_errors %}
-                    <div>{{ error }}</div>
-                {% endfor %}
-            </div>
+        <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+            <div>{{ error }}</div>
+            {% endfor %}
+        </div>
         {% endif %}
 
         <form method="post" novalidate>
@@ -99,11 +137,11 @@
                     </label>
                     {{ form.first_name }}
                     {% if form.first_name.errors %}
-                        <div class="text-danger small mt-1">
-                            {% for error in form.first_name.errors %}
-                                <div>{{ error }}</div>
-                            {% endfor %}
-                        </div>
+                    <div class="text-danger small mt-1">
+                        {% for error in form.first_name.errors %}
+                        <div>{{ error }}</div>
+                        {% endfor %}
+                    </div>
                     {% endif %}
                 </div>
                 <div class="col-6 mb-3">
@@ -112,11 +150,11 @@
                     </label>
                     {{ form.last_name }}
                     {% if form.last_name.errors %}
-                        <div class="text-danger small mt-1">
-                            {% for error in form.last_name.errors %}
-                                <div>{{ error }}</div>
-                            {% endfor %}
-                        </div>
+                    <div class="text-danger small mt-1">
+                        {% for error in form.last_name.errors %}
+                        <div>{{ error }}</div>
+                        {% endfor %}
+                    </div>
                     {% endif %}
                 </div>
             </div>
@@ -128,11 +166,11 @@
                 </label>
                 {{ form.username }}
                 {% if form.username.errors %}
-                    <div class="text-danger small mt-1">
-                        {% for error in form.username.errors %}
-                            <div>{{ error }}</div>
-                        {% endfor %}
-                    </div>
+                <div class="text-danger small mt-1">
+                    {% for error in form.username.errors %}
+                    <div>{{ error }}</div>
+                    {% endfor %}
+                </div>
                 {% endif %}
             </div>
 
@@ -142,11 +180,11 @@
                 </label>
                 {{ form.email }}
                 {% if form.email.errors %}
-                    <div class="text-danger small mt-1">
-                        {% for error in form.email.errors %}
-                            <div>{{ error }}</div>
-                        {% endfor %}
-                    </div>
+                <div class="text-danger small mt-1">
+                    {% for error in form.email.errors %}
+                    <div>{{ error }}</div>
+                    {% endfor %}
+                </div>
                 {% endif %}
             </div>
 
@@ -156,11 +194,11 @@
                 </label>
                 {{ form.password1 }}
                 {% if form.password1.errors %}
-                    <div class="text-danger small mt-1">
-                        {% for error in form.password1.errors %}
-                            <div>{{ error }}</div>
-                        {% endfor %}
-                    </div>
+                <div class="text-danger small mt-1">
+                    {% for error in form.password1.errors %}
+                    <div>{{ error }}</div>
+                    {% endfor %}
+                </div>
                 {% endif %}
             </div>
 
@@ -170,16 +208,19 @@
                 </label>
                 {{ form.password2 }}
                 {% if form.password2.errors %}
-                    <div class="text-danger small mt-1">
-                        {% for error in form.password2.errors %}
-                            <div>{{ error }}</div>
-                        {% endfor %}
-                    </div>
+                <div class="text-danger small mt-1">
+                    {% for error in form.password2.errors %}
+                    <div>{{ error }}</div>
+                    {% endfor %}
+                </div>
                 {% endif %}
             </div>
 
-            <button type="submit" class="btn btn-primary w-100 mt-1">
-                Create account
+            <button type="submit"
+                class="w-full bg-primary text-white py-[14px] px-8 rounded-full font-bold shadow-lg hover:opacity-90 transition-all duration-300 mt-4 flex items-center justify-center gap-2 group">
+                Create Account
+                <span
+                    class="material-icons-outlined text-sm transition-transform duration-300 group-hover:translate-x-1">arrow_forward</span>
             </button>
         </form>
 

@@ -1,5 +1,11 @@
 {% extends 'timeline/base.html' %} {% block title %}Login - Story Timeline
-Builder{% endblock %} {% block content %}
+Builder{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.tailwindcss.com"></script>
+{% endblock %}
+
+{% block content %}
 <div class="row justify-content-center mt-5">
     <div class="col-md-6 col-lg-4">
         <div class="card">
@@ -12,30 +18,16 @@ Builder{% endblock %} {% block content %}
                 <form method="post">
                     {% csrf_token %}
                     <div class="mb-3">
-                        <label for="id_username" class="form-label"
-                            >Username</label
-                        >
-                        <input
-                            type="text"
-                            name="username"
-                            class="form-control"
-                            id="id_username"
-                            required
-                        />
+                        <label for="id_username" class="form-label">Username</label>
+                        <input type="text" name="username" class="form-control" id="id_username" required />
                     </div>
                     <div class="mb-3">
-                        <label for="id_password" class="form-label"
-                            >Password</label
-                        >
-                        <input
-                            type="password"
-                            name="password"
-                            class="form-control"
-                            id="id_password"
-                            required
-                        />
+                        <label for="id_password" class="form-label">Password</label>
+                        <input type="password" name="password" class="form-control" id="id_password" required />
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">
+                    <button type="submit"
+                        class="btn w-100 py-3 rounded-full font-bold shadow-lg transition-all duration-300"
+                        style="background-color: #333333; color: white;">
                         Login
                     </button>
                 </form>
