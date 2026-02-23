@@ -1,0 +1,326 @@
+[
+{
+  "model": "timeline.changelogentry",
+  "pk": 1,
+  "fields": {
+    "version": "v2.3",
+    "title": "Premium Staff Dashboard & Live AI Usage Tracking",
+    "description": "We've launched a comprehensive Staff Dashboard for superusers, featuring:\n- Live AI Usage Tracking: Real-time dollar and token monitoring for DeepSeek and Gemini.\n- Service Connectivity Status: Instant visibility into which AI models are powering your Story Support and Book Imports.\n- Site-Wide Analytics: High-level stats for users, books, and recent platform activity.\n- DeepSeek Integration: Direct balance monitoring and top-up links.",
+    "category": "ai",
+    "date": "2026-02-23",
+    "created_at": "2026-02-23T15:07:25.297Z"
+  }
+},
+{
+  "model": "timeline.changelogentry",
+  "pk": 2,
+  "fields": {
+    "version": "v2.4",
+    "title": "DeepSeek Engine Integration",
+    "description": "Switched core AI functionalities to DeepSeek for superior narrative reasoning:\n- Ghostwriter: Enhanced with DeepSeek-Chat for natural prose continuation.\n- Book Importer: Now utilizes DeepSeek-Reasoner for complex story extraction.\n- Gemini Fallback: Implemented automatic failover to Gemini 1.5 Pro/Flash to ensure 100% uptime.",
+    "category": "new",
+    "date": "2026-02-23",
+    "created_at": "2026-02-23T15:07:25.303Z"
+  }
+},
+{
+  "model": "timeline.changelogentry",
+  "pk": 3,
+  "fields": {
+    "version": "v1.7",
+    "title": "Universal Search & Performance Boost",
+    "description": "Searching your story is now faster and more comprehensive:\n- Unified Search: Search across Books, Chapters, Characters, Events, and WorldWiki from a single bar.\n- Sidebar Integration: The search bar is now pinned to your sidebar for instant access from any page.\n- Query Optimization: Database queries have been tuned for large-scale series (distinct results and faster indexing).",
+    "category": "improvement",
+    "date": "2026-02-17",
+    "created_at": "2026-02-23T15:07:25.309Z"
+  }
+},
+{
+  "model": "timeline.changelogentry",
+  "pk": 4,
+  "fields": {
+    "version": "v1.5",
+    "title": "Relationship Mapping & Visualizations",
+    "description": "Visualize the complex web of your narrative:\n- Dynamic Relationship Map: A force-directed graph showing character connections.\n- Strength & Trust Levels: Precisely define how characters feel about each other (1-10 scale).\n- Evolution Tracking: Record how bonds change across different books in your series.",
+    "category": "new",
+    "date": "2026-02-15",
+    "created_at": "2026-02-23T15:07:25.311Z"
+  }
+},
+{
+  "model": "timeline.changelogentry",
+  "pk": 5,
+  "fields": {
+    "version": "v2.2",
+    "title": "Writing Mode — Full In-Editor Experience",
+    "description": "A dedicated, distraction-free writing environment is now available for every chapter:\n- Zen Mode: Hide all sidebars and focus entirely on your manuscript.\n- Floating Formatting Toolbar: A bubble menu appears on text selection with H1/H2/H3, bold, italic, bullet list, and blockquote controls.\n- Chapter Cast Panel: See which characters appear in the current chapter as you write.\n- In-Editor Word Count: Live word count updates as you type.\n- Auto-Save: Your draft is saved automatically as you work.",
+    "category": "new",
+    "date": "2026-02-22",
+    "created_at": "2026-02-23T15:33:06.636Z"
+  }
+},
+{
+  "model": "timeline.changelogentry",
+  "pk": 6,
+  "fields": {
+    "version": "v1.9",
+    "title": "AI Book Importer — Intelligent Story Extraction",
+    "description": "Upload an existing manuscript and let the platform do the heavy lifting:\n- Automatic Chapter Detection: The importer splits your novel into chapters and populates them instantly.\n- Character Extraction: Characters are identified and linked to the chapters they first appear in.\n- Book & Description Generation: A book title, summary, and metadata are generated from your content.\n- Progress Tracking: A live progress bar shows the import status in real time.\n- Bulk Chapter Upload: Alternatively, upload multiple chapter files at once via drag-and-drop.",
+    "category": "new",
+    "date": "2026-02-19",
+    "created_at": "2026-02-23T15:33:06.640Z"
+  }
+},
+{
+  "model": "timeline.changelogentry",
+  "pk": 7,
+  "fields": {
+    "version": "v1.4",
+    "title": "World Wiki — Lore & World-Building Hub",
+    "description": "Build and manage the lore of your fictional world in a structured wiki:\n- Categorised Entries: Organise locations, organisations, artefacts, concepts, and more.\n- Rich Descriptions: Add detailed descriptions and notes to each world entry.\n- Book Linking: Attach world entries to specific books in your series.\n- World List View: Browse all lore entries from a clean, filterable list.",
+    "category": "new",
+    "date": "2026-02-14",
+    "created_at": "2026-02-23T15:33:06.642Z"
+  }
+},
+{
+  "model": "timeline.changelogentry",
+  "pk": 8,
+  "fields": {
+    "version": "v2.0",
+    "title": "Dashboard Overhaul — Writer's Command Centre",
+    "description": "The dashboard has been completely redesigned as a central hub for your creative work:\n- Writing Stats: Daily word counts, streaks, and session totals displayed at a glance.\n- Recent Activity Feed: See your latest books, chapters, and character edits in one place.\n- Focus Mode: Set a writing goal for the session and track it on the dashboard.\n- Quick Navigation: Jump directly to your active book, latest chapter, or the relationship map.\n- Daily Quote: An inspiring writing quote appears each day to motivate your session.",
+    "category": "improvement",
+    "date": "2026-02-20",
+    "created_at": "2026-02-23T15:33:06.643Z"
+  }
+},
+{
+  "model": "timeline.changelogentry",
+  "pk": 9,
+  "fields": {
+    "version": "v2.2.2",
+    "title": "Character Deep Dive — AI-Powered Character Analysis",
+    "description": "Get a thorough, in-depth profile for any character from your story bible:\n- Psychological Profile: Personality traits, speech patterns, and behavioural analysis generated from your notes.\n- Narrative Role Analysis: Understand how a character functions within your story's structure.\n- Motivation & Arc Summary: Key motivations and character arc highlighted automatically.\n- Chapter Appearances: All chapters the character appears in are listed and linked.\n- Sync to Profile: Save the generated insights directly back to the character's profile.",
+    "category": "ai",
+    "date": "2026-02-22",
+    "created_at": "2026-02-23T15:33:06.646Z"
+  }
+},
+{
+  "model": "timeline.changelogentry",
+  "pk": 10,
+  "fields": {
+    "version": "v1.8",
+    "title": "Story Bible Export — Professional PDF Output",
+    "description": "Export a complete, formatted story bible for any book in your series:\n- Full Book Summary: Title, description, status, and word count targets included.\n- Character Roster: Every character with their description, role, and motivation.\n- Timeline of Events: All plot events listed in chronological order.\n- Relationship Overview: A textual summary of character connections.\n- World-Building Notes: Lore entries from the World Wiki included in the export.",
+    "category": "new",
+    "date": "2026-02-18",
+    "created_at": "2026-02-23T15:33:06.648Z"
+  }
+},
+{
+  "model": "timeline.changelogentry",
+  "pk": 11,
+  "fields": {
+    "version": "v1.1",
+    "title": "Timeline View — Chronological Story Planner",
+    "description": "Plan and visualise every plot event across your series on a structured timeline:\n- Vertical & Horizontal Views: Switch between a vertical list and a horizontal scroll-based timeline.\n- Drag-to-Reorder: Rearrange events directly on the timeline without editing forms.\n- Scene-Level Detail: Each event supports a title, description, location, associated characters, and tags.\n- Book Filtering: Filter the timeline to show only events from a specific book.\n- Word Count per Event: Track estimated word counts at the scene level.",
+    "category": "new",
+    "date": "2026-02-11",
+    "created_at": "2026-02-23T15:33:06.649Z"
+  }
+},
+{
+  "model": "timeline.changelogentry",
+  "pk": 12,
+  "fields": {
+    "version": "v2.1",
+    "title": "Scene Outline & Chapter Summary — Instant Structure Generator",
+    "description": "Two new AI-assisted tools to help you plan and review your chapters:\n- Scene Outline: Generate a structured breakdown of scenes for any chapter based on your notes and plot events.\n- Chapter Summary: Produce a concise narrative summary of any chapter's content.\n- Both tools are accessed directly inside the Chapter Detail view with a single click.\n- Summaries can be saved back to the chapter for future reference.",
+    "category": "ai",
+    "date": "2026-02-21",
+    "created_at": "2026-02-23T15:33:06.651Z"
+  }
+},
+{
+  "model": "timeline.changelogentry",
+  "pk": 13,
+  "fields": {
+    "version": "v1.2",
+    "title": "Character Codex — Profiles, Motivation & Relationships",
+    "description": "The character management system has been significantly expanded:\n- Motivation Field: Capture what drives each character at their core.\n- Avatar Upload: Add a portrait image to any character profile.\n- Role Classification: Tag characters as Protagonist, Antagonist, Supporting, or Minor.\n- Book & Chapter Tracking: Log which book and chapter a character first appears in.\n- Linked Relationships: View all relationships for a character directly from their profile page.",
+    "category": "improvement",
+    "date": "2026-02-12",
+    "created_at": "2026-02-23T15:33:06.653Z"
+  }
+},
+{
+  "model": "timeline.changelogentry",
+  "pk": 14,
+  "fields": {
+    "version": "v1.3",
+    "title": "Social Login — Sign In with Google",
+    "description": "Authentication has been made faster and more accessible:\n- Sign in with Google: One-click sign-in using your existing Google account.\n- Auto Profile Creation: A full user profile is created automatically on first social login.\n- Secure Token Handling: Full OAuth 2.0 implementation with secure state management.\n- Fallback to Email: Traditional email and password login remains available for all users.",
+    "category": "new",
+    "date": "2026-02-13",
+    "created_at": "2026-02-23T15:33:06.655Z"
+  }
+},
+{
+  "model": "timeline.changelogentry",
+  "pk": 15,
+  "fields": {
+    "version": "v1.6",
+    "title": "Relationship Suggestion Engine",
+    "description": "The Relationship Map now includes intelligent suggestions to enrich your character web:\n- Auto-Suggest: Based on your existing character profiles and story events, the engine proposes likely relationships.\n- One-Click Accept: Approve a suggestion and it is added to the map instantly.\n- Custom Relationship Types: Define unique bond types (mentor, rival, estranged family, etc.) beyond the presets.\n- Strength & Trust Sliders: Fine-tune the intensity of each relationship on a granular scale.",
+    "category": "ai",
+    "date": "2026-02-16",
+    "created_at": "2026-02-23T15:33:06.657Z"
+  }
+},
+{
+  "model": "timeline.changelogentry",
+  "pk": 16,
+  "fields": {
+    "version": "v1.0",
+    "title": "Tag System & Content Filtering",
+    "description": "A flexible tagging system has been added across books, chapters, and events:\n- Custom Tags: Create any tag you need — themes, locations, POV characters, tone, and more.\n- Multi-Object Support: Apply tags to books, chapters, and timeline events independently.\n- Filter by Tag: Narrow down your timeline or chapter list by selecting specific tags.\n- Tag Manager: Create, rename, and delete tags from a dedicated management view.\n- Colour-Coded Labels: Tags display as colour-coded chips throughout the interface.",
+    "category": "improvement",
+    "date": "2026-02-10",
+    "created_at": "2026-02-23T15:33:06.660Z"
+  }
+},
+{
+  "model": "timeline.changelogentry",
+  "pk": 17,
+  "fields": {
+    "version": "v1.0.1",
+    "title": "Tag Display & Filtering Fixes",
+    "description": "- Tags not rendering on the Timeline Events list after being applied.\n- Filtering by tag on the Chapter list returning zero results despite matches existing.\n- Tag chip colour not persisting after a page refresh.",
+    "category": "fix",
+    "date": "2026-02-10",
+    "created_at": "2026-02-23T15:43:06.700Z"
+  }
+},
+{
+  "model": "timeline.changelogentry",
+  "pk": 18,
+  "fields": {
+    "version": "v1.1.1",
+    "title": "Timeline Ordering & Navigation Fixes",
+    "description": "- Drag-and-drop event reorder not persisting after a hard page refresh.\n- Horizontal timeline scroll position resetting to the start on browser back navigation.\n- Event detail panel failing to open when two events shared the same title.",
+    "category": "fix",
+    "date": "2026-02-11",
+    "created_at": "2026-02-23T15:43:06.705Z"
+  }
+},
+{
+  "model": "timeline.changelogentry",
+  "pk": 19,
+  "fields": {
+    "version": "v1.3.1",
+    "title": "Authentication & Session Fixes",
+    "description": "- Social login redirect sending returning users to the registration page instead of the dashboard.\n- Session timeout not being extended correctly on page interaction.\n- Password reset email not dispatching on accounts created via social login.",
+    "category": "fix",
+    "date": "2026-02-13",
+    "created_at": "2026-02-23T15:43:06.709Z"
+  }
+},
+{
+  "model": "timeline.changelogentry",
+  "pk": 20,
+  "fields": {
+    "version": "v1.5.1",
+    "title": "Relationship Map Rendering Fixes",
+    "description": "- Edge labels overlapping character nodes when zoomed out to full-series view.\n- Selected character highlight not clearing when clicking an empty area of the canvas.\n- Map not loading when a character had no defined relationships.",
+    "category": "fix",
+    "date": "2026-02-15",
+    "created_at": "2026-02-23T15:43:06.710Z"
+  }
+},
+{
+  "model": "timeline.changelogentry",
+  "pk": 21,
+  "fields": {
+    "version": "v1.6.1",
+    "title": "Relationship Suggestions Fixes",
+    "description": "- Suggestions engine proposing relationships for character pairs that were already connected.\n- Accepting a suggestion occasionally creating a duplicate relationship entry in the database.\n- Strength slider defaulting to 0 instead of 5 when accepting a suggestion.",
+    "category": "fix",
+    "date": "2026-02-16",
+    "created_at": "2026-02-23T15:43:06.712Z"
+  }
+},
+{
+  "model": "timeline.changelogentry",
+  "pk": 22,
+  "fields": {
+    "version": "v1.7.1",
+    "title": "Search & Indexing Fixes",
+    "description": "- Search bar retaining the previous query text after navigating away and returning.\n- Character results appearing multiple times when a character appeared in more than one book.\n- World Wiki entries not appearing in universal search results.",
+    "category": "fix",
+    "date": "2026-02-17",
+    "created_at": "2026-02-23T15:43:06.714Z"
+  }
+},
+{
+  "model": "timeline.changelogentry",
+  "pk": 23,
+  "fields": {
+    "version": "v1.9.1",
+    "title": "Book Import Stability Fixes",
+    "description": "- Import stalling at 90% progress on manuscripts containing special characters (em-dashes, ellipses) in chapter headings.\n- Progress bar not resetting to zero when re-importing an existing book.\n- Character names containing apostrophes being truncated during extraction.",
+    "category": "fix",
+    "date": "2026-02-19",
+    "created_at": "2026-02-23T15:43:06.718Z"
+  }
+},
+{
+  "model": "timeline.changelogentry",
+  "pk": 24,
+  "fields": {
+    "version": "v2.0.1",
+    "title": "Dashboard Stats & Display Fixes",
+    "description": "- Dashboard session word count not zeroing out at midnight when a writing session spanned two days.\n- Aggregate word count not updating on the dashboard after a chapter was deleted.\n- Recent activity feed showing duplicate entries when the same chapter was edited in quick succession.",
+    "category": "fix",
+    "date": "2026-02-20",
+    "created_at": "2026-02-23T15:43:06.720Z"
+  }
+},
+{
+  "model": "timeline.changelogentry",
+  "pk": 25,
+  "fields": {
+    "version": "v2.1.1",
+    "title": "Scene Outline & Chapter Summary Fixes",
+    "description": "- Scene outline generator pulling characters from the wrong book when a series had chapters with identical titles.\n- Chapter summary occasionally returning an empty response on the first request; now retries automatically.\n- Save-to-chapter button not activating after a summary was generated.",
+    "category": "fix",
+    "date": "2026-02-21",
+    "created_at": "2026-02-23T15:43:06.723Z"
+  }
+},
+{
+  "model": "timeline.changelogentry",
+  "pk": 26,
+  "fields": {
+    "version": "v2.2.1",
+    "title": "Writing Mode Editor Fixes",
+    "description": "- Auto-save incorrectly marking the document as having unsaved changes immediately on load.\n- Cursor jumping to the beginning of the document when auto-save fired mid-sentence.\n- Bubble formatting toolbar not dismissing when clicking outside it on touch devices.",
+    "category": "fix",
+    "date": "2026-02-22",
+    "created_at": "2026-02-23T15:43:06.727Z"
+  }
+},
+{
+  "model": "timeline.changelogentry",
+  "pk": 27,
+  "fields": {
+    "version": "v2.4.1",
+    "title": "Dashboard & Usage Tracking Fixes",
+    "description": "- Usage counters not resetting between separate user sessions in the Staff Dashboard.\n- Service connectivity status incorrectly showing offline when the response was slow rather than absent.\n- Site-wide user count stat caching stale data for up to 10 minutes after a new registration.",
+    "category": "fix",
+    "date": "2026-02-23",
+    "created_at": "2026-02-23T15:43:06.730Z"
+  }
+}
+]
