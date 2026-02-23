@@ -7,31 +7,32 @@ from django.contrib.auth.models import User
 from .models import Book, Chapter, Character, Event, Tag, CharacterRelationship, WorldEntry
 
 
-class UserRegisterForm(UserCreationForm):
-    """User registration form."""
+class UserRegisterForm(forms.ModelForm):
+    """User registration form with single password entry."""
     first_name = forms.CharField(max_length=30, required=False, label="First name")
     last_name = forms.CharField(max_length=30, required=False, label="Last name")
     email = forms.EmailField(required=True, label="Email")
+    password = forms.CharField(widget=forms.PasswordInput, label="Password")
 
     class Meta:
         model = User
-        fields = ["first_name", "last_name", "username", "email"]
+        fields = ["first_name", "last_name", "username", "email", "password"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["first_name"].widget.attrs.update({"placeholder": "Dennis"})
-        self.fields["last_name"].widget.attrs.update({"placeholder": "Murray"})
-        self.fields["email"].widget.attrs.update({"placeholder": "writer@example.com"})
-        self.fields["username"].widget.attrs.update({"placeholder": "dmurray10"})
-        self.fields["password1"].widget.attrs.update({"placeholder": "••••••••••••"})
-        self.fields["password2"].widget.attrs.update({"placeholder": "••••••••••••"})
+        self.fields["first_name"].widget.attrs.update({"placeholder": "Dennis", "class": "form-control"})
+        self.fields["last_name"].widget.attrs.update({"placeholder": "Murray", "class": "form-control"})
+        self.fields["email"].widget.attrs.update({"placeholder": "writer@example.com", "class": "form-control"})
+        self.fields["username"].widget.attrs.update({"placeholder": "dmurray10", "class": "form-control"})
+        self.fields["password"].widget.attrs.update({"placeholder": "••••••••••••", "class": "form-control"})
 
     def save(self, commit=True):
-        """Save the user with first/last name and email set."""
+        """Save the user with hashed password."""
         user = super().save(commit=False)
         user.first_name = self.cleaned_data.get("first_name", "")
         user.last_name = self.cleaned_data.get("last_name", "")
         user.email = self.cleaned_data.get("email", "")
+        user.set_password(self.cleaned_data["password"])
         if commit:
             user.save()
         return user

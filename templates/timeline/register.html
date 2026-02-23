@@ -43,6 +43,137 @@
         background-color: #f2f0eb !important;
     }
 
+    /* Relationship Map & Codex Styles */
+    .map-hotspot {
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .map-hotspot:hover {
+        transform: scale(1.1);
+        background-color: rgba(255, 255, 255, 0.4);
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(147, 51, 234, 0.2);
+        border-radius: 10px;
+    }
+
+    .custom-scrollbar:hover::-webkit-scrollbar-thumb {
+        background: rgba(147, 51, 234, 0.4);
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+        display: none !important;
+    }
+
+    .no-scrollbar {
+        -ms-overflow-style: none !important;
+        scrollbar-width: none !important;
+    }
+
+    @keyframes float {
+
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    .animate-float {
+        animation: float 6s ease-in-out infinite;
+    }
+
+    .character-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 50;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(8px);
+        display: none;
+        flex-direction: column;
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    .character-overlay.active {
+        display: flex !important;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: scale(0.98);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    .close-overlay {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        border-radius: 50%;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        z-index: 60;
+    }
+
+    .close-overlay:hover {
+        transform: scale(1.1);
+        background: #f3f4f6;
+    }
+
+    @keyframes pulse-subtle {
+
+        0%,
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 0.8;
+            transform: scale(1.05);
+        }
+    }
+
+    .animate-pulse-subtle {
+        animation: pulse-subtle 4s ease-in-out infinite;
+    }
+
+    .connection-line {
+        transition: opacity 0.4s ease;
+    }
+
+    .character-node {
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
     .navbar,
     .sidebar,
     .footer {
@@ -162,7 +293,7 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
-        max-width: 520px;
+        max-width: 480px;
         background-color: white;
         position: relative;
         z-index: 10;
@@ -280,43 +411,187 @@
         opacity: 0.5 !important;
     }
 
+    /* Registration Tabs */
+    .registration-tabs {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid #f0f0f0;
+        padding-bottom: 0.5rem;
+    }
+
+    .tab-btn {
+        background: none;
+        border: none;
+        padding: 0.5rem 0;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #9CA3AF;
+        cursor: pointer;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .tab-btn.active {
+        color: #1a1a1a;
+    }
+
+    .tab-btn.active::after {
+        content: '';
+        position: absolute;
+        bottom: -0.6rem;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: #333;
+        border-radius: 2px;
+    }
+
+    /* Social Buttons */
+    .social-create-area {
+        display: none;
+        flex-direction: column;
+        gap: 1rem;
+        animation: fadeIn 0.4s ease-out;
+    }
+
+    .social-create-area.active {
+        display: flex;
+    }
+
+    .social-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-top: 0.5rem;
+    }
+
+    .btn-social {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.75rem;
+        border: 1px solid #e5e5e5;
+        border-radius: 8px;
+        background: white;
+        font-weight: 500;
+        color: #262626;
+        text-decoration: none;
+        transition: background 0.2s;
+        font-size: 0.875rem;
+    }
+
+    .btn-social:hover {
+        background: #f9fafb;
+        color: #000;
+    }
+
+    .btn-social i {
+        font-size: 1.1rem;
+    }
+
+    .social-divider {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin: 2rem 0;
+        color: #666;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .social-divider::before,
+    .social-divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: #e5e5e5;
+    }
+
+    .hidden-form {
+        display: none !important;
+    }
+
+    .registration-content-wrapper {
+        position: relative;
+        width: 100%;
+    }
+
     /* Right Side: Showcase */
     .login-showcase-area {
         flex: 1.2;
-        background: rgba(244, 235, 217, 0.3);
+        background-color: rgba(244, 235, 217, 0.3) !important;
         position: relative;
-        padding: 4rem;
+        padding: 2rem !important;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         overflow: hidden;
+        height: 100%;
     }
 
-    /* Responsive */
-    @media (max-width: 992px) {
-        .login-showcase-area {
-            display: none;
-        }
-
-        .studio-card {
-            max-width: 500px;
-        }
-
-        .login-form-area {
-            padding: 3rem;
-            max-width: 100%;
-        }
+    /* Showcase Blurs */
+    .blur-orange {
+        position: absolute;
+        width: 256px;
+        height: 256px;
+        top: -128px;
+        right: -128px;
+        background: rgba(254, 215, 170, 0.2);
+        filter: blur(32px);
+        border-radius: 50%;
     }
 
-    /* Showcase Elements (Copy from Login) */
+    .blur-yellow {
+        position: absolute;
+        width: 384px;
+        height: 384px;
+        bottom: -96px;
+        left: -128px;
+        background: rgba(254, 240, 138, 0.2);
+        filter: blur(32px);
+        border-radius: 50%;
+    }
+
+    #codex-container {
+        height: 300px !important;
+        min-height: 300px !important;
+        max-height: 300px !important;
+        transition: none !important;
+    }
+
+    .map-fixed-height {
+        height: 350px !important;
+        min-height: 350px !important;
+        max-height: 350px !important;
+        transition: none !important;
+    }
+
+    .map-container {
+        perspective: 1000px;
+    }
+
+    .map-surface {
+        transform: rotateY(-5deg) rotateX(5deg);
+        transition: transform 0.5s ease;
+    }
+
+    .map-surface:hover {
+        transform: rotateY(0deg) rotateX(0deg);
+    }
+
+    /* Showcase Elements */
     .ai-card {
-        background: white;
-        border-radius: 20px;
-        padding: 1.5rem;
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(12px);
+        border-radius: 24px;
+        padding: 1.75rem;
         width: 100%;
-        max-width: 400px;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        max-width: 440px;
+        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
         border: 1px solid rgba(255, 255, 255, 0.5);
         position: relative;
         z-index: 5;
@@ -326,46 +601,96 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 1rem;
+        margin-bottom: 1.25rem;
     }
 
     .ai-card-title {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.75rem;
+    }
+
+    .ai-card-title i {
+        font-size: 1.25rem;
+    }
+
+    .ai-card-title h3 {
+        font-family: 'DM Serif Display', serif;
+        font-size: 1.2rem;
         color: #1a1a1a;
-        font-weight: 600;
+        margin: 0;
     }
 
     .active-tag {
-        font-size: 0.7rem;
-        background: #e1f5fe;
-        color: #039be5;
-        padding: 0.25rem 0.5rem;
-        border-radius: 4px;
+        font-size: 0.65rem;
+        background: #f3f4f6;
+        color: #6b7280;
+        padding: 0.25rem 0.6rem;
+        border-radius: 6px;
         text-transform: uppercase;
         font-weight: 700;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.1em;
     }
 
     .ai-message {
         display: flex;
-        gap: 1rem;
-        margin-top: 1rem;
+        gap: 1.25rem;
     }
 
     .message-indicator {
         width: 3px;
         background: #333;
-        border-radius: 3px;
+        border-radius: 999px;
         flex-shrink: 0;
     }
 
     .ai-message p {
-        font-size: 0.9rem;
-        color: #444;
-        font-style: italic;
-        line-height: 1.5;
+        font-size: 0.95rem;
+        color: #4b5563;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    /* Reveal Animations */
+    .reveal {
+        opacity: 0;
+        transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .reveal.active {
+        opacity: 1;
+    }
+
+    .fade-in {
+        transform: scale(0.95);
+    }
+
+    .slide-up {
+        opacity: 0;
+    }
+
+    .delay-100 {
+        transition-delay: 100ms;
+    }
+
+    .delay-200 {
+        transition-delay: 200ms;
+    }
+
+    @keyframes float {
+
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    .animate-float {
+        animation: float 6s ease-in-out infinite;
     }
 
     .login-footer {
@@ -421,6 +746,13 @@
                         <p>Architect your story universe.</p>
                     </div>
 
+                    <div class="registration-tabs">
+                        <button class="tab-btn active" id="email-registration-tab"
+                            onclick="toggleRegistration('email')">Email Context</button>
+                        <button class="tab-btn" id="social-registration-tab"
+                            onclick="toggleRegistration('social')">Social Connect</button>
+                    </div>
+
                     {% if form.non_field_errors %}
                     <div class="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">
                         {% for error in form.non_field_errors %}
@@ -428,8 +760,7 @@
                         {% endfor %}
                     </div>
                     {% endif %}
-
-                    <form method="post" novalidate class="register-form">
+                    <form method="post" novalidate class="register-form" id="standard-registration-form">
                         {% csrf_token %}
 
                         <div class="register-form-scroll">
@@ -456,14 +787,10 @@
                             </div>
 
                             <div>
-                                <label for="{{ form.password1.id_for_label }}" class="form-label">Password</label>
-                                {{ form.password1 }}
-                            </div>
-
-                            <div>
-                                <label for="{{ form.password2.id_for_label }}" class="form-label">Confirm
-                                    Password</label>
-                                {{ form.password2 }}
+                                <label for="{{ form.password.id_for_label }}" class="form-label">Password</label>
+                                {{ form.password }}
+                                <p class="text-[9px] text-gray-400 mt-1 italic">Minimum 8 characters with a mix of
+                                    symbols.</p>
                             </div>
                         </div>
 
@@ -472,31 +799,530 @@
                             <span class="material-icons-outlined">arrow_forward</span>
                         </button>
                     </form>
+
+                    <!-- Social Registration Area -->
+                    <div class="social-create-area" id="social-registration-area">
+                        <p class="text-[11px] text-gray-500 mb-6 uppercase tracking-widest font-bold">Access with
+                            story-synced account</p>
+
+                        <div class="social-buttons">
+                            <a href="#" class="btn-social">
+                                <i class="bi bi-google"></i>
+                                Google
+                            </a>
+                            <a href="#" class="btn-social">
+                                <i class="bi bi-apple"></i>
+                                Apple
+                            </a>
+                        </div>
+
+                        <div class="mt-8 p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                            <div class="flex items-start gap-3">
+                                <span class="material-icons-outlined text-gray-400 text-sm mt-0.5">info</span>
+                                <p class="text-[10px] text-gray-400 leading-relaxed font-medium">
+                                    Choosing a social connection instantly syncs your profile and allows for immediate
+                                    access to the Narrative Lab.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </section>
 
                 <!-- Showcase Area -->
-                <section class="login-showcase-area">
-                    <div class="ai-card">
-                        <div class="ai-card-header">
-                            <div class="ai-card-title">
-                                <i class="bi bi-stars"></i>
-                                <h3>The Ghostwriter</h3>
-                            </div>
-                            <div class="active-tag">Active</div>
-                        </div>
-                        <div class="ai-message">
-                            <div class="message-indicator"></div>
-                            <p>"I've detected a new character, Agnes Temple. I'm indexing her motivations and
-                                connections into your story bible now."</p>
-                        </div>
-                    </div>
+                <section class="login-showcase-area p-8 flex flex-col">
+                    <div class="blur-orange"></div>
+                    <div class="blur-yellow"></div>
 
-                    <div class="mt-12 text-center max-w-sm">
-                        <h3 class="font-serif text-2xl text-primary mb-3">It learns from your first word.</h3>
-                        <p class="text-gray-500 text-sm leading-relaxed">
-                            Our AI architecture doesn't just write for you—it remembers. Every character and location is
-                            instantly indexed.
-                        </p>
+                    <div class="flex flex-col gap-6 flex-grow">
+                        <!-- Top: Interactive Map -->
+                        <div
+                            class="reveal slide-up relative bg-white/40 dark:bg-black/20 backdrop-blur-md rounded-3xl border border-white/60 dark:border-white/5 overflow-hidden shadow-soft h-[350px] shrink-0 map-fixed-height">
+                            <!-- Title Overlay -->
+                            <div
+                                class="absolute top-4 left-6 flex items-center gap-2 text-[10px] font-bold text-blue-500 uppercase tracking-[0.2em] z-20 reveal fade-in">
+                                <span class="w-8 h-[1px] bg-blue-500"></span> Narrative Engineering
+                            </div>
+
+                            <!-- Character Details Overlays -->
+                            <!-- Agnes Overlay -->
+                            <div id="overlay-agnes" class="character-overlay p-6 overflow-y-auto custom-scrollbar">
+                                <div class="close-overlay" onclick="closeAllOverlays()">
+                                    <span class="material-icons-outlined text-sm">close</span>
+                                </div>
+                                <div class="flex items-center gap-4 mb-6 mt-4">
+                                    <div
+                                        class="w-16 h-16 rounded-2xl bg-accent overflow-hidden shadow-md rotate-3 border-2 border-white">
+                                        <img src="{% static 'img/Agnes.webp' %}" class="w-full h-full object-cover">
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xl font-serif text-gray-900 mb-1">Agnes Temple</h4>
+                                        <span
+                                            class="text-[9px] font-bold uppercase tracking-widest bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full">Protagonist</span>
+                                    </div>
+                                </div>
+                                <div class="space-y-4">
+                                    <p class="text-[11px] text-gray-600 leading-relaxed">A compulsive investigator who
+                                        treats emotions as variables. Driven by a latent empathy she views as a
+                                        weakness.</p>
+                                    <div class="p-4 bg-blue-50/50 rounded-xl border border-blue-100">
+                                        <p class="text-[9px] text-blue-600 font-bold uppercase tracking-widest mb-1">
+                                            Internal Conflict</p>
+                                        <p class="text-[10px] text-gray-500 italic">Logic vs. Blood Loyalty. She wants
+                                            to be
+                                            an objective observer, but the Temple name creates a primitive pull she
+                                            hates.</p>
+                                    </div>
+                                    <div class="p-4 bg-blue-50/50 rounded-xl border border-blue-100">
+                                        <p class="text-[9px] text-blue-600 font-bold uppercase tracking-widest mb-1">
+                                            Narrative Thread</p>
+                                        <p class="text-[10px] text-gray-500 italic">Recurring nightmares about a 'White
+                                            Room'—a repressed memory of her father's first trial.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Dora Overlay -->
+                            <div id="overlay-dora" class="character-overlay p-6 overflow-y-auto custom-scrollbar">
+                                <div class="close-overlay" onclick="closeAllOverlays()">
+                                    <span class="material-icons-outlined text-sm">close</span>
+                                </div>
+                                <div class="flex items-center gap-4 mb-6 mt-4">
+                                    <div
+                                        class="w-16 h-16 rounded-2xl bg-purple-100 overflow-hidden shadow-md -rotate-3 border-2 border-white">
+                                        <img src="{% static 'img/Dora-new.webp' %}"
+                                            class="w-full h-full object-cover scale-[2.0] translate-y-2">
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xl font-serif text-gray-900 mb-1">Dora Temple</h4>
+                                        <span
+                                            class="text-[9px] font-bold uppercase tracking-widest bg-purple-100 text-purple-600 px-2 py-0.5 rounded-full">Cousin</span>
+                                    </div>
+                                </div>
+                                <div class="space-y-4">
+                                    <p class="text-[11px] text-gray-600 leading-relaxed">Shadow Observer. She has spent
+                                        her life being dismissed, using that invisibility to gather family secrets.</p>
+                                    <div class="p-4 bg-purple-50/50 rounded-xl border border-purple-100">
+                                        <p class="text-[9px] text-purple-600 font-bold uppercase tracking-widest mb-1">
+                                            Internal Conflict</p>
+                                        <p class="text-[10px] text-gray-500 italic">Vengeance vs. Virtue. She wants the
+                                            Temples to fall, but fears her methods are making her like them.</p>
+                                    </div>
+                                    <div class="p-4 bg-purple-50/50 rounded-xl border border-purple-100">
+                                        <p class="text-[9px] text-purple-600 font-bold uppercase tracking-widest mb-1">
+                                            Hidden Thread</p>
+                                        <p class="text-[10px] text-gray-500 italic">Secret apartment in the Docks with
+                                            stolen archive files for a rainy day.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Lucius Overlay -->
+                            <div id="overlay-lucius" class="character-overlay p-6 overflow-y-auto custom-scrollbar">
+                                <div class="close-overlay" onclick="closeAllOverlays()">
+                                    <span class="material-icons-outlined text-sm">close</span>
+                                </div>
+                                <div class="flex items-center gap-4 mb-6 mt-4">
+                                    <div
+                                        class="w-16 h-16 rounded-2xl bg-yellow-100 overflow-hidden shadow-md rotate-3 border-2 border-white">
+                                        <img src="{% static 'img/Lucius-Temple.webp' %}"
+                                            class="w-full h-full object-cover">
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xl font-serif text-gray-900 mb-1">Lucius Temple</h4>
+                                        <span
+                                            class="text-[9px] font-bold uppercase tracking-widest bg-red-100 text-red-600 px-2 py-0.5 rounded-full">Patriarch</span>
+                                    </div>
+                                </div>
+                                <div class="space-y-4">
+                                    <p class="text-[11px] text-gray-600 leading-relaxed">Stoic Architect of the Temple
+                                        power structure. He believes sanitizing history is the only way to preserve the
+                                        future.</p>
+                                    <div class="p-4 bg-red-50/50 rounded-xl border border-red-100">
+                                        <p class="text-[9px] text-red-600 font-bold uppercase tracking-widest mb-1">
+                                            Internal Conflict</p>
+                                        <p class="text-[10px] text-gray-500 italic">Preservation vs. Paternal Love. He
+                                            loves
+                                            Agnes by archiving her potential, yet fears her independence.</p>
+                                    </div>
+                                    <div class="p-4 bg-red-50/50 rounded-xl border border-red-100">
+                                        <p class="text-[9px] text-red-600 font-bold uppercase tracking-widest mb-1">
+                                            Hidden Thread</p>
+                                        <p class="text-[10px] text-gray-500 italic">Keeps a 'Debt Ledger' of allies who
+                                            would be destroyed if the archives leaked.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Theodora Overlay -->
+                            <div id="overlay-theodora" class="character-overlay p-6 overflow-y-auto custom-scrollbar">
+                                <div class="close-overlay" onclick="closeAllOverlays()">
+                                    <span class="material-icons-outlined text-sm">close</span>
+                                </div>
+                                <div class="flex items-center gap-4 mb-6 mt-4">
+                                    <div
+                                        class="w-16 h-16 rounded-2xl bg-blue-100 overflow-hidden shadow-md -rotate-3 border-2 border-white">
+                                        <img src="{% static 'img/aunt-theodora.webp' %}"
+                                            class="w-full h-full object-cover">
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xl font-serif text-gray-900 mb-1">Aunt Theodora</h4>
+                                        <span
+                                            class="text-[9px] font-bold uppercase tracking-widest bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full">Confidante</span>
+                                    </div>
+                                </div>
+                                <div class="space-y-4">
+                                    <p class="text-[11px] text-gray-600 leading-relaxed">Bohemian Rebel who uses her
+                                        status to bridge High London and the Docks resistance groups.</p>
+                                    <div class="p-4 bg-blue-50/50 rounded-xl border border-blue-100">
+                                        <p class="text-[9px] text-blue-600 font-bold uppercase tracking-widest mb-1">
+                                            Internal Conflict</p>
+                                        <p class="text-[10px] text-gray-500 italic">Safety vs. Subversion. She wants to
+                                            protect Agnes but knows true safety requires dismantling the system.</p>
+                                    </div>
+                                    <div class="p-4 bg-blue-50/50 rounded-xl border border-blue-100">
+                                        <p class="text-[9px] text-blue-600 font-bold uppercase tracking-widest mb-1">
+                                            Hidden Thread</p>
+                                        <p class="text-[10px] text-gray-500 italic">Communicates through floral
+                                            semantics—arrangements with tactical meaning.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Elise Overlay -->
+                            <div id="overlay-elise" class="character-overlay p-6 overflow-y-auto custom-scrollbar">
+                                <div class="close-overlay" onclick="closeAllOverlays()">
+                                    <span class="material-icons-outlined text-sm">close</span>
+                                </div>
+                                <div class="flex items-center gap-4 mb-6 mt-4">
+                                    <div
+                                        class="w-16 h-16 rounded-2xl bg-accent overflow-hidden shadow-md rotate-3 border-2 border-white">
+                                        <img src="{% static 'img/Elise-temple.webp' %}"
+                                            class="w-full h-full object-cover object-top">
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xl font-serif text-gray-900 mb-1">Elise Temple</h4>
+                                        <span
+                                            class="text-[9px] font-bold uppercase tracking-widest bg-purple-100 text-purple-600 px-2 py-0.5 rounded-full">Matriarch</span>
+                                    </div>
+                                </div>
+                                <div class="space-y-4">
+                                    <p class="text-[11px] text-gray-600 leading-relaxed">Wounded Guardian. Her coldness
+                                        is a calcified armor developed after witnessing the family's brutal rise.</p>
+                                    <div class="p-4 bg-purple-50/50 rounded-xl border border-purple-100">
+                                        <p class="text-[9px] text-purple-600 font-bold uppercase tracking-widest mb-1">
+                                            Internal Conflict</p>
+                                        <p class="text-[10px] text-gray-500 italic">Duty vs. Guilt. She carries the
+                                            family's
+                                            secrets so Agnes never has to know the cost of luxury.</p>
+                                    </div>
+                                    <div class="p-4 bg-purple-50/50 rounded-xl border border-purple-100">
+                                        <p class="text-[9px] text-purple-600 font-bold uppercase tracking-widest mb-1">
+                                            Hidden Thread</p>
+                                        <p class="text-[10px] text-gray-500 italic">Secretly funds an underground asylum
+                                            for former archive employees whose minds broke.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Amy Overlay -->
+                            <div id="overlay-amy" class="character-overlay p-6 overflow-y-auto custom-scrollbar">
+                                <div class="close-overlay" onclick="closeAllOverlays()">
+                                    <span class="material-icons-outlined text-sm">close</span>
+                                </div>
+                                <div class="flex items-center gap-4 mb-6 mt-4">
+                                    <div
+                                        class="w-16 h-16 rounded-2xl bg-accent overflow-hidden shadow-md -rotate-3 border-2 border-white">
+                                        <img src="{% static 'img/Amy-temple.webp' %}"
+                                            class="w-full h-full object-cover object-top">
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xl font-serif text-gray-900 mb-1">Amy Temple</h4>
+                                        <span
+                                            class="text-[9px] font-bold uppercase tracking-widest bg-purple-100 text-purple-600 px-2 py-0.5 rounded-full">Sister</span>
+                                    </div>
+                                </div>
+                                <div class="space-y-4">
+                                    <p class="text-[11px] text-gray-600 leading-relaxed">Strategic Socialite. Behind her
+                                        curated perfection is a sharp, analytical mind that understands social capital.
+                                    </p>
+                                    <div class="p-4 bg-purple-400/5 rounded-xl border border-purple-400/10">
+                                        <p class="text-[9px] text-purple-400 font-bold uppercase tracking-widest mb-1">
+                                            Internal Conflict</p>
+                                        <p class="text-[10px] text-gray-500 italic">Ambition vs. Belonging. She wants to
+                                            lead the Temple dynasty but realizes the price is her own identity.</p>
+                                    </div>
+                                    <div class="p-4 bg-purple-50/50 rounded-xl border border-purple-100">
+                                        <p class="text-[9px] text-purple-600 font-bold uppercase tracking-widest mb-1">
+                                            Hidden Thread</p>
+                                        <p class="text-[10px] text-gray-500 italic">Expert in Victorian cyphers; has
+                                            been
+                                            intercepting Lucius's encrypted mail.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Mrs. Temple Overlay -->
+                            <div id="overlay-mrs" class="character-overlay p-6 overflow-y-auto custom-scrollbar">
+                                <div class="close-overlay" onclick="closeAllOverlays()">
+                                    <span class="material-icons-outlined text-sm">close</span>
+                                </div>
+                                <div class="flex items-center gap-4 mb-6 mt-4">
+                                    <div
+                                        class="w-16 h-16 rounded-2xl bg-accent overflow-hidden shadow-md rotate-3 border-2 border-white">
+                                        <img src="{% static 'img/Mrs.Temple.webp' %}"
+                                            class="w-full h-full object-cover scale-[1.5] origin-top object-[70%_top]">
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xl font-serif text-gray-900 mb-1">Mrs. Temple</h4>
+                                        <span
+                                            class="text-[9px] font-bold uppercase tracking-widest bg-red-100 text-red-600 px-2 py-0.5 rounded-full">Mother</span>
+                                    </div>
+                                </div>
+                                <div class="space-y-4">
+                                    <p class="text-[11px] text-gray-600 leading-relaxed">Fragile Oracle. Her 'nervous
+                                        condition' is a subconscious defense mechanism; she sees patterns long before
+                                        others.</p>
+                                    <div class="p-4 bg-red-50/50 rounded-xl border border-red-100">
+                                        <p class="text-[9px] text-red-600 font-bold uppercase tracking-widest mb-1">
+                                            Internal Conflict</p>
+                                        <p class="text-[10px] text-gray-500 italic">Knowledge vs. Sanity. The more she
+                                            understands the family's past, the more she retreats.</p>
+                                    </div>
+                                    <div class="p-4 bg-red-50/50 rounded-xl border border-red-100">
+                                        <p class="text-[9px] text-red-600 font-bold uppercase tracking-widest mb-1">
+                                            Hidden Thread</p>
+                                        <p class="text-[10px] text-gray-500 italic">Pressed flowers from 'forbidden
+                                            gardens' where Lucius disposes of evidence.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Map Container (Nodes Centered) -->
+                            <div class="relative w-full h-full scale-[0.85] origin-center -translate-y-[36px]">
+                                <!-- Connection Line: Agnes to Dora (Family - Purple) -->
+                                <svg class="absolute pointer-events-none overflow-visible connection-line family-connection"
+                                    style="top: calc(47.5% - 6px); left: calc(50% - 156px); width: 130px; height: 60px; z-index: 5;">
+                                    <path d="M 130 60 L 85 39" stroke="#9333EA" stroke-width="3" fill="none"
+                                        opacity="0.9" />
+                                    <path d="M 45 21 L 0 0" stroke="#9333EA" stroke-width="3" fill="none"
+                                        opacity="0.9" />
+                                    <text id="family-label-dora" x="65" y="30" text-anchor="middle"
+                                        alignment-baseline="middle" font-size="7" fill="black"
+                                        class="font-bold uppercase tracking-[0.2em] cursor-pointer hover:fill-purple-400 transition-colors pointer-events-auto"
+                                        transform="rotate(25, 65, 30)">Family</text>
+                                </svg>
+
+                                <!-- Dora Temple Hotspot Overlay -->
+                                <div id="dora-hotspot"
+                                    class="map-hotspot character-node character-family absolute flex flex-col items-center gap-1 z-10"
+                                    style="top: calc(47.5% - 30px); left: calc(50% - 180px); "
+                                    title="Click for Profile">
+                                    <div
+                                        class="w-12 h-12 rounded-full border-2 border-white/50 bg-accent dark:bg-yellow-900/40 flex items-center justify-center overflow-hidden shadow-lg relative">
+                                        <img src="{% static 'img/Dora-new.webp' %}" alt="Dora Temple Profile"
+                                            class="w-full h-full object-cover object-top scale-[2.0] translate-y-[45%]">
+                                    </div>
+                                    <span
+                                        class="bg-black/60 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded-full font-medium whitespace-nowrap shadow-sm">Dora
+                                        Temple</span>
+                                </div>
+
+                                <!-- Agnes Temple Hotspot Overlay -->
+                                <div id="agnes-hotspot"
+                                    class="map-hotspot absolute top-[calc(47.5%+30px)] left-[calc(50%-50px)] flex flex-col items-center gap-1 z-10"
+                                    title="Click for Profile">
+                                    <div
+                                        class="w-12 h-12 rounded-full border-2 border-white/50 bg-accent dark:bg-yellow-900/40 flex items-center justify-center overflow-hidden shadow-lg relative">
+                                        <img src="{% static 'img/Agnes.webp' %}" alt="Agnes Temple Profile"
+                                            class="w-full h-full object-cover">
+                                    </div>
+                                    <span
+                                        class="bg-black/60 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded-full font-medium whitespace-nowrap shadow-sm">Agnes
+                                        Temple</span>
+                                </div>
+
+                                <!-- Connection Line: Agnes to Lucius -->
+                                <svg class="absolute pointer-events-none overflow-visible connection-line mentor-connection"
+                                    style="top: calc(47.5%); left: calc(50% - 16px); width: 130px; height: 75px; z-index: 5;">
+                                    <path d="M 0 54 L 60 28" stroke="#FACC15" stroke-width="3" fill="none"
+                                        opacity="0.9" />
+                                    <path d="M 90 15 L 123 0" stroke="#FACC15" stroke-width="3" fill="none"
+                                        opacity="0.9" />
+                                    <text id="mentor-label" x="75" y="21" text-anchor="middle"
+                                        alignment-baseline="middle" font-size="7" fill="black"
+                                        class="font-bold uppercase tracking-[0.2em] cursor-pointer hover:fill-yellow-400 transition-colors pointer-events-auto"
+                                        transform="rotate(-24, 75, 21)">Mentor</text>
+                                </svg>
+
+                                <!-- Lucius Temple Hotspot Overlay -->
+                                <div id="lucius-hotspot"
+                                    class="character-node character-mentor map-hotspot absolute flex flex-col items-center gap-1 z-10"
+                                    style="top: calc(47.5% - 30px); left: calc(50% + 80px);" title="Click for Profile">
+                                    <div
+                                        class="w-12 h-12 rounded-full border-2 border-white/50 bg-accent dark:bg-yellow-900/40 flex items-center justify-center overflow-hidden shadow-lg relative">
+                                        <img src="{% static 'img/Lucius-Temple.webp' %}" alt="Lucius Temple Profile"
+                                            class="w-full h-full object-cover">
+                                    </div>
+                                    <span
+                                        class="bg-black/60 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded-full font-medium whitespace-nowrap shadow-sm">Lucius
+                                        Temple</span>
+                                </div>
+
+                                <!-- Connection Line: Agnes to Theodora (Friend) -->
+                                <svg class="absolute pointer-events-none overflow-visible connection-line friend-connection"
+                                    style="top: calc(47.5% + 45px); left: calc(50% - 16px); width: 130px; height: 95px; z-index: 5;">
+                                    <path d="M 0 15 L 50 42" stroke="#3B82F6" stroke-width="3" fill="none"
+                                        opacity="0.9" />
+                                    <path d="M 80 58 L 120 80" stroke="#3B82F6" stroke-width="3" fill="none"
+                                        opacity="0.9" />
+                                    <text id="friend-label" x="65" y="50" text-anchor="middle"
+                                        alignment-baseline="middle" font-size="7" fill="black"
+                                        class="font-bold uppercase tracking-[0.2em] cursor-pointer hover:fill-blue-400 transition-colors pointer-events-auto"
+                                        transform="rotate(28, 65, 50)">Friend</text>
+                                </svg>
+
+                                <!-- Aunt Theodora Hotspot Overlay -->
+                                <div id="theodora-hotspot"
+                                    class="character-node character-friend map-hotspot absolute flex flex-col items-center gap-1 z-10"
+                                    style="top: calc(47.5% + 100px); left: calc(50% + 80px);" title="Click for Profile">
+                                    <div
+                                        class="w-12 h-12 rounded-full border-2 border-white/50 bg-accent dark:bg-yellow-900/40 flex items-center justify-center overflow-hidden shadow-lg relative">
+                                        <img src="{% static 'img/aunt-theodora.webp' %}" alt="Aunt Theodora Profile"
+                                            class="w-full h-full object-cover object-top">
+                                    </div>
+                                    <span
+                                        class="bg-black/60 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded-full font-medium whitespace-nowrap shadow-sm">Aunt
+                                        Theodora</span>
+                                </div>
+
+                                <!-- Connection Line: Agnes to Elise (Family) -->
+                                <svg class="absolute pointer-events-none overflow-visible connection-line family-connection"
+                                    style="top: calc(47.5% + 45px); left: calc(50% - 146px); width: 130px; height: 95px; z-index: 5;">
+                                    <path d="M 130 0 L 85 28" stroke="#9333EA" stroke-width="3" fill="none"
+                                        opacity="0.9" />
+                                    <path d="M 55 47 L 2 80" stroke="#9333EA" stroke-width="3" fill="none"
+                                        opacity="0.9" />
+                                    <text id="family-label-elise" x="70" y="38" text-anchor="middle"
+                                        alignment-baseline="middle" font-size="7" fill="black"
+                                        class="font-bold uppercase tracking-[0.2em]"
+                                        transform="rotate(-32, 70, 38)">Family</text>
+                                </svg>
+
+                                <!-- Elise Temple Hotspot Overlay -->
+                                <div id="elise-hotspot"
+                                    class="character-node character-family map-hotspot absolute flex flex-col items-center gap-1 z-10"
+                                    style="top: calc(47.5% + 100px); left: calc(50% - 180px);"
+                                    title="Click for Profile">
+                                    <div
+                                        class="w-12 h-12 rounded-full border-2 border-white/50 bg-accent dark:bg-yellow-900/40 flex items-center justify-center overflow-hidden shadow-lg relative">
+                                        <img src="{% static 'img/Elise-temple.webp' %}" alt="Elise Temple Profile"
+                                            class="w-full h-full object-cover object-top">
+                                    </div>
+                                    <span
+                                        class="bg-black/60 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded-full font-medium whitespace-nowrap shadow-sm">Elise
+                                        Temple</span>
+                                </div>
+
+                                <!-- Connection Line: Agnes to Amy (Family) -->
+                                <svg class="absolute pointer-events-none overflow-visible connection-line family-connection"
+                                    style="top: calc(47.5% + 48px); left: calc(50% - 22px); width: 22px; height: 122px; z-index: 5;">
+                                    <path d="M 12 0 L 13.4 56" stroke="#9333EA" stroke-width="3" fill="none"
+                                        opacity="0.9" />
+                                    <path d="M 14.1 86 L 15 122" stroke="#9333EA" stroke-width="3" fill="none"
+                                        opacity="0.9" />
+                                    <text id="family-label-amy" x="13.7" y="71" text-anchor="middle"
+                                        alignment-baseline="middle" font-size="7" fill="black"
+                                        class="font-bold uppercase tracking-[0.2em]"
+                                        transform="rotate(89, 13.7, 71)">Family</text>
+                                </svg>
+
+                                <!-- Amy Temple Hotspot Overlay -->
+                                <div id="amy-hotspot"
+                                    class="character-node character-family map-hotspot absolute flex flex-col items-center gap-1 z-10"
+                                    style="top: calc(47.5% + 170px); left: calc(50% - 46px);" title="Click for Profile">
+                                    <div
+                                        class="w-12 h-12 rounded-full border-2 border-white/50 bg-accent dark:bg-purple-900/40 flex items-center justify-center overflow-hidden shadow-lg relative">
+                                        <img src="{% static 'img/Amy-temple.webp' %}" alt="Amy Temple Profile"
+                                            class="w-full h-full object-cover object-top">
+                                    </div>
+                                    <span
+                                        class="bg-black/60 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded-full font-medium whitespace-nowrap shadow-sm">Amy
+                                        Temple</span>
+                                </div>
+
+                                <!-- Connection Line: Agnes to Mrs. Temple (Family) -->
+                                <svg class="absolute pointer-events-none overflow-visible connection-line family-connection"
+                                    style="top: calc(47.5% - 87px); left: calc(50%); width: 22px; height: 122px; z-index: 5;">
+                                    <path d="M 0 122 L 4 81" stroke="#9333EA" stroke-width="3" fill="none"
+                                        opacity="0.9" />
+                                    <path d="M 8 41 L 12 0" stroke="#9333EA" stroke-width="3" fill="none"
+                                        opacity="0.9" />
+                                    <text id="family-label-mrs" x="6" y="61" text-anchor="middle"
+                                        alignment-baseline="middle" font-size="7" fill="black"
+                                        class="font-bold uppercase tracking-[0.2em]"
+                                        transform="rotate(-84, 6, 61)">Family</text>
+                                </svg>
+
+                                <!-- Mrs. Temple Hotspot Overlay -->
+                                <div id="mrs-hotspot"
+                                    class="character-node character-family map-hotspot absolute flex flex-col items-center gap-1 z-10"
+                                    style="top: calc(47.5% - 125px); left: calc(50% - 24px);" title="Click for Profile">
+                                    <div
+                                        class="w-12 h-12 rounded-full border-2 border-white/50 bg-accent dark:bg-red-900/40 flex items-center justify-center overflow-hidden shadow-lg relative">
+                                        <img src="{% static 'img/Mrs.Temple.webp' %}" alt="Mrs. Temple Profile"
+                                            class="w-full h-full object-cover scale-[1.5] origin-top object-[70%_top]">
+                                    </div>
+                                    <span
+                                        class="bg-black/60 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded-full font-medium whitespace-nowrap shadow-sm">Mrs.
+                                        Temple</span>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- Bottom: Codex Panel -->
+                        <div id="codex-container"
+                            class="reveal slide-up delay-200 bg-white/40 dark:bg-black/20 backdrop-blur-md rounded-3xl border border-white/60 dark:border-white/5 overflow-hidden shadow-soft h-[300px] flex flex-col">
+                            <!-- Default State: Marketing Text -->
+                            <div id="codex-default" class="p-6 overflow-y-auto custom-scrollbar flex-grow">
+                                <div
+                                    class="flex items-center gap-2 mb-4 text-[9px] font-bold text-blue-500 uppercase tracking-widest">
+                                    <span class="w-6 h-[1px] bg-blue-500"></span> Neural Narrative Map
+                                </div>
+                                <h3 class="text-xl font-serif text-gray-900 dark:text-white mb-2">The Architecture of
+                                    Conflict</h3>
+                                <p class="text-[11px] text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+                                    A novel's complexity lies in the density of its relationships. This dynamic map
+                                    evolve with your manuscript, providing a living visualization of the shifting
+                                    alliances.
+                                </p>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="p-3 rounded-2xl bg-white/50 dark:bg-black/20 border border-white/20">
+                                        <h4 class="text-[9px] font-bold uppercase tracking-widest text-blue-600 mb-1">
+                                            Character Tracking</h4>
+                                        <p class="text-[9px] text-gray-500 leading-relaxed">Indexed upon narrative
+                                            introduction.</p>
+                                    </div>
+                                    <div class="p-3 rounded-2xl bg-white/50 dark:bg-black/20 border border-white/20">
+                                        <h4 class="text-[9px] font-bold uppercase tracking-widest text-blue-600 mb-1">
+                                            Conflict Topography</h4>
+                                        <p class="text-[9px] text-gray-500 leading-relaxed">Visualizes every emotional
+                                            weight.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Insight Footer -->
+                            <div class="p-3 bg-gray-50/50 dark:bg-black/40 border-t border-white/20">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
+                                        <span
+                                            class="text-[8px] font-bold text-gray-400 uppercase tracking-widest">Neural
+                                            Link Active</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </section>
             </div>
@@ -512,4 +1338,132 @@
         <div>&copy; 2026 Story Timeline Builder. All rights reserved.</div>
     </footer>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Toggle Registration Method
+        window.toggleRegistration = function (method) {
+            const emailForm = document.getElementById('standard-registration-form');
+            const socialArea = document.getElementById('social-registration-area');
+            const emailTab = document.getElementById('email-registration-tab');
+            const socialTab = document.getElementById('social-registration-tab');
+
+            if (method === 'email') {
+                emailForm.classList.remove('hidden-form');
+                socialArea.classList.remove('active');
+                emailTab.classList.add('active');
+                socialTab.classList.remove('active');
+            } else {
+                emailForm.classList.add('hidden-form');
+                socialArea.classList.add('active');
+                emailTab.classList.remove('active');
+                socialTab.classList.add('active');
+            }
+        };
+
+        // Animation Activator
+        const observerOptions = { threshold: 0.1 };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // Interaction Logic for Map Overlays
+        const overlays = {
+            agnes: document.getElementById('overlay-agnes'),
+            dora: document.getElementById('overlay-dora'),
+            lucius: document.getElementById('overlay-lucius'),
+            theodora: document.getElementById('overlay-theodora'),
+            elise: document.getElementById('overlay-elise'),
+            amy: document.getElementById('overlay-amy'),
+            mrs: document.getElementById('overlay-mrs')
+        };
+
+        const hotspots = {
+            agnes: document.getElementById('agnes-hotspot'),
+            dora: document.getElementById('dora-hotspot'),
+            lucius: document.getElementById('lucius-hotspot'),
+            theodora: document.getElementById('theodora-hotspot'),
+            elise: document.getElementById('elise-hotspot'),
+            amy: document.getElementById('amy-hotspot'),
+            mrs: document.getElementById('mrs-hotspot')
+        };
+
+        window.closeAllOverlays = function () {
+            Object.values(overlays).forEach(overlay => {
+                if (overlay) overlay.classList.remove('active');
+            });
+        };
+
+        function showOverlay(id) {
+            closeAllOverlays();
+            if (overlays[id]) {
+                overlays[id].classList.add('active');
+            }
+        }
+
+        // Add click listeners to hotspots
+        Object.entries(hotspots).forEach(([id, element]) => {
+            if (element) {
+                element.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    showOverlay(id);
+                });
+            }
+        });
+
+        // Legend interactions (optional filtering effect)
+        const legendItems = {
+            mentor: document.getElementById('legend-mentor'),
+            friend: document.getElementById('legend-friend'),
+            family: document.getElementById('legend-family')
+        };
+
+        Object.entries(legendItems).forEach(([type, element]) => {
+            if (element) {
+                element.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const lines = document.querySelectorAll(`.${type}-connection`);
+                    const nodes = document.querySelectorAll(`.character-${type}`);
+
+                    // Toggle active state on legend item
+                    element.classList.toggle('opacity-40');
+                    const isActive = !element.classList.contains('opacity-40');
+
+                    // Toggle lines
+                    lines.forEach(line => {
+                        line.style.transition = 'opacity 0.4s ease';
+                        line.style.opacity = isActive ? '0.9' : '0';
+                        line.style.pointerEvents = isActive ? 'auto' : 'none';
+                    });
+
+                    // Toggle character nodes
+                    nodes.forEach(node => {
+                        node.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+                        node.style.opacity = isActive ? '1' : '0';
+                        node.style.pointerEvents = isActive ? 'auto' : 'none';
+                        node.style.transform = isActive ? 'scale(1)' : 'scale(0.5)';
+                    });
+                });
+            }
+        });
+
+        // Immediate activation for elements already in viewport
+        setTimeout(() => {
+            document.querySelectorAll('.reveal').forEach(el => {
+                const rect = el.getBoundingClientRect();
+                if (rect.top >= 0 && rect.top <= window.innerHeight) {
+                    el.classList.add('active');
+                }
+            });
+        }, 500);
+    });
+</script>
 {% endblock %}
