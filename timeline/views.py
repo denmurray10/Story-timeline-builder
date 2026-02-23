@@ -2,14 +2,17 @@
 Views for the Timeline app.
 """
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import login
 from django.contrib.auth.models import User
+from blog.models import Post
+from django.contrib.admin.models import LogEntry
 from django.contrib import messages
 import docx2txt
 import io
 import os
 from django.http import JsonResponse
+import requests
 from django.db.models import Count, Sum, Q
 from django.views.decorators.http import require_POST
 import json
@@ -28,7 +31,7 @@ from ebooklib import epub
 from bs4 import BeautifulSoup
 import tempfile
 
-from .models import Book, Chapter, Character, Event, Tag, CharacterRelationship, AIFocusTask, ActivityLog, WorldEntry, InteractionSummaryCache, RelationshipAnalysisCache, StoryScanStatus
+from .models import Book, Chapter, Character, Event, Tag, CharacterRelationship, AIFocusTask, ActivityLog, WorldEntry, InteractionSummaryCache, RelationshipAnalysisCache, StoryScanStatus, AIUsageLog
 from .forms import (
     UserRegisterForm, BookForm, ChapterForm, CharacterForm, 
     EventForm, TagForm, UserAccountForm, CharacterRelationshipForm, WorldEntryForm
@@ -37,6 +40,36 @@ from .utils.ai_context import ContextResolver
 from .context_engine import ContextEngine
 import datetime
 from django.contrib.auth.views import LoginView as DjangoLoginView
+
+def _log_ai_usage(user, service, model, prompt_tokens, completion_tokens):
+    """Logs AI usage for cost and token tracking."""
+    # Rough cost estimates in USD per 1M tokens
+    pricing = {
+        'deepseek-chat': {'input': 0.14, 'output': 0.28},
+        'deepseek-reasoner': {'input': 0.55, 'output': 2.19},
+        'gemini-1.5-flash': {'input': 0.075, 'output': 0.30}, # Estimates
+        'gemini-1.5-pro': {'input': 3.50, 'output': 10.50},  # Estimates
+    }
+    
+    total_tokens = prompt_tokens + completion_tokens
+    cost = 0
+    
+    if model in pricing:
+        cost = (prompt_tokens * pricing[model]['input'] / 1000000) + \
+               (completion_tokens * pricing[model]['output'] / 1000000)
+    
+    try:
+        AIUsageLog.objects.create(
+            user=user if user and user.is_authenticated else None,
+            service_name=service,
+            model_name=model,
+            prompt_tokens=prompt_tokens,
+            completion_tokens=completion_tokens,
+            total_tokens=total_tokens,
+            cost_estimate=cost
+        )
+    except Exception as e:
+        print(f"Error logging AI usage: {e}")
 
 def handler404(request, exception):
     """Custom 404 error handler."""
@@ -94,24 +127,44 @@ class CustomLoginView(DjangoLoginView):
 
     def generate_ai_quotes(self):
         """
-        Uses Gemini to generate 4 fresh writing quotes with generated author names.
+        Uses DeepSeek (preferred) or Gemini to generate 4 fresh writing quotes.
         """
-        api_key = getattr(settings, 'GEMINI_API_KEY', None)
-        if not api_key:
+        deepseek_key = getattr(settings, 'DEEPSEEK_API_KEY', None)
+        gemini_key = getattr(settings, 'GEMINI_API_KEY', None)
+        
+        if not deepseek_key and not gemini_key:
             return None
             
+        prompt = (
+            "Generate 4 inspiring and unique quotes about writing and storytelling. "
+            "For EACH quote, also generate a fictional but professional-sounding author name. "
+            "Format the response ONLY as a JSON list of objects, for example: "
+            '[{"text": "Quote here...", "author": "Name here"}, ...]'
+        )
+
         try:
-            import google.generativeai as genai
-            genai.configure(api_key=api_key)
-            model = genai.GenerativeModel('gemini-1.5-flash')
-            prompt = (
-                "Generate 4 inspiring and unique quotes about writing and storytelling. "
-                "For EACH quote, also generate a fictional but professional-sounding author name. "
-                "Format the response ONLY as a JSON list of objects, for example: "
-                '[{"text": "Quote here...", "author": "Name here"}, ...]'
-            )
-            response = model.generate_content(prompt)
-            text = response.text.strip()
+            if deepseek_key:
+                client = OpenAI(api_key=deepseek_key, base_url="https://api.deepseek.com")
+                response = client.chat.completions.create(
+                    model="deepseek-chat",
+                    messages=[
+                        {"role": "system", "content": "You are a helpful story writing coach. Output JSON only."},
+                        {"role": "user", "content": prompt},
+                    ],
+                    response_format={'type': 'json_object'} if "deepseek-chat" in str(deepseek_key) else None, # Some accounts might not support this yet
+                    stream=False
+                )
+                text = response.choices[0].message.content.strip()
+                _log_ai_usage(None, 'DeepSeek', 'deepseek-chat', response.usage.prompt_tokens, response.usage.completion_tokens)
+            else:
+                genai.configure(api_key=gemini_key)
+                model = genai.GenerativeModel('gemini-1.5-flash')
+                response = model.generate_content(prompt)
+                text = response.text.strip()
+                # Gemini usage tracking is slightly different, often in response.usage_metadata
+                try:
+                    _log_ai_usage(None, 'Gemini', 'gemini-1.5-flash', response.usage_metadata.prompt_token_count, response.usage_metadata.candidates_token_count)
+                except: pass
             
             # Clean up markdown if present
             if '```json' in text:
@@ -184,6 +237,160 @@ def home(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
     return render(request, 'timeline/landingpagev2.html')
+
+
+@login_required
+def search_results(request):
+    """
+    Unified search functionality for the Story Bible.
+    Displays results in a clean, categorized list.
+    """
+    query = request.GET.get('q', '')
+    results = {
+        'books': [],
+        'chapters': [],
+        'characters': [],
+        'events': [],
+        'world_entries': [],
+    }
+    
+    total_results = 0
+    if query:
+        # Search Books
+        results['books'] = Book.objects.filter(user=request.user).filter(
+            Q(title__icontains=query) | Q(description__icontains=query)
+        ).distinct()
+        
+        # Search Chapters
+        results['chapters'] = Chapter.objects.filter(book__user=request.user).filter(
+            Q(title__icontains=query) | Q(description__icontains=query) | Q(content__icontains=query)
+        ).distinct()
+        
+        # Search Characters
+        results['characters'] = Character.objects.filter(user=request.user).filter(
+            Q(name__icontains=query) | Q(description__icontains=query) | Q(motivation__icontains=query) | Q(aliases__icontains=query)
+        ).distinct()
+        
+        # Search Events
+        results['events'] = Event.objects.filter(user=request.user).filter(
+            Q(title__icontains=query) | Q(description__icontains=query) | Q(notes__icontains=query) | Q(location__icontains=query)
+        ).distinct()
+        
+        # Search World Entries
+        results['world_entries'] = WorldEntry.objects.filter(user=request.user).filter(
+            Q(title__icontains=query) | Q(content__icontains=query)
+        ).distinct()
+        
+        total_results = sum(len(list(v)) for v in results.values())
+
+    context = {
+        'query': query,
+        'results': results,
+        'total_results': total_results,
+    }
+    return render(request, 'timeline/search_results.html', context)
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def staff_dashboard(request):
+    """
+    Comprehensive dashboard for superusers to manage and monitor the platform.
+    """
+    # Site Statistics
+    stats = {
+        'total_users': User.objects.count(),
+        'active_users': User.objects.filter(is_active=True).count(),
+        'total_books': Book.objects.count(),
+        'total_chapters': Chapter.objects.count(),
+        'total_events': Event.objects.count(),
+        'total_characters': Character.objects.count(),
+        'total_posts': Post.objects.count(),
+        'total_world_entries': WorldEntry.objects.count(),
+    }
+    
+    # Recent User Registrations
+    recent_users = User.objects.all().order_by('-date_joined')[:10]
+    
+    # Recent System Activity (LogEntries)
+    recent_activity = LogEntry.objects.all().select_related('user', 'content_type').order_by('-action_time')[:15]
+    
+    # Blog Posts Management
+    blog_posts = Post.objects.all().order_by('-created_on')[:10]
+    
+    # DeepSeek Balance Check
+    deepseek_balance = None
+    deepseek_key = getattr(settings, 'DEEPSEEK_API_KEY', None)
+    if deepseek_key:
+        try:
+            response = requests.get(
+                "https://api.deepseek.com/user/balance",
+                headers={"Authorization": f"Bearer {deepseek_key}"},
+                timeout=5
+            )
+            if response.status_code == 200:
+                deepseek_balance = response.json()
+        except Exception as e:
+            print(f"Error fetching DeepSeek balance: {e}")
+
+    # Today's AI Usage
+    today_start = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    today_usage = AIUsageLog.objects.filter(timestamp__gte=today_start)
+    
+    usage_stats = {
+        'total_tokens': today_usage.aggregate(Sum('total_tokens'))['total_tokens__sum'] or 0,
+        'estimated_cost': today_usage.aggregate(Sum('cost_estimate'))['cost_estimate__sum'] or 0,
+        'call_count': today_usage.count(),
+        # Breadown by service
+        'deepseek_tokens': today_usage.filter(service_name='DeepSeek').aggregate(Sum('total_tokens'))['total_tokens__sum'] or 0,
+        'gemini_tokens': today_usage.filter(service_name='Gemini').aggregate(Sum('total_tokens'))['total_tokens__sum'] or 0,
+    }
+
+    # Placeholder for Analytics (e.g., Google Analytics summary)
+    # In a real app, you might fetch this via API
+    analytics = {
+        'sessions': 1240,
+        'page_views': 5820,
+        'bounce_rate': '34.2%',
+        'avg_duration': '4:12'
+    }
+
+    # AI Service Connection Mapping
+    ai_services = []
+    gemini_key = getattr(settings, 'GEMINI_API_KEY', None)
+    
+    # Story Support
+    support_model = "None"
+    if deepseek_key: support_model = "DeepSeek Chat"
+    elif gemini_key: support_model = "Gemini 1.5 Flash"
+    
+    ai_services.append({
+        'name': 'Story Support',
+        'model': support_model,
+        'status': 'Active' if support_model != "None" else 'Disconnected'
+    })
+    
+    # AI Book Import
+    import_model = "None"
+    if deepseek_key: import_model = "DeepSeek Reasoner"
+    elif gemini_key: import_model = "Gemini 1.5 Pro"
+    
+    ai_services.append({
+        'name': 'AI Book Import',
+        'model': import_model,
+        'status': 'Active' if import_model != "None" else 'Disconnected'
+    })
+
+    context = {
+        'stats': stats,
+        'recent_users': recent_users,
+        'recent_activity': recent_activity,
+        'blog_posts': blog_posts,
+        'analytics': analytics,
+        'deepseek_balance': deepseek_balance,
+        'ai_services': ai_services,
+        'usage_stats': usage_stats,
+    }
+    return render(request, 'timeline/staff_dashboard.html', context)
 
 
 def home_preview(request):
@@ -487,11 +694,15 @@ def generate_daily_focus_tasks(user):
                 stream=False
             )
             tasks_text = response.choices[0].message.content
+            _log_ai_usage(user, 'DeepSeek', 'deepseek-chat', response.usage.prompt_tokens, response.usage.completion_tokens)
         elif settings.GEMINI_API_KEY:
             genai.configure(api_key=settings.GEMINI_API_KEY)
             model = genai.GenerativeModel('gemini-3-flash-preview')
             response = model.generate_content(context)
             tasks_text = response.text
+            try:
+                _log_ai_usage(user, 'Gemini', 'gemini-1.5-flash', response.usage_metadata.prompt_token_count, response.usage_metadata.candidates_token_count)
+            except: pass
         else:
             tasks_text = "- Add a new scene to your current book.\n- Flesh out a secondary character.\n- Review your last chapter."
 
@@ -1283,6 +1494,9 @@ def _call_ai_json(prompt, system_message="You are a professional literary analys
                 model = genai.GenerativeModel(model_name)
                 response = model.generate_content(f"{system_message}\n\nTask:\n{prompt}")
                 content = response.text
+                try:
+                    _log_ai_usage(None, 'Gemini', model_name, response.usage_metadata.prompt_token_count, response.usage_metadata.candidates_token_count)
+                except: pass
             else:
                 client = OpenAI(api_key=settings.DEEPSEEK_API_KEY, base_url="https://api.deepseek.com")
                 response = client.chat.completions.create(
@@ -1295,6 +1509,7 @@ def _call_ai_json(prompt, system_message="You are a professional literary analys
                     timeout=60
                 )
                 content = response.choices[0].message.content
+                _log_ai_usage(None, 'DeepSeek', deepseek_model, response.usage.prompt_tokens, response.usage.completion_tokens)
 
             if "```json" in content:
                 content = content.split("```json")[1].split("```")[0].strip()
@@ -2033,11 +2248,15 @@ def api_character_deep_dive(request):
                 stream=False
             )
             ai_response = response.choices[0].message.content
+            _log_ai_usage(request.user, 'DeepSeek', 'deepseek-chat', response.usage.prompt_tokens, response.usage.completion_tokens)
         else:
             genai.configure(api_key=settings.GEMINI_API_KEY)
             model = genai.GenerativeModel('gemini-3-flash-preview')
             response = model.generate_content(prompt)
             ai_response = response.text
+            try:
+                _log_ai_usage(request.user, 'Gemini', 'gemini-1.5-flash', response.usage_metadata.prompt_token_count, response.usage_metadata.candidates_token_count)
+            except: pass
 
         # Save to database
         character.deep_dive_notes = ai_response
@@ -2945,18 +3164,38 @@ def _perform_relationship_analysis(char_a, char_b, book, interaction_summaries, 
 def _call_ai_text(prompt, system_message="You are a creative writing assistant.", max_retries=3):
     """
     Helper to call AI and return raw text (for prose generation).
-    Defaults to Gemini for speed/cost.
+    Prioritizes DeepSeek, falls back to Gemini.
     """
-    if not settings.GEMINI_API_KEY:
+    deepseek_key = getattr(settings, 'DEEPSEEK_API_KEY', None)
+    gemini_key = getattr(settings, 'GEMINI_API_KEY', None)
+
+    if not deepseek_key and not gemini_key:
         return "Error: AI API Key not configured."
-    
-    genai.configure(api_key=settings.GEMINI_API_KEY)
-    model = genai.GenerativeModel('gemini-1.5-flash')
     
     for attempt in range(max_retries):
         try:
-            response = model.generate_content(f"{system_message}\n\nTask:\n{prompt}")
-            return response.text
+            if deepseek_key:
+                client = OpenAI(api_key=deepseek_key, base_url="https://api.deepseek.com")
+                response = client.chat.completions.create(
+                    model="deepseek-chat",
+                    messages=[
+                        {"role": "system", "content": system_message},
+                        {"role": "user", "content": prompt},
+                    ],
+                    stream=False
+                )
+                ai_response = response.choices[0].message.content
+                _log_ai_usage(None, 'DeepSeek', 'deepseek-chat', response.usage.prompt_tokens, response.usage.completion_tokens)
+                return ai_response
+            else:
+                genai.configure(api_key=gemini_key)
+                model = genai.GenerativeModel('gemini-1.5-flash')
+                response = model.generate_content(f"{system_message}\n\nTask:\n{prompt}")
+                ai_response = response.text
+                try:
+                    _log_ai_usage(None, 'Gemini', 'gemini-1.5-flash', response.usage_metadata.prompt_token_count, response.usage_metadata.candidates_token_count)
+                except: pass
+                return ai_response
         except Exception as e:
             print(f"AI Text Call Error (attempt {attempt + 1}): {e}")
             if attempt < max_retries - 1:

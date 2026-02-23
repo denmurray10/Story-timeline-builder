@@ -1,0 +1,206 @@
+{% extends 'timeline/base.html' %}
+{% load static %}
+
+{% block title %}Search Results - Story Timeline Builder{% endblock %}
+
+{% block extra_css %}
+<style>
+    .search-result-card {
+        transition: all 0.2s ease;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        background: #fff;
+        overflow: hidden;
+    }
+
+    .search-result-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+        border-color: var(--accent);
+    }
+
+    .result-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+
+    .icon-book {
+        background-color: #eef2ff;
+        color: #6366f1;
+    }
+
+    .icon-chapter {
+        background-color: #ecfdf5;
+        color: #10b981;
+    }
+
+    .icon-character {
+        background-color: #fff7ed;
+        color: #f97316;
+    }
+
+    .icon-event {
+        background-color: #f0f9ff;
+        color: #0ea5e9;
+    }
+
+    .icon-world {
+        background-color: #f5f3ff;
+        color: #8b5cf6;
+    }
+
+    .result-type-badge {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 2px 8px;
+        border-radius: 999px;
+        margin-bottom: 4px;
+        display: inline-block;
+    }
+</style>
+{% endblock %}
+
+{% block top_header_actions %}
+<div class="me-auto">
+    <form action="{% url 'search_results' %}" method="GET" class="d-flex" style="width: 300px;">
+        <div class="input-group">
+            <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+            <input type="text" name="q" class="form-control border-start-0 ps-0" placeholder="Search bible..."
+                value="{{ query }}">
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="mb-5">
+    <h1 class="mb-2">Search Results</h1>
+    <p class="text-muted">
+        {% if query %}
+        Found {{ total_results }} result{{ total_results|pluralize }} for <span class="fw-bold text-dark">"{{ query
+            }}"</span>
+        {% else %}
+        Enter a keyword to search your story bible.
+        {% endif %}
+    </p>
+</div>
+
+{% if query %}
+{% if total_results > 0 %}
+<div class="d-flex flex-column gap-3">
+
+    {# Books #}
+    {% if results.books %}
+    {% for book in results.books %}
+    <a href="{% url 'book_detail' book.pk %}" class="text-decoration-none">
+        <div class="search-result-card p-3 d-flex align-items-center gap-3">
+            <div class="result-icon icon-book"><i class="bi bi-book"></i></div>
+            <div class="flex-grow-1">
+                <span class="result-type-badge bg-primary text-white">Book</span>
+                <h5 class="mb-1 text-dark">{{ book.title }}</h5>
+                <p class="mb-0 text-muted small">{{ book.description|truncatechars:150 }}</p>
+            </div>
+            <div class="text-muted"><i class="bi bi-chevron-right"></i></div>
+        </div>
+    </a>
+    {% endfor %}
+    {% endif %}
+
+    {# Chapters #}
+    {% if results.chapters %}
+    {% for chapter in results.chapters %}
+    <a href="{% url 'chapter_detail' chapter.pk %}" class="text-decoration-none">
+        <div class="search-result-card p-3 d-flex align-items-center gap-3">
+            <div class="result-icon icon-chapter"><i class="bi bi-list-ol"></i></div>
+            <div class="flex-grow-1">
+                <span class="result-type-badge bg-success text-white">Chapter</span>
+                <h5 class="mb-1 text-dark">{{ chapter.title }}</h5>
+                <p class="mb-0 text-muted small">Part of: <span class="text-dark fw-medium">{{ chapter.book.title
+                        }}</span></p>
+            </div>
+            <div class="text-muted"><i class="bi bi-chevron-right"></i></div>
+        </div>
+    </a>
+    {% endfor %}
+    {% endif %}
+
+    {# Characters #}
+    {% if results.characters %}
+    {% for character in results.characters %}
+    <a href="{% url 'character_detail' character.pk %}" class="text-decoration-none">
+        <div class="search-result-card p-3 d-flex align-items-center gap-3">
+            <div class="result-icon icon-character"><i class="bi bi-person"></i></div>
+            <div class="flex-grow-1">
+                <span class="result-type-badge bg-warning text-dark">Character</span>
+                <h5 class="mb-1 text-dark">{{ character.name }}</h5>
+                <p class="mb-0 text-muted small">{{ character.description|truncatechars:150 }}</p>
+            </div>
+            <div class="text-muted"><i class="bi bi-chevron-right"></i></div>
+        </div>
+    </a>
+    {% endfor %}
+    {% endif %}
+
+    {# Events #}
+    {% if results.events %}
+    {% for event in results.events %}
+    <a href="{% url 'event_detail' event.pk %}" class="text-decoration-none">
+        <div class="search-result-card p-3 d-flex align-items-center gap-3">
+            <div class="result-icon icon-event"><i class="bi bi-calendar-event"></i></div>
+            <div class="flex-grow-1">
+                <span class="result-type-badge bg-info text-white">Event / Scene</span>
+                <h5 class="mb-1 text-dark">{{ event.title }}</h5>
+                <p class="mb-0 text-muted small">{{ event.description|truncatechars:150 }}</p>
+            </div>
+            <div class="text-muted"><i class="bi bi-chevron-right"></i></div>
+        </div>
+    </a>
+    {% endfor %}
+    {% endif %}
+
+    {# World Entries #}
+    {% if results.world_entries %}
+    {% for entry in results.world_entries %}
+    <a href="{% url 'world_detail' entry.pk %}" class="text-decoration-none">
+        <div class="search-result-card p-3 d-flex align-items-center gap-3">
+            <div class="result-icon icon-world"><i class="bi bi-globe"></i></div>
+            <div class="flex-grow-1">
+                <span class="result-type-badge bg-secondary text-white">Wiki Entry</span>
+                <h5 class="mb-1 text-dark">{{ entry.title }}</h5>
+                <p class="mb-0 text-muted small">{{ entry.content|truncatechars:150 }}</p>
+            </div>
+            <div class="text-muted"><i class="bi bi-chevron-right"></i></div>
+        </div>
+    </a>
+    {% endfor %}
+    {% endif %}
+
+</div>
+{% else %}
+<div class="text-center py-5">
+    <div class="display-1 text-muted mb-4 opacity-25">
+        <i class="bi bi-search"></i>
+    </div>
+    <h3>No results found</h3>
+    <p class="text-muted">We couldn't find anything matching "{{ query }}".<br>Try a different keyword or check your
+        spelling.</p>
+    <a href="{% url 'dashboard' %}" class="btn btn-dark mt-3 rounded-pill px-4">Return Home</a>
+</div>
+{% endif %}
+{% else %}
+<div class="text-center py-5">
+    <div class="display-1 text-muted mb-4 opacity-25">
+        <i class="bi bi-search"></i>
+    </div>
+    <h3>Search your story bible</h3>
+    <p class="text-muted">Look up characters, plot points, locations, and world-building notes.</p>
+</div>
+{% endif %}
+{% endblock %}

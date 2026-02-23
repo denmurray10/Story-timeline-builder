@@ -99,4 +99,6 @@ urlpatterns = [
     path('api/books/<int:book_id>/deep-scan/status/', views.api_deep_scan_status, name='api_deep_scan_status'),
     path('api/ai/generate-prose/', views.api_generate_prose, name='api_generate_prose'),
     path('account/', views.account, name='account'),
+    path('search/', views.search_results, name='search_results'),
+    path('staff/dashboard/', views.staff_dashboard, name='staff_dashboard'),
 ]

@@ -481,6 +481,18 @@
                     <img src="{% static 'img/logo.png' %}" alt="Story Timeline Builder Logo"
                         style="height: 3.5rem; width: auto; margin: 0 auto;">
                 </div>
+
+                <!-- Global Sidebar Search -->
+                <div class="px-4 mb-4">
+                    <form action="{% url 'search_results' %}" method="GET">
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-white border-end-0 rounded-start-pill py-2"><i
+                                    class="bi bi-search text-muted"></i></span>
+                            <input type="text" name="q" class="form-control border-start-0 rounded-end-pill py-2 ps-0"
+                                placeholder="Search bible..." aria-label="Search">
+                        </div>
+                    </form>
+                </div>
                 <nav class="nav flex-column">
                     {% if user.is_authenticated and request.resolver_match.url_name != 'home_preview' %}
                     <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
@@ -503,6 +515,15 @@
                         href="{% url 'character_list' %}">
                         <i class="bi bi-people"></i> Characters
                     </a>
+
+                    {% if user.is_superuser %}
+                    <hr class="my-3 opacity-25" />
+                    <a class="nav-link {% if request.resolver_match.url_name == 'staff_dashboard' %}active{% endif %}"
+                        href="{% url 'staff_dashboard' %}" style="background-color: #f1f5f9; color: #0f172a;">
+                        <i class="bi bi-shield-lock-fill text-danger"></i> <strong>Staff Dashboard</strong>
+                    </a>
+                    {% endif %}
+
                     <a class="nav-link architect-only {% if 'relationship' in request.resolver_match.url_name %}active{% endif %}"
                         href="{% url 'relationship_map' %}">
                         <i class="bi bi-diagram-3"></i> Relationship Map

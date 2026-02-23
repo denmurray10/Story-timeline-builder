@@ -193,15 +193,15 @@
                         our archives.
                     </p>
                     <div class="space-y-6 max-w-md mx-auto lg:mx-0">
-                        <div class="relative group">
+                        <form action="{% url 'search_results' %}" method="GET" class="relative group">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <span
                                     class="material-symbols-outlined text-gray-400 group-focus-within:text-primary dark:group-focus-within:text-white transition-colors">search</span>
                             </div>
                             <input
                                 class="block w-full pl-10 pr-3 py-3.5 border border-gray-300 dark:border-gray-700 rounded-xl leading-5 bg-white dark:bg-surface-dark text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-white focus:border-transparent sm:text-sm shadow-sm transition-all"
-                                placeholder="Search the Story Bible..." type="text" />
-                        </div>
+                                placeholder="Search the Story Bible..." type="text" name="q" />
+                        </form>
                         <div class="flex flex-col sm:flex-row gap-4">
                             <a class="flex-1 bg-primary text-white dark:bg-white dark:text-primary px-6 py-3.5 rounded-xl font-medium hover:opacity-90 transition-all shadow-md flex items-center justify-center gap-2 group"
                                 href="{% url 'dashboard' %}">

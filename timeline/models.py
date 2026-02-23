@@ -796,3 +796,22 @@ class StoryScanStatus(models.Model):
 
     def __str__(self):
         return f"Scan for {self.book.title} - {self.status} ({self.progress_percentage}%)"
+
+class AIUsageLog(models.Model):
+    """
+    Log of AI usage (tokens, cost) to track daily usage in the staff dashboard.
+    """
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    service_name = models.CharField(max_length=50) # e.g. DeepSeek, Gemini
+    model_name = models.CharField(max_length=50)   # e.g. deepseek-chat, deepseek-reasoner
+    prompt_tokens = models.PositiveIntegerField(default=0)
+    completion_tokens = models.PositiveIntegerField(default=0)
+    total_tokens = models.PositiveIntegerField(default=0)
+    cost_estimate = models.DecimalField(max_digits=10, decimal_places=6, default=0)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-timestamp']
+
+    def __str__(self):
+        return f"{self.service_name} ({self.model_name}) - {self.total_tokens} tokens at {self.timestamp}"
