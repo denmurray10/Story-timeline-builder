@@ -102,4 +102,6 @@ urlpatterns = [
     path('search/', views.search_results, name='search_results'),
     path('staff/dashboard/', views.staff_dashboard, name='staff_dashboard'),
     path('changelog/', views.changelog, name='changelog'),
+    path('subscribe/newsletter/', views.subscribe_newsletter, name='subscribe_newsletter'),
+    path('subscribe/thank-you/', views.subscribe_thank_you, name='subscribe_thank_you'),
 ]

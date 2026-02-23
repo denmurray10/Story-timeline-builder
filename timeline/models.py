@@ -841,3 +841,39 @@ class ChangelogEntry(models.Model):
 
     def __str__(self):
         return f"{self.date} - {self.title}"
+
+
+class NewsletterSubscription(models.Model):
+    """
+    Stores email newsletter subscriptions from the changelog and other pages.
+    Links to User if they are logged in when subscribing.
+    """
+    SUBSCRIPTION_CHOICES = [
+        ('changelog', 'Changelog Updates'),
+        ('product', 'Product Updates'),
+        ('blog', 'Blog Posts'),
+    ]
+
+    email = models.EmailField()
+    user = models.ForeignKey(
+        User, on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name='newsletter_subscriptions'
+    )
+    subscription_type = models.CharField(
+        max_length=20,
+        choices=SUBSCRIPTION_CHOICES,
+        default='changelog'
+    )
+    is_active = models.BooleanField(default=True)
+    subscribed_at = models.DateTimeField(auto_now_add=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-subscribed_at']
+        unique_together = ['email', 'subscription_type']
+        verbose_name_plural = "Newsletter Subscriptions"
+
+    def __str__(self):
+        return f"{self.email} ({self.get_subscription_type_display()})"
+

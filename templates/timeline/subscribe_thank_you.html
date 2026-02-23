@@ -1,0 +1,34 @@
+{% extends 'timeline/base.html' %}
+{% load static %}
+
+{% block title %}Thank You for Subscribing - Story Timeline Builder{% endblock %}
+
+{% block content %}
+<main class="pt-[200px] pb-20 min-h-[80vh] flex items-center justify-center">
+    <div class="max-w-2xl mx-auto px-4 text-center">
+        <div class="mb-8 flex justify-center">
+            <div
+                class="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center animate-bounce">
+                <span class="material-symbols-outlined text-green-600 dark:text-green-400 text-4xl">check_circle</span>
+            </div>
+        </div>
+
+        <h1 class="text-4xl md:text-5xl font-serif text-primary dark:text-white mb-6">You're on the list!</h1>
+        <p class="text-xl text-gray-600 dark:text-gray-300 mb-10 leading-relaxed">
+            Thank you for subscribing to our updates. We'll keep you posted on the latest features, improvements, and
+            story engine evolutions.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{% url 'changelog' %}"
+                class="px-8 py-3 bg-primary text-white dark:bg-white dark:text-primary rounded-full font-medium hover:opacity-90 transition-all shadow-lg hover:shadow-xl">
+                Back to Changelog
+            </a>
+            <a href="{% url 'landing_page_v2' %}"
+                class="px-8 py-3 border border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-300 rounded-full font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-all">
+                Return Home
+            </a>
+        </div>
+    </div>
+</main>
+{% endblock %}

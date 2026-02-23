@@ -31,7 +31,7 @@ from ebooklib import epub
 from bs4 import BeautifulSoup
 import tempfile
 
-from .models import Book, Chapter, Character, Event, Tag, CharacterRelationship, AIFocusTask, ActivityLog, WorldEntry, InteractionSummaryCache, RelationshipAnalysisCache, StoryScanStatus, AIUsageLog, ChangelogEntry
+from .models import Book, Chapter, Character, Event, Tag, CharacterRelationship, AIFocusTask, ActivityLog, WorldEntry, InteractionSummaryCache, RelationshipAnalysisCache, StoryScanStatus, AIUsageLog, ChangelogEntry, NewsletterSubscription
 from .forms import (
     UserRegisterForm, BookForm, ChapterForm, CharacterForm, 
     EventForm, TagForm, UserAccountForm, CharacterRelationshipForm, WorldEntryForm
@@ -389,6 +389,15 @@ def staff_dashboard(request):
         'deepseek_balance': deepseek_balance,
         'ai_services': ai_services,
         'usage_stats': usage_stats,
+        # Newsletter Subscriptions
+        'newsletter_subscriptions': NewsletterSubscription.objects.select_related('user').all()[:50],
+        'newsletter_stats': {
+            'total': NewsletterSubscription.objects.count(),
+            'active': NewsletterSubscription.objects.filter(is_active=True).count(),
+            'changelog': NewsletterSubscription.objects.filter(subscription_type='changelog', is_active=True).count(),
+            'product': NewsletterSubscription.objects.filter(subscription_type='product', is_active=True).count(),
+            'blog': NewsletterSubscription.objects.filter(subscription_type='blog', is_active=True).count(),
+        },
     }
     return render(request, 'timeline/staff_dashboard.html', context)
 
@@ -413,6 +422,58 @@ def changelog(request):
     }
     return render(request, 'timeline/changelog.html', context)
 
+
+@require_POST
+def subscribe_newsletter(request):
+    """
+    Handles newsletter subscription from the changelog page.
+    Stores the email, links to user if logged in, and redirects to thank you page.
+    """
+    email = request.POST.get('email', '').strip()
+    subscription_type = request.POST.get('subscription_type', 'changelog')
+    
+    if not email:
+        messages.error(request, 'Please enter a valid email address.')
+        return redirect('changelog')
+    
+    # Get client IP
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip_address = x_forwarded_for.split(',')[0].strip()
+    else:
+        ip_address = request.META.get('REMOTE_ADDR')
+    
+    # Check if already subscribed
+    existing = NewsletterSubscription.objects.filter(
+        email=email, subscription_type=subscription_type
+    ).first()
+    
+    if existing:
+        if existing.is_active:
+            messages.info(request, 'You are already subscribed!')
+            return redirect('subscribe_thank_you')
+        else:
+            # Re-activate
+            existing.is_active = True
+            existing.user = request.user if request.user.is_authenticated else None
+            existing.ip_address = ip_address
+            existing.save()
+            return redirect('subscribe_thank_you')
+    
+    # Create new subscription
+    NewsletterSubscription.objects.create(
+        email=email,
+        user=request.user if request.user.is_authenticated else None,
+        subscription_type=subscription_type,
+        ip_address=ip_address,
+    )
+    
+    return redirect('subscribe_thank_you')
+
+
+def subscribe_thank_you(request):
+    """Thank you page after subscribing to the newsletter."""
+    return render(request, 'timeline/subscribe_thank_you.html')
 
 def home_preview(request):
     """Preview page for the new homepage design."""
