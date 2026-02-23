@@ -13,6 +13,9 @@ urlpatterns = [
     path('', include('timeline.urls')),
 ]
 
+handler404 = 'timeline.views.handler404'
+handler500 = 'timeline.views.handler500'
+
 # Serve media files in development
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

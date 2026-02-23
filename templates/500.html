@@ -1,0 +1,284 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Story Timeline Builder - Internal Server Error</title>
+    <meta content="AI-powered writing platform for storytellers. Plan, draft, and polish your fictional world."
+        name="description" />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&amp;family=Inter:wght@300;400;500;600;700&amp;family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#333333", // Dark charcoal for primary buttons/text
+                        accent: "#F4EBD9", // Warm highlight
+                        "background-light": "#F2F0EB", // Warm grey/beige background from screenshot
+                        "background-dark": "#121212", // Deep dark background
+                        "surface-light": "#FFFFFF",
+                        "surface-dark": "#1E1E1E",
+                        "text-light": "#333333",
+                        "text-dark": "#E0E0E0",
+                        "border-light": "#E5E5E5",
+                        "border-dark": "#333333",
+                        "green-success": "#4CAF50",
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['DM Serif Display', 'serif'], // For Headlines
+                        display: ['Playfair Display', 'serif'], // For italic accents
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem",
+                        'xl': '0.75rem',
+                        '2xl': '1rem',
+                        '3xl': '1.5rem',
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'card': '0 10px 30px -5px rgba(0, 0, 0, 0.08)',
+                    }
+                },
+            },
+        };
+    </script>
+    <style>
+        .glass-panel {
+            backdrop-filter: blur(8px);
+            background: rgba(255, 255, 255, 0.7);
+        }
+
+        .dark .glass-panel {
+            background: rgba(30, 30, 30, 0.7);
+        }
+
+        .ink-blot {
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 200px;
+            height: 200px;
+            background: #000;
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0.1;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-sans transition-colors duration-300 antialiased selection:bg-accent selection:text-primary flex flex-col min-h-screen">
+    <nav id="main-nav"
+        class="fixed w-full z-50 left-0 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md border-b border-transparent">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <a href="{% url 'landing_page_v2' %}" class="flex-shrink-0 flex items-center cursor-pointer">
+                    <img src="{% static 'img/logo.webp' %}" alt="Story Timeline Builder"
+                        style="height: 3.5rem; width: auto;">
+                </a>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-white transition-colors"
+                        href="{% url 'coming_soon' %}">Features</a>
+                    <a class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-white transition-colors"
+                        href="{% url 'pricing' %}">Pricing</a>
+                    <a class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-white transition-colors"
+                        href="{% url 'coming_soon' %}">Resources</a>
+                    <a class="bg-primary text-white dark:bg-white dark:text-primary px-5 py-2.5 rounded-full text-sm font-medium hover:opacity-90 transition-opacity shadow-sm"
+                        href="{% url 'login' %}">Start Writing</a>
+                </div>
+                <div class="md:hidden flex items-center">
+                    <button class="text-primary dark:text-white p-2">
+                        <span class="material-symbols-outlined">menu</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <main
+        class="flex-grow flex items-center justify-center relative pt-[185px] pb-[118px] overflow-hidden min-h-[calc(100vh-80px)]">
+        <div
+            class="absolute top-[10%] left-[10%] w-64 h-64 bg-red-200/20 dark:bg-red-900/10 rounded-full blur-3xl -z-10">
+        </div>
+        <div
+            class="absolute bottom-[20%] right-[10%] w-80 h-80 bg-gray-300/30 dark:bg-gray-800/10 rounded-full blur-3xl -z-10">
+        </div>
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+                <!-- Left: CTA Section -->
+                <div class="order-1 text-center lg:text-left">
+                    <div
+                        class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800/30 shadow-sm mb-6">
+                        <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                        <span
+                            class="text-xs font-semibold tracking-wide uppercase text-red-600 dark:text-red-400">Structural
+                            Failure</span>
+                    </div>
+                    <h1 class="text-5xl md:text-6xl font-serif text-primary dark:text-white mb-6 leading-tight">
+                        The ink has<br />
+                        <span class="font-display italic font-normal text-gray-500 dark:text-gray-400">spilled.</span>
+                    </h1>
+                    <p class="text-lg text-gray-600 dark:text-gray-400 mb-10 leading-relaxed max-w-lg mx-auto lg:mx-0">
+                        Our server encountered an internal error. It's not your fault—the story bible just hit a heavy
+                        structural snag.
+                    </p>
+                    <div class="space-y-6 max-w-md mx-auto lg:mx-0">
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <a class="flex-1 bg-primary text-white dark:bg-white dark:text-primary px-6 py-3.5 rounded-xl font-medium hover:opacity-90 transition-all shadow-md flex items-center justify-center gap-2 group"
+                                href="javascript:location.reload()">
+                                <span
+                                    class="material-symbols-outlined text-sm group-hover:rotate-180 transition-transform duration-500">refresh</span>
+                                Rewrite Scene (Refresh)
+                            </a>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <a class="flex-1 bg-white dark:bg-surface-dark text-primary dark:text-white border border-gray-200 dark:border-gray-700 px-6 py-3.5 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-all shadow-sm flex items-center justify-center gap-2 group"
+                                href="{% url 'dashboard' %}">
+                                <span
+                                    class="material-symbols-outlined text-sm group-hover:-translate-x-1 transition-transform">arrow_back</span>
+                                Return to Dashboard
+                            </a>
+                        </div>
+                        <div class="pt-2 text-center lg:text-left">
+                            <a class="text-sm font-medium text-gray-500 hover:text-primary dark:hover:text-white transition-colors inline-flex items-center gap-1 border-b border-transparent hover:border-gray-300 dark:hover:border-gray-600 pb-0.5"
+                                href="mailto:support@storytimelinebuilder.com">
+                                <span class="material-symbols-outlined text-sm">flag</span>
+                                Report a Plot Hole
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Visual Section -->
+                <div class="relative order-2">
+                    <div
+                        class="relative bg-white dark:bg-surface-dark rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 p-8 md:p-12 transform rotate-1 transition-transform hover:rotate-0 duration-500 overflow-hidden">
+                        <div class="ink-blot"></div>
+                        <div class="font-serif text-lg leading-loose text-gray-800 dark:text-gray-200 opacity-60">
+                            <h3 class="font-bold text-2xl mb-6 text-primary dark:text-white">A Narrative Collapse</h3>
+                            <p class="mb-4">The inkwell shattered. Across the page, the carefully mapped foundations of
+                                the world began to blur and bleed into one another.</p>
+                            <p class="mb-4">Logic failed. The characters froze mid-sentence, waiting for the architect
+                                to fix the broken strings of the universe.</p>
+                        </div>
+                        <div class="mt-8 relative h-32 w-full opacity-30">
+                            <svg class="w-full h-full" viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg">
+                                <path class="text-gray-400 dark:text-gray-600" d="M 20 60 Q 100 20, 180 60 T 300 60"
+                                    fill="none" stroke="currentColor" stroke-dasharray="8,8" stroke-width="3"></path>
+                                <circle class="fill-current text-primary dark:text-white" cx="20" cy="60" r="6">
+                                </circle>
+                                <circle class="fill-current text-primary dark:text-white" cx="180" cy="60" r="6">
+                                </circle>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="absolute -bottom-10 -left-6 md:-left-10 z-20 max-w-xs w-full">
+                        <div
+                            class="glass-panel border border-white/20 dark:border-gray-700/50 rounded-2xl p-4 shadow-card backdrop-blur-md">
+                            <div class="flex items-start gap-4">
+                                <div class="relative flex-shrink-0">
+                                    <div
+                                        class="w-12 h-12 rounded-full bg-[#8B5CF6] flex items-center justify-center text-white shadow-lg">
+                                        <span class="material-symbols-outlined text-2xl">auto_awesome</span>
+                                    </div>
+                                    <span
+                                        class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 border-2 border-white dark:border-surface-dark rounded-full"></span>
+                                </div>
+                                <div class="flex-1">
+                                    <div
+                                        class="bg-white dark:bg-gray-800 rounded-lg rounded-tl-none p-3 shadow-sm border border-gray-100 dark:border-gray-700 relative">
+                                        <p class="text-sm text-gray-700 dark:text-gray-300 italic leading-relaxed">
+                                            "Something went wrong on the backend. I'm trying to re-bind the manuscript,
+                                            but we may need a moment."</p>
+                                    </div>
+                                    <div class="mt-2 flex gap-2">
+                                        <span
+                                            class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Ghostwriter
+                                            AI</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer class="bg-background-light dark:bg-background-dark pt-20 pb-10 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-16">
+                <div class="col-span-2 lg:col-span-2">
+                    <div class="flex items-center mb-4">
+                        <img src="{% static 'img/logo.webp' %}" alt="Story Timeline Builder"
+                            style="height: 3.5rem; width: auto;">
+                    </div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 max-w-xs mb-6">
+                        Architecting narrative worlds through a synthesis of structured planning, contextual
+                        intelligence, and uncompromised creative flow.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-primary dark:text-white mb-4">Product</h4>
+                    <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+                        <li><a class="hover:text-primary dark:hover:text-white"
+                                href="{% url 'coming_soon' %}">Features</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'pricing' %}">Pricing</a>
+                        </li>
+                        <li><a class="hover:text-primary dark:hover:text-white"
+                                href="{% url 'coming_soon' %}">Changelog</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-primary dark:text-white mb-4">Resources</h4>
+                    <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+                        <li><a class="hover:text-primary dark:hover:text-white"
+                                href="{% url 'coming_soon' %}">Community</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Help
+                                Center</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Blog</a>
+                        </li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Writers
+                                Guide</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-primary dark:text-white mb-4">Legal</h4>
+                    <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Privacy
+                                Policy</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Terms of
+                                Service</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Cookie
+                                Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div
+                class="border-t border-gray-200 dark:border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-sm text-gray-500 dark:text-gray-400">© 2026 Story Timeline Builder. All rights reserved.
+                </p>
+                <div class="flex gap-4 text-gray-400">
+                    <a class="hover:text-primary dark:hover:text-white transition-colors"
+                        href="{% url 'coming_soon' %}"><span class="material-icons-outlined">flutter_dash</span></a>
+                    <a class="hover:text-primary dark:hover:text-white transition-colors"
+                        href="{% url 'coming_soon' %}"><span class="material-icons-outlined">code</span></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+
+</html>

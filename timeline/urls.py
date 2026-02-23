@@ -22,6 +22,10 @@ urlpatterns = [
     path('pricing/', views.pricing_page, name='pricing'),
     path('coming-soon/', views.coming_soon, name='coming_soon'),
     
+    # Error Page Previews (DEBUG ONLY)
+    path('404/', views.handler404, {'exception': Exception("URL Testing")}, name='test_404'),
+    path('500/', views.handler500, name='test_500'),
+    
     # Books
     path('books/', views.book_list, name='book_list'),
     path('books/create/', views.book_create, name='book_create'),

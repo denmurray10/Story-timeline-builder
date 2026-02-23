@@ -38,6 +38,14 @@ from .context_engine import ContextEngine
 import datetime
 from django.contrib.auth.views import LoginView as DjangoLoginView
 
+def handler404(request, exception):
+    """Custom 404 error handler."""
+    return render(request, '404.html', status=404)
+
+def handler500(request):
+    """Custom 500 error handler."""
+    return render(request, '500.html', status=500)
+
 class CustomLoginView(DjangoLoginView):
     """
     Login view that adds daily AI-generated quotes to the context.
