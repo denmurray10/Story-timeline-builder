@@ -67,6 +67,20 @@
             background: radial-gradient(circle at 30% 30%, #D44242, #A62C2C);
             box-shadow: 0 2px 4px rgba(0,0,0,0.2), inset 0 0 4px rgba(0,0,0,0.3);
         }
+
+        /* Nav Padding Scroll Logic */
+        nav {
+            top: 50px !important;
+            transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+        }
+
+        nav.scrolled {
+            top: 0 !important;
+        }
+
+        .dark nav.scrolled {
+            top: 0 !important;
+        }
     </style>
 </head>
 
@@ -99,9 +113,9 @@
         </div>
     </nav>
     <main
-        class="flex-grow flex items-center justify-center relative pt-[120px] pb-12 overflow-hidden min-h-[calc(100vh-80px)]">
+        class="flex-grow flex items-center justify-center relative pt-[200px] pb-[60px] overflow-hidden min-h-[calc(100vh-80px)]">
         <div
-            class="absolute top-[10%] left-[10%] w-64 h-64 bg-yellow-200/30 dark:bg-yellow-600/10 rounded-full blur-3xl -z-10">
+            class="absolute top-[5%] left-[5%] w-32 h-32 bg-yellow-200/20 dark:bg-yellow-600/5 rounded-full blur-3xl -z-10">
         </div>
         <div
             class="absolute bottom-[20%] right-[10%] w-80 h-80 bg-purple-200/30 dark:bg-purple-900/10 rounded-full blur-3xl -z-10">
@@ -109,6 +123,10 @@
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
                 <div class="relative order-2 lg:order-1">
+                    <!-- Top-Left Card Blur -->
+                    <div
+                        class="absolute -top-12 -left-12 w-48 h-48 bg-yellow-200/30 dark:bg-yellow-600/10 rounded-full blur-3xl -z-10 pointer-events-none">
+                    </div>
                     <div
                         class="relative bg-white dark:bg-surface-dark rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 p-8 md:p-12 transform rotate-1 transition-transform hover:rotate-0 duration-500">
                         <div
@@ -142,7 +160,7 @@
                                 <div class="relative flex-shrink-0">
                                     <div
                                         class="w-12 h-12 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-white shadow-lg">
-                                        <span class="material-symbols-outlined text-2xl">auto_awesome</span>
+                                        <span class="material-symbols-outlined text-2xl">edit_note</span>
                                     </div>
                                     <span
                                         class="absolute -top-1 -right-1 w-3 h-3 bg-green-400 border-2 border-white dark:border-surface-dark rounded-full"></span>
@@ -156,8 +174,8 @@
                                     </div>
                                     <div class="mt-2 flex gap-2">
                                         <span
-                                            class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Ghostwriter
-                                            AI</span>
+                                            class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Penn
+                                            - Digital Assistant</span>
                                     </div>
                                 </div>
                             </div>
@@ -196,11 +214,10 @@
                     </p>
                     <div class="space-y-6 max-w-md mx-auto lg:mx-0">
                         <div class="flex flex-col sm:flex-row gap-4">
-                            <a class="flex-1 bg-primary text-white dark:bg-white dark:text-primary px-6 py-3.5 rounded-xl font-medium hover:opacity-90 transition-all shadow-md flex items-center justify-center gap-2 group"
-                                href="#">
-                                <span
-                                    class="material-symbols-outlined text-sm group-hover:-translate-x-1 transition-transform">arrow_back</span>
-                                Go to Dashboard
+                            <a class="bg-primary text-white dark:bg-white dark:text-primary px-8 py-3.5 rounded-full font-medium hover:scale-105 transition-transform duration-200 shadow-md flex items-center justify-center gap-2 group"
+                                href="{% url 'dashboard' %}">
+                                Go to Dashboard <span
+                                    class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
                             </a>
                         </div>
                         <div class="pt-2 text-center lg:text-left">
