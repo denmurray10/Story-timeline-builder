@@ -31,7 +31,7 @@ from ebooklib import epub
 from bs4 import BeautifulSoup
 import tempfile
 
-from .models import Book, Chapter, Character, Event, Tag, CharacterRelationship, AIFocusTask, ActivityLog, WorldEntry, InteractionSummaryCache, RelationshipAnalysisCache, StoryScanStatus, AIUsageLog
+from .models import Book, Chapter, Character, Event, Tag, CharacterRelationship, AIFocusTask, ActivityLog, WorldEntry, InteractionSummaryCache, RelationshipAnalysisCache, StoryScanStatus, AIUsageLog, ChangelogEntry
 from .forms import (
     UserRegisterForm, BookForm, ChapterForm, CharacterForm, 
     EventForm, TagForm, UserAccountForm, CharacterRelationshipForm, WorldEntryForm
@@ -391,6 +391,27 @@ def staff_dashboard(request):
         'usage_stats': usage_stats,
     }
     return render(request, 'timeline/staff_dashboard.html', context)
+
+
+def changelog(request):
+    """
+    Displays personal and system-wide application updates.
+    """
+    entries = ChangelogEntry.objects.all().order_by('-date', '-id')
+    
+    # Get counts for the sidebar
+    # Map model categories to simpler display categories if needed
+    features_count = ChangelogEntry.objects.filter(category='new').count()
+    improvements_count = ChangelogEntry.objects.filter(category__in=['improvement', 'ai']).count()
+    fixes_count = ChangelogEntry.objects.filter(category='fix').count()
+    
+    context = {
+        'entries': entries,
+        'features_count': features_count,
+        'improvements_count': improvements_count,
+        'fixes_count': fixes_count,
+    }
+    return render(request, 'timeline/changelog.html', context)
 
 
 def home_preview(request):

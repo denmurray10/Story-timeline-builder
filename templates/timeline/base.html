@@ -540,6 +540,10 @@
                         href="{% url 'post_list' %}">
                         <i class="bi bi-journal-text"></i> Blog
                     </a>
+                    <a class="nav-link {% if request.resolver_match.url_name == 'changelog' %}active{% endif %}"
+                        href="{% url 'changelog' %}">
+                        <i class="bi bi-rocket-takeoff"></i> Changelog
+                    </a>
 
                     <hr class="my-3 opacity-10" />
                     <h6 class="sidebar-heading px-4 mb-2 text-muted text-uppercase small"

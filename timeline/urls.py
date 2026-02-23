@@ -101,4 +101,5 @@ urlpatterns = [
     path('account/', views.account, name='account'),
     path('search/', views.search_results, name='search_results'),
     path('staff/dashboard/', views.staff_dashboard, name='staff_dashboard'),
+    path('changelog/', views.changelog, name='changelog'),
 ]

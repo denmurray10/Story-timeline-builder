@@ -1,0 +1,296 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Story Timeline Builder - Changelog</title>
+    <meta content="Keep up with the latest updates and improvements to Story Timeline Builder." name="description" />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&amp;family=Inter:wght@300;400;500;600;700&amp;family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#333333", // Dark charcoal for primary buttons/text
+                        accent: "#F4EBD9", // Warm highlight
+                        "background-light": "#FDFCF8", // Specific warm off-white from request
+                        "background-dark": "#121212", // Deep dark background
+                        "surface-light": "#FFFFFF",
+                        "surface-dark": "#1E1E1E",
+                        "text-light": "#333333",
+                        "text-dark": "#E0E0E0",
+                        "border-light": "#E5E5E5",
+                        "border-dark": "#333333",
+                        "tag-purple": "#E9D5FF",
+                        "tag-purple-text": "#6B21A8",
+                        "tag-blue": "#DBEAFE",
+                        "tag-blue-text": "#1E40AF",
+                        "tag-gray": "#F3F4F6",
+                        "tag-gray-text": "#374151",
+                        "tag-green": "#DCFCE7",
+                        "tag-green-text": "#166534",
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['DM Serif Display', 'serif'], // For Headlines
+                        display: ['Playfair Display', 'serif'], // For italic accents
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem",
+                        'xl': '0.75rem',
+                        '2xl': '1rem',
+                        '3xl': '1.5rem',
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'card': '0 10px 30px -5px rgba(0, 0, 0, 0.04)',
+                    }
+                },
+            },
+        };
+    </script>
+    <style>
+        .timeline-line {
+            position: absolute;
+            left: 24px;
+            top: 40px;
+            bottom: -40px;
+            width: 1px;
+            background-color: #E5E5E5;
+            z-index: 0;
+        }
+
+        .timeline-item:last-child .timeline-line {
+            display: none;
+        }
+
+        .dark .timeline-line {
+            background-color: #333;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-sans transition-colors duration-300 antialiased selection:bg-accent selection:text-primary">
+    <nav
+        class="fixed w-full z-50 top-0 left-0 transition-all duration-300 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md border-b border-transparent dark:border-border-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <a href="{% url 'landing_page_v2' %}" class="flex-shrink-0 flex items-center gap-2 cursor-pointer">
+                    <img src="{% static 'img/logo.webp' %}" alt="Story Timeline Builder"
+                        style="height: 3.5rem; width: auto;">
+                </a>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-white transition-colors"
+                        href="{% url 'landing_page_v2' %}">Features</a>
+                    <a class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-white transition-colors"
+                        href="{% url 'pricing' %}">Pricing</a>
+                    <a class="text-sm font-medium text-primary dark:text-white font-bold transition-colors"
+                        href="{% url 'changelog' %}">Changelog</a>
+                    <a class="bg-primary text-white dark:bg-white dark:text-primary px-5 py-2.5 rounded-full text-sm font-medium hover:opacity-90 transition-opacity shadow-sm"
+                        href="{% url 'login' %}">Start Writing</a>
+                </div>
+                <div class="md:hidden flex items-center">
+                    <button class="text-primary dark:text-white p-2">
+                        <span class="material-symbols-outlined">menu</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <main class="pt-32 pb-20 min-h-screen">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 relative">
+                <div
+                    class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-accent/30 rounded-full blur-3xl -z-10 opacity-50">
+                </div>
+                <h1 class="text-5xl md:text-6xl font-serif text-primary dark:text-white mb-4 leading-tight">Changelog
+                </h1>
+                <p class="text-xl md:text-2xl font-display italic text-gray-600 dark:text-gray-300 font-light">
+                    Tracing the evolution of the story engine.
+                </p>
+            </div>
+            <div class="flex flex-col lg:flex-row gap-12">
+                <aside class="w-full lg:w-64 flex-shrink-0">
+                    <div class="sticky top-28 space-y-8">
+                        <div>
+                            <h3
+                                class="font-serif text-lg font-bold mb-4 text-primary dark:text-white border-b border-gray-200 dark:border-gray-800 pb-2">
+                                Filter Updates</h3>
+                            <nav class="space-y-2">
+                                <button
+                                    class="w-full text-left px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium transition-colors">
+                                    All Updates
+                                </button>
+                                <button
+                                    class="w-full text-left px-4 py-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary dark:hover:text-white text-sm font-medium transition-colors flex justify-between items-center group">
+                                    Features
+                                    <span
+                                        class="bg-gray-100 dark:bg-gray-700 text-gray-500 text-xs px-2 py-0.5 rounded-full group-hover:bg-white dark:group-hover:bg-gray-600">{{ features_count }}</span>
+                                </button>
+                                <button
+                                    class="w-full text-left px-4 py-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary dark:hover:text-white text-sm font-medium transition-colors flex justify-between items-center group">
+                                    Improvements
+                                    <span
+                                        class="bg-gray-100 dark:bg-gray-700 text-gray-500 text-xs px-2 py-0.5 rounded-full group-hover:bg-white dark:group-hover:bg-gray-600">{{ improvements_count }}</span>
+                                </button>
+                                <button
+                                    class="w-full text-left px-4 py-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary dark:hover:text-white text-sm font-medium transition-colors flex justify-between items-center group">
+                                    Bug Fixes
+                                    <span
+                                        class="bg-gray-100 dark:bg-gray-700 text-gray-500 text-xs px-2 py-0.5 rounded-full group-hover:bg-white dark:group-hover:bg-gray-600">{{ fixes_count }}</span>
+                                </button>
+                            </nav>
+                        </div>
+                        <div
+                            class="bg-white dark:bg-surface-dark p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
+                            <h4 class="font-bold text-sm text-primary dark:text-white mb-2">Subscribe to updates</h4>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Get the latest features delivered
+                                to your inbox.</p>
+                            <form class="space-y-2">
+                                <input
+                                    class="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none"
+                                    placeholder="Email address" type="email" />
+                                <button
+                                    class="w-full bg-primary text-white dark:bg-white dark:text-primary px-3 py-2 rounded-md text-sm font-medium hover:opacity-90 transition-opacity">Subscribe</button>
+                            </form>
+                        </div>
+                    </div>
+                </aside>
+                <div class="flex-1 max-w-3xl">
+                    <div class="relative space-y-12 pl-4 md:pl-0">
+                        {% for entry in entries %}
+                        <div class="timeline-item relative pl-0 md:pl-12">
+                            <div
+                                class="hidden md:block absolute left-2 top-8 w-3 h-3 {% if forloop.first %}bg-primary dark:bg-white{% else %}bg-gray-300 dark:bg-gray-600{% endif %} rounded-full border-4 border-background-light dark:border-background-dark z-10 box-content">
+                            </div>
+                            {% if not forloop.last %}
+                            <div
+                                class="hidden md:block timeline-line absolute left-[1.125rem] top-12 bottom-0 w-px bg-gray-200 dark:bg-gray-800 h-full -mb-12">
+                            </div>
+                            {% endif %}
+                            <div
+                                class="bg-white dark:bg-surface-dark rounded-xl md:rounded-2xl shadow-card p-8 border border-gray-100 dark:border-gray-800 relative group transition-all duration-300 hover:shadow-lg">
+                                <div
+                                    class="flex flex-col sm:flex-row sm:items-baseline justify-between mb-6 border-b border-gray-100 dark:border-gray-800 pb-4">
+                                    <div class="flex items-center gap-3">
+                                        <h2 class="text-2xl font-serif font-bold text-primary dark:text-white">{% if entry.version %}{{ entry.version }}{% endif %}</h2>
+                                        {% if forloop.first %}<span class="px-2 py-1 bg-green-100 text-green-800 text-xs font-bold uppercase rounded-full tracking-wider dark:bg-green-900/30 dark:text-green-400">Latest</span>{% endif %}
+                                    </div>
+                                    <span class="font-serif text-gray-500 dark:text-gray-400 italic mt-2 sm:mt-0">{{ entry.date|date:"F d, Y" }}</span>
+                                </div>
+                                <div class="mb-6">
+                                    <h3 class="text-xl font-bold text-primary dark:text-white mb-2">{{ entry.title }}</h3>
+                                    <div class="text-gray-600 dark:text-gray-300 leading-relaxed">{{ entry.description|linebreaksbr }}</div>
+                                </div>
+                                <div class="flex flex-wrap gap-2 mb-4">
+                                    {% if entry.category == 'new' %}
+                                    <span
+                                        class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-tag-green dark:bg-green-900/30 text-tag-green-text dark:text-green-300">
+                                        <span class="material-symbols-outlined text-[14px] mr-1">add_circle</span> New
+                                        Feature
+                                    </span>
+                                    {% elif entry.category == 'improvement' %}
+                                    <span
+                                        class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-tag-blue dark:bg-blue-900/30 text-tag-blue-text dark:text-blue-300">
+                                        <span class="material-symbols-outlined text-[14px] mr-1">arrow_upward</span>
+                                        Improvement
+                                    </span>
+                                    {% elif entry.category == 'fix' %}
+                                    <span
+                                        class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-tag-gray dark:bg-gray-700 text-tag-gray-text dark:text-gray-300">
+                                        <span class="material-symbols-outlined text-[14px] mr-1">bug_report</span> Bug
+                                        Fix
+                                    </span>
+                                    {% elif entry.category == 'ai' %}
+                                    <span
+                                        class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-tag-purple dark:bg-purple-900/30 text-tag-purple-text dark:text-purple-300">
+                                        <span class="material-symbols-outlined text-[14px] mr-1">auto_awesome</span> AI
+                                        Update
+                                    </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="text-center py-20 text-gray-400">
+                            <span class="material-symbols-outlined text-6xl mb-4 block">history</span>
+                            <p class="text-lg">No updates published yet. Check back soon!</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="mt-16 text-center">
+                    <button
+                        class="px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-full text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-white hover:border-primary dark:hover:border-white transition-colors text-sm font-medium bg-white dark:bg-surface-dark shadow-sm">
+                        Load Older Updates
+                    </button>
+                </div>
+            </div>
+        </div>
+        </div>
+    </main>
+        <footer class="bg-background-light dark:bg-background-dark pt-20 pb-10 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-16">
+                <div class="col-span-2 lg:col-span-2">
+                    <div class="flex items-center mb-4">
+                        <img src="{% static 'img/logo.webp' %}" alt="Story Timeline Builder"
+                            style="height: 3.5rem; width: auto;">
+                    </div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 max-w-xs mb-6">
+                        Architecting narrative worlds through a synthesis of structured planning, contextual
+                        intelligence, and uncompromised creative flow.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-primary dark:text-white mb-4">Product</h4>
+                    <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'landing_page_v2' %}">Features</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'pricing' %}">Pricing</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white font-bold text-primary dark:text-white" href="{% url 'changelog' %}">Changelog</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Download</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-primary dark:text-white mb-4">Resources</h4>
+                    <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Community</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Help Center</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Blog</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Writers Guide</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-primary dark:text-white mb-4">Legal</h4>
+                    <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Privacy Policy</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Terms of Service</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Cookie Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-200 dark:border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-sm text-gray-500 dark:text-gray-400">&#169; 2026 Story Timeline Builder. All rights reserved.</p>
+                <div class="flex gap-4 text-gray-400">
+                    <a class="hover:text-primary dark:hover:text-white transition-colors" href="{% url 'coming_soon' %}"><span class="material-icons-outlined">flutter_dash</span></a>
+                    <a class="hover:text-primary dark:hover:text-white transition-colors" href="{% url 'coming_soon' %}"><span class="material-icons-outlined">code</span></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+
+</html>

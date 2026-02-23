@@ -815,3 +815,29 @@ class AIUsageLog(models.Model):
 
     def __str__(self):
         return f"{self.service_name} ({self.model_name}) - {self.total_tokens} tokens at {self.timestamp}"
+
+class ChangelogEntry(models.Model):
+    """
+    Tracks application updates, new features, and bug fixes for the user-facing changelog.
+    """
+    CATEGORY_CHOICES = [
+        ('new', 'New Feature'),
+        ('improvement', 'Improvement'),
+        ('fix', 'Bug Fix'),
+        ('ai', 'AI Update'),
+        ('other', 'Other'),
+    ]
+    
+    version = models.CharField(max_length=50, blank=True, help_text="e.g. v1.2.0")
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='new')
+    date = models.DateField(default=timezone.now)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-date', '-created_at']
+        verbose_name_plural = "Changelog Entries"
+
+    def __str__(self):
+        return f"{self.date} - {self.title}"
