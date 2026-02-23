@@ -145,6 +145,13 @@ def pricing_page(request):
     return render(request, 'timeline/pricing.html')
 
 
+def coming_soon(request):
+    """
+    Renders the coming soon / waitlist page.
+    """
+    return render(request, 'timeline/coming_soon.html')
+
+
 
 # ============== Authentication Views ==============
 

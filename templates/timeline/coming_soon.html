@@ -1,0 +1,310 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Coming Soon — Story Timeline Builder</title>
+    <meta
+        content="The Future of Fiction is Being Written. Join the waitlist for Story Timeline Builder — your AI-powered writing companion."
+        name="description" />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&amp;family=Inter:wght@300;400;500;600;700&amp;family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#333333",
+                        accent: "#F4EBD9",
+                        "background-light": "#F2F0EB",
+                        "background-dark": "#121212",
+                        "surface-light": "#FFFFFF",
+                        "surface-dark": "#1E1E1E",
+                        "text-light": "#333333",
+                        "text-dark": "#E0E0E0",
+                        "border-light": "#E5E5E5",
+                        "border-dark": "#333333",
+                        "green-success": "#4CAF50",
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['DM Serif Display', 'serif'],
+                        display: ['Playfair Display', 'serif'],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem",
+                        'xl': '0.75rem',
+                        '2xl': '1rem',
+                        '3xl': '1.5rem',
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'card': '0 10px 30px -5px rgba(0, 0, 0, 0.08)',
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                },
+            },
+        };
+    </script>
+    <style>
+        /* Reveal animations (matching homepage) */
+        .reveal {
+            opacity: 0;
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.slide-up {
+            transform: translateY(30px);
+        }
+
+        .reveal.fade-in {
+            transform: none;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal.delay-100 {
+            transition-delay: 0.1s;
+        }
+
+        .reveal.delay-200 {
+            transition-delay: 0.2s;
+        }
+
+        .reveal.delay-300 {
+            transition-delay: 0.3s;
+        }
+
+        .reveal.delay-400 {
+            transition-delay: 0.4s;
+        }
+
+        .reveal.delay-500 {
+            transition-delay: 0.5s;
+        }
+
+        /* Nav scroll behaviour */
+        #main-nav.scrolled {
+            border-color: rgba(0, 0, 0, 0.06);
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-sans transition-colors duration-300 antialiased selection:bg-accent selection:text-primary">
+
+    <!-- ── NAVBAR (matching homepage) ──────────────────── -->
+    <nav id="main-nav"
+        class="fixed w-full z-50 left-0 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md border-b border-transparent">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <a href="{% url 'landing_page_v2' %}" class="flex-shrink-0 flex items-center cursor-pointer">
+                    <img src="{% static 'img/logo.webp' %}" alt="Story Timeline Builder"
+                        style="height: 3.5rem; width: auto;">
+                </a>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-white transition-colors"
+                        href="{% url 'landing_page_v2' %}">Features</a>
+                    <a class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-white transition-colors"
+                        href="{% url 'pricing' %}">Pricing</a>
+                    <a class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-white transition-colors"
+                        href="{% url 'coming_soon' %}">Resources</a>
+                    <a class="bg-primary text-white dark:bg-white dark:text-primary px-5 py-2.5 rounded-full text-sm font-medium hover:opacity-90 transition-opacity shadow-sm"
+                        href="{% url 'login' %}">Start Writing</a>
+                </div>
+                <div class="md:hidden flex items-center">
+                    <button class="text-primary dark:text-white p-2">
+                        <span class="material-icons-outlined">menu</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ── HERO ────────────────────────────────────────── -->
+    <section class="pt-[200px] pb-20 min-h-[80vh] flex items-center">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center">
+
+            <!-- Status badge -->
+            <div
+                class="reveal fade-in inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark shadow-sm mb-8">
+                <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                <span class="text-xs font-semibold tracking-wide uppercase text-gray-500 dark:text-gray-400">Coming
+                    Soon</span>
+            </div>
+
+            <!-- Floating book icon -->
+            <div class="reveal fade-in delay-100 relative mb-10 animate-float">
+                <div class="relative w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center">
+                    <div
+                        class="absolute inset-0 bg-primary/5 rounded-full blur-2xl transform scale-150 animate-pulse-slow">
+                    </div>
+                    <span
+                        class="material-icons-outlined text-6xl sm:text-7xl text-primary/80 dark:text-white/80">menu_book</span>
+                    <span
+                        class="material-icons-outlined absolute -top-3 text-4xl sm:text-5xl text-amber-600/60 dark:text-amber-400/60"
+                        style="transform: translateY(8px);">park</span>
+                </div>
+            </div>
+
+            <!-- Heading -->
+            <h1
+                class="reveal slide-up delay-200 text-5xl md:text-7xl font-serif text-primary dark:text-white mb-6 leading-tight max-w-4xl mx-auto">
+                The Future of Fiction<br />
+                <span class="font-display italic font-normal text-gray-500 dark:text-gray-400">is Being
+                    Written.</span>
+            </h1>
+
+            <!-- Subtitle -->
+            <p
+                class="reveal slide-up delay-300 text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-12 leading-relaxed">
+                Your AI Ghostwriter is almost ready. Be the first to architect your masterpiece.
+            </p>
+
+            <!-- Waitlist card -->
+            <div class="reveal slide-up delay-400 w-full max-w-md mx-auto">
+                <div
+                    class="bg-white dark:bg-surface-dark p-8 sm:p-10 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-card">
+                    <h2 class="text-primary dark:text-white font-serif text-2xl mb-2">Join the Waitlist</h2>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm mb-6 font-light">Limited spots available for
+                        the beta release.</p>
+                    <form class="space-y-4">
+                        <div>
+                            <label class="sr-only" for="email">Email address</label>
+                            <input
+                                class="block w-full rounded-lg border border-gray-200 dark:border-gray-600 bg-background-light dark:bg-background-dark py-3 px-4 text-gray-900 dark:text-white placeholder:text-gray-400 focus:border-primary focus:ring-1 focus:ring-primary sm:text-sm transition-colors"
+                                id="email" name="email" placeholder="writer@example.com" type="email" />
+                        </div>
+                        <button
+                            class="w-full bg-primary text-white dark:bg-white dark:text-primary py-3 px-4 rounded-full font-medium hover:opacity-90 transition-all duration-300 shadow-md text-sm tracking-wide flex items-center justify-center gap-2 group"
+                            type="button">
+                            Request Early Access
+                            <span
+                                class="material-icons-outlined text-sm transition-transform duration-300 group-hover:translate-x-1">arrow_forward</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Trust line -->
+            <p class="reveal fade-in delay-500 mt-6 text-xs text-gray-400 dark:text-gray-500">No credit card required.
+                Cancel any time.</p>
+
+        </div>
+    </section>
+
+    <!-- Transition: Content to Footer -->
+    <div
+        class="h-32 bg-gradient-to-b from-background-light to-background-light dark:from-background-dark dark:to-background-dark">
+    </div>
+
+    <!-- ── FOOTER (matching homepage) ──────────────────── -->
+    <footer class="bg-background-light dark:bg-background-dark pt-20 pb-10 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-16">
+                <div class="col-span-2 lg:col-span-2">
+                    <div class="flex items-center mb-4">
+                        <img src="{% static 'img/logo.webp' %}" alt="Story Timeline Builder"
+                            style="height: 3.5rem; width: auto;">
+                    </div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 max-w-xs mb-6">
+                        Architecting narrative worlds through a synthesis of structured planning, contextual
+                        intelligence, and uncompromised creative flow.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-primary dark:text-white mb-4">Product</h4>
+                    <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+                        <li><a class="hover:text-primary dark:hover:text-white"
+                                href="{% url 'landing_page_v2' %}">Features</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'pricing' %}">Pricing</a>
+                        </li>
+                        <li><a class="hover:text-primary dark:hover:text-white"
+                                href="{% url 'coming_soon' %}">Changelog</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-primary dark:text-white mb-4">Resources</h4>
+                    <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+                        <li><a class="hover:text-primary dark:hover:text-white"
+                                href="{% url 'coming_soon' %}">Community</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Help
+                                Centre</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Blog</a>
+                        </li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Writers
+                                Guide</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-primary dark:text-white mb-4">Legal</h4>
+                    <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Privacy
+                                Policy</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Terms of
+                                Service</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Cookie
+                                Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div
+                class="border-t border-gray-200 dark:border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-sm text-gray-500 dark:text-gray-400">&copy; 2026 Story Timeline Builder. All rights
+                    reserved.
+                </p>
+                <div class="flex gap-4 text-gray-400">
+                    <a class="hover:text-primary dark:hover:text-white transition-colors"
+                        href="{% url 'coming_soon' %}"><span class="material-icons-outlined">flutter_dash</span></a>
+                    <a class="hover:text-primary dark:hover:text-white transition-colors"
+                        href="{% url 'coming_soon' %}"><span class="material-icons-outlined">code</span></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ── Scroll reveal (matching homepage) ────────────
+        const allReveals = document.querySelectorAll('.reveal');
+
+        if ('IntersectionObserver' in window) {
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('active');
+                });
+            }, { threshold: 0.05, rootMargin: '0px 0px -20px 0px' });
+            allReveals.forEach(el => revealObserver.observe(el));
+        } else {
+            allReveals.forEach(el => el.classList.add('active'));
+        }
+
+        // ── Nav scroll behaviour ─────────────────────────
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('main-nav');
+            if (nav) nav.classList.toggle('scrolled', window.scrollY > 20);
+        });
+    </script>
+</body>
+
+</html>

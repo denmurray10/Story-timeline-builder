@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Story Timeline Builder - Coming Soon V1</title>
+<meta content="The Future of Fiction is Being Written. Join the waitlist for Story Timeline Builder." name="description"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&amp;family=Inter:wght@300;400;500;600;700&amp;family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#0D0D0D",
+                        accent: "#F4EBD9",
+                        "background-light": "#FDFCF8", 
+                        "background-dark": "#121212", 
+                        "surface-light": "#FFFFFF",
+                        "surface-dark": "#1E1E1E",
+                        "text-light": "#333333",
+                        "text-dark": "#E0E0E0",
+                        "border-light": "#E5E5E5",
+                        "border-dark": "#333333",
+                        "gold-muted": "#C5B358",
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['DM Serif Display', 'serif'], 
+                        display: ['Playfair Display', 'serif'], 
+                    },
+                    backgroundImage: {
+                        'glow-radial': 'radial-gradient(circle at center, rgba(255,255,255,0.08) 0%, rgba(13,13,13,0) 70%)',
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                },
+            },
+        };
+    </script>
+<style type="text/tailwindcss">
+        @layer utilities {
+            .text-glow {
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+            }
+        }
+    </style>
+</head>
+<body class="bg-primary text-text-dark font-sans min-h-screen flex flex-col justify-between selection:bg-accent selection:text-primary overflow-x-hidden">
+<div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+<div class="absolute top-0 left-0 w-full h-full bg-glow-radial opacity-60"></div>
+<div class="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-blue-900/10 rounded-full blur-[120px]"></div>
+<div class="absolute top-[40%] -right-[5%] w-[30%] h-[30%] bg-purple-900/10 rounded-full blur-[100px]"></div>
+</div>
+<nav class="relative z-20 w-full pt-8 px-8">
+<div class="max-w-7xl mx-auto flex justify-between items-center">
+<div class="flex items-center gap-2 opacity-80 hover:opacity-100 transition-opacity cursor-default">
+<span class="material-symbols-outlined text-white text-3xl font-light">auto_stories</span>
+<div class="hidden sm:block">
+<span class="font-serif text-lg leading-tight text-white tracking-wide">Story<br/>Timeline Builder</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<a class="text-xs uppercase tracking-widest text-gray-400 hover:text-white transition-colors" href="#">Contact</a>
+<a class="text-xs uppercase tracking-widest text-gray-400 hover:text-white transition-colors" href="#">Login</a>
+</div>
+</div>
+</nav>
+<main class="relative z-10 flex-grow flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
+<div class="relative mb-12 animate-float group">
+<div class="absolute inset-0 bg-white/5 rounded-full blur-2xl transform scale-150 animate-pulse-slow"></div>
+<div class="relative w-24 h-24 sm:w-32 sm:h-32 flex items-center justify-center">
+<span class="material-symbols-outlined text-6xl sm:text-7xl text-white/90 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">menu_book</span>
+<span class="material-symbols-outlined absolute -top-4 text-4xl sm:text-5xl text-accent/80 drop-shadow-[0_0_10px_rgba(244,235,217,0.4)]" style="transform: translateY(10px);">park</span>
+</div>
+</div>
+<div class="text-center max-w-4xl mx-auto mb-16 space-y-6">
+<h1 class="text-4xl sm:text-6xl md:text-7xl font-serif text-white font-medium leading-tight text-glow">
+                The Future of Fiction<br/>
+<span class="text-gray-400 italic font-display">is Being Written.</span>
+</h1>
+<p class="text-lg sm:text-xl text-gray-400 font-light tracking-wide max-w-2xl mx-auto">
+                Your AI Ghostwriter is almost ready.
+            </p>
+</div>
+<div class="w-full max-w-md mx-auto relative group">
+<div class="absolute -inset-0.5 bg-gradient-to-r from-gray-700 via-gray-500 to-gray-700 rounded-lg blur opacity-30 group-hover:opacity-60 transition duration-1000"></div>
+<div class="relative bg-background-light p-1 sm:p-2 rounded-lg shadow-2xl">
+<div class="bg-background-light px-6 py-8 sm:px-8 sm:py-10 rounded-md border border-gray-100 flex flex-col items-center text-center">
+<h2 class="text-primary font-serif text-2xl mb-2">Join the Waitlist</h2>
+<p class="text-gray-500 text-sm mb-6 font-light">Be the first to architect your masterpiece.</p>
+<form class="w-full space-y-4">
+<div class="relative">
+<label class="sr-only" for="email">Email address</label>
+<input class="block w-full rounded-none border-0 border-b-2 border-gray-200 bg-transparent py-3 px-1 text-gray-900 placeholder:text-gray-400 focus:border-primary focus:ring-0 sm:text-sm transition-colors" id="email" name="email" placeholder="writer@example.com" type="email"/>
+</div>
+<button class="w-full bg-primary text-white py-3 px-4 rounded hover:bg-gray-800 transition-all duration-300 shadow-md hover:shadow-lg text-sm font-medium tracking-wide uppercase flex items-center justify-center gap-2 group/btn" type="button">
+                            Request Early Access
+                            <span class="material-symbols-outlined text-sm transition-transform duration-300 group-hover/btn:translate-x-1">arrow_forward</span>
+</button>
+</form>
+<p class="mt-4 text-xs text-gray-400">Limited spots available for the beta release.</p>
+</div>
+</div>
+</div>
+</main>
+<footer class="relative z-10 w-full py-8 px-8 border-t border-white/5">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500 uppercase tracking-wider">
+<div class="flex gap-6">
+<span>© 2023 Story Timeline Builder</span>
+</div>
+<div class="flex gap-6">
+<a class="hover:text-gray-300 transition-colors" href="#">Privacy</a>
+<span class="text-gray-700">|</span>
+<a class="hover:text-gray-300 transition-colors" href="#">Twitter</a>
+<a class="hover:text-gray-300 transition-colors" href="#">Instagram</a>
+</div>
+</div>
+</footer>
+
+</body></html>
