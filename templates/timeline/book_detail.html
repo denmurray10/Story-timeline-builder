@@ -344,23 +344,21 @@
                                 <div class="bg-white py-3.5 px-5 rounded-2xl border border-border-subtle hover:shadow-md transition-all group {% if not event.is_written %}bg-gray-50/50{% endif %}">
                                     <div class="flex justify-between items-start mb-2">
                                         <span class="text-[10px] font-bold uppercase tracking-wider text-text-muted">
-                                            {{ event.story_date|upper|default:"Undefined Time" }}
+                                            {% if event.chapter %}Chapter {{ event.chapter.chapter_number }}{% else %}{{ event.story_date|upper|default:"Planned" }}{% endif %}
                                         </span>
-                                        <a href="{% url 'event_detail' event.pk %}"
-                                            class="material-symbols-outlined text-gray-300 text-[16px] group-hover:text-black transition-colors no-underline">open_in_new</a>
                                     </div>
-                                    <h4 class="font-serif text-lg text-black mb-1 m-0">{{ event.title }}</h4>
+                                    <h4 class="font-serif text-lg text-black mb-1 m-0">
+                                        <a href="{% url 'event_detail' event.pk %}" class="text-black no-underline hover:text-highlight transition-colors">
+                                            {{ event.title }}
+                                        </a>
+                                    </h4>
                                     {% if event.description %}
                                     <p class="text-xs text-text-muted mb-3 m-0 line-clamp-2" title="{{ event.description }}">
                                         {{ event.description }}
                                     </p>
                                     {% endif %}
 
-                                    <div class="flex items-center gap-2">
-                                        <span class="px-2.5 py-1 bg-background-light text-[10px] font-bold uppercase tracking-wider rounded-lg text-text-muted border border-border-subtle">
-                                            {% if event.chapter %}Ch {{ event.chapter.chapter_number }}{% else %}Planned{% endif %}
-                                        </span>
-                                    </div>
+
                                 </div>
                             </div>
                             {% empty %}
