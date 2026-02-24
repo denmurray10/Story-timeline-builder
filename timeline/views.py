@@ -13,6 +13,7 @@ import io
 import os
 from django.http import JsonResponse
 import requests
+from django.core.files.base import ContentFile
 from django.db.models import Count, Sum, Q
 from django.views.decorators.http import require_POST
 import json
@@ -2163,7 +2164,15 @@ def character_list(request):
     characters = Character.objects.filter(user=request.user).annotate(
         event_count=Count('events')
     )
-    return render(request, 'timeline/character_list.html', {'characters': characters})
+    
+    selected_role = request.GET.get('role', '')
+    if selected_role:
+        characters = characters.filter(role=selected_role)
+        
+    return render(request, 'timeline/character_list.html', {
+        'characters': characters,
+        'selected_role': selected_role
+    })
 
 
 @login_required
@@ -2226,6 +2235,69 @@ def character_delete(request, pk):
         messages.success(request, f'Character "{character_name}" deleted successfully!')
         return redirect('character_list')
     return render(request, 'timeline/character_confirm_delete.html', {'character': character})
+
+
+@login_required
+@require_POST
+def api_generate_portrait(request, pk):
+    """Generates an AI profile picture for the character."""
+    try:
+        character = get_object_or_404(Character, pk=pk, user=request.user)
+        
+        # Build prompt from character details
+        desc = character.description if character.description else "A character"
+        traits = character.traits if character.traits else ""
+        prompt = f"ultra realistic close up portrait of {character.name}, {desc}. {traits}. hyper detail, cinematic lighting, magic neon, Canon EOS R3, nikon, f/1.4, ISO 200, 1/160s, 8K, RAW, unedited, symmetrical balance, in-frame, 8K"
+        
+        getimg_api_key = "key-UDd6UDTyum504olT8Hn3KIxMjKUQbdyG73HePVbzHYSdDsE0LkrgZ8uZIRhSCYhV967umbnUs1GyYaVcbmKIC0PmKNqIawV"
+        
+        if getimg_api_key == "PUT_YOUR_GETIMG_API_KEY_HERE":
+            return JsonResponse({"status": "error", "message": "API key for getimg.ai is missing."})
+        
+        url = "https://api.getimg.ai/v1/flux-schnell/text-to-image"
+        payload = json.dumps({
+            "prompt": prompt,
+            "width": 512,
+            "height": 512,
+            "steps": 4,
+            "response_format": "b64" # Get base64 direct to avoid saving random temp URLs that expire or need 2nd requests
+        })
+        headers = {
+            "accept": "application/json",
+            "content-type": "application/json",
+            "authorization": f"Bearer {getimg_api_key}"
+        }
+        
+        response = requests.post(url, headers=headers, data=payload)
+        
+        if response.status_code == 200:
+            result = response.json()
+            if "image" in result:
+                import base64
+                image_data = base64.b64decode(result["image"])
+                
+                filename = f"char_{character.pk}_portrait.png"
+                character.profile_image.save(filename, ContentFile(image_data), save=True)
+                
+                return JsonResponse({
+                    "status": "success", 
+                    "image_url": character.profile_pic_url
+                })
+            else:
+                return JsonResponse({"status": "error", "message": "Image not found in API response."})
+        else:
+            try:
+                error_data = response.json()
+                error_msg = error_data.get("error", {}).get("message", "Unknown error from getimg.ai")
+                return JsonResponse({"status": "error", "message": error_msg})
+            except Exception:
+                return JsonResponse({"status": "error", "message": f"Failed to generate image. HTTP {response.status_code}"})
+                
+        
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return JsonResponse({"status": "error", "message": str(e)})
 
 
 # ============== Event/Timeline Views ==============

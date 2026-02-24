@@ -214,7 +214,6 @@
                 <nav class="nav flex-column">
                     <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
                     <a class="nav-link {% if 'book' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'book_list' %}"><i class="bi bi-book"></i> Manuscripts</a>
-                    <a class="nav-link {% if 'chapter' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'chapter_list' %}"><i class="bi bi-list-ol"></i> Chapters</a>
                     <a class="nav-link {% if 'character' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'character_list' %}"><i class="bi bi-people"></i> Characters</a>
                     <a class="nav-link {% if 'relationship' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'relationship_map' %}"><i class="bi bi-diagram-3"></i> Relationship Map</a>
                     <a class="nav-link {% if request.resolver_match.url_name == 'horizontal_timeline' %}active{% endif %}" href="{% url 'horizontal_timeline' %}"><i class="bi bi-clock-history"></i> Timeline</a>

@@ -19,17 +19,23 @@
     <div class="col-md-3">
         <div class="character-sidebar card shadow-sm border-0 rounded-4 overflow-hidden mb-4 p-4 text-center bg-white">
             <!-- Portrait -->
-            <div class="portrait-container mb-3 mx-auto shadow-sm d-flex align-items-center justify-content-center"
+            <div class="portrait-container mb-3 mx-auto shadow-sm d-flex align-items-center justify-content-center position-relative"
                 style="width:140px;height:140px;border-radius:50%; border:1px solid #eee; background: #fff;">
                 {% if character.profile_pic_url %}
-                <img src="{{ character.profile_pic_url }}" class="rounded-pill" alt="{{ character.name }}"
+                <img id="profileImageDisplay" src="{{ character.profile_pic_url }}" class="rounded-pill" alt="{{ character.name }}"
                     style="width:120px;height:120px;object-fit:cover;">
                 {% else %}
-                <div class="rounded-pill bg-light d-flex align-items-center justify-content-center mx-auto"
+                <div id="profileImageDisplayPlaceholder" class="rounded-pill bg-light d-flex align-items-center justify-content-center mx-auto"
                     style="width:120px;height:120px;">
                     <i class="bi bi-person display-4 text-muted opacity-50"></i>
                 </div>
+                <!-- Hidden image for when it's generated but no placeholder existed originally -->
+                <img id="profileImageDisplay" src="" class="rounded-pill d-none" alt="{{ character.name }}"
+                    style="width:120px;height:120px;object-fit:cover;">
                 {% endif %}
+                <button id="generatePortraitBtn" class="btn btn-sm btn-light position-absolute bottom-0 end-0 rounded-circle shadow" style="width: 36px; height: 36px; padding: 0; z-index: 10;" title="Generate AI Portrait">
+                    <i class="bi bi-magic text-primary"></i>
+                </button>
             </div>
             <!-- Header Info -->
             <h2 class="h4 mb-1 fw-bold">{{ character.name }}</h2>
@@ -184,6 +190,46 @@
                     loadingIndicator.style.display = 'none'; tabContent.style.opacity = '1'; deepDiveBtn.disabled = false;
                     if (data.status === 'success') { contentArea.innerHTML = data.response.replace(/\n/g, '<br>'); summaryArea.style.display = 'block'; }
                     else alert('Error: ' + data.message);
+                });
+            });
+        }
+
+        const generatePortraitBtn = document.getElementById('generatePortraitBtn');
+        if (generatePortraitBtn) {
+            generatePortraitBtn.addEventListener('click', function () {
+                const originalIcon = generatePortraitBtn.innerHTML;
+                generatePortraitBtn.disabled = true;
+                generatePortraitBtn.innerHTML = '<span class="spinner-border spinner-border-sm text-primary"></span>';
+                
+                fetch("{% url 'api_generate_portrait' character.pk %}", {
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    generatePortraitBtn.disabled = false; 
+                    generatePortraitBtn.innerHTML = originalIcon;
+                    if (data.status === 'success') {
+                        const imgDisplay = document.getElementById('profileImageDisplay');
+                        const placeholder = document.getElementById('profileImageDisplayPlaceholder');
+                        if (placeholder) {
+                            placeholder.classList.add('d-none');
+                            placeholder.classList.remove('d-flex');
+                        }
+                        if (imgDisplay) {
+                            imgDisplay.src = data.image_url + "?t=" + new Date().getTime(); // force refresh
+                            imgDisplay.classList.remove('d-none');
+                        } else {
+                            window.location.reload(); // Fallback
+                        }
+                    } else {
+                        alert('Error generating portrait: ' + data.message);
+                    }
+                })
+                .catch(err => {
+                    generatePortraitBtn.disabled = false; 
+                    generatePortraitBtn.innerHTML = originalIcon;
+                    alert('Error connecting to generation service.');
                 });
             });
         }
