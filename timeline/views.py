@@ -219,6 +219,7 @@ def coming_soon(request):
 
 
 # ============== Authentication Views ==============
+from .utils.clone_book import clone_book_for_user
 
 def register(request):
     """User registration view."""
@@ -226,7 +227,15 @@ def register(request):
         form = UserRegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)
+            
+            # Pre-populate the user's account with the "Through the Looking Glass" template (Book ID 1)
+            try:
+                clone_book_for_user(1, user)
+            except Exception as e:
+                # Log the error but don't prevent the user from logging in
+                print(f"Error cloning demo book for new user {user.username}: {e}")
+                
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             messages.success(request, f'Account created for {user.username}!')
             return redirect('timeline_home')
     else:
@@ -884,8 +893,8 @@ def api_add_focus_task(request):
 def book_list(request):
     """List all books for the current user."""
     books = Book.objects.filter(user=request.user).annotate(
-        chapter_count=Count('chapters'),
-        event_count=Count('events'),
+        chapter_count=Count('chapters', distinct=True),
+        event_count=Count('events', distinct=True),
         character_count=Count('events__characters', distinct=True)
     )
     return render(request, 'timeline/book_list.html', {'books': books})
