@@ -1,314 +1,627 @@
-{% extends 'timeline/base.html' %}
-{% load static %}
-{% block title %}Books - Story Timeline Builder{% endblock %}
-{% block extra_css %}
-<script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
-<script>
-    tailwind.config = {
-        darkMode: "class",
-        theme: {
-            extend: {
-                colors: {
-                    branddark: "#1A1A1A", // Very dark grey
-                    accent: "#F4EBD9", // Warm parchment
-                    "warm-white": "#FDFCF8", // The story bible page color
-                    "background-light": "#F2F0EB", // Outer background
-                    "surface-light": "#FFFFFF",
-                    "text-main": "#262626",
-                    "text-muted": "#666666",
-                    "border-subtle": "#E5E5E5",
-                    "highlight": "#D4A373", // A warm highlight color
-                },
-                fontFamily: {
-                    sans: ['Inter', 'sans-serif'],
-                    serif: ['DM Serif Display', 'serif'],
-                    display: ['Playfair Display', 'serif'],
-                }
-            },
-        },
-    };
-</script>
-<style type="text/tailwindcss">
-    @layer utilities {
-            .text-balance {
-                text-wrap: balance;
-            }
-            .scrollbar-hide::-webkit-scrollbar {
-                display: none;
-            }
-            .scrollbar-hide {
-                -ms-overflow-style: none;
-                scrollbar-width: none;
-            }
-        }
-    </style>
-{% endblock %}
-{% block content %}
-<main class="relative z-10 flex-grow w-full py-8 md:py-10 max-w-7xl mx-auto h-full">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 h-full">
-        <div class="lg:col-span-8 flex flex-col gap-6">
-            <div class="flex justify-between items-end mb-2">
-                <div>
-                    <h1 class="font-serif text-4xl text-branddark mb-2"
-                        style="font-family: 'DM Serif Display', serif !important;">Your Manuscripts</h1>
-                    <p class="text-text-muted font-light" style="font-family: 'Inter', sans-serif !important;">Manage
-                        your active projects and archives.</p>
-                </div>
-                <div class="flex gap-2">
-                    <a href="{% url 'book_import' %}"
-                        class="bg-white border text-branddark border-border-subtle px-4 py-2.5 rounded-lg shadow-sm hover:shadow hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2 text-sm font-medium no-underline">
-                        <span class="material-symbols-outlined text-lg">upload</span>
-                        Import with AI
-                    </a>
-                    <a href="{% url 'book_create' %}"
-                        class="bg-branddark text-white border border-branddark px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2 text-sm font-medium no-underline">
-                        <span class="material-symbols-outlined text-lg">add</span>
-                        New Project
-                    </a>
-                </div>
-            </div>
-            <div class="flex gap-4 border-b border-border-subtle pb-4 overflow-x-auto scrollbar-hide">
-                <button class="text-branddark font-semibold border-b-2 border-branddark pb-4 -mb-4.5 px-2">
-                    Active Works
-                    {% if books %}({{ books.count }}){% endif %}
-                </button>
-                <button
-                    class="text-text-muted hover:text-branddark transition-colors pb-4 -mb-4.5 px-2">Completed</button>
-                <button class="text-text-muted hover:text-branddark transition-colors pb-4 -mb-4.5 px-2">Archives</button>
-            </div>
-            <div class="space-y-4">
-                {% if books %}
-                {% for book in books %}
-                <div id="book-{{ book.pk }}"
-                    class="bg-warm-white rounded-xl border border-border-subtle shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden group {% if book.status == 'importing' %}book-processing{% endif %}">
-                    {% if book.status == 'importing' %}
-                    <div
-                        class="absolute inset-0 bg-white/60 backdrop-blur-sm z-10 flex flex-col items-center justify-center rounded-xl">
-                        <div class="text-center">
-                            <span class="material-symbols-outlined animate-spin text-branddark text-4xl mb-2">sync</span>
-                            <div class="font-bold text-branddark" style="font-family: 'Inter', sans-serif !important;">
-                                Import in Progress...</div>
-                            <small class="text-text-muted block mb-3"
-                                style="font-family: 'Inter', sans-serif !important;">Please wait while AI analyses your
-                                book.</small>
-                            <form action="{% url 'book_delete' book.pk %}" method="post" class="inline">
-                                {% csrf_token %}
-                                <button type="submit"
-                                    class="bg-red-50 text-red-600 border border-red-200 px-4 py-1.5 rounded-full text-sm font-medium hover:bg-red-100 transition-colors"
-                                    onclick="return confirm('Are you sure you want to cancel this import and delete the partial data?')">
-                                    Cancel Import
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                    {% endif %}
-                    <div class="flex flex-col md:flex-row p-5 gap-6 items-start md:items-center relative z-0">
-                        <!-- Book Cover placeholder -->
-                        <div
-                            class="w-full md:w-24 h-32 bg-gray-200 rounded-md shadow-inner flex-shrink-0 relative overflow-hidden group-hover:scale-[1.02] transition-transform">
-                            {% if book.image %}
-                            <div class="absolute inset-0 bg-cover bg-center"
-                                style="background-image: url('{{ book.image.url }}');"></div>
-                            {% else %}
-                            <div class="absolute inset-0 bg-cover bg-center"
-                                style="background-color: {% cycle '#2c3e50' '#8e44ad' '#c0392b' '#27ae60' '#f39c12' %};">
-                            </div>
-                            <div class="absolute inset-0 flex items-center justify-center text-white/20 font-serif text-4xl"
-                                style="font-family: 'DM Serif Display', serif !important;">
-                                {{ forloop.counter }}
-                            </div>
-                            {% endif %}
-                        </div>
-                        <!-- Book Info -->
-                        <div class="flex-grow min-w-0 w-full">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <a href="{% if book.status != 'importing' %}{% url 'book_detail' book.pk %}{% else %}#{% endif %}"
-                                        class="no-underline">
-                                        <h3 class="font-serif text-2xl text-branddark leading-tight hover:text-highlight transition-colors cursor-pointer"
-                                            style="font-family: 'DM Serif Display', serif !important;">
-                                            {{ book.title }}
-                                        </h3>
-                                    </a>
-                                    <div class="flex items-center flex-wrap gap-2 mt-1 text-sm text-text-muted"
-                                        style="font-family: 'Inter', sans-serif !important;">
-                                        <span
-                                            class="bg-accent/50 px-2 py-0.5 rounded text-xs font-medium tracking-wide border border-accent">
-                                            {{ book.get_status_display }}
-                                        </span>
-                                        {% if book.series_order %}
-                                        <span>•</span>
-                                        <span>Book {{ book.series_order }}</span>
-                                        {% endif %}
-                                        <span>•</span>
-                                        <span>{{ book.chapter_count }} Chapters</span>
-                                        <span>•</span>
-                                        <span>{{ book.character_count }} Characters</span>
-                                    </div>
-                                </div>
-                                <div class="flex gap-2">
-                                    <a href="{% if book.status != 'importing' %}{% url 'book_edit' book.pk %}{% else %}#{% endif %}"
-                                        class="p-2 text-text-muted hover:text-branddark rounded-full hover:bg-gray-100 transition-colors">
-                                        <span class="material-symbols-outlined">edit</span>
-                                    </a>
-                                    <a href="{% if book.status != 'importing' %}{% url 'book_detail' book.pk %}{% else %}#{% endif %}"
-                                        class="p-2 text-text-muted hover:text-branddark rounded-full hover:bg-gray-100 transition-colors">
-                                        <span class="material-symbols-outlined">visibility</span>
-                                    </a>
-                                </div>
-                            </div>
-                            <div class="mt-4">
-                                <div class="flex justify-between text-xs mb-1"
-                                    style="font-family: 'Inter', sans-serif !important;">
-                                    <span class="font-medium text-text-main">Progress</span>
-                                    <span class="text-text-muted">{{ book.current_word_count|floatformat:0 }} / {{
-                                        book.word_count_target|floatformat:0 }} words</span>
-                                </div>
-                                <div class="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
-                                    <div class="bg-green-600 h-1.5 rounded-full js-progress-bar transition-all duration-500"
-                                        data-width="{% if book.status|lower == 'published' or book.status|lower == 'complete' %}100%{% elif book.progress_percentage|add:0 < 10 and book.status|lower != 'planning' %}10%{% else %}{{ book.progress_percentage }}%{% endif %}">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Deep Scan Info area -->
-                    {% if book.status != 'importing' %}
-                    <div
-                        class="bg-accent/20 border-t border-border-subtle/50 px-5 py-3 flex flex-col md:flex-row gap-4 md:items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <span class="material-symbols-outlined text-highlight text-lg fill-1">psychology</span>
-                            <span class="text-xs font-bold uppercase tracking-wider text-branddark"
-                                style="font-family: 'Inter', sans-serif !important;">Deep Intelligence:</span>
-                            <span class="text-sm text-text-main" style="font-family: 'Inter', sans-serif !important;">
-                                {% if book.description %}
-                                {{ book.description|truncatewords:10 }}
-                                {% else %}
-                                No recent narrative anomalies detected.
-                                {% endif %}
-                            </span>
-                        </div>
-                        <a href="{% url 'book_detail' book.pk %}"
-                            class="no-underline text-xs font-semibold text-branddark hover:text-highlight transition-colors flex items-center gap-1 group/btn"
-                            style="font-family: 'Inter', sans-serif !important;">
-                            View Insights
-                            <span
-                                class="material-symbols-outlined text-sm group-hover/btn:translate-x-0.5 transition-transform">arrow_forward</span>
-                        </a>
-                    </div>
-                    {% endif %}
-                </div>
-                {% endfor %}
-                {% else %}
-                <div
-                    class="bg-warm-white rounded-xl border border-border-subtle shadow-sm p-12 text-center flex flex-col items-center justify-center">
-                    <span class="material-symbols-outlined text-6xl text-text-muted/30 mb-4">auto_stories</span>
-                    <h3 class="font-serif text-2xl text-branddark mb-2"
-                        style="font-family: 'DM Serif Display', serif !important;">No Books Yet</h3>
-                    <p class="text-text-muted mb-6" style="font-family: 'Inter', sans-serif !important;">Create your
-                        first book to start building your story timeline.</p>
-                    <a href="{% url 'book_create' %}"
-                        class="bg-branddark text-white border border-branddark px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2 text-sm font-medium no-underline">
-                        <span class="material-symbols-outlined text-lg">add</span>
-                        Create First Book
-                    </a>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-        <!-- Right Sidebar (Ghostwriter Consultant) -->
-        <div class="lg:col-span-4 pl-0 lg:pl-4">
-            <div
-                class="sticky top-10 bg-white border border-border-subtle rounded-2xl shadow-sm overflow-hidden flex flex-col max-h-[calc(100vh-140px)]">
-                <div class="p-5 border-b border-border-subtle bg-accent/10">
-                    <div class="flex items-center gap-2 mb-1">
-                        <span class="material-symbols-outlined text-branddark">auto_awesome</span>
-                        <h2 class="font-serif text-xl text-branddark m-0"
-                            style="font-family: 'DM Serif Display', serif !important;">Ghostwriter Consultant</h2>
-                    </div>
-                    <p class="text-xs text-text-muted m-0" style="font-family: 'Inter', sans-serif !important;">
-                        Real-time narrative analysis across your universe.</p>
-                </div>
-                <div class="overflow-y-auto p-5 space-y-6 scrollbar-hide">
-                    {% if books %}
-                    <div
-                        class="relative pl-4 border-l-2 border-branddark/20 hover:border-highlight transition-colors group">
-                        <div
-                            class="absolute -left-[5px] top-0 w-2.5 h-2.5 rounded-full bg-white border-2 border-branddark group-hover:border-highlight">
-                        </div>
-                        <span class="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-1 block"
-                            style="font-family: 'Inter', sans-serif !important;">Welcome</span>
-                        <p class="text-sm text-text-main leading-relaxed"
-                            style="font-family: 'Inter', sans-serif !important;">
-                            Select a manuscript to view detailed narrative insights, character arcs, and world building
-                            suggestions.
-                        </p>
-                    </div>
-                    {% else %}
-                    <div
-                        class="relative pl-4 border-l-2 border-branddark/20 hover:border-highlight transition-colors group">
-                        <div
-                            class="absolute -left-[5px] top-0 w-2.5 h-2.5 rounded-full bg-white border-2 border-branddark group-hover:border-highlight">
-                        </div>
-                        <span class="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-1 block"
-                            style="font-family: 'Inter', sans-serif !important;">System Readiness</span>
-                        <p class="text-sm text-text-main leading-relaxed"
-                            style="font-family: 'Inter', sans-serif !important;">
-                            AI Consultant is standing by. Create a book to begin receiving intelligent narrative
-                            analysis and plot tracking.
-                        </p>
-                    </div>
-                    {% endif %}
-                </div>
-                <!-- <div class="p-3 border-t border-border-subtle bg-gray-50 text-center">
-                    <button class="text-xs font-semibold text-branddark hover:text-highlight transition-colors uppercase tracking-widest border-0 bg-transparent" style="font-family: 'Inter', sans-serif !important;">View Full Report</button>
-                </div> -->
-            </div>
-        </div>
-    </div>
-</main>
-{% endblock %}
-{% block extra_js %}
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Init progress bars
-        document.querySelectorAll('.js-progress-bar').forEach(bar => {
-            const width = bar.getAttribute('data-width');
-            if (width) {
-                // adding a small timeout for animation effect
-                setTimeout(() => {
-                    bar.style.width = width;
-                }, 100);
-            }
-        });
-        // Background Import Polling for Notification
-        const importingBooks = document.querySelectorAll('.book-processing');
-        if (importingBooks.length > 0) {
-            importingBooks.forEach(card => {
-                const bookId = card.id.replace('book-', '');
-                const checkStatus = setInterval(() => {
-                    fetch(`/api/books/${bookId}/progress/`)
-                        .then(res => res.json())
-                        .then(data => {
-                            if (data.status === 'drafting') {
-                                clearInterval(checkStatus);
-                                if ("Notification" in window && Notification.permission === "granted") {
-                                    new Notification("Import Complete!", {
-                                        body: `Your book has been successfully analysed. Refresh the page to view it.`
-                                    });
-                                } else {
-                                    alert(`Success! Book analysis is complete. The page will now reload.`);
-                                }
-                                location.reload();
-                            }
-                        })
-                        .catch(err => console.error('Background polling error:', err));
-                }, 10000);
-            });
-            if ("Notification" in window && Notification.permission === "default") {
-                Notification.requestPermission();
-            }
-        }
-    });
-</script>
+{% extends 'timeline/base.html' %}
+
+{% load static %}
+
+{% block title %}Books - Story Timeline Builder{% endblock %}
+
+{% block extra_css %}
+
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+
+<script>
+
+    tailwind.config = {
+
+        darkMode: "class",
+
+        theme: {
+
+            extend: {
+
+                colors: {
+
+                    branddark: "#1A1A1A", // Very dark grey
+
+                    accent: "#F4EBD9", // Warm parchment
+
+                    "warm-white": "#FDFCF8", // The story bible page color
+
+                    "background-light": "#F2F0EB", // Outer background
+
+                    "surface-light": "#FFFFFF",
+
+                    "text-main": "#262626",
+
+                    "text-muted": "#666666",
+
+                    "border-subtle": "#E5E5E5",
+
+                    "highlight": "#D4A373", // A warm highlight color
+
+                },
+
+                fontFamily: {
+
+                    sans: ['Inter', 'sans-serif'],
+
+                    serif: ['DM Serif Display', 'serif'],
+
+                    display: ['Playfair Display', 'serif'],
+
+                }
+
+            },
+
+        },
+
+    };
+
+</script>
+
+<style type="text/tailwindcss">
+
+    @layer utilities {
+
+            .text-balance {
+
+                text-wrap: balance;
+
+            }
+
+            .scrollbar-hide::-webkit-scrollbar {
+
+                display: none;
+
+            }
+
+            .scrollbar-hide {
+
+                -ms-overflow-style: none;
+
+                scrollbar-width: none;
+
+            }
+
+        }
+
+    </style>
+
+{% endblock %}
+
+{% block content %}
+
+<main class="relative z-10 flex-grow w-full py-8 md:py-10 max-w-7xl mx-auto h-full">
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 h-full">
+
+        <div class="lg:col-span-8 flex flex-col gap-6">
+
+            <div class="flex justify-between items-end mb-2">
+
+                <div>
+
+                    <h1 class="font-serif text-4xl text-branddark mb-2"
+
+                        style="font-family: 'DM Serif Display', serif;">Your Manuscripts</h1>
+
+                    <p class="text-text-muted font-light" style="font-family: 'Inter', sans-serif;">Manage
+
+                        your active projects and archives.</p>
+
+                </div>
+
+                <div class="flex gap-2">
+
+                    <a href="{% url 'book_import' %}"
+
+                        class="bg-white border text-branddark border-border-subtle px-4 py-2.5 rounded-lg shadow-sm hover:shadow hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2 text-sm font-medium no-underline">
+
+                        <span class="material-symbols-outlined text-lg">upload</span>
+
+                        Import with AI
+
+                    </a>
+
+                    <a href="{% url 'book_create' %}"
+
+                        class="bg-branddark text-white border border-branddark px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2 text-sm font-medium no-underline">
+
+                        <span class="material-symbols-outlined text-lg">add</span>
+
+                        New Project
+
+                    </a>
+
+                </div>
+
+            </div>
+
+            <div class="flex gap-4 border-b border-border-subtle pb-4 overflow-x-auto scrollbar-hide">
+
+                <button class="text-branddark font-semibold border-b-2 border-branddark pb-4 -mb-4.5 px-2">
+
+                    Active Works
+
+                    {% if books %}({{ books.count }}){% endif %}
+
+                </button>
+
+                <button
+
+                    class="text-text-muted hover:text-branddark transition-colors pb-4 -mb-4.5 px-2">Completed</button>
+
+                <button class="text-text-muted hover:text-branddark transition-colors pb-4 -mb-4.5 px-2">Archives</button>
+
+            </div>
+
+            <div class="space-y-4">
+
+                {% if books %}
+
+                {% for book in books %}
+
+                <div id="book-{{ book.pk }}"
+
+                    class="bg-warm-white rounded-xl border border-border-subtle shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden group {% if book.status == 'importing' %}book-processing{% endif %}">
+
+                    {% if book.status == 'importing' %}
+
+                    <div
+
+                        class="absolute inset-0 bg-white/60 backdrop-blur-sm z-10 flex flex-col items-center justify-center rounded-xl">
+
+                        <div class="text-center">
+
+                            <span class="material-symbols-outlined animate-spin text-branddark text-4xl mb-2">sync</span>
+
+                            <div class="font-bold text-branddark" style="font-family: 'Inter', sans-serif;">
+
+                                Import in Progress...</div>
+
+                            <small class="text-text-muted block mb-3"
+
+                                style="font-family: 'Inter', sans-serif;">Please wait while AI analyses your
+
+                                book.</small>
+
+                            <form action="{% url 'book_delete' book.pk %}" method="post" class="inline">
+
+                                {% csrf_token %}
+
+                                <button type="submit"
+
+                                    class="bg-red-50 text-red-600 border border-red-200 px-4 py-1.5 rounded-full text-sm font-medium hover:bg-red-100 transition-colors"
+
+                                    onclick="return confirm('Are you sure you want to cancel this import and delete the partial data?')">
+
+                                    Cancel Import
+
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                    {% endif %}
+
+                    <div class="flex flex-col md:flex-row p-5 gap-6 items-start md:items-center relative z-0">
+
+                        <!-- Book Cover placeholder -->
+
+                        <div
+
+                            class="w-full md:w-24 h-32 bg-gray-200 rounded-md shadow-inner flex-shrink-0 relative overflow-hidden group-hover:scale-[1.02] transition-transform">
+
+                            {% if book.image %}
+
+                            <div class="absolute inset-0 bg-cover bg-center"
+
+                                style="background-image: url('{{ book.image.url }}');"></div>
+
+                            {% else %}
+
+                            <div class="absolute inset-0 bg-cover bg-center"
+
+                                style="background-color: {% cycle '#2c3e50' '#8e44ad' '#c0392b' '#27ae60' '#f39c12' %};">
+
+                            </div>
+
+                            <div class="absolute inset-0 flex items-center justify-center text-white/20 font-serif text-4xl"
+
+                                style="font-family: 'DM Serif Display', serif;">
+
+                                {{ forloop.counter }}
+
+                            </div>
+
+                            {% endif %}
+
+                        </div>
+
+                        <!-- Book Info -->
+
+                        <div class="flex-grow min-w-0 w-full">
+
+                            <div class="flex justify-between items-start">
+
+                                <div>
+
+                                    <a href="{% if book.status != 'importing' %}{% url 'book_detail' book.pk %}{% else %}#{% endif %}"
+
+                                        class="no-underline">
+
+                                        <h3 class="font-serif text-2xl text-branddark leading-tight hover:text-highlight transition-colors cursor-pointer"
+
+                                            style="font-family: 'DM Serif Display', serif;">
+
+                                            {{ book.title }}
+
+                                        </h3>
+
+                                    </a>
+
+                                    <div class="flex items-center flex-wrap gap-2 mt-1 text-sm text-text-muted"
+
+                                        style="font-family: 'Inter', sans-serif;">
+
+                                        <span
+
+                                            class="bg-accent/50 px-2 py-0.5 rounded text-xs font-medium tracking-wide border border-accent">
+
+                                            {{ book.get_status_display }}
+
+                                        </span>
+
+                                        {% if book.series_order %}
+
+                                        <span>•</span>
+
+                                        <span>Book {{ book.series_order }}</span>
+
+                                        {% endif %}
+
+                                        <span>•</span>
+
+                                        <span>{{ book.chapter_count }} Chapters</span>
+
+                                        <span>•</span>
+
+                                        <span>{{ book.character_count }} Characters</span>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="flex gap-2">
+
+                                    <a href="{% if book.status != 'importing' %}{% url 'book_edit' book.pk %}{% else %}#{% endif %}"
+
+                                        class="p-2 text-text-muted hover:text-branddark rounded-full hover:bg-gray-100 transition-colors">
+
+                                        <span class="material-symbols-outlined">edit</span>
+
+                                    </a>
+
+                                    <a href="{% if book.status != 'importing' %}{% url 'book_detail' book.pk %}{% else %}#{% endif %}"
+
+                                        class="p-2 text-text-muted hover:text-branddark rounded-full hover:bg-gray-100 transition-colors">
+
+                                        <span class="material-symbols-outlined">visibility</span>
+
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                            <div class="mt-4">
+
+                                <div class="flex justify-between text-xs mb-1"
+
+                                    style="font-family: 'Inter', sans-serif;">
+
+                                    <span class="font-medium text-text-main">Progress</span>
+
+                                    <span class="text-text-muted">{{ book.current_word_count|floatformat:0 }} / {{
+
+                                        book.word_count_target|floatformat:0 }} words</span>
+
+                                </div>
+
+                                <div class="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+
+                                    <div class="bg-green-600 h-1.5 rounded-full js-progress-bar transition-all duration-500"
+
+                                        data-width="{% if book.status|lower == 'published' or book.status|lower == 'complete' %}100%{% elif book.progress_percentage|add:0 < 10 and book.status|lower != 'planning' %}10%{% else %}{{ book.progress_percentage }}%{% endif %}">
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Deep Scan Info area -->
+
+                    {% if book.status != 'importing' %}
+
+                    <div
+
+                        class="bg-accent/20 border-t border-border-subtle/50 px-5 py-3 flex flex-col md:flex-row gap-4 md:items-center justify-between">
+
+                        <div class="flex items-center gap-2">
+
+                            <span class="material-symbols-outlined text-highlight text-lg fill-1">psychology</span>
+
+                            <span class="text-xs font-bold uppercase tracking-wider text-branddark"
+
+                                style="font-family: 'Inter', sans-serif;">Deep Intelligence:</span>
+
+                            <span class="text-sm text-text-main" style="font-family: 'Inter', sans-serif;">
+
+                                {% if book.description %}
+
+                                {{ book.description|truncatewords:10 }}
+
+                                {% else %}
+
+                                No recent narrative anomalies detected.
+
+                                {% endif %}
+
+                            </span>
+
+                        </div>
+
+                        <a href="{% url 'book_detail' book.pk %}"
+
+                            class="no-underline text-xs font-semibold text-branddark hover:text-highlight transition-colors flex items-center gap-1 group/btn"
+
+                            style="font-family: 'Inter', sans-serif;">
+
+                            View Insights
+
+                            <span
+
+                                class="material-symbols-outlined text-sm group-hover/btn:translate-x-0.5 transition-transform">arrow_forward</span>
+
+                        </a>
+
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+                {% endfor %}
+
+                {% else %}
+
+                <div
+
+                    class="bg-warm-white rounded-xl border border-border-subtle shadow-sm p-12 text-center flex flex-col items-center justify-center">
+
+                    <span class="material-symbols-outlined text-6xl text-text-muted/30 mb-4">auto_stories</span>
+
+                    <h3 class="font-serif text-2xl text-branddark mb-2"
+
+                        style="font-family: 'DM Serif Display', serif;">No Books Yet</h3>
+
+                    <p class="text-text-muted mb-6" style="font-family: 'Inter', sans-serif;">Create your
+
+                        first book to start building your story timeline.</p>
+
+                    <a href="{% url 'book_create' %}"
+
+                        class="bg-branddark text-white border border-branddark px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2 text-sm font-medium no-underline">
+
+                        <span class="material-symbols-outlined text-lg">add</span>
+
+                        Create First Book
+
+                    </a>
+
+                </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        <!-- Right Sidebar (Ghostwriter Consultant) -->
+
+        <div class="lg:col-span-4 pl-0 lg:pl-4">
+
+            <div
+
+                class="sticky top-10 bg-white border border-border-subtle rounded-2xl shadow-sm overflow-hidden flex flex-col max-h-[calc(100vh-140px)]">
+
+                <div class="p-5 border-b border-border-subtle bg-accent/10">
+
+                    <div class="flex items-center gap-2 mb-1">
+
+                        <span class="material-symbols-outlined text-branddark">auto_awesome</span>
+
+                        <h2 class="font-serif text-xl text-branddark m-0"
+
+                            style="font-family: 'DM Serif Display', serif;">Ghostwriter Consultant</h2>
+
+                    </div>
+
+                    <p class="text-xs text-text-muted m-0" style="font-family: 'Inter', sans-serif;">
+
+                        Real-time narrative analysis across your universe.</p>
+
+                </div>
+
+                <div class="overflow-y-auto p-5 space-y-6 scrollbar-hide">
+
+                    {% if books %}
+
+                    <div
+
+                        class="relative pl-4 border-l-2 border-branddark/20 hover:border-highlight transition-colors group">
+
+                        <div
+
+                            class="absolute -left-[5px] top-0 w-2.5 h-2.5 rounded-full bg-white border-2 border-branddark group-hover:border-highlight">
+
+                        </div>
+
+                        <span class="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-1 block"
+
+                            style="font-family: 'Inter', sans-serif;">Welcome</span>
+
+                        <p class="text-sm text-text-main leading-relaxed"
+
+                            style="font-family: 'Inter', sans-serif;">
+
+                            Select a manuscript to view detailed narrative insights, character arcs, and world building
+
+                            suggestions.
+
+                        </p>
+
+                    </div>
+
+                    {% else %}
+
+                    <div
+
+                        class="relative pl-4 border-l-2 border-branddark/20 hover:border-highlight transition-colors group">
+
+                        <div
+
+                            class="absolute -left-[5px] top-0 w-2.5 h-2.5 rounded-full bg-white border-2 border-branddark group-hover:border-highlight">
+
+                        </div>
+
+                        <span class="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-1 block"
+
+                            style="font-family: 'Inter', sans-serif;">System Readiness</span>
+
+                        <p class="text-sm text-text-main leading-relaxed"
+
+                            style="font-family: 'Inter', sans-serif;">
+
+                            AI Consultant is standing by. Create a book to begin receiving intelligent narrative
+
+                            analysis and plot tracking.
+
+                        </p>
+
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+                <!-- <div class="p-3 border-t border-border-subtle bg-gray-50 text-center">
+
+                    <button class="text-xs font-semibold text-branddark hover:text-highlight transition-colors uppercase tracking-widest border-0 bg-transparent" style="font-family: 'Inter', sans-serif;">View Full Report</button>
+
+                </div> -->
+
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        // Init progress bars
+
+        document.querySelectorAll('.js-progress-bar').forEach(bar => {
+
+            const width = bar.getAttribute('data-width');
+
+            if (width) {
+
+                // adding a small timeout for animation effect
+
+                setTimeout(() => {
+
+                    bar.style.width = width;
+
+                }, 100);
+
+            }
+
+        });
+
+        // Background Import Polling for Notification
+
+        const importingBooks = document.querySelectorAll('.book-processing');
+
+        if (importingBooks.length > 0) {
+
+            importingBooks.forEach(card => {
+
+                const bookId = card.id.replace('book-', '');
+
+                const checkStatus = setInterval(() => {
+
+                    fetch(`/api/books/${bookId}/progress/`)
+
+                        .then(res => res.json())
+
+                        .then(data => {
+
+                            if (data.status === 'drafting') {
+
+                                clearInterval(checkStatus);
+
+                                if ("Notification" in window && Notification.permission === "granted") {
+
+                                    new Notification("Import Complete!", {
+
+                                        body: `Your book has been successfully analysed. Refresh the page to view it.`
+
+                                    });
+
+                                } else {
+
+                                    alert(`Success! Book analysis is complete. The page will now reload.`);
+
+                                }
+
+                                location.reload();
+
+                            }
+
+                        })
+
+                        .catch(err => console.error('Background polling error:', err));
+
+                }, 10000);
+
+            });
+
+            if ("Notification" in window && Notification.permission === "default") {
+
+                Notification.requestPermission();
+
+            }
+
+        }
+
+    });
+
+</script>
+
 {% endblock %}
