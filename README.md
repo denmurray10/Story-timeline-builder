@@ -10,178 +10,85 @@ A comprehensive Django web application designed specifically for authors to plan
 
 ## Table of Contents
 
-- [Project Overview](#project-overview)
-- [Features](#features)
-- [User Experience (UX) Design](#user-experience-ux-design)
+- [1. Ideation & Scoping](#1-ideation--scoping)
+  - [Problem Statement](#problem-statement)
+  - [Purpose](#purpose)
+  - [Target Audience](#target-audience)
+- [2. Features](#2-features)
+  - [MVP Features](#mvp-features)
+  - [Additional Features](#additional-features)
+- [3. User Experience (UX) Design](#3-user-experience-ux-design)
   - [User Stories](#user-stories)
   - [Design Philosophy](#design-philosophy)
   - [Wireframes](#wireframes)
-- [Database Schema](#database-schema)
-- [Technologies Used](#technologies-used)
-- [Installation & Setup](#installation--setup)
-- [Deployment](#deployment)
-- [Testing](#testing)
-- [Credits](#credits)
+- [4. Technical Design](#4-technical-design)
+  - [Data Model](#data-model)
+  - [User Flow](#user-flow)
+- [5. Technologies Used](#5-technologies-used)
+- [6. Installation & Setup](#6-installation--setup)
+- [7. Deployment & Testing](#7-deployment--testing)
+- [8. Credits](#8-credits)
 
 ---
 
-## Project Overview
+## 1. Ideation & Scoping
 
-Story Timeline Builder was created to solve a specific problem for fiction authors: managing the complexity of multi-book series. Whether you're writing a trilogy or a 20-book saga, keeping track of character development, plot threads, timelines, and world-building consistency becomes exponentially harder as your story grows.
+### Problem Statement
+Fiction authors, especially those writing long-running series, struggle to maintain consistency and narrative momentum across thousands of pages. Managing complex character arcs, evolving relationships, and chronological timelines across multiple books often leads to:
+- **Plot Holes**: Forgetting when a specific event happened relative to others.
+- **Inconsistency**: Losing track of world-building rules or character traits.
+- **Cognitive Overload**: Spending more time managing notes than actually writing.
 
-This application provides:
-
-- **Manuscript Management**: Organise books in series order with word count tracking
-- **Timeline Visualisation**: See your entire story laid out chronologically or in narrative order
-- **Character Profiles**: Track character arcs, relationships, and development across books
-- **Event/Scene Management**: Break down your story into manageable, taggable events
-- **World Wiki**: Maintain consistency with a dedicated world-building reference system
-- **AI Integration**: Optional AI-powered analysis and suggestions (Google Gemini & DeepSeek)
+### Purpose
+The **Story Timeline Builder** provides an intuitive, centralised platform for authors to map out their entire narrative universe. By digitalising the "story bible," it allows writers to:
+- Visualise chronological vs. narrative sequence.
+- Track character development and relationships dynamically.
+- Maintain a consistent world wiki.
+- Use AI-assisted prompts to overcome writer's block.
 
 ### Target Audience
-
-- Fiction authors writing series (fantasy, sci-fi, thrillers, etc.)
-- Creative writing students managing complex projects
-- Writing teams collaborating on shared universes
-
----
-
-## Features
-
-### Core Functionality (CRUD)
-
-✅ **Books (Manuscripts)**
-- Create, edit, and delete book entries
-- Track series order, word count targets, and completion status
-- Upload book cover images
-- Import manuscript content from .docx/.txt files
-
-✅ **Chapters**
-- Organise chapters within books
-- Auto-calculate word counts from pasted content or uploaded files
-- Mark chapters as complete
-
-✅ **Events/Scenes**
-- Full CRUD for story events
-- Rich-text editor for detailed scene descriptions
-- Categorise by story beat, emotional tone, location, and POV character
-- Smart date system (exact, fuzzy, relative, or ongoing dates)
-- Tag events with themes, subplots, or custom categories
-
-✅ **Characters**
-- Complete character profiles with goals, motivations, and traits
-- Upload custom profile images or select cartoon avatars
-- Track character introduction points and activity status
-
-✅ **Character Relationships**
-- Define relationships between characters with detailed attributes:
-  - Type (friend, enemy, romantic, family, etc.)
-  - Trust level, strength, power dynamics
-  - Conflict sources and shared secrets
-- Visualise with an interactive relationship map
-
-✅ **Tags & Themes**
-- Create custom tags for themes, locations, subplots, motifs, or tones
-- Colour-coded for visual organisation
-
-✅ **World Wiki**
-- Document locations, lore, factions, magic systems, creatures, and cultures
-- Attach images and link entries to specific books
-
-### Authentication & Authorization
-
-- **Role-based access**: Regular users vs. staff/admin
-- **Secure registration & login** with hashed passwords
-- **Social authentication**: Google, Twitter, and LinkedIn login via django-allauth
-- **Permission-based rendering**: Staff dashboard hidden from regular users
-
-### User Notifications
-
-- **Activity logging**: All create/update/delete actions logged via Django signals
-- **Real-time feedback**: Django messages framework displays success/error notifications
-- **Recent activity widget**: Dashboard shows latest changes across all models
-
-### Dashboard & Analytics
-
-- **At-a-glance stats**: Books, chapters, characters, and events count
-- **Progress tracking**: Visual progress bars for word count targets
-- **AI-generated focus tasks**: Daily writing prompts to keep momentum
-- **Character dynamics analysis**: Identify relationship gaps and opportunities
-
-### AI Features (Optional)
-
-- **Deep Dive Analysis**: AI-generated character insights using Google Gemini
-- **Relationship Mapping**: Automated character relationship suggestions
-- **Writing prompts**: Context-aware task generation
+- **Series Authors**: Writers managing trilogies or extensive sagas (e.g., the user's 20-book series project).
+- **World Builders**: Authors of fantasy/sci-fi needing a consistent reference for lore.
+- **Plotters**: Writers who prefer detailed outlining and scene-by-scene planning.
 
 ---
 
-## User Experience (UX) Design
+## 2. Features
+
+### MVP Features (Current Scope)
+To alleviate the core problem of narrative disorganisation, the MVP includes:
+- **User Authentication**: Secure registration and login to ensure private, persistent story data.
+- **Manuscript Management**: CRUD operations for books to organise series structure.
+- **Scene/Event Tracking**: A foundational system to record and edit scenes with smart dating.
+- **Character Profiles**: Basic cast management to track who is in the story.
+- **Activity Logging**: Automated tracking of changes to provide a "recent activity" overview.
+
+### Additional Features (Iteration 2 & 3)
+- **Interactive Timeline**: Visual horizontal layout for high-level plotting.
+- **Relationship Mapping**: Visualising bonds and dynamics between characters.
+- **AI Integration**: Deep dive character analysis and daily task generation.
+- **World Wiki**: A dedicated codex for world-building consistency.
+- **Manuscript Import**: Uploading .docx files to auto-populate the database.
+
+---
+
+## 3. User Experience (UX) Design
 
 ### User Stories
-
-The project was developed using Agile methodology with user stories tracked in GitHub Projects:
-
-**Epic 1: Core Story Management**
-- As an author, I want to create and organise multiple books in a series
-- As an author, I want to visualise my entire story on an interactive timeline
-- As an author, I want to track character appearances across multiple books
-
-**Epic 2: Planning & Organisation**
-- As an author, I want to link events to specific chapters
-- As an author, I want to tag events with themes and subplots
-- As an author, I want to maintain a world-building wiki for consistency
-
-**Epic 3: Character Development**
-- As an author, I want to manage a detailed cast of characters
-- As an author, I want to map relationships between characters
-- As an author, I want to track how relationships evolve over time
-
-**Epic 4: Productivity & AI**
-- As an author, I want AI-generated writing prompts
-- As an author, I want automated relationship analysis
-- As an author, I want word count tracking and progress visualisation
-
-Full project board: [GitHub Projects](https://github.com/users/denmurray10/projects/12)
+User stories are framed within the context of solving the narrative complexity problem:
+- **As a busy author**, I want a dashboard with "Today's Focus" tasks so I can immediately know what to work on and reduce planning stress.
+- **As a series plotter**, I want to link events to specific books and chapters so I have a clear overview of my story's structure.
+- **As a world-builder**, I want to tag events with themes and locations to ensure I don't create geographical or thematic plot holes.
 
 ### Design Philosophy
+The UI focuses on **reducing cognitive load**:
+- **Clean Interface**: Minimalist cards and soft pastel colours to prevent eye strain.
+- **Quick Actions**: One-click entry points for New Event/Character from any page.
+- **Architect View**: A toggle to switch between high-level planning and detail-oriented drafting.
 
-**1. Writer-Centric Interface**
-- Distraction-free writing mode
-- Quick actions sidebar for rapid data entry
-- Keyboard shortcuts for common tasks
+### Wireframes
 
-**2. Visual Clarity**
-- Pastel colour palette for reduced eye strain during long sessions
-- Consistent iconography (Bootstrap Icons)
-- Colour-coded character badges and timeline markers
-
-**3. Responsive & Accessible**
-- Mobile-responsive layout (Bootstrap 5.3)
-- Semantic HTML structure
-- ARIA labels for screen readers
-- Clear navigation hierarchy
-
-**4. Progressive Disclosure**
-- Essential features visible immediately
-- Advanced features (AI, relationship maps) accessible via sidebar
-- Collapsible sections to reduce cognitive load
-
-### Design Iteration
-
-**Initial Wireframes → Live Implementation Changes:**
-
-1. **Dashboard Layout**: Originally planned as a 3-column grid. Changed to a flexible card-based layout with widget reordering after user feedback.
-2. **Timeline View**: Moved from vertical scroll to horizontal timeline with zoom controls for better overview.
-3. **Character Profiles**: Added avatar selection system after realising users needed quick visual differentiation.
-4. **Navigation**: Simplified from dropdown menus to a persistent sidebar with icon + text labels.
-
----## Wireframes
-
-Below are simplified wireframes showing the key user interface layouts:
-
-### 1. Dashboard (Landing Page After Login)
-
+#### Dashboard (Foundational Solution for Stress Reduction)
 ```
 ┌───────────────────────────────────────────────────────────────────────┐
 │ [Logo] Story Timeline Builder            [Search]      Hello, User ▼ │
@@ -195,14 +102,11 @@ Below are simplified wireframes showing the key user interface layouts:
 │ Chapt│  └─────────────────────────┴─────────────────┴────────────────┘│
 │      │  ┌─────────────────────────┬─────────────────────────────────┐ │
 │ Story│  │ Stats                   │ Your Books                      │ │
-│ T  │  │ [Books] [Chars]      │ [ New Book ]                   │ │
-│      │  │ [Events][Chaps]      │                                │ │
-│      │  └──────────────────────┴────────────────────────────────┘ │
+│ Time │  │ [Books] [Chars]         │ [ New Book ]                    │ │
 └──────┴────────────────────────────────────────────────────────────┘
 ```
 
-### 2. Manuscript List / Create Book
-
+#### Manuscript List
 ```
 ┌───────────────────────────────────────────────────────────────────────┐
 │ [Logo] Story Timeline Builder            [Search]      Hello, User ▼ │
@@ -215,143 +119,54 @@ Below are simplified wireframes showing the key user interface layouts:
 │      │  │ Book 1: Title        │  │ Book 2: Title        │            │
 │ Chapt│  │ Status: Drafting     │  │ Status: Planning     │            │
 │      │  │ Progress: [████░░░]  │  │ Progress: [░░░░░░░]  │            │
-│ Story│  │ [Edit] [Delete]      │  │ [Edit] [Delete]      │            │
-│ Time │  └──────────────────────┘  └──────────────────────┘            │
-└──────┴────────────────────────────────────────────────────────────┘
-```
-
-### 3. Timeline View (Interactive)
-
-```
-┌───────────────────────────────────────────────────────────────────────┐
-│ [Logo] Story Timeline Builder            [Search]      Hello, User ▼ │
-├──────┬────────────────────────────────────────────────────────────────┤
-│      │  STORY TIMELINE                                  [ + Event ]  │
-│ ☰    │                                                                │
-│ Dash │  [Chronological] [Narrative]                  [ Zoom - / + ]   │
-│      │                                                                │
-│ Manus│  |-----------------|-----------------|-----------------|       │
-│      │  [Scene 1]         [Scene 3]         [Scene 5]                 │
-│ Chapt│        [Scene 2]         [Scene 4]                             │
-│      │                                                                │
-│ Story│  POV: [Leo ▼]  Theme: [Action ▼]                              │
-└──────┴────────────────────────────────────────────────────────────┘
-```
-
-### 4. Character Management
-
-```
-┌───────────────────────────────────────────────────────────────────────┐
-│ [Logo] Story Timeline Builder            [Search]      Hello, User ▼ │
-├──────┬────────────────────────────────────────────────────────────────┤
-│      │  CHARACTERS                                  [ + Character ]   │
-│ ☰    │                                                                │
-│ Dash │  ┌───────────────┐ ┌───────────────┐ ┌───────────────┐         │
-│      │  │ [Avatar]      │ │ [Avatar]      │ │ [Avatar]      │         │
-│ Manus│  │ Name: Leo     │ │ Name: Jamal   │ │ Name: Ethan   │         │
-│      │  │ Role: Protagon│ │ Role: Support │ │ Role: Antagon │         │
-│ Chapt│  │ [Profile]     │ │ [Profile]     │ │ [Profile]     │         │
-│      │  └───────────────┘ └───────────────┘ └───────────────┘         │
 └──────┴────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Database Schema
+## 4. Technical Design
 
-The application uses a robust relational database schema built with Django's ORM:
+### Data Model
+The database structure is designed to ensure **privacy and personalisation**:
+- **User ↔ Book (1:N)**: All story data is linked to a specific user, ensuring authors' IP remains private and their experience is personalised.
+- **Book ↔ Chapter ↔ Event (Hierarchy)**: Maintains structural integrity, reflecting how real books are organised.
+- **Character ↔ Event (M:N)**: Tracks appearances, solving the "who is where?" problem.
 
-- **User**: Django's built-in auth model (extended via allauth)
-- **Book**: Represents a manuscript with word count tracking and series metadata
-- **Chapter**: Organises narrative within a book
-- **Character**: Detailed profiles for cast management
-- **Event**: The core "building block" (scene) linked to POV, location, book, and chapter
-- **Tag**: Flexible categorisation system for themes and subplots
-- **CharacterRelationship**: Many-to-Many mapping with detailed bond attributes
-- **WorldEntry**: Wiki entries for consistent world-building
-- **ActivityLog**: Automated tracking of all user actions
-
----
-
-## Technologies Used
-
-- **Framework**: Django 4.2.27 (Python)
-- **Database**: PostgreSQL (Neon.tech) / SQLite (Local)
-- **Front-end**: Bootstrap 5.3.2, Bootstrap Icons, jQuery
-- **Media Hosting**: Cloudinary (Image management)
-- **Deployment**: Heroku
-- **AI Models**: Google Gemini Pro, DeepSeek R1/V3
-- **Tools**: VS Code, Git/GitHub, Figma (UI Design)
+### User Flow
+1. **Landing/Registration**: User enters the platform.
+2. **Dashboard**: User sees AI-suggested tasks and recent activity.
+3. **Manuscript Setup**: User creates a book and adds chapters.
+4. **World Building**: User adds characters and world entries.
+5. **Timeline Mapping**: User adds events, linking them to chapters and POV characters.
 
 ---
 
-## Installation & Setup
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/denmurray10/Story-timeline-builder.git
-   cd Story-timeline-builder
-   ```
-
-2. **Create and activate virtual environment:**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\\Scripts\\activate
-   ```
-
-3. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Environment Variables:**
-   Create a `.env` file in the root directory:
-   ```env
-   SECRET_KEY=your_secret_key
-   DEBUG=True
-   DATABASE_URL=your_postgres_url
-   GEMINI_API_KEY=your_key
-   DEEPSEEK_API_KEY=your_key
-   CLOUDINARY_URL=your_cloudinary_url
-   ```
-
-5. **Run Migrations:**
-   ```bash
-   python manage.py migrate
-   ```
-
-6. **Start Server:**
-   ```bash
-   python manage.py runserver
-   ```
+## 5. Technologies Used
+- **Django 4.2.27**: Robust backend framework.
+- **Neon PostgreSQL**: Scalable relational database.
+- **Cloudinary**: Persistent image storage for covers and avatars.
+- **Heroku**: Cloud hosting platform.
+- **Google Gemini / DeepSeek**: AI engines for narrative analysis.
 
 ---
 
-## Deployment
-
-The project is configured for deployment on **Heroku**:
-
-- **Procfile**: Defined for Gunicorn server
-- **WhiteNoise**: Configured for efficient static file serving
-- **Cloudinary**: Integrated for persistent media storage
-- **dj-database-url**: For seamless PostgreSQL connection
+## 6. Installation & Setup
+1. Clone the repo.
+2. Create `venv` and `pip install -r requirements.txt`.
+3. Configure `.env` with `DATABASE_URL` and `SECRET_KEY`.
+4. `python manage.py migrate` and `python manage.py runserver`.
 
 ---
 
-## Testing
-
-Extensive manual testing has been performed across all user stories:
-
-- **CRUD Testing**: Verified all models can be created, edited, and deleted with real-time feedback.
-- **Security Testing**: Authenticated users can only access/modify their own data.
-- **Responsive Testing**: Verified layout on Chrome (Desktop), Firefox, and Safari (iOS).
-- **AI Integration**: Stress-tested relationship mapping with complex story datasets.
+## 7. Deployment & Testing
+Deployed on Heroku using Gunicorn and WhiteNoise.
+Manual testing verified for:
+- User story completion.
+- Form validation and error message clarity.
+- Responsive design across screen sizes.
 
 ---
 
-## Credits
-
-- **Developer**: [Den Murray](https://github.com/denmurray10)
-- **UI/UX Inspiration**: Figma Community
-- **Icons**: [Bootstrap Icons](https://icons.getbootstrap.com/)
-- **Special Thanks**: AI Augmented FullStack Bootcamp
+## 8. Credits
+- Developed by **Den Murray**.
+- Built as a Capstone Project for the AI Augmented FullStack Bootcamp.
