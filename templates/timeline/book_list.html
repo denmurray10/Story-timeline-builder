@@ -65,14 +65,12 @@
                     <p class="text-text-muted font-light" style="font-family: 'Inter', sans-serif !important;">Manage
                         your active projects and archives.</p>
                 </div>
-                <div class="flex gap-2">
-                    <a href="{% url 'book_import' %}"
-                        class="bg-white border text-branddark border-border-subtle px-4 py-2.5 rounded-lg shadow-sm hover:shadow hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2 text-sm font-medium no-underline">
+                <div class="flex gap-3">
+                    <a href="{% url 'book_import' %}" class="btn-premium btn-premium-light !py-2.5">
                         <span class="material-symbols-outlined text-lg">upload</span>
                         Import with AI
                     </a>
-                    <a href="{% url 'book_create' %}"
-                        class="bg-branddark text-white border border-branddark px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2 text-sm font-medium no-underline">
+                    <a href="{% url 'book_create' %}" class="btn-premium btn-premium-dark !py-2.5">
                         <span class="material-symbols-outlined text-lg">add</span>
                         New Project
                     </a>
@@ -110,8 +108,7 @@
 
                             <form action="{% url 'book_delete' book.pk %}" method="post" class="inline">
                                 {% csrf_token %}
-                                <button type="submit"
-                                    class="bg-red-50 text-red-600 border border-red-200 px-4 py-1.5 rounded-full text-sm font-medium hover:bg-red-100 transition-colors"
+                                <button type="submit" class="btn-premium btn-premium-danger !py-1.5 !px-4 !text-xs"
                                     onclick="return confirm('Are you sure you want to cancel this import and delete the partial data?')">
                                     Cancel Import
                                 </button>
@@ -228,8 +225,7 @@
                         style="font-family: 'DM Serif Display', serif !important;">No Books Yet</h3>
                     <p class="text-text-muted mb-6" style="font-family: 'Inter', sans-serif !important;">Create your
                         first book to start building your story timeline.</p>
-                    <a href="{% url 'book_create' %}"
-                        class="bg-branddark text-white border border-branddark px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2 text-sm font-medium no-underline">
+                    <a href="{% url 'book_create' %}" class="btn-premium btn-premium-dark">
                         <span class="material-symbols-outlined text-lg">add</span>
                         Create First Book
                     </a>

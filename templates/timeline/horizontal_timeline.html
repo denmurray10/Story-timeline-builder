@@ -1,145 +1,74 @@
-{% extends 'timeline/base.html' %}
-{% load static %}
-{% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="mb-0">Story Timeline</h2>
-    <div class="d-flex align-items-center">
-        <!-- View Mode Toggle -->
-        <div class="btn-group me-3 shadow-sm" role="group" aria-label="Timeline View Mode">
-            <a href="?mode=chronological"
-                class="btn btn-sm {% if mode == 'narrative' %}btn-outline-dark{% else %}btn-dark{% endif %}">
-                <i class="bi bi-calendar-event me-1"></i> Chronological
-            </a>
-            <a href="?mode=narrative"
-                class="btn btn-sm {% if mode == 'narrative' %}btn-dark{% else %}btn-outline-dark{% endif %}">
-                <i class="bi bi-book me-1"></i> Narrative
-            </a>
-        </div>
-        <a href="javascript:void(0)" class="btn btn-sm btn-dark btn-invert-hover" onclick="alert('Coming Soon!')">
-            <i class="bi bi-list"></i> Vertical View
-        </a>
-    </div>
-</div>
-<!-- Timeline Wrapper with Scrollbar -->
-<!-- Padding adjusted to 20px top/bottom buffer relative to cards -->
-<div class="timeline-horizontal-wrapper position-relative"
-    style="overflow-x: auto; padding: 20px 50px; height: 380px; background-color: #f4f1ee; border: none !important;">
-    <div style="min-width: max-content; position: relative; height: 100%;">
-        <!-- Central Line -->
-        <div class="timeline-line position-absolute"
-            style="top: 50%; left: 0; width: 100%; height: 3px; background-color: #d1d5db; transform: translateY(-50%); z-index: 1;">
-        </div>
-        <div class="d-flex position-relative h-100 align-items-center" style="z-index: 2;">
-            {% for event in events %}
-            <!-- Timeline Item Container -->
-            <div class="timeline-item position-relative mx-3" style="width: 260px; height: 100%;">
-                <!-- The Dot (Always on the center line) - Black Fill -->
-                <div class="timeline-dot position-absolute rounded-circle shadow-sm" style="width: 16px; 
-                                height: 16px; 
-                                background-color: #000000;
-                                top: 50%; 
-                                left: 50%; 
-                                transform: translate(-50%, -50%);
-                                border: 2px solid #ffffff;
-                                z-index: 3;">
-                </div>
-                <!-- Connector Line -->
-                <div class="timeline-connector position-absolute" style="left: 50%; 
-                                width: 2px; 
-                                background-color: #d1d5db;
-                                transform: translateX(-50%);
-                                z-index: 1;
-                                {% if forloop.counter|divisibleby:2 %}
-                                    /* Bottom Item (Even) */
-                                    top: 50%;
-                                    height: 100px; 
-                                {% else %}
-                                    /* Top Item (Odd) */
-                                    bottom: 50%;
-                                    height: 80px;
-                                {% endif %}">
-                </div>
-                <!-- Content Card (Dashboard Style) -->
-                <div class="card dash-card position-absolute" style="width: 100%; z-index: 2;
-                                {% if forloop.counter|divisibleby:2 %}
-                                    /* Bottom Item (Even) */
-                                    top: calc(50% + 40px);
-                                {% else %}
-                                    /* Top Item (Odd) */
-                                    bottom: calc(50% + 16px);
-                                {% endif %}">
-                    <div class="card-body p-3">
-                        <h6 class="dash-card-header text-center text-truncate mb-1">{{ event.title }}</h6>
-                        {% if event.story_date %}
-                        <div class="text-muted small text-center mb-2" style="font-size: 0.75rem;">
-                            {{ event.story_date }}
-                        </div>
-                        {% endif %}
-                        <p class="card-text small text-secondary mb-0 text-center lh-sm" style="font-size: 0.8rem;">
-                            {{ event.description|truncatechars:60 }}
-                        </p>
-                        <div class="mt-2 text-center">
-                            <a href="{% url 'event_detail' event.pk %}"
-                                class="btn btn-black-accent btn-sm px-4 py-1">View</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% empty %}
-            <div class="text-center w-100 py-5">
-                <p class="text-muted">No events found. Start by creating an event!</p>
-                <a href="{% url 'event_create' %}" class="btn btn-dark">Create Event</a>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-</div>
-<style>
-    /* Styling for the Black Button */
-    .btn-black-accent {
-        background-color: #000000;
-        color: #ffffff;
-        border: none;
-        font-size: 0.75rem;
-        border-radius: 999px;
-        transition: background-color 0.2s;
-    }
-    .btn-black-accent:hover {
-        background-color: #222222;
-        color: #ffffff;
-    }
-    .dash-card {
-        background-color: #ffffff;
-        border-radius: 18px;
-        border: none;
-        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.05);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .dash-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 35px rgba(15, 23, 42, 0.1) !important;
-    }
-    .dash-card-header {
-        font-weight: 600;
-        font-size: 0.95rem;
-        color: #111827;
-        margin-bottom: 6px;
-    }
-    /* Custom Scrollbar specifically for the timeline wrapper */
-    .timeline-horizontal-wrapper::-webkit-scrollbar {
-        height: 8px;
-    }
-    .timeline-horizontal-wrapper::-webkit-scrollbar-track {
-        background: #e2e8f0;
-        border-radius: 10px;
-        margin: 0 50px;
-    }
-    .timeline-horizontal-wrapper::-webkit-scrollbar-thumb {
-        background: #000000;
-        border-radius: 10px;
-    }
-    .timeline-horizontal-wrapper::-webkit-scrollbar-thumb:hover {
-        background: #333333;
-    }
-</style>
+{% extends 'timeline/base.html' %}
+{% load static %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Story Timeline</h2>
+    <div class="d-flex align-items-center">
+        <!-- View Mode Toggle -->
+        <div class="flex gap-1 me-3 p-1 bg-gray-100 rounded-full shadow-sm">
+            <a href="?mode=chronological" class="btn-premium {% if mode == 'narrative' %}btn-premium-light !border-transparent !shadow-none hover:!bg-white{% else %}btn-premium-dark{% endif %} !py-1.5 !px-4 !text-xs">
+                <i class="bi bi-calendar-event me-1"></i> Chronological
+            </a>
+            <a href="?mode=narrative" class="btn-premium {% if mode == 'narrative' %}btn-premium-dark{% else %}btn-premium-light !border-transparent !shadow-none hover:!bg-white{% endif %} !py-1.5 !px-4 !text-xs">
+                <i class="bi bi-book me-1"></i> Narrative
+            </a>
+        </div>
+        <a href="javascript:void(0)" class="btn-premium btn-premium-dark !py-1.5 !px-4 !text-xs" onclick="alert('Coming Soon!')">
+            <i class="bi bi-list"></i> Vertical
+        </a>
+    </div>
+</div>
+
+<div class="timeline-horizontal-wrapper position-relative" style="overflow-x: auto; padding: 20px 50px; height: 380px; background-color: #f4f1ee; border: none !important;">
+    <div style="min-width: max-content; position: relative; height: 100%;">
+        <div class="timeline-line position-absolute" style="top: 50%; left: 0; width: 100%; height: 3px; background-color: #d1d5db; transform: translateY(-50%); z-index: 1;"></div>
+        <div class="d-flex position-relative h-100 align-items-center" style="z-index: 2;">
+            {% for event in events %}
+            <div class="timeline-item position-relative mx-3" style="width: 260px; height: 100%;">
+                <div class="timeline-dot position-absolute rounded-circle shadow-sm" style="width: 16px; height: 16px; background-color: #000000; top: 50%; left: 50%; transform: translate(-50%, -50%); border: 2px solid #ffffff; z-index: 3;"></div>
+                <div class="timeline-connector position-absolute" style="left: 50%; width: 2px; background-color: #d1d5db; transform: translateX(-50%); z-index: 1; {% if forloop.counter|divisibleby:2 %} top: 50%; height: 100px; {% else %} bottom: 50%; height: 80px; {% endif %}"></div>
+                <div class="card dash-card position-absolute" style="width: 100%; z-index: 2; {% if forloop.counter|divisibleby:2 %} top: calc(50% + 40px); {% else %} bottom: calc(50% + 16px); {% endif %}">
+                    <div class="card-body p-3">
+                        <h6 class="dash-card-header text-center text-truncate mb-1">{{ event.title }}</h6>
+                        {% if event.story_date %}<div class="text-muted small text-center mb-2" style="font-size: 0.75rem;">{{ event.story_date }}</div>{% endif %}
+                        <p class="card-text small text-secondary mb-0 text-center lh-sm" style="font-size: 0.8rem;">{{ event.description|truncatechars:60 }}</p>
+                        <div class="mt-2 text-center">
+                            <a href="{% url 'event_detail' event.pk %}" class="btn-premium btn-premium-dark !px-4 !py-1 !font-bold !text-[10px] uppercase tracking-wider">View</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center w-100 py-5">
+                <p class="text-muted">No events found. Start by creating an event!</p>
+                <a href="{% url 'event_create' %}" class="btn-premium btn-premium-dark">Create Event</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .dash-card {
+        background-color: #ffffff;
+        border-radius: 18px;
+        border: none;
+        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.05);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .dash-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(15, 23, 42, 0.1) !important;
+    }
+    .dash-card-header {
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: #111827;
+        margin-bottom: 6px;
+    }
+    .timeline-horizontal-wrapper::-webkit-scrollbar { height: 8px; }
+    .timeline-horizontal-wrapper::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 10px; margin: 0 50px; }
+    .timeline-horizontal-wrapper::-webkit-scrollbar-thumb { background: #000000; border-radius: 10px; }
+    .timeline-horizontal-wrapper::-webkit-scrollbar-thumb:hover { background: #333333; }
+</style>
 {% endblock %}
