@@ -907,10 +907,17 @@ def book_detail(request, pk):
     chapters = book.chapters.all().annotate(event_count=Count('events')).order_by('chapter_number')
     events = book.events.all().order_by('sequence_order')
     
+    # Calculate word count properly
+    from django.db.models import Sum
+    total_words = chapters.aggregate(Sum('word_count'))['word_count__sum'] or 0
+    actual_chapter_count = chapters.count()
+    
     context = {
         'book': book,
         'chapters': chapters,
         'events': events,
+        'total_words': total_words,
+        'actual_chapter_count': actual_chapter_count,
     }
     return render(request, 'timeline/book_detail.html', context)
 
