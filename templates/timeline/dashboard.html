@@ -50,6 +50,13 @@
         <h2 class="mb-0">Dashboard <span class="badge bg-warning text-dark" style="font-size: 0.6rem; vertical-align: middle;">TEST MODE</span></h2>
     </div>
     <div class="d-flex align-items-center">
+        <select class="form-select form-select-sm me-3 border-0 bg-light rounded-pill px-3 shadow-none fw-semibold text-dark" id="bookSelector" style="width: auto; cursor: pointer; font-size: 0.85rem;">
+            <option value="">All Books</option>
+            {% for book in user_books %}
+            <option value="{{ book.id }}" {% if selected_book and selected_book.id == book.id %}selected{% endif %}>{{ book.title|truncatechars:20 }}</option>
+            {% endfor %}
+        </select>
+        
         <div class="form-check form-switch me-3 mb-0">
             <input class="form-check-input" type="checkbox" id="writerModeToggle" style="cursor: pointer;">
             <label class="form-check-label fw-semibold" for="writerModeToggle" style="cursor: pointer;">
@@ -235,6 +242,21 @@
                     <a href="{% url 'writing_mode_latest' %}" class="btn-premium btn-premium-light !w-full !py-3 !font-bold"><i class="bi bi-pencil-square me-2"></i> Start Writing Now</a>
                 </div>
             </div>
+            <div class="dash-card p-4 draggable-card mb-3 text-center" id="card-sprint">
+                <div class="d-flex justify-content-between align-items-center mb-3"><h5 class="dash-card-header mb-0"><i class="bi bi-grip-vertical drag-handle me-2"></i>Daily Sprint</h5><span class="badge bg-danger rounded-pill">🔥 {{ streak_days }} Day Streak</span></div>
+                <div class="position-relative d-inline-block mt-2 mb-3">
+                    <svg width="120" height="120" viewBox="0 0 120 120">
+                        <circle cx="60" cy="60" r="54" fill="none" stroke="#e5e7eb" stroke-width="12"></circle>
+                        <circle cx="60" cy="60" r="54" fill="none" stroke="#10b981" stroke-width="12" stroke-dasharray="339.29" stroke-dashoffset="calc(339.29 - (339.29 * {{ daily_progress }}) / 100)" stroke-linecap="round" transform="rotate(-90 60 60)"></circle>
+                    </svg>
+                    <div class="position-absolute top-50 start-50 translate-middle d-flex flex-column align-items-center">
+                        <span class="fs-4 fw-bold lh-1">{{ words_today }}</span>
+                        <span class="text-muted" style="font-size: 0.65rem;">/ {{ daily_goal }}</span>
+                    </div>
+                </div>
+                <p class="dash-muted mb-0">Words written today.</p>
+            </div>
+            
             <div class="dash-card p-4 draggable-card mb-3" id="card-integrity">
                 <div class="d-flex justify-content-between align-items-center mb-3"><h5 class="dash-card-header mb-0"><i class="bi bi-grip-vertical drag-handle me-2"></i>Timeline Integrity</h5><span class="badge bg-light text-dark border">Found {{ integrity_issues|length }} Issues</span></div>
                 {% if integrity_issues %}<div class="list-group list-group-flush">
@@ -243,12 +265,51 @@
             </div>
         </div>
         <div class="col-lg-4 draggable-zone" id="writer-col-2">
+            <div class="dash-card p-4 draggable-card mb-3" id="card-up-next">
+                <div class="d-flex justify-content-between align-items-center mb-3"><h5 class="dash-card-header mb-0"><i class="bi bi-grip-vertical drag-handle me-2"></i>Up Next</h5><span class="badge bg-primary">Next Scene</span></div>
+                {% if up_next_event %}
+                <div class="p-3 bg-light rounded-3 mb-3 border">
+                    <h6 class="fw-bold mb-1">{{ up_next_event.title }}</h6>
+                    <p class="small text-muted mb-2 line-clamp-2" style="display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;-webkit-line-clamp:2;">{{ up_next_event.description|default:"No description yet." }}</p>
+                    <div class="d-flex gap-2 mb-1">
+                        <span class="badge bg-white text-dark border"><i class="bi bi-geo-alt text-muted"></i> {{ up_next_event.location|default:"TBD" }}</span>
+                        <span class="badge bg-white text-dark border"><i class="bi bi-thermometer-half text-danger"></i> Tension: {{ up_next_event.tension_level }}/10</span>
+                    </div>
+                </div>
+                
+                {% if pov_reference_char %}
+                <div class="border-top pt-3">
+                    <div class="small text-muted fw-bold text-uppercase mb-2" style="font-size:0.65rem;">POV Quick-Reference</div>
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="avatar-small me-2" style="width:24px;height:24px;background-color:{{pov_reference_char.color_code|default:'#6366f1'}};border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:bold;">{{ pov_reference_char.name|slice:":1" }}</div>
+                        <span class="fw-semibold text-dark">{{ pov_reference_char.name }}</span>
+                    </div>
+                    {% if pov_reference_char.motivation %}<p class="small text-muted fst-italic mb-0">"{{ pov_reference_char.motivation }}"</p>{% endif %}
+                </div>
+                {% endif %}
+                
+                <div class="mt-3 text-center">
+                    <a href="{% url 'event_edit' up_next_event.id %}" class="btn-premium btn-premium-light !py-2 !px-3 !w-full !text-xs">Prep Scene</a>
+                </div>
+                {% else %}
+                <div class="text-center py-4 text-muted"><p class="mb-0">You're all caught up! No unwritten scenes planned.</p></div>
+                {% endif %}
+            </div>
+            
             <div class="dash-card p-4 draggable-card mb-3" id="card-loops">
                 <div class="d-flex justify-content-between align-items-center mb-3"><h5 class="dash-card-header mb-0"><i class="bi bi-grip-vertical drag-handle me-2"></i>Open Loops</h5><span class="badge bg-light text-dark border">{{ unresolved_rels.count }} Unresolved</span></div>
                 {% if unresolved_rels %}<div class="row g-2">{% for rel in unresolved_rels %}<div class="col-12"><div class="p-2 border rounded bg-light d-flex align-items-center gap-2"><div class="d-flex align-items-center"><div class="avatar-small me-1" style="width:24px;height:24px;background-color:{{rel.character_a.color_code}};border-radius:50%;color:white;font-size:0.6rem;display:flex;align-items:center;justify-content:center;">{{ rel.character_a.name|slice:":1" }}</div><i class="bi bi-arrow-left-right text-muted mx-1" style="font-size: 0.8rem;"></i><div class="avatar-small ms-1" style="width:24px;height:24px;background-color:{{rel.character_b.color_code}};border-radius:50%;color:white;font-size:0.6rem;display:flex;align-items:center;justify-content:center;">{{ rel.character_b.name|slice:":1" }}</div></div><div class="chk-truncate ms-2 flex-grow-1"><div class="fw-semibold" style="font-size:0.85rem;">{{ rel.get_relationship_type_display }}</div><div class="text-muted" style="font-size:0.75rem;">{{ rel.character_a.name }} & {{ rel.character_b.name }}</div></div><a href="{% url 'character_detail' rel.character_a.id %}" class="text-muted"><i class="bi bi-pencil-square"></i></a></div></div>{% endfor %}</div>{% else %}<p class="text-muted small">All relationship arcs are resolved.</p>{% endif %}
             </div>
         </div>
         <div class="col-lg-4 draggable-zone" id="writer-col-3">
+            <div class="dash-card p-4 draggable-card mb-3" id="card-estimator">
+                <div class="d-flex justify-content-between align-items-center mb-3"><h5 class="dash-card-header mb-0"><i class="bi bi-grip-vertical drag-handle me-2"></i>Drafting Velocity</h5><i class="bi bi-speedometer2 text-muted"></i></div>
+                <div class="row g-2 mb-3 text-center">
+                    <div class="col-6"><div class="p-2 border rounded-3 bg-light"><div class="fw-bold fs-5 text-primary">{{ words_per_day }}</div><div class="small text-muted">words/day avg.</div></div></div>
+                    <div class="col-6"><div class="p-2 border rounded-3 bg-light"><div class="fw-bold fs-5 text-dark">{{ estimated_finish_date|date:"M j"|default:"TBD" }}</div><div class="small text-muted">est. finish</div></div></div>
+                </div>
+            </div>
+            
             <div class="dash-card p-4 draggable-card mb-3" id="card-whereabouts"><h5 class="dash-card-header mb-3"><i class="bi bi-grip-vertical drag-handle me-2"></i>Character Whereabouts</h5><div class="d-flex flex-wrap gap-2">{% for items in char_locations %}<div class="badge bg-white text-dark border p-2 d-flex align-items-center gap-2 rounded-pill fw-normal"><span class="d-inline-block rounded-circle" style="width:8px;height:8px;background-color:{{ items.character.color_code }}"></span><strong>{{ items.character.name }}:</strong><span class="text-muted">{{ items.location }}</span></div>{% empty %}<p class="text-muted small">No location data available.</p>{% endfor %}</div></div>
             <div class="dash-card p-4 draggable-card mb-3" id="card-pacing">
                 <div class="d-flex justify-content-between align-items-center mb-3"><h5 class="dash-card-header mb-0"><i class="bi bi-grip-vertical drag-handle me-2"></i>Pacing & Tension</h5></div>
@@ -302,6 +363,55 @@
                     <div class="col-6"><div class="p-2 border rounded-3 bg-light"><div class="fw-bold" style="font-size:0.8rem;">Status</div><div class="small text-muted">Books: {{ books.count }}</div></div></div>
                 </div>
             </div>
+            
+            <!-- Worldbuilding Tracker -->
+            <div class="dash-card p-3 draggable-card mb-3" id="card-worldbuilding">
+                <div class="dash-card-header d-flex align-items-center mb-2"><i class="bi bi-grip-vertical drag-handle"></i>Worldbuilding Progress</div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="small fw-semibold">{{ world_entries_count }} / {{ worldbuilding_target }} Entries</span>
+                        <span class="small text-muted">{{ worldbuilding_progress }}%</span>
+                    </div>
+                    <div class="dash-progress-bg">
+                        <div class="dash-progress-fill" style="width: {{ worldbuilding_progress }}%; background-color: #10b981;"></div>
+                    </div>
+                </div>
+                <div class="dash-card-sub mb-2 fw-semibold">Suggested to define:</div>
+                <div class="d-flex flex-wrap gap-2">
+                    {% for suggestion in worldbuilding_suggestions %}
+                    <span class="badge bg-light text-dark border"><i class="bi bi-plus text-muted"></i> {{ suggestion|title }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Architect Integrity Checks -->
+            <div class="dash-card dash-pill-card p-3 draggable-card mb-3" id="card-architect-integrity">
+                <div class="dash-card-header d-flex justify-content-between align-items-center mb-2">
+                    <div><i class="bi bi-grip-vertical drag-handle"></i>Integrity Checks</div>
+                    {% if integrity_issues %}<span class="badge bg-danger rounded-pill">{{ integrity_issues|length }}</span>{% else %}<span class="badge bg-success rounded-pill"><i class="bi bi-check"></i></span>{% endif %}
+                </div>
+                {% if integrity_issues %}
+                <div class="list-group list-group-flush">
+                    {% for issue in integrity_issues %}
+                    <div class="list-group-item px-0 border-0 d-flex gap-2 align-items-start py-1">
+                        <div class="mt-1">
+                            {% if issue.type == 'fuzzy_date' %}<i class="bi bi-calendar-range text-warning small"></i>
+                            {% elif issue.type == 'missing_loc' %}<i class="bi bi-geo-alt text-danger small"></i>
+                            {% elif issue.type == 'missing_pov' %}<i class="bi bi-person-fill-exclamation text-danger small"></i>
+                            {% else %}<i class="bi bi-card-text text-info small"></i>{% endif %}
+                        </div>
+                        <div>
+                            <div class="fw-semibold text-dark" style="font-size:0.8rem; line-height: 1.2;">{{ issue.msg }}</div>
+                            <div class="text-muted text-truncate" style="font-size:0.7rem; max-width: 150px;" title="{{ issue.event.title }}">{{ issue.event.title }}</div>
+                        </div>
+                        <a href="{% url 'event_edit' issue.event.id %}" class="btn text-primary p-0 ms-auto" title="Fix"><i class="bi bi-pencil-square small"></i></a>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-2 text-muted small"><i class="bi bi-shield-check text-success fs-3 mb-1 d-block"></i>No structural warnings.</div>
+                {% endif %}
+            </div>
         </div>
 
         <div class="col-lg-3 draggable-zone" id="col-middle">
@@ -310,6 +420,60 @@
                 <ul class="dash-list">
                     {% for activity in recent_activity %}<li><strong>{{ activity.get_action_display }}: {{ activity.object_name }}</strong><br><span class="dash-muted">{{ activity.model_name }} · {{ activity.timestamp|timesince }} ago</span></li>{% empty %}<li class="dash-muted">No recent activity.</li>{% endfor %}
                 </ul>
+            </div>
+            
+            <!-- Subplots Visualizer -->
+            <div class="dash-card p-3 draggable-card mb-3" id="card-subplots">
+                <div class="dash-card-header d-flex align-items-center mb-2"><i class="bi bi-grip-vertical drag-handle"></i>Subplot Threads</div>
+                <ul class="dash-list">
+                    {% for subplot in subplot_data %}
+                    <li class="d-flex justify-content-between align-items-start mb-2 pb-2 {% if not forloop.last %}border-bottom{% endif %}">
+                        <div>
+                            <div class="fw-semibold" style="font-size: 0.85rem;"><span class="badge" style="background-color:{{ subplot.tag.color|default:'#6b7280' }}15; color:{{ subplot.tag.color|default:'#6b7280' }}; border: 1px solid {{ subplot.tag.color|default:'#6b7280' }};">{{ subplot.tag.name }}</span></div>
+                            <div class="small text-muted mt-1">{{ subplot.events_count }} events</div>
+                        </div>
+                        {% if subplot.last_event %}
+                        <div class="text-end">
+                            <div class="small text-muted">Last touched:</div>
+                            <div class="small fw-semibold text-truncate" style="max-width: 120px;" title="{{ subplot.last_event.title }}">{{ subplot.last_event.title }}</div>
+                        </div>
+                        {% else %}
+                        <div class="small text-muted text-end">No events yet</div>
+                        {% endif %}
+                    </li>
+                    {% empty %}
+                    <li class="dash-muted">No subplot tags created yet.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            
+            <!-- Character Arc Snapshot -->
+            <div class="dash-card p-3 draggable-card mb-3" id="card-arc-snapshot">
+                <div class="dash-card-header d-flex align-items-center mb-2"><i class="bi bi-grip-vertical drag-handle"></i>Arc Snapshot</div>
+                {% if arc_snapshot %}
+                <div class="d-flex align-items-center mb-3">
+                    <div class="avatar-small me-2" style="width:36px;height:36px;background-color:{{arc_snapshot.character.color_code|default:'#6366f1'}};border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-weight:bold;">{{ arc_snapshot.character.name|slice:":1" }}</div>
+                    <div><h6 class="mb-0 fw-bold" style="font-size:0.9rem;">{{ arc_snapshot.character.name }}</h6><small class="text-muted">{{ arc_snapshot.character.get_role_display }}</small></div>
+                </div>
+                <div class="p-2 bg-light rounded-3 mb-3 border">
+                    <span class="badge bg-secondary mb-1" style="font-size:0.6rem;">Motivation</span>
+                    <div class="fst-italic text-dark" style="font-size: 0.8rem;">"{{ arc_snapshot.character.motivation }}"</div>
+                </div>
+                <div class="position-relative ps-3 border-start border-2 border-primary-subtle">
+                    <div class="mb-3 position-relative">
+                        <span class="position-absolute translate-middle bg-white border border-primary rounded-circle" style="width:10px;height:10px;left:-17px;top:8px;"></span>
+                        <div class="small text-muted fw-bold text-uppercase" style="font-size:0.65rem;">Start Point</div>
+                        <div class="small fw-semibold">{{ arc_snapshot.first_event.title|default:"No events yet" }}</div>
+                    </div>
+                    <div class="position-relative">
+                        <span class="position-absolute translate-middle bg-primary rounded-circle shadow-sm" style="width:10px;height:10px;left:-17px;top:8px;"></span>
+                        <div class="small text-muted fw-bold text-uppercase" style="font-size:0.65rem;">Current Point</div>
+                        <div class="small fw-semibold">{{ arc_snapshot.last_event.title|default:"-" }}</div>
+                    </div>
+                </div>
+                {% else %}
+                <p class="dash-muted mb-0">Add a motivation to a main character to see their arc.</p>
+                {% endif %}
             </div>
             {% if spotlight_character %}
             <div class="dash-card p-3 draggable-card mb-3" id="card-character-spotlight">
@@ -444,6 +608,19 @@
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        const bookSelector = document.getElementById('bookSelector');
+        if (bookSelector) {
+            bookSelector.addEventListener('change', function() {
+                const url = new URL(window.location.href);
+                if (this.value) {
+                    url.searchParams.set('book_id', this.value);
+                } else {
+                    url.searchParams.delete('book_id');
+                }
+                window.location.href = url.toString();
+            });
+        }
+
         const toggle = document.getElementById('writerModeToggle');
         const modeLabel = document.getElementById('modeLabel');
         const modeIcon = document.getElementById('modeIcon');

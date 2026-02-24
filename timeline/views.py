@@ -441,24 +441,45 @@ def dashboard(request):
     Now promoted from the experimental 'Writer Mode' dashboard.
     """
     # --- Existing Logic (Cloned) ---
-    books = Book.objects.filter(user=request.user).annotate(
+    book_id = request.GET.get('book_id')
+    selected_book = None
+    if book_id:
+        try:
+            selected_book = Book.objects.get(id=book_id, user=request.user)
+        except Book.DoesNotExist:
+            pass
+
+    user_books = Book.objects.filter(user=request.user)
+    books = user_books.annotate(
         chapter_count=Count('chapters', distinct=True),
         event_count=Count('events', distinct=True),
         book_character_count=Count('events__characters', distinct=True)
     )
     
+    # Base Querysets
     characters = Character.objects.filter(user=request.user, is_active=True)
-    total_events = Event.objects.filter(user=request.user).count()
-    events_written = Event.objects.filter(user=request.user, is_written=True).count()
+    events = Event.objects.filter(user=request.user)
+    chapters = Chapter.objects.filter(book__user=request.user)
+    world_entries = WorldEntry.objects.filter(user=request.user)
+    relationships = CharacterRelationship.objects.filter(user=request.user)
+    
+    # Apply Book Filter if selected
+    if selected_book:
+        characters = characters.filter(events__book=selected_book).distinct()
+        events = events.filter(book=selected_book)
+        chapters = chapters.filter(book=selected_book)
+        world_entries = world_entries.filter(Q(book=selected_book) | Q(book__isnull=True))
+        relationships = relationships.filter(Q(character_a__events__book=selected_book) | Q(character_b__events__book=selected_book)).distinct()
+    
+    total_events = events.count()
+    events_written = events.filter(is_written=True).count()
     
     # Recent activity logs (last 5)
     recent_activity = ActivityLog.objects.filter(user=request.user).order_by('-timestamp')[:5]
     
     today = timezone.localdate()
     
-    chapters_completed = Chapter.objects.filter(
-        book__user=request.user
-    ).count()
+    chapters_completed = chapters.count()
 
     focus_tasks = AIFocusTask.objects.filter(user=request.user, created_at__date=today)
     
@@ -482,26 +503,30 @@ def dashboard(request):
         random.seed()
     
     # Relationship Sparkline (Latest/Strongest)
-    top_relationships = CharacterRelationship.objects.filter(user=request.user).order_by('-strength')[:4]
+    top_relationships = relationships.order_by('-strength')[:4]
     
     # Inspiration Mood Board (Random Elements)
     import random
     mood_elements = []
     
     # 1. Random Tag (Theme or Location)
-    random_tags = list(Tag.objects.filter(user=request.user))
+    # Filter tags by events in this book if selected
+    random_tags = Tag.objects.filter(user=request.user)
+    if selected_book:
+        random_tags = random_tags.filter(events__book=selected_book).distinct()
+    random_tags = list(random_tags)
     if random_tags:
         random_tag = random.choice(random_tags)
         mood_elements.append({'type': 'tag', 'content': random_tag.name, 'color': random_tag.color})
         
     # 2. Random Key Event
-    key_events = list(Event.objects.filter(user=request.user, importance__gte=3))
+    key_events = list(events.filter(tension_level__gte=7))
     if key_events:
         random_event = random.choice(key_events)
         mood_elements.append({'type': 'event', 'content': random_event.title})
         
     # 3. Random Character Motivation
-    motivated_chars = list(Character.objects.filter(user=request.user).exclude(motivation=''))
+    motivated_chars = list(characters.exclude(motivation=''))
     if motivated_chars:
         random_char = random.choice(motivated_chars)
         mood_elements.append({'type': 'motivation', 'char': random_char.name, 'content': random_char.motivation})
@@ -509,11 +534,11 @@ def dashboard(request):
     
     # --- NEW: Timeline Integrity Data ---
     # 1. Fuzzy Dates
-    fuzzy_events = Event.objects.filter(user=request.user, date_type='fuzzy')
+    fuzzy_events = events.filter(date_type='fuzzy')
     # 2. Missing Locations
-    missing_loc_events = Event.objects.filter(user=request.user, location='').exclude(title__icontains='chapter') # Exclude potential placeholders
+    missing_loc_events = events.filter(location='').exclude(title__icontains='chapter') # Exclude potential placeholders
     # 3. No Description
-    empty_desc_events = Event.objects.filter(user=request.user, description='')
+    empty_desc_events = events.filter(description='')
 
     integrity_issues = []
     for e in fuzzy_events[:3]:
@@ -526,25 +551,24 @@ def dashboard(request):
 
     # --- NEW: Open Loop Tracker ---
     # Unresolved Relationships
-    unresolved_rels = CharacterRelationship.objects.filter(
-        user=request.user, 
+    unresolved_rels = relationships.filter(
         relationship_status__in=['unresolved', 'estranged']
     )[:5]
     
     # --- NEW: Character Whereabouts ---
     # Get last event for each main character (Protagonist/Antagonist)
-    main_chars = Character.objects.filter(user=request.user, role__in=['protagonist', 'antagonist'])
+    main_chars = characters.filter(role__in=['protagonist', 'antagonist'])
     char_locations = []
     for char in main_chars:
-        last_event = char.events.order_by('-chronological_order').first()
+        last_event = char.events.filter(id__in=events.values('id')).order_by('-chronological_order').first()
         if last_event and last_event.location:
              char_locations.append({'character': char, 'location': last_event.location, 'event': last_event})
 
-    # --- NEW: Writer Mode Data ---
+    # --- NEW: Writer Mode Data (V1 legacy mapping) ---
 
     # 1. Pacing & Tension Graph
     # Get last 20 events ordered chronologically
-    recent_events = Event.objects.filter(user=request.user).order_by('chronological_order')[:20]
+    recent_events = events.order_by('chronological_order')[:20]
     pacing_data = []
     tone_scores = {
         'tension': 5, 'action': 4, 'emotional': 3, 
@@ -560,50 +584,29 @@ def dashboard(request):
         })
 
     # 2. Forgotten Characters
-    # Find active characters not in the last 10 events
-    from django.db.models import Max
-    last_10_event_ids = Event.objects.filter(user=request.user).order_by('-sequence_order').values_list('id', flat=True)[:10]
-    
-    # Get all active non-minor characters
-    active_chars = Character.objects.filter(user=request.user, is_active=True).exclude(role='minor')
-    
+    last_10_event_ids = events.order_by('-sequence_order').values_list('id', flat=True)[:10]
+    active_chars = characters.exclude(role='minor')
     forgotten_chars = []
     for char in active_chars:
-        # Check if they are in the last 10 events
         if not char.events.filter(id__in=last_10_event_ids).exists():
-             # Get their last appearance ever
-             last_event = char.events.order_by('-sequence_order').first()
+             last_event = char.events.filter(id__in=events.values('id')).order_by('-sequence_order').first()
              if last_event:
                  forgotten_chars.append({
                      'character': char,
                      'last_seen': last_event.title,
                      'last_seen_date': last_event.date
                  })
-    # Sort by who has been gone the longest (we can't easily do that without more complex queries, 
-    # so we'll just take the list for now. Ideally we'd store 'last_sequence_id' on the char)
 
     # 3. Story Beat Checklist
-    # Check for presence of key beats
-    key_beats = [
-        ('inciting', 'Inciting Incident'),
-        ('rising', 'Rising Action'),
-        ('midpoint', 'Midpoint'), # Note: Model might not have this exact key, checking choices...
-        ('climax', 'Climax'),
-        ('resolution', 'Resolution')
-    ]
-    # Re-check model choices in Event.STORY_BEAT_CHOICES
-    # Choices: exposition, inciting, rising, climax, falling, resolution, setup, payoff
-    # Let's map our target checklist to actual choices
     target_beats = {
         'inciting': 'Inciting Incident',
         'rising': 'Rising Action', 
         'climax': 'Climax',
         'resolution': 'Resolution'
     }
-    
     story_beats = []
     for key, label in target_beats.items():
-        beat_event = Event.objects.filter(user=request.user, story_beat=key).first()
+        beat_event = events.filter(story_beat=key).first()
         story_beats.append({
             'label': label,
             'is_present': beat_event is not None,
@@ -611,7 +614,87 @@ def dashboard(request):
         })
 
 
+    # === NEW: ARCHITECT MODE CARDS ===
+    
+    # 1. Worldbuilding Completion Tracker
+    world_entries_count = world_entries.count()
+    worldbuilding_target = 50 # Arbitrary starter target
+    worldbuilding_progress = min(int((world_entries_count / worldbuilding_target) * 100) if worldbuilding_target > 0 else 0, 100)
+    
+    existing_categories = set(world_entries.values_list('category', flat=True))
+    all_categories = [c[0] for c in WorldEntry.CATEGORY_CHOICES]
+    missing_categories = [c for c in all_categories if c not in existing_categories]
+    worldbuilding_suggestions = missing_categories[:2] if missing_categories else ['Expand a stub entry', 'Add a new location']
+    
+    # 2. Subplot Thread Visualizer
+    subplots = Tag.objects.filter(user=request.user, category='subplot')
+    if selected_book:
+        subplots = subplots.filter(events__book=selected_book).distinct()
+    subplot_data = []
+    for subplot in subplots:
+        events_count = subplot.events.filter(id__in=events.values('id')).count()
+        last_event = subplot.events.filter(id__in=events.values('id')).order_by('-chronological_order').first()
+        subplot_data.append({
+            'tag': subplot,
+            'events_count': events_count,
+            'last_event': last_event,
+        })
+    
+    # 3. Character Arc Snapshot
+    arc_character = characters.filter(role__in=['protagonist', 'antagonist']).exclude(motivation='').order_by('?').first()
+    arc_snapshot = None
+    if arc_character:
+        first_event = arc_character.events.filter(id__in=events.values('id')).order_by('chronological_order').first()
+        last_event = arc_character.events.filter(id__in=events.values('id')).order_by('-chronological_order').first()
+        arc_snapshot = {
+            'character': arc_character,
+            'first_event': first_event,
+            'last_event': last_event,
+        }
+        
+    # 4. Timeline Integrity (Extended to catch missing POVs)
+    missing_pov_events = events.filter(pov_character__isnull=True).exclude(scene_type='exposition')
+    for e in missing_pov_events[:3]:
+        integrity_issues.append({'type': 'missing_pov', 'event': e, 'msg': 'Missing POV Character'})
+        
+    
+    # === NEW: WRITER MODE CARDS ===
+    
+    today = timezone.now().date()
+    
+    # 1. Daily Sprint & Streak
+    words_today_agg = events.filter(updated_at__date=today).aggregate(Sum('word_count'))
+    words_today = words_today_agg['word_count__sum'] or 0
+    daily_goal = 1500
+    daily_progress = min(int((words_today / daily_goal) * 100), 100)
+    streak_days = 1 if words_today > 0 else 0  # Static logic placeholder 
+    
+    # 2. "Up Next" Scene & POV Voice
+    up_next_event = events.filter(is_written=False).order_by('sequence_order').first()
+    pov_reference_char = up_next_event.pov_character if up_next_event else None
+    
+    # 4. Drafting Velocity Estimator
+    total_words_written = events.filter(is_written=True).aggregate(Sum('word_count'))['word_count__sum'] or 0
+    if selected_book:
+        first_book = selected_book
+        target_words_total = selected_book.word_count_target or 80000
+    else:
+        first_book = books.order_by('created_at').first()
+        target_words_total = books.aggregate(Sum('word_count_target'))['word_count_target__sum'] or 100000
+        
+    velocity_days_passed = (today - first_book.created_at.date()).days if first_book else 1
+    velocity_days_passed = max(velocity_days_passed, 1) 
+    
+    words_per_day = total_words_written / velocity_days_passed
+    remaining_words = max(target_words_total - total_words_written, 0)
+    
+    estimated_days_left = int(remaining_words / words_per_day) if words_per_day > 0 else 999
+    estimated_finish_date = today + timezone.timedelta(days=estimated_days_left) if words_per_day > 0 else None
+
+
     context = {
+        'user_books': user_books,
+        'selected_book': selected_book,
         'books': books,
         'character_count': characters.count(),
         'total_events': total_events,
@@ -622,15 +705,30 @@ def dashboard(request):
         'spotlight_character': spotlight_character,
         'top_relationships': top_relationships,
         'mood_elements': mood_elements,
-        # New Context
         'integrity_issues': integrity_issues,
         'unresolved_rels': unresolved_rels,
         'char_locations': char_locations,
-        # New Writer Mode Cards Data
         'pacing_data': pacing_data,
         'forgotten_chars': forgotten_chars[:5], # Top 5
         'story_beats': story_beats,
-        'is_test_dashboard': False # Now it's the main one
+        'is_test_dashboard': False, 
+        
+        # New Architect/Writer Context
+        'worldbuilding_progress': worldbuilding_progress,
+        'world_entries_count': world_entries_count,
+        'worldbuilding_target': worldbuilding_target,
+        'worldbuilding_suggestions': worldbuilding_suggestions,
+        'subplot_data': subplot_data,
+        'arc_snapshot': arc_snapshot,
+        
+        'words_today': words_today,
+        'daily_goal': daily_goal,
+        'daily_progress': daily_progress,
+        'streak_days': streak_days,
+        'up_next_event': up_next_event,
+        'pov_reference_char': pov_reference_char,
+        'words_per_day': int(words_per_day),
+        'estimated_finish_date': estimated_finish_date,
     }
     # Render the newly renamed dashboard.html (which was dashboard_test.html)
     return render(request, 'timeline/dashboard.html', context)
