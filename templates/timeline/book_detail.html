@@ -140,19 +140,14 @@
                         {{ book.description|default:"Your story begins here." }}
                     </p>
                 </div>
-                <div class="flex flex-wrap gap-3">
+                <div class="flex items-center gap-3">
                     <button id="btn-deep-scan"
-                        class="px-4 py-2 bg-bg-white border border-border-subtle rounded-lg text-sm font-medium text-text-main shadow-sm hover:bg-gray-100 hover:border-gray-300 transition-all flex items-center gap-2">
+                        class="whitespace-nowrap shrink-0 px-6 py-3 bg-white border border-border-subtle rounded-full text-sm font-medium text-text-main shadow-md hover:bg-gray-50 hover:scale-105 transition-all duration-200 flex items-center gap-2">
                         <span class="material-symbols-outlined text-[18px]">psychology</span>
                         Deep Story Scan
                     </button>
-                    <a href="{% url 'book_export' book.pk %}"
-                        class="px-4 py-2 bg-white border border-border-subtle rounded-lg text-sm font-medium text-text-main shadow-sm hover:bg-gray-50 hover:border-gray-300 transition-all flex items-center gap-2 no-underline">
-                        <span class="material-symbols-outlined text-[18px]">ios_share</span>
-                        Export
-                    </a>
                     <a href="{% url 'book_edit' book.pk %}"
-                        class="px-5 py-2 bg-black text-white rounded-lg text-sm font-medium shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center gap-2 no-underline">
+                        class="whitespace-nowrap shrink-0 px-6 py-3 bg-black text-white rounded-full text-sm font-medium shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200 flex items-center gap-2 no-underline">
                         <span class="material-symbols-outlined text-[18px]">edit_square</span>
                         Edit Book
                     </a>
@@ -163,57 +158,69 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10">
             <div class="lg:col-span-8 space-y-8">
-                <!-- Counters & Stats -->
-                <section
-                    class="bg-white rounded-2xl border border-border-subtle p-6 shadow-sm relative overflow-hidden">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
-                        <div
-                            class="flex flex-col gap-1 p-4 rounded-xl hover:bg-background-light/50 transition-colors cursor-default">
-                            <div class="flex items-center gap-2 text-text-muted mb-1">
-                                <span class="material-symbols-outlined text-[18px]">format_align_left</span>
-                                <span class="text-xs font-bold uppercase tracking-wider">Word Count</span>
+                <!-- Counters & Stats with Book Cover -->
+                <section class="bg-white rounded-2xl border border-border-subtle py-4 px-6 shadow-sm relative overflow-hidden">
+                    <div class="flex flex-col md:flex-row gap-8 relative z-10">
+                        <!-- Book Cover Column -->
+                        <div class="w-full md:w-48 shrink-0">
+                            <div class="aspect-[2/3] rounded-xl overflow-hidden shadow-lg border border-border-subtle bg-background-light relative group">
+                                {% if book.image %}
+                                <img src="{{ book.image.url }}" alt="{{ book.title }}" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
+                                {% else %}
+                                <div class="w-full h-full flex flex-col items-center justify-center bg-accent/10 border-2 border-dashed border-accent/30 text-text-muted gap-2">
+                                    <span class="material-symbols-outlined text-4xl opacity-30">auto_stories</span>
+                                    <span class="text-[10px] font-bold uppercase tracking-widest text-center px-4 opacity-50">Draft <br>Cover</span>
+                                </div>
+                                {% endif %}
+                                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors pointer-events-none"></div>
                             </div>
-                            <span class="text-3xl font-serif text-black">{{ total_words|floatformat:0 }}</span>
-                            <span class="text-xs text-text-muted">{{ book.word_count_target|floatformat:0 }}
-                                Target</span>
                         </div>
 
-                        <div
-                            class="flex flex-col gap-1 p-4 rounded-xl hover:bg-background-light/50 transition-colors cursor-default border-l-0 md:border-l border-border-subtle">
-                            <div class="flex items-center gap-2 text-text-muted mb-1">
-                                <span class="material-symbols-outlined text-[18px]">menu_book</span>
-                                <span class="text-xs font-bold uppercase tracking-wider">Chapters</span>
-                            </div>
-                            <span class="text-3xl font-serif text-black">{{ actual_chapter_count }}</span>
-                            <span class="text-xs text-text-muted">Drafts & Notes</span>
-                        </div>
+                        <!-- Counters Column -->
+                        <div class="flex-grow flex flex-col justify-center gap-2">
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div class="flex flex-col gap-1 p-3 rounded-xl hover:bg-background-light/50 transition-colors cursor-default">
+                                    <div class="flex items-center gap-2 text-text-muted mb-1">
+                                        <span class="material-symbols-outlined text-[16px]">format_align_left</span>
+                                        <span class="text-[10px] font-bold uppercase tracking-wider">Words</span>
+                                    </div>
+                                    <span class="text-2xl font-serif text-black">{{ total_words|floatformat:0 }}</span>
+                                    <span class="text-[10px] text-text-muted">{{ book.word_count_target|floatformat:0 }} Target</span>
+                                </div>
 
-                        <div
-                            class="flex flex-col gap-1 p-4 rounded-xl hover:bg-background-light/50 transition-colors cursor-default border-l-0 md:border-l border-border-subtle">
-                            <div class="flex items-center gap-2 text-text-muted mb-1">
-                                <span class="material-symbols-outlined text-[18px]">timeline</span>
-                                <span class="text-xs font-bold uppercase tracking-wider">Events</span>
+                                <div class="flex flex-col gap-1 p-3 rounded-xl hover:bg-background-light/50 transition-colors cursor-default">
+                                    <div class="flex items-center gap-2 text-text-muted mb-1">
+                                        <span class="material-symbols-outlined text-[16px]">menu_book</span>
+                                        <span class="text-[10px] font-bold uppercase tracking-wider">Chapters</span>
+                                    </div>
+                                    <span class="text-2xl font-serif text-black">{{ actual_chapter_count }}</span>
+                                    <span class="text-[10px] text-text-muted">Drafts & Notes</span>
+                                </div>
+
+                                <div class="flex flex-col gap-1 p-3 rounded-xl hover:bg-background-light/50 transition-colors cursor-default">
+                                    <div class="flex items-center gap-2 text-text-muted mb-1">
+                                        <span class="material-symbols-outlined text-[16px]">timeline</span>
+                                        <span class="text-[10px] font-bold uppercase tracking-wider">Events</span>
+                                    </div>
+                                    <span class="text-2xl font-serif text-black">{{ events.count }}</span>
+                                    <span class="text-[10px] text-text-muted">Plot beats</span>
+                                </div>
                             </div>
-                            <span class="text-3xl font-serif text-black">{{ events.count }}</span>
-                            <span class="text-xs text-text-muted">Key plot beats</span>
+
+                            <div class="mt-4 pt-4 border-t border-border-subtle">
+                                <div class="flex justify-between items-end mb-2">
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-text-muted">Completion Goal</span>
+                                    <span class="text-sm font-semibold text-black">{% if book.status == 'published' %}100.0{% else %}{{ book.progress_percentage|floatformat:1 }}{% endif %}%</span>
+                                </div>
+                                <div class="w-full h-2 bg-background-light rounded-full overflow-hidden">
+                                    <div class="h-full bg-black rounded-full transition-all duration-700 js-progress-bar w-0"
+                                        data-width="{% if book.status == 'published' %}100{% else %}{{ book.progress_percentage }}{% endif %}%"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="mt-8 pt-6 border-t border-border-subtle">
-                        <div class="flex justify-between items-end mb-2">
-                            <span class="text-xs font-bold uppercase tracking-wider text-text-muted">Completion
-                                Goal</span>
-                            <span class="text-sm font-semibold text-black">{% if book.status == 'published' %}100.0{% else %}{{ book.progress_percentage|floatformat:1 }}{% endif %}%</span>
-                        </div>
-                        <div class="w-full h-2 bg-background-light rounded-full overflow-hidden">
-                            <div class="h-full bg-black rounded-full transition-all duration-700 js-progress-bar w-0"
-                                data-width="{% if book.status == 'published' %}100{% else %}{{ book.progress_percentage }}{% endif %}%"></div>
-                        </div>
-                    </div>
-
-                    <div
-                        class="absolute top-0 right-0 w-64 h-64 bg-accent/20 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2 pointer-events-none">
-                    </div>
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-accent/10 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
                 </section>
 
                 <!-- Chapter List -->
@@ -222,11 +229,15 @@
                         <h2 class="font-serif text-2xl text-black m-0">Chapters</h2>
                         <div class="flex gap-2">
                             <a href="{% url 'chapter_bulk_upload' book.pk %}"
-                                class="text-xs font-bold uppercase tracking-wider text-text-muted hover:text-black transition-colors flex items-center gap-1 px-3 py-1.5 rounded-lg border border-border-subtle hover:bg-white no-underline">
-                                <span class="material-symbols-outlined text-[16px]">cloud_upload</span> Bulk Upload
+                                class="whitespace-nowrap shrink-0 text-[10px] font-bold uppercase tracking-wider text-text-muted hover:text-black transition-colors flex items-center gap-1 px-3 py-1.5 rounded-lg border border-border-subtle hover:bg-white no-underline">
+                                <span class="material-symbols-outlined text-[16px]">cloud_upload</span> Bulk
+                            </a>
+                            <a href="{% url 'book_export' book.pk %}"
+                                class="whitespace-nowrap shrink-0 text-[10px] font-bold uppercase tracking-wider text-text-muted hover:text-black transition-colors flex items-center gap-1 px-3 py-1.5 rounded-lg border border-border-subtle hover:bg-white no-underline">
+                                <span class="material-symbols-outlined text-[16px]">ios_share</span> Export
                             </a>
                             <a href="{% url 'chapter_create' book.pk %}"
-                                class="text-xs font-bold uppercase tracking-wider text-white bg-black hover:bg-opacity-90 transition-colors flex items-center gap-1 px-3 py-1.5 rounded-lg no-underline shadow-sm">
+                                class="whitespace-nowrap shrink-0 px-5 py-2.5 bg-black text-white rounded-full text-xs font-bold uppercase tracking-widest hover:scale-105 transition-all duration-200 flex items-center gap-1 no-underline shadow-md">
                                 <span class="material-symbols-outlined text-[16px]">add</span> Add New
                             </a>
                         </div>
@@ -311,7 +322,7 @@
                 <section>
                     <div class="flex items-center justify-between mb-6">
                         <h2 class="font-serif text-2xl text-black m-0">Key Events</h2>
-                        <a href="{% url 'timeline_view' %}?book={{ book.pk }}"
+                        <a href="{% url 'horizontal_timeline' %}?book={{ book.pk }}"
                             class="text-xs font-bold uppercase tracking-wider text-black hover:underline no-underline">View All</a>
                     </div>
 
