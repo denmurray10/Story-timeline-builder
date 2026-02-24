@@ -88,11 +88,33 @@
                     class="text-text-muted hover:text-branddark transition-colors pb-4 -mb-4.5 px-2">Archives</button>
             </div>
 
-            <div class="space-y-4">
+            <div class="space-y-6">
                 {% if books %}
-                {% for book in books %}
-                <div id="book-{{ book.pk }}"
-                    class="bg-warm-white rounded-xl border border-border-subtle shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden group {% if book.status == 'importing' %}book-processing{% endif %}">
+                {% regroup books by series as series_groups %}
+                
+                {% for group in series_groups %}
+                    {% if group.grouper %}
+                        <div class="flex items-center gap-3 pt-6 pb-2">
+                             <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-bg-white border border-border-subtle shadow-sm text-branddark">
+                                 <span class="material-symbols-outlined text-[16px]">collections_bookmark</span>
+                             </div>
+                             <h2 class="font-serif text-2xl text-branddark m-0">{{ group.grouper.title }}</h2>
+                             <div class="h-px bg-border-subtle flex-grow ml-2"></div>
+                        </div>
+                    {% else %}
+                        <div class="flex items-center gap-3 pt-6 pb-2">
+                             <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 border border-gray-100 text-gray-400">
+                                 <span class="material-symbols-outlined text-[16px]">book_2</span>
+                             </div>
+                             <h2 class="font-serif text-xl text-gray-500 m-0">Stand-alone Works</h2>
+                             <div class="h-px bg-border-subtle flex-grow ml-2"></div>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="grid grid-cols-1 gap-4">
+                    {% for book in group.list %}
+                    <div id="book-{{ book.pk }}"
+                        class="bg-warm-white rounded-xl border border-border-subtle shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden group {% if book.status == 'importing' %}book-processing{% endif %}">
 
                     {% if book.status == 'importing' %}
                     <div
@@ -152,6 +174,12 @@
                                             class="bg-accent/50 px-2 py-0.5 rounded text-xs font-medium tracking-wide border border-accent">
                                             {{ book.get_status_display }}
                                         </span>
+                                        {% if book.series %}
+                                        <span
+                                            class="bg-primary/10 px-2 py-0.5 rounded text-xs font-medium tracking-wide border border-primary/20 text-primary">
+                                            {{ book.series.title }}
+                                        </span>
+                                        {% endif %}
                                         {% if book.series_order %}
                                         <span>•</span>
                                         <span>Book {{ book.series_order }}</span>
@@ -178,8 +206,7 @@
                                 <div class="flex justify-between text-xs mb-1"
                                     style="font-family: 'Inter', sans-serif !important;">
                                     <span class="font-medium text-text-main">Progress</span>
-                                    <span class="text-text-muted">{{ book.current_word_count|floatformat:0 }} / {{
-                                        book.word_count_target|floatformat:0 }} words</span>
+                                    <span class="text-text-muted">{{ book.current_word_count|floatformat:0 }} / {{ book.word_count_target|floatformat:0 }} words</span>
                                 </div>
                                 <div class="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
                                     <div class="bg-green-600 h-1.5 rounded-full js-progress-bar transition-all duration-500"
@@ -216,6 +243,8 @@
                     </div>
                     {% endif %}
                 </div>
+                    {% endfor %}
+                    </div>
                 {% endfor %}
                 {% else %}
                 <div

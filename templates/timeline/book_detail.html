@@ -136,6 +136,10 @@
                     <div class="flex items-center gap-3">
                         <span
                             class="px-2.5 py-0.5 rounded-full bg-green-100 text-green-800 text-[10px] font-bold uppercase tracking-wider border border-green-200">{{ book.get_status_display }}</span>
+                        {% if book.series %}
+                        <span
+                            class="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider border border-primary/20">{{ book.series.title }}</span>
+                        {% endif %}
                         {% if book.series_order %}
                         <span
                             class="px-2.5 py-0.5 rounded-full bg-bg-white text-text-main text-[10px] font-bold uppercase tracking-wider border border-gray-100">Book

@@ -4,7 +4,7 @@ Forms for the Timeline app.
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Book, Chapter, Character, Event, Tag, CharacterRelationship, WorldEntry
+from .models import Series, Book, Chapter, Character, Event, Tag, CharacterRelationship, WorldEntry
 
 
 class UserRegisterForm(forms.ModelForm):
@@ -38,12 +38,25 @@ class UserRegisterForm(forms.ModelForm):
         return user
 
 
+class SeriesForm(forms.ModelForm):
+    """Form for creating/editing series."""
+
+    class Meta:
+        model = Series
+        fields = ["title", "description"]
+        widgets = {
+            "title": forms.TextInput(attrs={"class": "form-control", "placeholder": "e.g., The Chronicles of Oakhaven"}),
+            "description": forms.Textarea(attrs={"rows": 3, "class": "form-control", "placeholder": "A brief overview of the series arc..."}),
+        }
+
+
 class BookForm(forms.ModelForm):
     """Form for creating/editing books."""
 
     class Meta:
         model = Book
         fields = [
+            "series",
             "title",
             "series_order",
             "description",
@@ -55,6 +68,7 @@ class BookForm(forms.ModelForm):
             "image",
         ]
         widgets = {
+            "series": forms.Select(attrs={"class": "form-control"}),
             "description": forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
             "title": forms.TextInput(attrs={"class": "form-control"}),
             "series_order": forms.NumberInput(attrs={"class": "form-control"}),
@@ -64,6 +78,13 @@ class BookForm(forms.ModelForm):
             "started_date": forms.DateInput(attrs={"class": "form-control", "type": "date"}),
             "completed_date": forms.DateInput(attrs={"class": "form-control", "type": "date"}),
         }
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        if user:
+            self.fields['series'].queryset = Series.objects.filter(user=user)
+        self.fields['series'].empty_label = "Stand-alone Novel / No Series"
 
 
 class ChapterForm(forms.ModelForm):

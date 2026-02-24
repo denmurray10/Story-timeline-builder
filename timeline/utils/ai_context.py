@@ -17,15 +17,26 @@ class ContextResolver:
         self.global_overview = self._build_global_overview()
 
     def _build_global_overview(self):
-        """Builds a very compact list of all known characters and locations."""
-        chars = Character.objects.filter(user=self.user).only('name', 'role')
-        world = WorldEntry.objects.filter(user=self.user).only('title', 'category')
+        """Builds a very compact list of all known characters, locations, and series."""
+        from timeline.models import Series, Book
+        
+        series = Series.objects.filter(user=self.user).prefetch_related('books')
+        chars = Character.objects.filter(user=self.user).select_related('introduction_book').only('name', 'role', 'introduction_book')
+        world = WorldEntry.objects.filter(user=self.user).select_related('book').only('title', 'category', 'book')
         
         overview = "[GLOBAL STORY BIBLE LIST]:\n"
+        
+        if series:
+            overview += "- SERIES & VOLUMES:\n"
+            for s in series:
+                book_titles = ", ".join([f"Vol {b.series_order}: {b.title}" for b in s.books.all()])
+                overview += f"  * {s.title}: {book_titles}\n"
+        
         if chars:
             overview += "- Characters: " + ", ".join([f"{c.name} ({c.get_role_display()})" for c in chars]) + "\n"
         if world:
             overview += "- World/Locations: " + ", ".join([f"{w.title} ({w.get_category_display()})" for w in world]) + "\n"
+        
         return overview
 
     def _build_character_map(self):

@@ -31,9 +31,9 @@ from ebooklib import epub
 from bs4 import BeautifulSoup
 import tempfile
 
-from .models import Book, Chapter, Character, Event, Tag, CharacterRelationship, AIFocusTask, ActivityLog, WorldEntry, InteractionSummaryCache, RelationshipAnalysisCache, StoryScanStatus, AIUsageLog, ChangelogEntry, NewsletterSubscription
+from .models import Series, Book, Chapter, Character, Event, Tag, CharacterRelationship, AIFocusTask, ActivityLog, WorldEntry, InteractionSummaryCache, RelationshipAnalysisCache, StoryScanStatus, AIUsageLog, ChangelogEntry, NewsletterSubscription
 from .forms import (
-    UserRegisterForm, BookForm, ChapterForm, CharacterForm, 
+    UserRegisterForm, SeriesForm, BookForm, ChapterForm, CharacterForm, 
     EventForm, TagForm, UserAccountForm, CharacterRelationshipForm, WorldEntryForm
 )
 from .utils.ai_context import ContextResolver
@@ -833,12 +833,23 @@ def api_add_focus_task(request):
 @login_required
 def book_list(request):
     """List all books for the current user."""
-    books = Book.objects.filter(user=request.user).annotate(
+    base_qs = Book.objects.filter(user=request.user).annotate(
         chapter_count=Count('chapters', distinct=True),
         event_count=Count('events', distinct=True),
         character_count=Count('events__characters', distinct=True)
     )
-    return render(request, 'timeline/book_list.html', {'books': books})
+    
+    active_books = base_qs.exclude(status__in=['complete', 'published', 'archived'])
+    completed_books = base_qs.filter(status__in=['complete', 'published'])
+    archived_books = base_qs.filter(status='archived')
+    
+    context = {
+        'books': active_books, # For backwards compatibility/default
+        'active_books': active_books,
+        'completed_books': completed_books,
+        'archived_books': archived_books,
+    }
+    return render(request, 'timeline/book_list.html', context)
 
 
 @login_required
@@ -867,7 +878,7 @@ def book_detail(request, pk):
 def book_create(request):
     """Create a new book."""
     if request.method == 'POST':
-        form = BookForm(request.POST, request.FILES)
+        form = BookForm(request.POST, request.FILES, user=request.user)
         if form.is_valid():
             book = form.save(commit=False)
             book.user = request.user
@@ -875,7 +886,7 @@ def book_create(request):
             messages.success(request, f'Book "{book.title}" created successfully!')
             return redirect('book_detail', pk=book.pk)
     else:
-        form = BookForm()
+        form = BookForm(user=request.user)
     return render(request, 'timeline/book_form.html', {'form': form, 'action': 'Create'})
 
 
@@ -885,7 +896,7 @@ def book_edit(request, pk):
     book = get_object_or_404(Book, pk=pk, user=request.user)
     if request.method == 'POST':
         old_status = book.status
-        form = BookForm(request.POST, request.FILES, instance=book)
+        form = BookForm(request.POST, request.FILES, instance=book, user=request.user)
         if form.is_valid():
             book = form.save()
             
@@ -905,8 +916,24 @@ def book_edit(request, pk):
             messages.success(request, f'Book "{book.title}" updated successfully!')
             return redirect('book_detail', pk=book.pk)
     else:
-        form = BookForm(instance=book)
+        form = BookForm(instance=book, user=request.user)
     return render(request, 'timeline/book_form.html', {'form': form, 'action': 'Edit', 'book': book})
+
+
+@login_required
+def series_create(request):
+    """Create a new series."""
+    if request.method == 'POST':
+        form = SeriesForm(request.POST)
+        if form.is_valid():
+            series = form.save(commit=False)
+            series.user = request.user
+            series.save()
+            messages.success(request, f'Series "{series.title}" created successfully!')
+            return redirect('book_list')
+    else:
+        form = SeriesForm()
+    return render(request, 'timeline/series_form.html', {'form': form})
 
 
 @login_required

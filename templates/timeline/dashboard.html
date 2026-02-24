@@ -41,6 +41,7 @@
     .sortable-ghost { opacity: 0.4; border: 2px dashed #6366f1 !important; }
     .drag-handle { cursor: grab; color: #d1d5db; margin-right: 8px; opacity: 0; transition: opacity 0.2s ease, color 0.2s ease; }
     .draggable-card:hover .drag-handle { color: #6366f1; opacity: 1; }
+    .modal-backdrop.show { opacity: 0.8 !important; backdrop-filter: blur(4px); }
 </style>
 {% endblock %}
 {% block content %}
@@ -112,25 +113,111 @@
 
 <!-- Penn Deep Dive Modal -->
 <div class="modal fade" id="pennModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 24px; background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold text-primary"><i class="bi bi-chat-heart me-2"></i>Deep Dive with Penn</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-4 d-flex flex-column" style="height: 70vh;">
-                <div id="penn-modal-chat-history" class="mb-3 scroll-premium pe-2 flex-grow-1" style="overflow-y: auto; font-size: 0.95rem; scrollbar-width: thin;">
-                    <!-- History Shared -->
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content border-0 shadow-2xl" style="border-radius: 20px; overflow: hidden; height: 85vh; background: #fff;">
+            <div class="d-flex h-100">
+                <!-- Sidebar -->
+                <div class="d-none d-lg-flex flex-column bg-light border-end" style="width: 280px;">
+                    <div class="p-4 border-b">
+                        <div class="d-flex align-items-center gap-2 mb-4">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                <i class="bi bi-chat-heart"></i>
+                            </div>
+                            <div>
+                                <div class="fw-bold text-dark leading-tight" style="font-size: 0.9rem;">Penn AI Assistant</div>
+                                <div class="text-muted" style="font-size: 0.7rem;">v2.5 Deep Intelligence</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary w-100 rounded-pill py-2 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2" onclick="localStorage.removeItem('penn_chat_history'); location.reload();">
+                            <i class="bi bi-plus-lg"></i> New Chat
+                        </button>
+                    </div>
+                    
+                    <div class="flex-grow-1 overflow-y-auto p-3 pe-2 scroll-premium" style="scrollbar-width: thin;">
+                        <div class="text-[10px] font-bold text-muted uppercase tracking-widest mb-3 px-2">Recent Thinking</div>
+                        <div class="list-group list-group-flush gap-1" id="penn-recent-queries">
+                            <!-- Mock or Dynamic History items -->
+                            <div class="list-group-item list-group-item-action border-0 rounded-lg p-2 px-3 bg-white shadow-xs mb-1">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-chat-left-text text-muted small"></i>
+                                    <div class="text-truncate small fw-medium">Plot Hole Check</div>
+                                </div>
+                                <div class="text-[10px] text-muted ms-4">Just now</div>
+                            </div>
+                            <div class="list-group-item list-group-item-action border-0 rounded-lg p-2 px-3 mb-1">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-person-lines-fill text-muted small"></i>
+                                    <div class="text-truncate small">Character Motivation</div>
+                                </div>
+                                <div class="text-[10px] text-muted ms-4">2 hours ago</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-3 border-top bg-white mt-auto">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="avatar-small bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px; font-size: 0.8rem;">
+                                    {{ user.username|slice:":1"|upper }}
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark" style="font-size: 0.8rem;">{{ user.username }}</div>
+                                    <div class="text-primary fw-bold" style="font-size: 0.7rem;">Architect Plan</div>
+                                </div>
+                            </div>
+                            <i class="bi bi-gear text-muted"></i>
+                        </div>
+                    </div>
                 </div>
-                <div id="penn-modal-suggestions" class="mb-3 d-flex flex-column gap-2"></div>
-                <div id="penn-modal-loading" style="display: none;" class="text-center mb-3">
-                    <div class="ai-loading-dots"><span></span><span></span><span></span></div>
-                </div>
-                <div class="mt-auto position-relative p-2 bg-white border rounded-pill shadow-sm d-flex align-items-center gap-2">
-                    <input type="text" class="form-control border-0 bg-transparent shadow-none" id="ai-query-modal" placeholder="Type your deeper question..." style="font-size: 1rem;">
-                    <button class="btn btn-dark rounded-circle d-flex align-items-center justify-content-center" id="ai-submit-modal" style="width: 44px; height: 44px; padding: 0;">
-                        <i class="bi bi-arrow-up-short fs-3"></i>
-                    </button>
+
+                <!-- Main Chat -->
+                <div class="flex-grow-1 d-flex flex-column" style="background: #fdfcf8;">
+                    <!-- Modal Header (Internal) -->
+                    <div class="p-3 px-4 border-bottom d-flex align-items-center justify-content-between bg-white">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 d-flex align-items-center gap-2 border border-primary-subtle" style="font-size: 0.7rem;">
+                                <span class="bg-primary rounded-circle" style="width: 8px; height: 8px;"></span>
+                                SMART CONTEXT ACTIVE
+                                <i class="bi bi-info-circle ms-1 opacity-50"></i>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-3 h-100">
+                             <div class="d-flex gap-2 text-muted me-3">
+                                 <i class="bi bi-dash-lg"></i>
+                                 <i class="bi bi-fullscreen" style="font-size: 0.8rem;"></i>
+                             </div>
+                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                    </div>
+
+                    <!-- Messages -->
+                    <div id="penn-modal-chat-history" class="flex-grow-1 overflow-y-auto p-4 md:p-5 scroll-premium" style="scrollbar-width: thin;">
+                        <!-- Messages render here -->
+                    </div>
+
+                    <!-- Footer / Input -->
+                    <div class="p-4 pt-0">
+                        <div id="penn-modal-suggestions" class="mb-3 d-flex flex-column gap-2"></div>
+                        <div id="penn-modal-loading" style="display: none;" class="text-center mb-3">
+                            <div class="ai-loading-dots"><span></span><span></span><span></span></div>
+                        </div>
+                        
+                        <div class="position-relative shadow-lg" style="border-radius: 16px;">
+                            <div class="p-3 bg-white border" style="border-radius: 16px;">
+                                <textarea id="ai-query-modal" class="form-control border-0 bg-transparent shadow-none px-0" placeholder="Ask Penn about your story..." rows="2" style="font-size: 0.95rem; resize: none;"></textarea>
+                                <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top">
+                                    <div class="d-flex gap-3 text-muted">
+                                        <i class="bi bi-paperclip cursor-pointer"></i>
+                                        <i class="bi bi-text-paragraph cursor-pointer"></i>
+                                    </div>
+                                    <button id="ai-submit-modal" class="btn btn-primary rounded-lg px-4 d-flex align-items-center gap-2">
+                                        Send <i class="bi bi-send-fill" style="font-size: 0.8rem;"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="text-center mt-2 opacity-50" style="font-size: 0.65rem;">Penn can make mistakes. Verify important timeline details.</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -471,19 +558,39 @@
                     if (!cont) return;
                     const isModal = cont === modalHistoryCont;
                     const div = document.createElement('div');
-                    div.className = `mb-3 ${role === 'user' ? 'text-end' : 'text-start'}`;
-                    const inner = document.createElement('div');
-                    inner.className = `d-inline-block p-2 px-3 shadow-sm ${role === 'user' ? 'bg-primary text-white' : 'bg-white border text-dark'}`;
-                    inner.style.maxWidth = '90%';
-                    inner.style.borderRadius = '18px';
+                    div.className = `mb-4 ${role === 'user' ? 'd-flex justify-content-end' : 'd-flex justify-content-start'}`;
+                    
+                    let contentHtml = '';
                     if (role === 'user') {
-                        inner.style.borderBottomRightRadius = '4px';
+                        contentHtml = `
+                            <div class="d-flex flex-row-reverse align-items-start gap-3" style="max-width: 85%;">
+                                <div class="avatar-small bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold flex-shrink-0 mt-1" style="width: 32px; height: 32px; font-size: 0.8rem;">
+                                    {{ user.username|slice:":1"|upper }}
+                                </div>
+                                <div class="text-end">
+                                    <div class="text-muted mb-1" style="font-size: 0.65rem;">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} <span class="fw-bold text-dark">You</span></div>
+                                    <div class="p-3 bg-primary text-white shadow-sm" style="border-radius: 18px 4px 18px 18px; font-size: ${isModal ? '0.95rem' : '0.82rem'};">
+                                        ${text}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
                     } else {
-                        inner.style.borderBottomLeftRadius = '4px';
+                        contentHtml = `
+                            <div class="d-flex align-items-start gap-3" style="max-width: 85%;">
+                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 mt-1" style="width: 32px; height: 32px; font-size: 0.8rem;">
+                                    <i class="bi bi-chat-heart"></i>
+                                </div>
+                                <div>
+                                    <div class="text-muted mb-1" style="font-size: 0.65rem;"><span class="fw-bold text-dark">Penn</span> ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                                    <div class="p-3 bg-white border shadow-sm text-dark" style="border-radius: 4px 18px 18px 18px; font-size: ${isModal ? '0.95rem' : '0.82rem'}; line-height: 1.6;">
+                                        ${text}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
                     }
-                    inner.style.fontSize = isModal ? '1rem' : '0.82rem';
-                    inner.innerText = text;
-                    div.appendChild(inner);
+                    div.innerHTML = contentHtml;
                     cont.appendChild(div);
                     cont.scrollTop = cont.scrollHeight;
                 });
@@ -492,6 +599,22 @@
                     if (chatHistory.length === 0 || chatHistory[chatHistory.length-1].content !== text) {
                         chatHistory.push({role: role, content: text});
                         localStorage.setItem('penn_chat_history', JSON.stringify(chatHistory));
+                        
+                        // Update recent list in modal
+                        if (role === 'user') {
+                            const recentCont = document.getElementById('penn-recent-queries');
+                            if (recentCont) {
+                                const item = document.createElement('div');
+                                item.className = 'list-group-item list-group-item-action border-0 rounded-lg p-2 px-3 mb-1';
+                                item.innerHTML = `
+                                    <div class="d-flex align-items-center gap-2 text-truncate">
+                                        <i class="bi bi-chat-left-text text-muted small"></i>
+                                        <div class="text-truncate small fw-medium">${text}</div>
+                                    </div>
+                                `;
+                                recentCont.prepend(item);
+                            }
+                        }
                     }
                 }
             }

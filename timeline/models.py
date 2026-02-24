@@ -11,11 +11,38 @@ from django.core.files.uploadedfile import UploadedFile
 from .utils.image_processing import compress_image
 
 
+class Series(models.Model):
+    """
+    Groups books into a narrative series.
+    """
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='series_list')
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name_plural = "Series"
+        ordering = ['title']
+        unique_together = ['user', 'title']
+
+    def __str__(self):
+        return self.title
+
+
 class Book(models.Model):
     """
     Represents a book in your series.
     Each book contains multiple chapters and is owned by a user.
     """
+    series = models.ForeignKey(
+        Series, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True, 
+        related_name='books',
+        help_text="Which series does this book belong to?"
+    )
     image = models.ImageField(upload_to='book_covers/', null=True, blank=True, help_text="Upload a cover image for this book.")
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='books')
     title = models.CharField(max_length=200)
@@ -37,6 +64,7 @@ class Book(models.Model):
             ('editing', 'Editing'),
             ('complete', 'Complete'),
             ('published', 'Published'),
+            ('archived', 'Archived'),
         ],
         default='planning'
     )
@@ -50,10 +78,12 @@ class Book(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['series_order']
-        unique_together = ['user', 'series_order']
+        ordering = ['series', 'series_order']
+        unique_together = ['user', 'series', 'series_order']
 
     def __str__(self):
+        if self.series:
+            return f"{self.series.title} - Book {self.series_order}: {self.title}"
         return f"Book {self.series_order}: {self.title}"
 
     def save(self, *args, **kwargs):
