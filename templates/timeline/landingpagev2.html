@@ -596,12 +596,12 @@
                     href="{% url 'login' %}">
                     Start Writing <span class="material-icons-outlined text-sm">arrow_forward</span>
                 </a>
-                <a class="bg-white dark:bg-surface-dark text-primary dark:text-white border border-gray-200 dark:border-border-dark px-8 py-3.5 rounded-full font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm flex items-center gap-2"
+                <a class="hidden lg:flex bg-white dark:bg-surface-dark text-primary dark:text-white border border-gray-200 dark:border-border-dark px-8 py-3.5 rounded-full font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm items-center gap-2"
                     href="{% url 'coming_soon' %}">
                     <span class="material-icons-outlined">play_circle_outline</span> Watch Demo
                 </a>
             </div>
-            <div class="reveal slide-up delay-500 relative w-full max-w-7xl mx-auto">
+            <div class="reveal slide-up delay-500 relative w-full max-w-7xl mx-auto hidden lg:block">
                 <div id="hero-writing-mockup"
                     class="relative rounded-xl md:rounded-3xl overflow-hidden transform scale-100 md:scale-105 bg-white dark:bg-surface-dark shadow-[0_50px_100px_-20px_rgba(0,0,0,0.15)] border border-gray-200 dark:border-gray-800 aspect-[16/10] flex flex-col font-sans">
                     <!-- Top Bar (Mac Style) -->
@@ -1208,18 +1208,19 @@
                 </div>
 
                 <div
-                    class="absolute -top-10 -left-10 w-40 h-40 bg-yellow-200/50 dark:bg-yellow-600/20 rounded-full blur-3xl -z-10">
+                    class="absolute -top-10 -left-10 w-40 h-40 bg-yellow-200/50 dark:bg-yellow-600/20 rounded-full blur-3xl -z-10 hidden lg:block">
                 </div>
                 <div
-                    class="absolute -bottom-10 -right-10 w-60 h-60 bg-purple-200/50 dark:bg-purple-600/20 rounded-full blur-3xl -z-10">
+                    class="absolute -bottom-10 -right-10 w-60 h-60 bg-purple-200/50 dark:bg-purple-600/20 rounded-full blur-3xl -z-10 hidden lg:block">
                 </div>
             </div>
         </div>
     </section>
     <!-- Transition 1: Hero to Process -->
-    <div class="h-32 bg-gradient-to-b from-background-light to-white dark:from-background-dark dark:to-surface-dark">
+    <div
+        class="h-20 lg:h-32 bg-gradient-to-b from-background-light to-white dark:from-background-dark dark:to-surface-dark">
     </div>
-    <section class="py-24 bg-white dark:bg-surface-dark relative">
+    <section class="py-24 bg-white dark:bg-surface-dark relative -mt-[140px] lg:mt-0">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="reveal slide-up text-center mb-16">
                 <h2 class="text-4xl md:text-[2.5rem] font-serif text-primary dark:text-white mb-6 font-bold">From Spark
@@ -1296,17 +1297,24 @@
     </section>
 
     <!-- Seamless Spacer: Process to Map -->
-    <div class="h-32 bg-white dark:bg-surface-dark"></div>
+    <div class="h-20 lg:h-32 bg-white dark:bg-surface-dark"></div>
 
-    <section class="py-24 bg-white dark:bg-surface-dark">
+    <section class="py-24 bg-white dark:bg-surface-dark relative -mt-[140px] lg:mt-0">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid lg:grid-cols-2 gap-16 items-center">
                 <!-- Left Column: Interactive Map Card -->
-                <div class="reveal slide-up relative z-10">
+                <div class="reveal slide-up relative z-10 order-2 lg:order-1">
 
                     <!-- Map Container (Nodes Centered) -->
                     <div
                         class="relative w-full h-[500px] bg-gray-50 dark:bg-gray-900/50 rounded-2xl overflow-hidden mb-6">
+
+                        <!-- Mobile Instruction -->
+                        <div class="lg:hidden absolute top-4 left-1/2 -translate-x-1/2 z-20 whitespace-nowrap">
+                            <span
+                                class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 bg-white/50 dark:bg-black/20 backdrop-blur-sm px-3 py-1 rounded-full">View
+                                Character Profile</span>
+                        </div>
 
                         <!-- Connection Line: Agnes to Dora (Family - Purple) -->
                         <svg class="absolute pointer-events-none overflow-visible connection-line family-connection"
@@ -1515,7 +1523,8 @@
                         </div>
 
                         <!-- Connection Key (Horizontal Header) -->
-                        <div class="absolute top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none w-max">
+                        <div
+                            class="absolute top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none w-max hidden lg:block">
                             <div
                                 class="bg-white/90 dark:bg-surface-dark/90 backdrop-blur-md px-5 py-2 rounded-full border border-gray-200 dark:border-gray-800 shadow-lg pointer-events-auto flex items-center gap-6">
                                 <div class="flex items-center gap-3 border-r border-gray-200 dark:border-gray-700 pr-4">
@@ -1567,7 +1576,7 @@
 
                 <!-- Right Column: Codex Panel -->
                 <div id="codex-container"
-                    class="reveal slide-up delay-200 relative min-h-[500px] overflow-hidden rounded-2xl transition-all duration-500">
+                    class="reveal slide-up delay-200 relative min-h-[500px] overflow-hidden rounded-2xl transition-all duration-500 order-1 lg:order-2">
 
                     <!-- Default State: Marketing Text -->
                     <div id="codex-default" class="p-8 custom-scrollbar">
@@ -2912,10 +2921,10 @@
     </section>
 
     <!-- Transition: Map to Bible -->
-    <div class="h-32 bg-gradient-to-b from-white to-gray-50 dark:from-surface-dark dark:to-black"></div>
+    <div class="h-20 lg:h-32 bg-gradient-to-b from-white to-gray-50 dark:from-surface-dark dark:to-black"></div>
 
     <!-- World-Building & Story Bible Section -->
-    <section class="py-24 bg-gray-50 dark:bg-black overflow-hidden relative">
+    <section class="py-24 bg-gray-50 dark:bg-black overflow-hidden relative -mt-[140px] lg:mt-0">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row items-center gap-16">
                 <!-- Left Content: Feature List -->
@@ -3162,18 +3171,22 @@
                     </div>
 
                     <!-- Decorative Background Elements -->
-                    <div class="absolute -top-10 -right-10 w-64 h-64 bg-purple-500/5 rounded-full blur-3xl -z-10"></div>
-                    <div class="absolute -bottom-10 -left-10 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl -z-10"></div>
+                    <div
+                        class="absolute -top-10 -right-10 w-64 h-64 bg-purple-500/5 rounded-full blur-3xl -z-10 hidden lg:block">
+                    </div>
+                    <div
+                        class="absolute -bottom-10 -left-10 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl -z-10 hidden lg:block">
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Transition: Bible to Architect -->
-    <div class="h-32 bg-gradient-to-b from-gray-50 to-white dark:from-black dark:to-surface-dark"></div>
+    <div class="h-20 lg:h-32 bg-gradient-to-b from-gray-50 to-white dark:from-black dark:to-surface-dark"></div>
 
     <!-- Planning & Plotting Tools Section -->
-    <section class="py-24 bg-white dark:bg-surface-dark overflow-hidden relative">
+    <section class="py-24 bg-white dark:bg-surface-dark overflow-hidden relative -mt-[140px] lg:mt-0">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row-reverse items-center gap-16">
                 <!-- Right Content: Feature List -->
@@ -3397,7 +3410,7 @@
 
                         <!-- Footer / Status -->
                         <div
-                            class="px-6 py-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between bg-gray-50/30 dark:bg-black/20">
+                            class="px-6 py-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between bg-gray-50/30 dark:bg-black/10">
                             <div class="flex items-center gap-3">
                                 <span class="material-icons-outlined text-xs text-emerald-500 animate-spin-slow">Don’t
                                     focus</span>
@@ -3419,9 +3432,9 @@
     </section>
 
     <!-- Seamless Spacer: Architect to Deep Focus -->
-    <div class="h-32 bg-white dark:bg-surface-dark"></div>
+    <div class="h-20 lg:h-32 bg-white dark:bg-surface-dark"></div>
 
-    <section class="py-24 bg-white dark:bg-surface-dark">
+    <section class="py-24 bg-white dark:bg-surface-dark relative -mt-[140px] lg:mt-0">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col-reverse md:flex-row items-center gap-16">
                 <div class="reveal slide-up w-full md:w-1/2">
@@ -3527,10 +3540,10 @@
     </section>
 
     <!-- Transition: Focus to Analysis -->
-    <div class="h-32 bg-gradient-to-b from-white to-gray-50 dark:from-surface-dark dark:to-black"></div>
+    <div class="h-16 bg-gradient-to-b from-white to-gray-50 dark:from-black dark:to-surface-dark"></div>
 
     <!-- Deep Manuscript Analysis Section -->
-    <section class="py-24 bg-gray-50 dark:bg-black overflow-hidden relative">
+    <section class="py-24 bg-gray-50 dark:bg-black overflow-hidden relative -mt-[180px] lg:mt-0">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row-reverse items-center gap-16">
                 <!-- Left Content: Feature List -->
@@ -3787,10 +3800,10 @@
     </section>
 
     <!-- Transition: Analysis to AI Collaboration -->
-    <div class="h-32 bg-gradient-to-b from-gray-50 to-white dark:from-black dark:to-surface-dark"></div>
+    <div class="h-20 lg:h-32 bg-gradient-to-b from-gray-50 to-white dark:from-black dark:to-surface-dark"></div>
 
     <!-- AI Collaboration & Brainstorming Section -->
-    <section class="py-24 bg-white dark:bg-surface-dark overflow-hidden relative">
+    <section class="py-24 bg-white dark:bg-surface-dark overflow-hidden relative -mt-[140px] lg:mt-0">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row items-center gap-16">
                 <!-- Left Content: Feature List -->
@@ -4223,9 +4236,9 @@
     </section>
 
     <!-- Transition 3: Drafting to Export Section -->
-    <div class="h-32 bg-gradient-to-b from-gray-50 to-white dark:from-black dark:to-surface-dark"></div>
+    <div class="h-20 lg:h-32 bg-gradient-to-b from-gray-50 to-white dark:from-black dark:to-surface-dark"></div>
     <!-- Export & Publishing Section -->
-    <section class="py-24 bg-white dark:bg-surface-dark overflow-hidden relative">
+    <section class="py-24 bg-white dark:bg-surface-dark overflow-hidden relative -mt-[140px] lg:mt-0">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="reveal slide-up text-center mb-16">
                 <div
@@ -4356,8 +4369,12 @@
                 </div>
 
                 <!-- Decorative Background Elements -->
-                <div class="absolute -top-10 -right-10 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl -z-10"></div>
-                <div class="absolute -bottom-10 -left-10 w-72 h-72 bg-teal-500/10 rounded-full blur-3xl -z-10"></div>
+                <div
+                    class="absolute -top-10 -right-10 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl -z-10 hidden lg:block">
+                </div>
+                <div
+                    class="absolute -bottom-10 -left-10 w-72 h-72 bg-teal-500/10 rounded-full blur-3xl -z-10 hidden lg:block">
+                </div>
             </div>
         </div>
     </section>
