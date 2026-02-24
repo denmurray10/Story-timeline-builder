@@ -96,12 +96,42 @@
                             <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0"><div><h6 class="mb-0 fw-semibold">World at a Glance</h6><small class="text-muted">Overview of your story bible.</small></div><div class="form-check form-switch"><input class="form-check-input widget-toggle" type="checkbox" data-card-id="card-world-glance" checked></div></div>
                             <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0"><div><h6 class="mb-0 fw-semibold">Quick Actions</h6><small class="text-muted">Buttons for new events and characters.</small></div><div class="form-check form-switch"><input class="form-check-input widget-toggle" type="checkbox" data-card-id="card-quick-actions" checked></div></div>
                             <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0"><div><h6 class="mb-0 fw-semibold">Story Support</h6><small class="text-muted">Chat with your writing consultant.</small></div><div class="form-check form-switch"><input class="form-check-input widget-toggle" type="checkbox" data-card-id="card-ai" checked></div></div>
+                            <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0"><div><h6 class="mb-0 fw-semibold">Pacing & Tension</h6><small class="text-muted">Visual map of story intensity.</small></div><div class="form-check form-switch"><input class="form-check-input widget-toggle" type="checkbox" data-card-id="card-pacing" checked></div></div>
+                            <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0"><div><h6 class="mb-0 fw-semibold">Story Beats</h6><small class="text-muted">Track narrative milestones.</small></div><div class="form-check form-switch"><input class="form-check-input widget-toggle" type="checkbox" data-card-id="card-beats" checked></div></div>
+                            <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0"><div><h6 class="mb-0 fw-semibold">Timeline Integrity</h6><small class="text-muted">Identify story inconsistencies.</small></div><div class="form-check form-switch"><input class="form-check-input widget-toggle" type="checkbox" data-card-id="card-integrity" checked></div></div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer border-0">
                 <button type="button" class="btn-premium btn-premium-dark !px-6" data-bs-dismiss="modal">Done</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Penn Deep Dive Modal -->
+<div class="modal fade" id="pennModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 24px; background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-primary"><i class="bi bi-chat-heart me-2"></i>Deep Dive with Penn</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 d-flex flex-column" style="height: 70vh;">
+                <div id="penn-modal-chat-history" class="mb-3 scroll-premium pe-2 flex-grow-1" style="overflow-y: auto; font-size: 0.95rem; scrollbar-width: thin;">
+                    <!-- History Shared -->
+                </div>
+                <div id="penn-modal-suggestions" class="mb-3 d-flex flex-column gap-2"></div>
+                <div id="penn-modal-loading" style="display: none;" class="text-center mb-3">
+                    <div class="ai-loading-dots"><span></span><span></span><span></span></div>
+                </div>
+                <div class="mt-auto position-relative p-2 bg-white border rounded-pill shadow-sm d-flex align-items-center gap-2">
+                    <input type="text" class="form-control border-0 bg-transparent shadow-none" id="ai-query-modal" placeholder="Type your deeper question..." style="font-size: 1rem;">
+                    <button class="btn btn-dark rounded-circle d-flex align-items-center justify-content-center" id="ai-submit-modal" style="width: 44px; height: 44px; padding: 0;">
+                        <i class="bi bi-arrow-up-short fs-3"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -133,6 +163,18 @@
         </div>
         <div class="col-lg-4 draggable-zone" id="writer-col-3">
             <div class="dash-card p-4 draggable-card mb-3" id="card-whereabouts"><h5 class="dash-card-header mb-3"><i class="bi bi-grip-vertical drag-handle me-2"></i>Character Whereabouts</h5><div class="d-flex flex-wrap gap-2">{% for items in char_locations %}<div class="badge bg-white text-dark border p-2 d-flex align-items-center gap-2 rounded-pill fw-normal"><span class="d-inline-block rounded-circle" style="width:8px;height:8px;background-color:{{ items.character.color_code }}"></span><strong>{{ items.character.name }}:</strong><span class="text-muted">{{ items.location }}</span></div>{% empty %}<p class="text-muted small">No location data available.</p>{% endfor %}</div></div>
+            <div class="dash-card p-4 draggable-card mb-3" id="card-pacing">
+                <div class="d-flex justify-content-between align-items-center mb-3"><h5 class="dash-card-header mb-0"><i class="bi bi-grip-vertical drag-handle me-2"></i>Pacing & Tension</h5></div>
+                <div class="d-flex align-items-end gap-1" style="height: 60px;">
+                    {% for data in pacing_data %}<div class="bg-primary opacity-50 flex-grow-1" style="height:{{data.height_percent}}%; border-radius:2px;" title="{{data.title}}: {{data.tone}}"></div>{% endfor %}
+                </div>
+            </div>
+            <div class="dash-card p-4 draggable-card mb-3" id="card-beats">
+                <h5 class="dash-card-header mb-3"><i class="bi bi-grip-vertical drag-handle me-2"></i>Story Beat Progress</h5>
+                <div class="small">
+                    {% for beat in story_beats %}<div class="d-flex align-items-center gap-2 mb-1"><i class="bi {% if beat.is_present %}bi-check-circle-fill text-success{% else %}bi-circle text-muted{% endif %}"></i><span>{{ beat.label }}</span></div>{% endfor %}
+                </div>
+            </div>
         </div>
     </div>
 
@@ -165,6 +207,14 @@
                     <div class="col-3"><div class="dash-stat-icon"><i class="bi bi-journal-text"></i></div><div class="dash-stat-value">{{ chapters_completed }}</div><div class="dash-stat-label">Chapters</div></div>
                 </div>
             </div>
+            <!-- World at a Glance -->
+            <div class="dash-card dash-pill-card p-3 draggable-card mb-3" id="card-world-glance">
+                <div class="dash-card-header d-flex align-items-center mb-2"><i class="bi bi-grip-vertical drag-handle"></i>World at a Glance</div>
+                <div class="row g-2">
+                    <div class="col-6"><div class="p-2 border rounded-3 bg-light"><div class="fw-bold" style="font-size:0.8rem;">Lore</div><div class="small text-muted">Characters: {{ character_count }}</div></div></div>
+                    <div class="col-6"><div class="p-2 border rounded-3 bg-light"><div class="fw-bold" style="font-size:0.8rem;">Status</div><div class="small text-muted">Books: {{ books.count }}</div></div></div>
+                </div>
+            </div>
         </div>
 
         <div class="col-lg-3 draggable-zone" id="col-middle">
@@ -187,15 +237,117 @@
                 <button class="btn-premium btn-premium-light !w-full !py-2 !text-xs" id="btn-character-deep-dive" data-char-id="{{ spotlight_character.id }}"><i class="bi bi-magic"></i> Deep Dive</button>
             </div>
             {% endif %}
+            <!-- Relationship Sparkline -->
+            <div class="dash-card p-3 draggable-card mb-3" id="card-relationship-sparkline">
+                <div class="dash-card-header d-flex align-items-center mb-2"><i class="bi bi-grip-vertical drag-handle"></i>Character Dynamics</div>
+                <ul class="dash-list">
+                    {% for rel in top_relationships %}
+                    <li class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="d-flex align-items-center"><div class="me-2 fw-semibold" style="font-size: 0.75rem;"><span>{{ rel.character_a.name }}</span><i class="bi bi-arrow-left-right mx-1 text-muted"></i><span>{{ rel.character_b.name }}</span></div></div>
+                        <span class="badge rounded-pill bg-light text-dark border" style="font-size: 0.6rem;">{{ rel.get_relationship_type_display }}</span>
+                    </li>
+                    {% empty %}
+                    <li class="dash-muted">No relationships tracked yet.</li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
 
         <div class="col-lg-3 draggable-zone" id="col-right">
              <div class="dash-card p-3 draggable-card mb-3" id="card-quick-actions">
                 <div class="dash-card-header d-flex align-items-center mb-2"><i class="bi bi-grip-vertical drag-handle"></i>Quick Actions</div>
-                <div class="d-flex flex-column gap-2">
+                <div class="d-flex flex-column gap-2 text-center">
                     <a href="{% url 'book_create' %}" class="btn-premium btn-premium-dark !py-2 !px-4 !text-xs"><i class="bi bi-plus-lg"></i> New Book</a>
                     <a href="{% url 'character_create' %}" class="btn-premium btn-premium-light !py-2 !px-4 !text-xs"><i class="bi bi-person-plus"></i> New Character</a>
                     <a href="{% url 'event_create' %}" class="btn-premium btn-premium-light !py-2 !px-4 !text-xs"><i class="bi bi-calendar-plus"></i> New Event</a>
+                </div>
+            </div>
+            <!-- Your Books -->
+            <div class="dash-card p-3 draggable-card mb-3" id="card-books">
+                <div class="dash-card-header d-flex align-items-center mb-2"><i class="bi bi-grip-vertical drag-handle"></i>Your Books</div>
+                {% if books %}
+                {% for book in books|slice:":4" %}
+                <div class="dash-book-mini mb-3">
+                    <div class="d-flex align-items-center mb-2">
+                        {% if book.image %}
+                        <img src="{{ book.image.url }}" alt="{{ book.title }} Cover" style="height: 48px; width: 36px; object-fit: cover; margin-right: 12px; border-radius: 6px;">
+                        {% else %}
+                        <img src="{% static 'img/book-cover.png' %}" alt="No Cover" style="height: 48px; width: 36px; object-fit: cover; margin-right: 12px; border-radius: 6px;">
+                        {% endif %}
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="dash-book-title" style="font-size:0.85rem;">{{ book.title|truncatechars:20 }}</div>
+                                <span class="dash-status-pill badge {% if book.status|lower == 'importing' %}bg-info{% elif book.status|lower == 'drafting' %}bg-warning text-dark{% elif book.status|lower == 'complete' or book.status|lower == 'published' %}bg-success{% elif book.status|lower == 'editing' %}bg-primary{% else %}bg-secondary{% endif %}">
+                                    {{ book.get_status_display }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dash-muted mb-2" style="font-size: 0.7rem; line-height: 1.2;">
+                        <div><i class="bi bi-files me-1"></i> {{ book.chapter_count|default:"0" }} Chapters</div>
+                        <div><i class="bi bi-pencil-square me-1"></i> {{ book.current_word_count|default:"0" }} Words</div>
+                    </div>
+                    <div class="dash-progress-bg mb-2" style="height:4px;">
+                        <div class="dash-progress-fill" style="height: 100%; border-radius: 999px; background-color: #6366f1; width: {{ book.progress_percentage }}%;"></div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="dash-muted">No books found.</div>
+                {% endif %}
+            </div>
+            <!-- Inspiration Mood Board -->
+            <div class="dash-card p-3 draggable-card mb-3" id="card-mood-board">
+                <div class="dash-card-header d-flex align-items-center mb-2"><i class="bi bi-grip-vertical drag-handle"></i>Mood Board</div>
+                <div class="d-flex flex-wrap gap-2">
+                    {% for element in mood_elements %}
+                    {% if element.type == 'tag' %}
+                    <div class="p-2 rounded-3 border w-100" style="background-color: {{ element.color }}15; border-color: {{ element.color }};">
+                        <span class="badge" style="background-color: {{ element.color }}; font-size:0.6rem;">Theme</span>
+                        <div class="mt-1 fw-bold" style="font-size: 0.8rem;">{{ element.content }}</div>
+                    </div>
+                    {% elif element.type == 'event' %}
+                    <div class="p-2 rounded-3 border bg-white w-100" style="border-style: dashed; border-color: #6366f1;">
+                        <span class="badge bg-primary" style="font-size:0.6rem;">Key Event</span>
+                        <div class="mt-1 fw-bold" style="font-size: 0.8rem;">{{ element.content }}</div>
+                    </div>
+                    {% elif element.type == 'motivation' %}
+                    <div class="p-2 rounded-3 border bg-light w-100">
+                        <span class="badge bg-secondary" style="font-size:0.6rem;">{{ element.char }}</span>
+                        <div class="mt-1 fst-italic" style="font-size: 0.75rem;">"{{ element.content|truncatechars:60 }}"</div>
+                    </div>
+                    {% endif %}
+                    {% empty %}
+                    <div class="dash-muted small">No inspiration elements yet.</div>
+                    {% endfor %}
+                </div>
+            </div>
+             <!-- Ask Penn Card -->
+             <div class="dash-card p-3 draggable-card mb-3" id="card-ai" style="background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);">
+                <div class="dash-card-header d-flex align-items-center justify-content-between mb-1 text-primary">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-grip-vertical drag-handle text-muted"></i>
+                        <i class="bi bi-chat-heart me-2"></i>Ask Penn...
+                    </div>
+                    <button class="btn btn-link btn-sm text-muted p-0" id="btn-expand-penn" data-bs-toggle="modal" data-bs-target="#pennModal">
+                        <i class="bi bi-arrows-angle-expand" style="font-size: 0.8rem;"></i>
+                    </button>
+                </div>
+                <div id="penn-chat-history" class="mb-2 scroll-premium" style="max-height: 250px; overflow-y: auto; display: none; font-size: 0.82rem; scrollbar-width: thin;">
+                    <!-- Chat history will appear here -->
+                </div>
+                <div class="dash-muted mb-2 small opacity-75" id="penn-intro">Brainstorming? Character trouble? Just ask.</div>
+                <div id="penn-suggestions" class="mb-3 d-flex flex-column gap-2" style="display: none;"></div>
+                <div class="position-relative mt-auto">
+                    <div class="d-flex align-items-center gap-2 p-1 bg-white border rounded-pill shadow-sm">
+                        <input type="text" class="form-control border-0 bg-transparent !py-0 !text-xs shadow-none" id="ai-query-dash" placeholder="Type your question..." style="font-size: 0.75rem;">
+                        <button class="btn btn-dark rounded-circle d-flex align-items-center justify-content-center" id="ai-submit-dash" style="width: 28px; height: 28px; padding: 0;">
+                            <i class="bi bi-arrow-up-short fs-5"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="penn-loading" style="display: none;" class="text-center mt-2">
+                    <div class="ai-loading-dots"><span></span><span></span><span></span></div>
                 </div>
             </div>
         </div>
@@ -228,10 +380,210 @@
             }
             localStorage.setItem('dashboard-writer-mode', isWriterMode);
         }
-
         toggle.addEventListener('change', updateMode);
         if (localStorage.getItem('dashboard-writer-mode') === 'true') { toggle.checked = true; }
         updateMode();
+
+        // Widget Visibility Persistance
+        const toggles = document.querySelectorAll('.widget-toggle');
+        function applyVisibility() {
+            const saved = JSON.parse(localStorage.getItem('dashboard-visibility') || '{}');
+            toggles.forEach(t => {
+                const cardId = t.dataset.cardId;
+                if (saved[cardId] !== undefined) {
+                    t.checked = saved[cardId];
+                    const card = document.getElementById(cardId);
+                    if (card) card.style.display = t.checked ? 'block' : 'none';
+                }
+            });
+        }
+        toggles.forEach(t => {
+            t.addEventListener('change', () => {
+                const card = document.getElementById(t.dataset.cardId);
+                if (card) card.style.display = t.checked ? 'block' : 'none';
+                const saved = JSON.parse(localStorage.getItem('dashboard-visibility') || '{}');
+                saved[t.dataset.cardId] = t.checked;
+                localStorage.setItem('dashboard-visibility', JSON.stringify(saved));
+            });
+        });
+        applyVisibility();
+
+        // Dashboard AI Consultant (Ask Penn)
+        const aiIn = document.getElementById('ai-query-dash');
+        const aiSub = document.getElementById('ai-submit-dash');
+        const modIn = document.getElementById('ai-query-modal');
+        const modSub = document.getElementById('ai-submit-modal');
+        
+        const chatHistoryCont = document.getElementById('penn-chat-history');
+        const modalHistoryCont = document.getElementById('penn-modal-chat-history');
+        
+        const pennIntro = document.getElementById('penn-intro');
+        const pennLoading = document.getElementById('penn-loading');
+        const modalLoading = document.getElementById('penn-modal-loading');
+        
+        const pennSuggestions = document.getElementById('penn-suggestions');
+        const modalSuggestions = document.getElementById('penn-modal-suggestions');
+        
+        let chatHistory = [];
+
+        if (aiSub) {
+            function renderSuggestions(questions) {
+                [pennSuggestions, modalSuggestions].forEach(cont => {
+                    if (!cont) return;
+                    cont.innerHTML = '';
+                    if (questions.length > 0) {
+                        cont.style.display = 'flex';
+                        questions.forEach(q => {
+                            const chip = document.createElement('div');
+                            chip.className = 'border text-dark bg-white font-normal p-2 px-3 rounded-3 hover-bg-light cursor-pointer shadow-sm w-100';
+                            chip.style.fontSize = cont === modalSuggestions ? '0.85rem' : '0.7rem';
+                            chip.style.cursor = 'pointer';
+                            chip.style.whiteSpace = 'normal';
+                            chip.style.lineHeight = '1.3';
+                            chip.innerText = q;
+                            chip.onclick = () => {
+                                if (q === "Yes, please tell me!") {
+                                    addMessage('user', q);
+                                    triggerProactiveInsight();
+                                    renderSuggestions([]);
+                                } else if (q === "Not right now, Penn.") {
+                                    addMessage('user', q);
+                                    addMessage('penn', "Understood. I'll be here whenever you need a second pair of eyes. Happy writing!");
+                                    renderSuggestions([]);
+                                } else {
+                                    if (cont === modalSuggestions) { modIn.value = q; modSub.click(); }
+                                    else { aiIn.value = q; aiSub.click(); }
+                                }
+                            };
+                            cont.appendChild(chip);
+                        });
+                    } else {
+                        cont.style.display = 'none';
+                    }
+                });
+            }
+
+            function addMessage(role, text, silent = false) {
+                chatHistoryCont.style.display = 'block';
+                if(pennIntro) pennIntro.style.display = 'none';
+                
+                [chatHistoryCont, modalHistoryCont].forEach(cont => {
+                    if (!cont) return;
+                    const isModal = cont === modalHistoryCont;
+                    const div = document.createElement('div');
+                    div.className = `mb-3 ${role === 'user' ? 'text-end' : 'text-start'}`;
+                    const inner = document.createElement('div');
+                    inner.className = `d-inline-block p-2 px-3 shadow-sm ${role === 'user' ? 'bg-primary text-white' : 'bg-white border text-dark'}`;
+                    inner.style.maxWidth = '90%';
+                    inner.style.borderRadius = '18px';
+                    if (role === 'user') {
+                        inner.style.borderBottomRightRadius = '4px';
+                    } else {
+                        inner.style.borderBottomLeftRadius = '4px';
+                    }
+                    inner.style.fontSize = isModal ? '1rem' : '0.82rem';
+                    inner.innerText = text;
+                    div.appendChild(inner);
+                    cont.appendChild(div);
+                    cont.scrollTop = cont.scrollHeight;
+                });
+                
+                if (!silent) {
+                    if (chatHistory.length === 0 || chatHistory[chatHistory.length-1].content !== text) {
+                        chatHistory.push({role: role, content: text});
+                        localStorage.setItem('penn_chat_history', JSON.stringify(chatHistory));
+                    }
+                }
+            }
+
+            function triggerProactiveInsight() {
+                pennLoading.style.display = 'block';
+                modalLoading.style.display = 'block';
+                fetch('{% url "api_penn_proactive_insight" %}', {
+                    method: 'POST', headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+                }).then(r => r.json()).then(data => {
+                    pennLoading.style.display = 'none';
+                    modalLoading.style.display = 'none';
+                    if (data.status === 'success') {
+                        addMessage('penn', data.response);
+                    } else if (data.status === 'empty') {
+                        addMessage('penn', "I looked over your notes, but it seems you haven't added much new prose for me to study yet. Keep writing, and I'll be ready!");
+                    }
+                });
+            }
+
+            function proactiveGreet() {
+                const text = "Welcome back! While you were away, I couldn't help but review some of your recent writing. Would you like to know what I think? I've prepared some thoughts on your narrative flow and character consistency.";
+                addMessage('penn', text);
+                renderSuggestions(["Yes, please tell me!", "Not right now, Penn."]);
+            }
+
+            function handlePennSubmit(inputEl, isModal) {
+                const q = inputEl.value.trim(); if(!q) return;
+                pennSuggestions.style.display = 'none';
+                modalSuggestions.style.display = 'none';
+                addMessage('user', q);
+                
+                [aiIn, modIn, aiSub, modSub].forEach(el => el.disabled = true);
+                if(isModal) modalLoading.style.display = 'block';
+                else pennLoading.style.display = 'block';
+
+                fetch('{% url "api_ai_consultant" %}', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                    body: JSON.stringify({ query: q, history: chatHistory.slice(0, -1) }) 
+                }).then(r => r.json()).then(data => {
+                    pennLoading.style.display = 'none';
+                    modalLoading.style.display = 'none';
+                    [aiIn, modIn, aiSub, modSub].forEach(el => {
+                        el.disabled = false;
+                        el.value = '';
+                    });
+                    inputEl.focus();
+                    
+                    if (data.status === 'success') {
+                        let responseText = data.response;
+                        // Brute-force strip remaining markdown bolding/italics
+                        responseText = responseText.replace(/\*\*/g, '').replace(/\*/g, '').replace(/#/g, '');
+                        
+                        let followUps = [];
+                        if (responseText.includes('FOLLOW_UP:')) {
+                            const parts = responseText.split('FOLLOW_UP:');
+                            responseText = parts[0].trim();
+                            followUps = parts[1].split('|').map(s => s.trim()).filter(s => s);
+                        }
+                        addMessage('penn', responseText);
+                        renderSuggestions(followUps);
+                    } else {
+                        addMessage('penn', "Sorry, I'm having trouble connecting to the story bible right now.");
+                    }
+                });
+            }
+
+            aiSub.addEventListener('click', () => handlePennSubmit(aiIn, false));
+            modSub.addEventListener('click', () => handlePennSubmit(modIn, true));
+            aiIn.addEventListener('keypress', (e) => { if (e.key === 'Enter') aiSub.click(); });
+            modIn.addEventListener('keypress', (e) => { if (e.key === 'Enter') modSub.click(); });
+
+            // Persistence: Load chat history
+            const savedHistory = localStorage.getItem('penn_chat_history');
+            if (savedHistory) {
+                try {
+                    const parsed = JSON.parse(savedHistory);
+                    parsed.forEach(msg => addMessage(msg.role, msg.content, true));
+                    chatHistory = parsed;
+                } catch(e) { localStorage.removeItem('penn_chat_history'); }
+            }
+
+            // Proactive Greeting
+            const lastGreet = localStorage.getItem('penn_last_greet');
+            const now = Date.now();
+            if (!lastGreet || (now - parseInt(lastGreet)) > (1000 * 60 * 60 * 6)) { // 6 hours
+                 setTimeout(() => {
+                     proactiveGreet();
+                     localStorage.setItem('penn_last_greet', now.toString());
+                 }, 3000);
+            }
+        }
 
         // Sortable & Widget Logic...
         const columns = ['col-left', 'col-middle', 'col-right', 'writer-col-1', 'writer-col-2', 'writer-col-3'];

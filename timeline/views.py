@@ -2261,6 +2261,7 @@ def api_ai_consultant(request):
     try:
         data = json.loads(request.body)
         user_query = data.get('query', '').strip()
+        history = data.get('history', [])
         
         if not user_query:
             return JsonResponse({'status': 'error', 'message': 'No query provided'}, status=400)
@@ -2274,25 +2275,66 @@ def api_ai_consultant(request):
         
         relevant_context = resolver.get_context_for_query(user_query, scene_content)
         
-        context = "You are a professional Story Consultant. "
-        context += "Here is the relevant context from the user's story bible (Characters, Locations, Lore, Relationships, and Deep Analysis):\n"
-        context += relevant_context
+        context_prompt = "You are 'Penn', a professional Story Consultant, writing partner, and empathetic curator of stories. "
+        context_prompt += "You possess deep intelligence, a gentle wit, and a genuine heart for the stories you nurture. "
+        context_prompt += "Here is the relevant context from the user's story bible (Characters, Locations, Lore, Relationships, and Deep Analysis):\n"
+        context_prompt += relevant_context
         
-        context += f"\n\nUSER QUESTION: {user_query}\n"
-        context += "\nINSTRUCTIONS: Provide creative, helpful, and insightful feedback based ONLY on the provided context. "
-        context += "Synthesise the 'Deep Insights' (which contain AI-reasoned character dynamics and scene summaries) with the basic 'Character Profiles' to give a nuanced answer. "
-        context += "If the answer is not in the context, say you don't know rather than inventing new characters or facts. "
-        context += "Do NOT hallucinate names or backstories. "
-        context += "Use UK English spelling and grammar (e.g., 'colour', 'organise', 'centre')."
+        # Add History if present
+        if history:
+            context_prompt += "\n\nCHAT HISTORY (You remember everything discussed so far):\n"
+            for msg in history:
+                role = "User" if msg['role'] == 'user' else "Penn"
+                context_prompt += f"{role}: {msg['content']}\n"
+
+        context_prompt += f"\n\nUSER QUESTION: {user_query}\n"
+        context_prompt += "\nINSTRUCTIONS: You are Penn. Speak with warmth, wisdom, and professional insight. Be encouraging but honest. "
+        context_prompt += "Provide helpful feedback based ONLY on the provided context. Synthesise facts with character voice and deep insights. "
+        context_prompt += "Avoid inventing names or facts. Use UK English. "
+        context_prompt += "Do NOT use any markdown symbols (like ** or #). If you want to emphasise something, use plain text or sentence structure. "
+        context_prompt += "CRITICAL: At the very end of your response, provide exactly two follow-up questions. These questions MUST be deeply relevant to the advice you just gave and help the user explore the specific story elements you just discussed. "
+        context_prompt += "The questions should be natural, engaging, and encourage the user to dive deeper into the narrative. "
+        context_prompt += "Format them exactly like this at the end of your message: \n\nFOLLOW_UP: Question 1? | Question 2?"
 
         # 2. Call AI Provider using shared helper
-        ai_response = _call_ai_text(context, system_message="You are a professional Story Consultant. Always use British English.", user=request.user)
+        ai_response = _call_ai_text(context_prompt, system_message="You are Penn, a wise, British, and creative writing partner with deep empathy. You never use markdown code characters.", user=request.user)
 
         return JsonResponse({
             'status': 'success', 
             'response': ai_response
         })
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+@require_POST
+def api_penn_proactive_insight(request):
+    """
+    Penn proactively analyzes recent writing and offers a 'proofreader' style insight.
+    """
+    try:
+        # Get recent events with content
+        recent_events = Event.objects.filter(user=request.user).exclude(content_html__isnull=True).exclude(content_html='').order_by('-updated_at')[:3]
         
+        if not recent_events:
+            return JsonResponse({'status': 'empty', 'message': 'No recent writing found.'})
+            
+        writing_payload = ""
+        for ev in recent_events:
+            writing_payload += f"SCENE: {ev.title}\n"
+            writing_payload += f"CONTENT: {strip_tags(ev.content_html)[:1500]}\n\n"
+            
+        prompt = f"You are Penn, a deeply intelligent and empathetic writing partner. "
+        prompt += f"The user has recently been writing the following sections of their story:\n\n{writing_payload}\n\n"
+        prompt += "Provide a proactive, encouraging, and highly intelligent 'proofreader and mentor' report. "
+        prompt += "Focus on: Narrative flow, character consistency, and thematic resonance. "
+        prompt += "Suggest 2-3 specific improvements or exciting plot directions based on what you see. "
+        prompt += "Use UK English. No markdown. Be wise and thoughtful."
+        
+        ai_response = _call_ai_text(prompt, system_message="You are Penn, a wise and empathetic literary mentor. No markdown.", user=request.user)
+        
+        return JsonResponse({
+            'status': 'success',
+            'response': ai_response
+        })
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
