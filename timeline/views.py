@@ -449,6 +449,15 @@ def dashboard(request):
         except Book.DoesNotExist:
             pass
 
+    series_id = request.GET.get('series_id')
+    selected_series = None
+    if series_id:
+        try:
+            selected_series = Series.objects.get(id=series_id, user=request.user)
+        except Series.DoesNotExist:
+            pass
+
+    user_series = Series.objects.filter(user=request.user)
     user_books = Book.objects.filter(user=request.user)
     books = user_books.annotate(
         chapter_count=Count('chapters', distinct=True),
@@ -470,6 +479,14 @@ def dashboard(request):
         chapters = chapters.filter(book=selected_book)
         world_entries = world_entries.filter(Q(book=selected_book) | Q(book__isnull=True))
         relationships = relationships.filter(Q(character_a__events__book=selected_book) | Q(character_b__events__book=selected_book)).distinct()
+    
+    # Apply Series Filter if selected
+    elif selected_series:
+        characters = characters.filter(events__book__series=selected_series).distinct()
+        events = events.filter(book__series=selected_series)
+        chapters = chapters.filter(book__series=selected_series)
+        world_entries = world_entries.filter(Q(book__series=selected_series) | Q(book__isnull=True))
+        relationships = relationships.filter(Q(character_a__events__book__series=selected_series) | Q(character_b__events__book__series=selected_series)).distinct()
     
     total_events = events.count()
     events_written = events.filter(is_written=True).count()
@@ -510,10 +527,12 @@ def dashboard(request):
     mood_elements = []
     
     # 1. Random Tag (Theme or Location)
-    # Filter tags by events in this book if selected
+    # Filter tags by events in this book or series if selected
     random_tags = Tag.objects.filter(user=request.user)
     if selected_book:
         random_tags = random_tags.filter(events__book=selected_book).distinct()
+    elif selected_series:
+        random_tags = random_tags.filter(events__book__series=selected_series).distinct()
     random_tags = list(random_tags)
     if random_tags:
         random_tag = random.choice(random_tags)
@@ -630,6 +649,8 @@ def dashboard(request):
     subplots = Tag.objects.filter(user=request.user, category='subplot')
     if selected_book:
         subplots = subplots.filter(events__book=selected_book).distinct()
+    elif selected_series:
+        subplots = subplots.filter(events__book__series=selected_series).distinct()
     subplot_data = []
     for subplot in subplots:
         events_count = subplot.events.filter(id__in=events.values('id')).count()
@@ -678,6 +699,9 @@ def dashboard(request):
     if selected_book:
         first_book = selected_book
         target_words_total = selected_book.word_count_target or 80000
+    elif selected_series:
+        first_book = Book.objects.filter(series=selected_series).order_by('created_at').first()
+        target_words_total = Book.objects.filter(series=selected_series).aggregate(Sum('word_count_target'))['word_count_target__sum'] or 100000
     else:
         first_book = books.order_by('created_at').first()
         target_words_total = books.aggregate(Sum('word_count_target'))['word_count_target__sum'] or 100000
@@ -694,7 +718,9 @@ def dashboard(request):
 
     context = {
         'user_books': user_books,
+        'user_series': user_series,
         'selected_book': selected_book,
+        'selected_series': selected_series,
         'books': books,
         'character_count': characters.count(),
         'total_events': total_events,
