@@ -1,1315 +1,1178 @@
-{% extends 'timeline/base.html' %}
-{% load static %}
-
-{% block title %}Writing Mode - {{ chapter.title }}{% endblock %}
-
-{% block extra_css %}
-<style>
-    /* Writing Mode Layout - FORCE FULL WIDTH */
-    body.writing-mode-active {
-        overflow: hidden;
-    }
-
-    /* Hide base.html sidebar and main container padding */
-    body.writing-mode-active .sidebar,
-    body.writing-mode-active .navbar,
-    body.writing-mode-active .d-flex.justify-content-end.align-items-center.mb-3 {
-        display: none !important;
-    }
-
-    /* Override Bootstrap columns to take full width */
-    body.writing-mode-active .main-content {
-        width: 100% !important;
-        flex: 0 0 100% !important;
-        max-width: 100% !important;
-        padding: 0 !important;
-        margin: 0 !important;
-    }
-
-    body.writing-mode-active .page-container {
-        max-width: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        width: 100% !important;
-    }
-
-    #writing-mode-container {
-        display: flex;
-        position: fixed;
-        /* FORCE OVERLAP */
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background-color: #f4f1ee;
-        /* MATCH APP BACKGROUND */
-        overflow: hidden;
-        z-index: 9999;
-    }
-
-    /* Hide standard scrollbars but keep functionality */
-    * {
-        scrollbar-width: none;
-        /* Firefox */
-        -ms-overflow-style: none;
-        /* IE/Edge */
-    }
-
-    *::-webkit-scrollbar {
-        display: none;
-        /* Chrome/Safari/Brave */
-    }
-
-    /* Sidebars */
-    .writing-sidebar {
-        width: 260px;
-        background-color: #ffffff;
-        border-right: 1px solid #e5e7eb;
-        display: flex;
-        flex-direction: column;
-        transition: width 0.3s ease;
-    }
-
-    .writing-sidebar.collapsed {
-        width: 0;
-        overflow: hidden;
-        border-right: none;
-    }
-
-    .writing-sidebar-header {
-        padding: 1rem;
-        border-bottom: 1px solid #f3f4f6;
-        font-weight: 600;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background-color: #ffffff;
-    }
-
-    .writing-sidebar-content {
-        flex-grow: 1;
-        overflow-y: auto;
-        padding: 1rem;
-        background-color: #ffffff;
-    }
-
-    /* Left Sidebar Specific */
-    .nav-section-title {
-        font-size: 0.75rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        color: #9ca3af;
-        margin-top: 1.5rem;
-        margin-bottom: 0.5rem;
-    }
-
-    .nav-item-link {
-        display: flex;
-        align-items: center;
-        padding: 0.5rem;
-        color: #4b5563;
-        text-decoration: none;
-        border-radius: 6px;
-        font-size: 0.9rem;
-        margin-bottom: 2px;
-    }
-
-    .nav-item-link:hover,
-    .nav-item-link.active {
-        background-color: #f3f4f6;
-        color: #111827;
-    }
-
-    .nav-item-link i {
-        margin-right: 0.75rem;
-        width: 16px;
-        text-align: center;
-    }
-
-    /* Main Content */
-    #writing-main {
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-        background-color: #f4f1ee;
-        /* MATCH APP BACKGROUND */
-        position: relative;
-    }
-
-    /* Toolbar */
-    #writing-toolbar {
-        height: 56px;
-        background-color: #ffffff;
-        border-bottom: 1px solid #e5e7eb;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 1.5rem;
-        z-index: 10;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    }
-
-    .toolbar-group {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .toolbar-btn {
-        background: none;
-        border: 1px solid transparent;
-        padding: 0.5rem 0.75rem;
-        border-radius: 6px;
-        color: #4b5563;
-        font-size: 0.85rem;
-        display: flex;
-        align-items: center;
-        gap: 0.4rem;
-        transition: all 0.2s;
-    }
-
-    .toolbar-btn:hover {
-        background-color: #f3f4f6;
-        color: #111827;
-    }
-
-    .toolbar-btn i {
-        font-size: 1rem;
-    }
-
-    .toolbar-btn.btn-primary-action {
-        background-color: #111827;
-        color: #ffffff;
-    }
-
-    .toolbar-btn.btn-primary-action:hover {
-        background-color: #374151;
-    }
-
-    /* Editor Page Area */
-    #editor-viewport {
-        flex-grow: 1;
-        overflow-y: auto;
-        padding: 3rem 1rem;
-        display: flex;
-        justify-content: center;
-    }
-
-    #editor-page {
-        width: 100%;
-        max-width: 800px;
-        background-color: #ffffff;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        min-height: 1000px;
-        padding: 4rem 5rem;
-        border-radius: 30px;
-        /* USER REQUEST: 30px border radius */
-    }
-
-    #writing-editor {
-        font-family: 'Merriweather', serif;
-        font-size: 1.15rem;
-        line-height: 1.8;
-        color: #111827;
-        outline: none;
-    }
-
-    .chapter-title-header {
-        font-family: 'Inter', sans-serif;
-        text-align: center;
-        margin-bottom: 3rem;
-    }
-
-    .chapter-number-small {
-        font-size: 1.5rem;
-        color: #d1d5db;
-        margin-bottom: 0.5rem;
-    }
-
-    .chapter-title-text {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: #111827;
-    }
-
-    /* Thin Black Icon Dock Layout */
-    .writing-sidebar-right {
-        width: 50px;
-        /* Minimal width for the dock */
-        background-color: #000000;
-        border-left: 1px solid #111111;
-        display: flex;
-        flex-direction: row;
-        /* Icons on the left, content on the right */
-        color: #e5e7eb;
-        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        overflow: visible;
-        z-index: 1000;
-        position: relative;
-    }
-
-    .writing-sidebar-right.expanded {
-        width: 800px !important;
-        min-width: 800px !important;
-        max-width: 800px !important;
-        /* Forced 800px width for maximum visibility */
-    }
-
-    /* Vertical Icon Bar - Always 50px */
-    .sidebar-icon-bar {
-        width: 50px;
-        min-width: 50px;
-        background-color: #000000;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding-top: 1rem;
-        gap: 1.5rem;
-        z-index: 10;
-        border-right: none;
-    }
-
-    .sidebar-icon {
-        color: #9ca3af;
-        font-size: 1.25rem;
-        cursor: pointer;
-        transition: all 0.2s;
-        width: 100%;
-        text-align: center;
-        padding: 0.75rem 0;
-        position: relative;
-    }
-
-    .sidebar-icon:hover {
-        color: #ffffff;
-    }
-
-    .sidebar-icon.active {
-        color: #ffffff;
-        background-color: #1f2937;
-    }
-
-    .sidebar-icon.active::after {
-        content: '';
-        position: absolute;
-        right: 0;
-        top: 20%;
-        height: 60%;
-        width: 3px;
-        background-color: #6366f1;
-        /* Accent for active state */
-        border-radius: 3px 0 0 3px;
-    }
-
-    /* Content Area - Slides out to the left */
-    .sidebar-content-area {
-        flex-grow: 1;
-        display: none;
-        /* Hidden unless expanded */
-        flex-direction: column;
-        overflow: hidden;
-        background-color: #f4f1ee;
-        border-right: 1px solid #e5e7eb;
-    }
-
-    .writing-sidebar-right.expanded .sidebar-content-area {
-        display: flex;
-    }
-
-    .writing-sidebar-right .cast-avatar {
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.7rem;
-        margin-right: 0.75rem;
-        color: white;
-        font-weight: 600;
-    }
-
-    .writing-sidebar-right .ghostwriter-chat-container .chat-messages {
-        height: calc(100vh - 250px);
-    }
-
-    .writing-sidebar-right .writing-sidebar-header {
-        background-color: #f4f1ee;
-        color: #111827;
-        border-bottom: none;
-        padding: 1.25rem 1.25rem 0.5rem 1.25rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-weight: 700;
-        font-size: 1.1rem;
-    }
-
-    .writing-sidebar-right .writing-sidebar-content {
-        background-color: #f4f1ee;
-        color: #4b5563;
-        padding: 1.25rem;
-        overflow-y: auto;
-    }
-
-    .sidebar-card {
-        background-color: #ffffff;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        padding: 1.25rem;
-        margin-bottom: 1.5rem;
-        border: 1px solid #e5e7eb;
-    }
-
-    .writing-sidebar-right .cast-item {
-        border-bottom: 1px solid #f3f4f6;
-    }
-
-    .writing-sidebar-right .nav-section-title {
-        color: #9ca3af;
-        font-size: 0.7rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        margin-top: 1rem;
-    }
-
-    /* AI Ghostwriter Sidebar & Chat - Card Theme */
-    .ghostwriter-chat-container {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-        background-color: #f4f1ee;
-        padding: 1.25rem;
-    }
-
-    .ghostwriter-chat-card {
-        background-color: #ffffff;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-        overflow: hidden;
-        border: 1px solid #e5e7eb;
-    }
-
-    .chat-messages {
-        flex-grow: 1;
-        overflow-y: auto;
-        padding: 1rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-    }
-
-    .chat-bubble {
-        padding: 0.75rem;
-        border-radius: 12px;
-        font-size: 0.85rem;
-        max-width: 90%;
-        line-height: 1.5;
-    }
-
-    .chat-bubble.ai {
-        background-color: #f3f4f6;
-        color: #1f2937;
-        align-self: flex-start;
-        border-bottom-left-radius: 2px;
-    }
-
-    .chat-bubble.user {
-        background-color: #3b82f6;
-        color: #ffffff;
-        align-self: flex-end;
-        border-bottom-right-radius: 2px;
-    }
-
-    .chat-input-area {
-        padding: 1rem;
-        border-top: 1px solid #f3f4f6;
-        display: flex;
-        gap: 0.5rem;
-        background-color: #ffffff;
-    }
-
-    .chat-input-area input {
-        border-radius: 20px;
-        padding: 0.5rem 1rem;
-        font-size: 0.85rem;
-        background-color: #f9fafb;
-        border: 1px solid #e5e7eb;
-        color: #111827;
-    }
-
-    .chat-input-area input::placeholder {
-        color: #9ca3af;
-    }
-
-    .quick-insight-btns {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0.5rem;
-        padding: 1rem;
-        border-bottom: 1px solid #e5e7eb;
-    }
-
-    .insight-btn {
-        background-color: #f9fafb;
-        border: 1px solid #e5e7eb;
-        padding: 0.5rem;
-        border-radius: 6px;
-        font-size: 0.7rem;
-        color: #374151;
-        text-align: left;
-        transition: all 0.2s;
-    }
-
-    .insight-btn:hover {
-        background-color: #f3f4f6;
-        border-color: #d1d5db;
-        color: #111827;
-    }
-
-    .insight-btn i {
-        color: #6366f1;
-        margin-right: 0.3rem;
-    }
-
-
-    /* Selection Menu Upgrades */
-    #bubble-menu {
-        padding: 6px;
-        border-radius: 50px;
-        background: #111827;
-        border: none;
-    }
-
-    .bubble-btn {
-        background: none;
-        border: none;
-        color: #d1d5db;
-        padding: 0.5rem 0.8rem;
-        font-size: 0.9rem;
-        display: flex;
-        align-items: center;
-        gap: 0.4rem;
-        border-radius: 50px;
-        transition: color 0.2s;
-    }
-
-    .bubble-btn:hover {
-        color: #ffffff;
-        background: #374151;
-    }
-
-    .bubble-divider {
-        width: 1px;
-        background: #374151;
-        margin: 0 4px;
-    }
-
-    /* Thinking State Animation */
-    @keyframes pulse-subtle {
-        0% {
-            opacity: 0.5;
-        }
-
-        50% {
-            opacity: 1;
-        }
-
-        100% {
-            opacity: 0.5;
-        }
-    }
-
-    .thinking-bubble {
-        animation: pulse-subtle 1.5s infinite;
-        font-style: italic;
-        color: #9ca3af;
-    }
-
-    /* AI Ghostwrite Response Area */
-    #ai-ghostwrite-response {
-        position: fixed;
-        bottom: 2rem;
-        right: 2rem;
-        width: 400px;
-        max-height: 500px;
-        background-color: #ffffff;
-        border-radius: 12px;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        border: 1px solid #e5e7eb;
-        display: none;
-        flex-direction: column;
-        z-index: 100;
-    }
-
-    /* Quill Overrides */
-    .ql-editor {
-        min-height: 500px;
-        font-family: 'Merriweather', serif !important;
-        font-size: 1.15rem !important;
-        line-height: 1.8 !important;
-        padding: 0 !important;
-    }
-
-    .ql-container.ql-snow {
-        border: none !important;
-    }
-</style>
-{% endblock %}
-
-{% block content %}
-<div id="writing-mode-container">
-    <!-- Left Sidebar: Manuscript & Nav -->
-    <aside class="writing-sidebar" id="sidebar-left">
-        <div class="writing-sidebar-header">
-            <span>Binder</span>
-            <i class="bi bi-layout-sidebar sidebar-toggle" onclick="toggleSidebar('left')"></i>
-        </div>
-        <div class="writing-sidebar-content">
-            <div class="input-group input-group-sm mb-3">
-                <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
-                <input type="text" class="form-control border-start-0" placeholder="Search Binder">
-            </div>
-
-            <nav>
-                <div class="nav-section-title">Manuscript</div>
-                {% for ch in chapters %}
-                <a href="{% url 'writing_mode' ch.pk %}"
-                    class="nav-item-link {% if ch.pk == chapter.pk %}active{% endif %}">
-                    <i class="bi bi-file-text"></i>
-                    <span class="text-truncate">{{ ch.title }}</span>
-                </a>
-                {% endfor %}
-
-                <div class="nav-section-title">Research</div>
-                <a href="#" class="nav-item-link"><i class="bi bi-folder"></i> Folder</a>
-
-                <div class="nav-section-title">Characters</div>
-                {% for char in characters|slice:":5" %}
-                <a href="{% url 'character_detail' char.pk %}" class="nav-item-link">
-                    <i class="bi bi-person"></i>
-                    <span class="text-truncate">{{ char.name }}</span>
-                </a>
-                {% endfor %}
-                <a href="{% url 'character_list' %}" class="nav-item-link text-muted small"><i class="bi bi-plus"></i>
-                    View All</a>
-
-                <div class="nav-section-title">Scenes</div>
-                <a href="{% url 'timeline_view' %}" class="nav-item-link"><i class="bi bi-geo-alt"></i> Timeline</a>
-
-                <div class="nav-section-title">Production</div>
-                <a href="#" class="nav-item-link" onclick="switchSidebarTab('audit')">
-                    <i class="bi bi-clipboard-check text-warning"></i>
-                    <span>Style Audit</span>
-                </a>
-                <a href="#" class="nav-item-link" onclick="switchSidebarTab('team')">
-                    <i class="bi bi-people-fill text-primary"></i>
-                    <span>Team Studio</span>
-                </a>
-                <a href="#" class="nav-item-link" onclick="switchSidebarTab('scrapbook')">
-                    <i class="bi bi-journal-bookmark text-info"></i>
-                    <span>Scrapbook</span>
-                </a>
-                <a href="#" class="nav-item-link" onclick="switchSidebarTab('export')">
-                    <i class="bi bi-file-earmark-arrow-up text-success"></i>
-                    <span>Export & Publish</span>
-                </a>
-            </nav>
-
-            <div class="mt-auto pt-4">
-                <button class="btn btn-sm btn-outline-secondary w-100 mb-2"><i class="bi bi-archive"></i>
-                    Archive</button>
-                <button class="btn btn-sm btn-outline-dark w-100 mb-2"><i class="bi bi-plus-lg"></i> Add New
-                    Chapter</button>
-                <button class="btn btn-sm btn-outline-secondary w-100"><i class="bi bi-file-earmark-arrow-up"></i>
-                    Import Text</button>
-            </div>
-        </div>
-    </aside>
-
-    <!-- Main Editor Area -->
-    <main id="writing-main">
-        <!-- Toolbar -->
-        <div id="writing-toolbar">
-            <div class="toolbar-group">
-                <i class="bi bi-layout-sidebar sidebar-toggle" onclick="toggleSidebar('left')"></i>
-                <div class="dropdown">
-                    <button class="toolbar-btn dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                        <span class="badge bg-primary me-2">{{ chapter.chapter_number }}</span> {{
-                        chapter.title|truncatechars:20 }}
-                    </button>
-                    <ul class="dropdown-menu shadow border-0">
-                        <li><a class="dropdown-item py-2" href="{% url 'dashboard' %}"><i
-                                    class="bi bi-house-fill me-2"></i> Exit to Dashboard</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li class="dropdown-header small text-uppercase fw-bold">Manuscript</li>
-                        {% for ch in chapters %}
-                        <li><a class="dropdown-item {% if ch.pk == chapter.pk %}active{% endif %}"
-                                href="{% url 'writing_mode' ch.pk %}">Ch. {{ ch.chapter_number }}: {{ ch.title }}</a>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
-
-            <div class="toolbar-group">
-                <button class="toolbar-btn" id="btn-ai-writing"><i class="bi bi-magic"></i> AI Writing</button>
-                <button class="toolbar-btn"><i class="bi bi-eye"></i> Review</button>
-                <button class="toolbar-btn"><i class="bi bi-palette"></i> Style</button>
-                <button class="toolbar-btn"><i class="bi bi-clock-history"></i> History</button>
-                <button class="toolbar-btn"><i class="bi bi-arrow-repeat"></i> Sync</button>
-                <button class="toolbar-btn"><i class="bi bi-fullscreen"></i> Focus</button>
-            </div>
-
-            <div class="toolbar-group">
-                <button class="toolbar-btn btn-primary-action" id="btn-save-manuscript">
-                    <i class="bi bi-save"></i> Save
-                </button>
-                <button class="toolbar-btn"><i class="bi bi-download"></i></button>
-                <button class="toolbar-btn"><i class="bi bi-upload"></i></button>
-            </div>
-        </div>
-
-        <!-- Editor Viewport -->
-        <div id="editor-viewport">
-            <div id="editor-page">
-                <div class="chapter-title-header">
-                    <div class="chapter-number-small">{{ chapter.chapter_number }}</div>
-                    <h1 class="chapter-title-text">{{ chapter.title }}</h1>
-                </div>
-
-                <div id="writing-editor">
-                    {{ chapter.content|safe }}
-                </div>
-            </div>
-        </div>
-
-        <!-- Hidden inputs for auto-save -->
-        <form id="auto-save-form" style="display:none;">
-            {% csrf_token %}
-            <input type="hidden" name="content" id="hidden-content">
-        </form>
-    </main>
-
-    <!-- Right Sidebar: Dark Thin Icon Dock + Sliding Drawer -->
-    <aside class="writing-sidebar writing-sidebar-right" id="sidebar-right">
-        <!-- Narrow Icon Bar (Fixed on the far right) -->
-        <div class="sidebar-icon-bar">
-            <div class="sidebar-icon" id="icon-cast" onclick="switchSidebarTab('cast')" title="Chapter Cast">
-                <i class="bi bi-people"></i>
-            </div>
-            <div class="sidebar-icon" id="icon-ghostwriter" onclick="switchSidebarTab('ghostwriter')"
-                title="Ghostwriter">
-                <i class="bi bi-stars"></i>
-            </div>
-            <div class="sidebar-icon" id="icon-audit" onclick="switchSidebarTab('audit')" title="AI Audit">
-                <i class="bi bi-clipboard-check"></i>
-            </div>
-            <div class="sidebar-icon" id="icon-team" onclick="switchSidebarTab('team')" title="Collaboration">
-                <i class="bi bi-people-fill"></i>
-            </div>
-            <div class="sidebar-icon" id="icon-scrapbook" onclick="switchSidebarTab('scrapbook')" title="Scrapbook">
-                <i class="bi bi-journal-bookmark"></i>
-            </div>
-            <div class="sidebar-icon" id="icon-export" onclick="switchSidebarTab('export')" title="Export">
-                <i class="bi bi-file-earmark-arrow-up"></i>
-            </div>
-            <div class="sidebar-icon" id="icon-map" onclick="switchSidebarTab('map')" title="Relationship Map">
-                <i class="bi bi-diagram-3"></i>
-            </div>
-            <div class="sidebar-icon" id="icon-timeline" onclick="switchSidebarTab('timeline')"
-                title="Project Timeline">
-                <i class="bi bi-clock-history"></i>
-            </div>
-            <div class="mt-auto mb-4">
-                <div class="sidebar-icon" title="Settings">
-                    <i class="bi bi-gear"></i>
-                </div>
-            </div>
-        </div>
-
-        <!-- Main Content Area (Drawer) -->
-        <div class="sidebar-content-area">
-            <div id="sidebar-tab-cast">
-                <div class="writing-sidebar-header">
-                    <span>Chapter Cast</span>
-                    <i class="bi bi-x-lg cursor-pointer small" onclick="closeSidebarRight()"></i>
-                </div>
-                <div class="writing-sidebar-content">
-                    <div class="sidebar-card">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6 class="small fw-bold text-uppercase text-muted mb-0">Characters</h6>
-                            <button class="btn btn-sm p-0 text-dark"><i class="bi bi-plus-lg"></i></button>
-                        </div>
-
-                        {% if chapter_cast %}
-                        {% for char in chapter_cast %}
-                        <div class="cast-item d-flex align-items-center mb-2 pb-2">
-                            <div class="cast-avatar" style="background-color: {{ char.color_code }};">
-                                {{ char.name|slice:":1" }}
-                            </div>
-                            <div>
-                                <div class="fw-semibold small text-dark">{{ char.name }}</div>
-                                <div class="text-muted" style="font-size: 0.65rem;">{{ char.get_role_display }}</div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                        {% else %}
-                        <div class="text-center py-4 text-muted">
-                            <i class="bi bi-people fs-2 opacity-20"></i>
-                            <p class="small mt-2">No characters found.</p>
-                        </div>
-                        {% endif %}
-                    </div>
-
-                    <div class="sidebar-card">
-                        <div class="nav-section-title mt-0 mb-3">Relationships</div>
-                        <p class="text-muted small italic mb-0" style="font-size: 0.75rem;">Select character to see
-                            dynamics.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div id="sidebar-tab-ghostwriter" style="display: none;">
-                <div class="writing-sidebar-header">
-                    <span>Ghostwriter</span>
-                    <i class="bi bi-x-lg cursor-pointer small" onclick="closeSidebarRight()"></i>
-                </div>
-                <div class="ghostwriter-chat-container">
-                    <div class="ghostwriter-chat-card">
-                        <div class="quick-insight-btns">
-                            <button class="insight-btn" onclick="askGhostwriter('Summarize the current plot')"><i
-                                    class="bi bi-text-paragraph"></i> Summarise</button>
-                            <button class="insight-btn"
-                                onclick="askGhostwriter('What character dynamics are active here?')"><i
-                                    class="bi bi-people"></i> Dynamics</button>
-                            <button class="insight-btn"
-                                onclick="askGhostwriter('Check for plot holes in this scene')"><i
-                                    class="bi bi-search"></i> Plot Check</button>
-                            <button class="insight-btn"
-                                onclick="askGhostwriter('Suggest character actions for this beat')"><i
-                                    class="bi bi-lightning"></i> suggestions</button>
-                        </div>
-                        <div class="chat-messages" id="ghostwriter-messages">
-                            <div class="chat-bubble ai">
-                                Hello! I am your Story Ghostwriter. How can I help with Chapter {{
-                                chapter.chapter_number }}?
-                            </div>
-                        </div>
-                        <div class="chat-input-area">
-                            <input type="text" class="form-control" id="ghostwriter-input"
-                                placeholder="Ask about your story..."
-                                onkeypress="if(event.key === 'Enter') sendToGhostwriter()">
-                            <button class="btn btn-primary btn-sm rounded-circle" onclick="sendToGhostwriter()"><i
-                                    class="bi bi-send"></i></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- AI Audit Tab -->
-            <div id="sidebar-tab-audit" style="display: none;">
-                <div class="writing-sidebar-header">
-                    <span>Style & Voice Audit</span>
-                    <i class="bi bi-x-lg cursor-pointer small" onclick="closeSidebarRight()"></i>
-                </div>
-                <div class="writing-sidebar-content">
-                    <div class="sidebar-card">
-                        <h6 class="text-uppercase small fw-bold text-warning mb-3">Manuscript Health</h6>
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="small fw-medium">Readability</span>
-                            <span class="badge bg-success bg-opacity-10 text-success">SMOOTH</span>
-                        </div>
-                        <div class="progress mb-3" style="height: 4px;">
-                            <div class="progress-bar bg-success" style="width: 85%"></div>
-                        </div>
-
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="small fw-medium">Voice Match</span>
-                            <span class="badge bg-primary bg-opacity-10 text-primary">CONSISTENT</span>
-                        </div>
-                        <div class="progress mb-4" style="height: 4px;">
-                            <div class="progress-bar bg-primary" style="width: 88%"></div>
-                        </div>
-
-                        <div class="p-3 rounded bg-light border">
-                            <p class="small text-muted mb-0 italic">"The emotional arc in this chapter is strong, but
-                                sentence length in Scene 2 is 40% higher than your series benchmark."</p>
-                        </div>
-                    </div>
-
-                    <div class="sidebar-card">
-                        <h6 class="text-uppercase small fw-bold text-muted mb-3">Genre Benchmarks</h6>
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between small mb-1">
-                                <span>Raymond Chandler</span>
-                                <span class="fw-bold">82%</span>
-                            </div>
-                            <div class="progress" style="height: 4px;">
-                                <div class="progress-bar bg-warning" style="width: 82%"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="d-flex justify-content-between small mb-1">
-                                <span>Stephen King</span>
-                                <span class="fw-bold">64%</span>
-                            </div>
-                            <div class="progress" style="height: 4px;">
-                                <div class="progress-bar bg-gray-300" style="width: 64%"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Team & Collaboration Tab -->
-            <div id="sidebar-tab-team" style="display: none;">
-                <div class="writing-sidebar-header">
-                    <span>Production Studio</span>
-                    <i class="bi bi-x-lg cursor-pointer small" onclick="closeSidebarRight()"></i>
-                </div>
-                <div class="writing-sidebar-content">
-                    <div class="sidebar-card">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6 class="text-uppercase small fw-bold text-primary mb-0">Team Access</h6>
-                            <button class="btn btn-link btn-sm p-0 text-decoration-none">+ INVITE</button>
-                        </div>
-                        <div class="d-flex gap-2">
-                            <div class="p-2 rounded border bg-light flex-grow-1">
-                                <span class="badge bg-success rounded-circle p-1 me-1">JD</span>
-                                <span class="small">Editor (Jane)</span>
-                            </div>
-                            <div class="p-2 rounded border bg-light flex-grow-1">
-                                <span class="badge bg-primary rounded-circle p-1 me-1">MK</span>
-                                <span class="small">Beta (Mike)</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="sidebar-card">
-                        <h6 class="text-uppercase small fw-bold text-muted mb-3">Revision History</h6>
-                        <div class="list-group list-group-flush">
-                            <div
-                                class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center bg-transparent">
-                                <div>
-                                    <div class="small fw-bold">Ch. {{ chapter.chapter_number }}: Current</div>
-                                    <div class="text-muted" style="font-size: 0.7rem;">Saved 2 mins ago</div>
-                                </div>
-                                <span class="badge bg-primary bg-opacity-10 text-primary">ACTIVE</span>
-                            </div>
-                            <a href="#"
-                                class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center bg-transparent text-decoration-none">
-                                <div>
-                                    <div class="small fw-bold">Original Draft</div>
-                                    <div class="text-muted" style="font-size: 0.7rem;">Yesterday at 11:45 PM</div>
-                                </div>
-                                <button class="btn btn-sm btn-outline-primary py-0 px-2"
-                                    style="font-size: 0.7rem;">RESTORE</button>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Scrapbook Tab -->
-            <div id="sidebar-tab-scrapbook" style="display: none;">
-                <div class="writing-sidebar-header">
-                    <span>Scrapbook & Snippets</span>
-                    <i class="bi bi-x-lg cursor-pointer small" onclick="closeSidebarRight()"></i>
-                </div>
-                <div class="writing-sidebar-content">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h6 class="text-uppercase small fw-bold text-muted mb-0">Saved Snippets</h6>
-                        <button class="btn btn-sm btn-dark"><i class="bi bi-plus-lg"></i></button>
-                    </div>
-                    <div class="sidebar-card bg-amber-50 border-amber-100 mb-2">
-                        <p class="small text-dark mb-0 italic">"The rain tasted like iron and old pennies..."</p>
-                    </div>
-                    <div class="sidebar-card bg-blue-50 border-blue-100 mb-2">
-                        <p class="small text-dark mb-0 italic">"Metaphor regarding the shifting tides of Agnes's
-                            soul..."</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Export Tab -->
-            <div id="sidebar-tab-export" style="display: none;">
-                <div class="writing-sidebar-header">
-                    <span>Export & Publishing</span>
-                    <i class="bi bi-x-lg cursor-pointer small" onclick="closeSidebarRight()"></i>
-                </div>
-                <div class="writing-sidebar-content">
-                    <div class="sidebar-card">
-                        <h6 class="text-uppercase small fw-bold text-success mb-3">Manuscript Export</h6>
-                        <div class="row g-2 mb-4">
-                            <div class="col-4">
-                                <div
-                                    class="p-2 border rounded text-center cursor-pointer border-success bg-success bg-opacity-10">
-                                    <i class="bi bi-file-earmark-word d-block mb-1 text-success"></i>
-                                    <span class="x-small fw-bold">.DOCX</span>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="p-2 border rounded text-center cursor-pointer hover-bg-light">
-                                    <i class="bi bi-file-earmark-pdf d-block mb-1 text-muted"></i>
-                                    <span class="x-small fw-bold text-muted">.PDF</span>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="p-2 border rounded text-center cursor-pointer hover-bg-light">
-                                    <i class="bi bi-book d-block mb-1 text-muted"></i>
-                                    <span class="x-small fw-bold text-muted">.EPUB</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-check form-switch small mb-3">
-                            <input class="form-check-input" type="checkbox" checked id="switchExportFM">
-                            <label class="form-check-label" for="switchExportFM">Standard Manuscript Format</label>
-                        </div>
-
-                        <button class="btn btn-success w-100 fw-bold border-0 shadow-sm"
-                            style="background-color: #10b981; color: white;">
-                            GENERATE DOWNLOAD
-                        </button>
-                    </div>
-
-                    <div class="p-3 border rounded border-dashed text-muted x-small font-serif leading-relaxed">
-                        AARON TEMPLE — "THE GILDED CAGE" — PAGE 1<br><br>
-                        Agnes sat by the window. The reflection of the city lights danced against the cold
-                        glass. She knew the secret was safe...
-                    </div>
-                </div>
-            </div>
-
-            <!-- Map Tab Placeholder -->
-            <div id="sidebar-tab-map" style="display: none;">
-                <div class="writing-sidebar-header">
-                    <span>Relationship Map</span>
-                    <i class="bi bi-x-lg cursor-pointer small" onclick="closeSidebarRight()"></i>
-                </div>
-                <div class="writing-sidebar-content">
-                    <div class="text-center py-5">
-                        <i class="bi bi-diagram-3 fs-1 text-muted opacity-20"></i>
-                        <p class="small mt-3">Visualizing character dynamics...</p>
-                        <a href="{% url 'timeline_view' %}" class="btn btn-sm btn-outline-primary mt-2">Open Full
-                            Map</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Timeline Tab Placeholder -->
-            <div id="sidebar-tab-timeline" style="display: none;">
-                <div class="writing-sidebar-header">
-                    <span>Project Timeline</span>
-                    <i class="bi bi-x-lg cursor-pointer small" onclick="closeSidebarRight()"></i>
-                </div>
-                <div class="writing-sidebar-content">
-                    <div class="text-center py-5">
-                        <i class="bi bi-clock-history fs-1 text-muted opacity-20"></i>
-                        <p class="small mt-3">Loading story events...</p>
-                        <a href="{% url 'timeline_view' %}" class="btn btn-sm btn-outline-primary mt-2">Open Full
-                            Timeline</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </aside>
-</div>
-
-<!-- Floating Toolbar for Selection (Bubble Menu) -->
-<div id="bubble-menu" style="display:none; position:absolute; z-index:1000;" class="d-flex align-items-center">
-    <button class="bubble-btn" onclick="applyMagic('bold')"><i class="bi bi-type-bold"></i></button>
-    <button class="bubble-btn" onclick="applyMagic('italic')"><i class="bi bi-type-italic"></i></button>
-    <div class="bubble-divider"></div>
-    <div class="dropdown">
-        <button class="bubble-btn" data-bs-toggle="dropdown">
-            <i class="bi bi-stars"></i> Magic
-        </button>
-        <ul class="dropdown-menu dropdown-menu-dark shadow">
-            <li><a class="dropdown-item" href="#" onclick="applyMagic('improve')"><i
-                        class="bi bi-pencil-square me-2"></i>
-                    Improve Prose</a></li>
-            <li><a class="dropdown-item" href="#" onclick="applyMagic('expand')"><i
-                        class="bi bi-arrows-angle-expand me-2"></i>
-                    Expand Scene</a></li>
-            <li><a class="dropdown-item" href="#" onclick="applyMagic('show-dont-tell')"><i class="bi bi-eye me-2"></i>
-                    Show,
-                    Don't Tell</a></li>
-            <li>
-                <hr class="dropdown-divider">
-            </li>
-            <li class="dropdown-header">Tone</li>
-            <li><a class="dropdown-item" href="#" onclick="applyMagic('tone-intense')">Intense</a></li>
-            <li><a class="dropdown-item" href="#" onclick="applyMagic('tone-playful')">Playful</a></li>
-        </ul>
-    </div>
-</div>
-
-{% endblock %}
-
-{% block extra_js %}
-<!-- Quill JS -->
-<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-
-<script>
-    function toggleSidebar(side) {
-        const sidebar = document.getElementById(`sidebar-${side}`);
-        sidebar.classList.toggle('collapsed');
-    }
-
-    // Sidebar Tab Switching
-    window.switchSidebarTab = function (tab) {
-        const sidebar = document.getElementById('sidebar-right');
-        const icon = document.getElementById(`icon-${tab}`);
-        if (!icon) return;
-
-        const isCurrentActive = icon.classList.contains('active');
-
-        if (isCurrentActive && sidebar.classList.contains('expanded')) {
-            closeSidebarRight();
-            return;
-        }
-
-        document.querySelectorAll('.sidebar-icon').forEach(i => i.classList.remove('active'));
-        document.querySelectorAll('[id^="sidebar-tab-"]').forEach(t => t.style.display = 'none');
-
-        sidebar.classList.add('expanded');
-        icon.classList.add('active');
-        const targetTab = document.getElementById(`sidebar-tab-${tab}`);
-        if (targetTab) targetTab.style.display = 'block';
-    }
-
-    window.closeSidebarRight = function () {
-        const sidebar = document.getElementById('sidebar-right');
-        sidebar.classList.remove('expanded');
-        document.querySelectorAll('.sidebar-icon').forEach(i => i.classList.remove('active'));
-    }
-
-    // Ghostwriter Chat
-    window.sendToGhostwriter = function () {
-        const input = document.getElementById('ghostwriter-input');
-        const query = input.value.trim();
-        if (!query) return;
-
-        addChatBubble('user', query);
-        input.value = '';
-
-        const thinkingId = addChatBubble('ai thinking-bubble', 'Ghostwriter is thinking...');
-
-        fetch("{% url 'api_ai_consultant' %}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-            },
-            body: JSON.stringify({
-                query: query,
-                scene_content: quill.getText()
-            })
-        })
-            .then(response => response.json())
-            .then(data => {
-                const thinkingElem = document.getElementById(thinkingId);
-                if (data.status === 'success') {
-                    thinkingElem.innerText = data.response;
-                    thinkingElem.classList.remove('thinking-bubble');
-                } else {
-                    thinkingElem.innerText = "Error: " + data.message;
-                    thinkingElem.classList.add('text-danger');
-                }
-            })
-            .catch(error => {
-                document.getElementById(thinkingId).innerText = "Failed to connect to AI.";
-            });
-    }
-
-    window.askGhostwriter = function (query) {
-        switchSidebarTab('ghostwriter');
-        document.getElementById('ghostwriter-input').value = query;
-        sendToGhostwriter();
-    }
-
-    function addChatBubble(role, text) {
-        const container = document.getElementById('ghostwriter-messages');
-        const id = 'chat-' + Date.now();
-        container.innerHTML += `<div class="chat-bubble ${role}" id="${id}">${text}</div>`;
-        container.scrollTop = container.scrollHeight;
-        return id;
-    }
-
-    // Magic Bubble Menu Actions
-    window.applyMagic = function (action) {
-        const selection = quill.getSelection();
-        if (!selection || selection.length === 0) return;
-
-        const selectedText = quill.getText(selection.index, selection.length);
-
-        if (action === 'bold') {
-            quill.format('bold', !quill.getFormat().bold);
-            return;
-        }
-        if (action === 'italic') {
-            quill.format('italic', !quill.getFormat().italic);
-            return;
-        }
-
-        // AI Actions
-        const btnMagic = document.querySelector('.bubble-btn .bi-stars').parentElement;
-        const originalHtml = btnMagic.innerHTML;
-        btnMagic.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> ...';
-
-        let instruction = "";
-        switch (action) {
-            case 'improve': instruction = "Improve the prose and flow of this selection."; break;
-            case 'expand': instruction = "Expand on this scene, adding more sensory detail."; break;
-            case 'show-dont-tell': instruction = "Rewrite this to follow 'Show, Don't Tell' principles."; break;
-            case 'tone-intense': instruction = "Rewrite this selection with a more intense, high-stakes tone."; break;
-            case 'tone-playful': instruction = "Rewrite this selection with a more playful, lighthearted tone."; break;
-        }
-
-        fetch("{% url 'api_generate_prose' %}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-            },
-            body: JSON.stringify({
-                chapter_id: "{{ chapter.pk }}",
-                current_text: quill.getText(),
-                instruction: `Focusing ONLY on this segment: "${selectedText}". ${instruction} Return only the improved segment.`
-            })
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.generated_text) {
-                    quill.deleteText(selection.index, selection.length);
-                    quill.insertText(selection.index, data.generated_text);
-                    quill.setSelection(selection.index, data.generated_text.length);
-                }
-            })
-            .finally(() => {
-                btnMagic.innerHTML = originalHtml;
-                document.getElementById('bubble-menu').style.display = 'none';
-            });
-    }
-
-    // Quill Selection Handling for Bubble Menu
-    quill.on('selection-change', function (range) {
-        const menu = document.getElementById('bubble-menu');
-        if (range && range.length > 0) {
-            const bounds = quill.getBounds(range.index, range.length);
-            const editorPos = document.getElementById('writing-editor').getBoundingClientRect();
-
-            menu.style.display = 'flex';
-            menu.style.left = (bounds.left + editorPos.left + (bounds.width / 2) - (menu.offsetWidth / 2)) + 'px';
-            menu.style.top = (bounds.top + editorPos.top - 50) + 'px';
-        } else {
-            menu.style.display = 'none';
-        }
-    });
-
-    document.addEventListener('DOMContentLoaded', function () {
-        // Initialize Quill
-        var quill = new Quill('#writing-editor', {
-            theme: 'snow',
-            modules: {
-                toolbar: false // Handle toolbar manually
-            },
-            placeholder: 'Type here...'
-        });
-        window.quill = quill; // Make global for other functions
-
-        // Hide the default toolbar that quill adds if theme is snow
-        const qlToolbar = document.querySelector('.ql-toolbar');
-        if (qlToolbar) qlToolbar.style.display = 'none';
-
-        // Auto-save logic
-        let timeout = null;
-        function saveContent() {
-            const content = quill.root.innerHTML;
-            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-            const btnSave = document.getElementById('btn-save-manuscript');
-
-            btnSave.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> Saving...';
-
-            fetch("{% url 'chapter_edit' chapter.pk %}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': csrfToken,
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: new URLSearchParams({
-                    'content': content,
-                    'title': "{{ chapter.title }}",
-                    'chapter_number': "{{ chapter.chapter_number }}"
-                })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    btnSave.innerHTML = '<i class="bi bi-check2"></i> Saved';
-                    setTimeout(() => {
-                        btnSave.innerHTML = '<i class="bi bi-save"></i> Save';
-                    }, 2000);
-                })
-                .catch(error => {
-                    console.error('Save failed:', error);
-                    btnSave.innerHTML = '<i class="bi bi-exclamation-triangle"></i> Error';
-                });
-        }
-
-        quill.on('text-change', function () {
-            clearTimeout(timeout);
-            timeout = setTimeout(saveContent, 3000); // Auto-save after 3s of inactivity
-        });
-
-        document.getElementById('btn-save-manuscript').addEventListener('click', saveContent);
-
-        // AI Writing Hook
-        const btnAI = document.getElementById('btn-ai-writing');
-        if (btnAI) {
-            btnAI.addEventListener('click', function () {
-                const currentText = quill.getText();
-                const selection = quill.getSelection(true);
-
-                btnAI.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> Writing...';
-                btnAI.disabled = true;
-
-                fetch("{% url 'api_generate_prose' %}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                    },
-                    body: JSON.stringify({
-                        chapter_id: "{{ chapter.pk }}",
-                        current_text: currentText,
-                        instruction: "Continue the story naturally."
-                    })
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.generated_text) {
-                            quill.insertText(selection.index, data.generated_text);
-                            quill.setSelection(selection.index + data.generated_text.length);
-                        }
-                    })
-                    .finally(() => {
-                        btnAI.innerHTML = '<i class="bi bi-magic"></i> AI Writing';
-                        btnAI.disabled = false;
-                    });
-            });
-        }
-
-        // CSS handles full-width layout via .writing-mode-active class on body
-        document.body.classList.add('writing-mode-active');
-    });
-</script>
+{% extends 'timeline/base.html' %}
+{% load static %}
+{% block title %}Writing Mode - {{ chapter.title }}{% endblock %}
+{% block extra_css %}
+<style>
+    /* Writing Mode Layout - FORCE FULL WIDTH */
+    body.writing-mode-active {
+        overflow: hidden;
+    }
+    /* Hide base.html sidebar and main container padding */
+    body.writing-mode-active .sidebar,
+    body.writing-mode-active .navbar,
+    body.writing-mode-active .d-flex.justify-content-end.align-items-center.mb-3 {
+        display: none !important;
+    }
+    /* Override Bootstrap columns to take full width */
+    body.writing-mode-active .main-content {
+        width: 100% !important;
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    body.writing-mode-active .page-container {
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+    }
+    #writing-mode-container {
+        display: flex;
+        position: fixed;
+        /* FORCE OVERLAP */
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: #f4f1ee;
+        /* MATCH APP BACKGROUND */
+        overflow: hidden;
+        z-index: 9999;
+    }
+    /* Hide standard scrollbars but keep functionality */
+    * {
+        scrollbar-width: none;
+        /* Firefox */
+        -ms-overflow-style: none;
+        /* IE/Edge */
+    }
+    *::-webkit-scrollbar {
+        display: none;
+        /* Chrome/Safari/Brave */
+    }
+    /* Sidebars */
+    .writing-sidebar {
+        width: 260px;
+        background-color: #ffffff;
+        border-right: 1px solid #e5e7eb;
+        display: flex;
+        flex-direction: column;
+        transition: width 0.3s ease;
+    }
+    .writing-sidebar.collapsed {
+        width: 0;
+        overflow: hidden;
+        border-right: none;
+    }
+    .writing-sidebar-header {
+        padding: 1rem;
+        border-bottom: 1px solid #f3f4f6;
+        font-weight: 600;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #ffffff;
+    }
+    .writing-sidebar-content {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 1rem;
+        background-color: #ffffff;
+    }
+    /* Left Sidebar Specific */
+    .nav-section-title {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #9ca3af;
+        margin-top: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+    .nav-item-link {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem;
+        color: #4b5563;
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        margin-bottom: 2px;
+    }
+    .nav-item-link:hover,
+    .nav-item-link.active {
+        background-color: #f3f4f6;
+        color: #111827;
+    }
+    .nav-item-link i {
+        margin-right: 0.75rem;
+        width: 16px;
+        text-align: center;
+    }
+    /* Main Content */
+    #writing-main {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        background-color: #f4f1ee;
+        /* MATCH APP BACKGROUND */
+        position: relative;
+    }
+    /* Toolbar */
+    #writing-toolbar {
+        height: 56px;
+        background-color: #ffffff;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 1.5rem;
+        z-index: 10;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    .toolbar-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .toolbar-btn {
+        background: none;
+        border: 1px solid transparent;
+        padding: 0.5rem 0.75rem;
+        border-radius: 6px;
+        color: #4b5563;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        transition: all 0.2s;
+    }
+    .toolbar-btn:hover {
+        background-color: #f3f4f6;
+        color: #111827;
+    }
+    .toolbar-btn i {
+        font-size: 1rem;
+    }
+    .toolbar-btn.btn-primary-action {
+        background-color: #111827;
+        color: #ffffff;
+    }
+    .toolbar-btn.btn-primary-action:hover {
+        background-color: #374151;
+    }
+    /* Editor Page Area */
+    #editor-viewport {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 3rem 1rem;
+        display: flex;
+        justify-content: center;
+    }
+    #editor-page {
+        width: 100%;
+        max-width: 800px;
+        background-color: #ffffff;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        min-height: 1000px;
+        padding: 4rem 5rem;
+        border-radius: 30px;
+        /* USER REQUEST: 30px border radius */
+    }
+    #writing-editor {
+        font-family: 'Merriweather', serif;
+        font-size: 1.15rem;
+        line-height: 1.8;
+        color: #111827;
+        outline: none;
+    }
+    .chapter-title-header {
+        font-family: 'Inter', sans-serif;
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    .chapter-number-small {
+        font-size: 1.5rem;
+        color: #d1d5db;
+        margin-bottom: 0.5rem;
+    }
+    .chapter-title-text {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #111827;
+    }
+    /* Thin Black Icon Dock Layout */
+    .writing-sidebar-right {
+        width: 50px;
+        /* Minimal width for the dock */
+        background-color: #000000;
+        border-left: 1px solid #111111;
+        display: flex;
+        flex-direction: row;
+        /* Icons on the left, content on the right */
+        color: #e5e7eb;
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: visible;
+        z-index: 1000;
+        position: relative;
+    }
+    .writing-sidebar-right.expanded {
+        width: 800px !important;
+        min-width: 800px !important;
+        max-width: 800px !important;
+        /* Forced 800px width for maximum visibility */
+    }
+    /* Vertical Icon Bar - Always 50px */
+    .sidebar-icon-bar {
+        width: 50px;
+        min-width: 50px;
+        background-color: #000000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-top: 1rem;
+        gap: 1.5rem;
+        z-index: 10;
+        border-right: none;
+    }
+    .sidebar-icon {
+        color: #9ca3af;
+        font-size: 1.25rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        width: 100%;
+        text-align: center;
+        padding: 0.75rem 0;
+        position: relative;
+    }
+    .sidebar-icon:hover {
+        color: #ffffff;
+    }
+    .sidebar-icon.active {
+        color: #ffffff;
+        background-color: #1f2937;
+    }
+    .sidebar-icon.active::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 20%;
+        height: 60%;
+        width: 3px;
+        background-color: #6366f1;
+        /* Accent for active state */
+        border-radius: 3px 0 0 3px;
+    }
+    /* Content Area - Slides out to the left */
+    .sidebar-content-area {
+        flex-grow: 1;
+        display: none;
+        /* Hidden unless expanded */
+        flex-direction: column;
+        overflow: hidden;
+        background-color: #f4f1ee;
+        border-right: 1px solid #e5e7eb;
+    }
+    .writing-sidebar-right.expanded .sidebar-content-area {
+        display: flex;
+    }
+    .writing-sidebar-right .cast-avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        margin-right: 0.75rem;
+        color: white;
+        font-weight: 600;
+    }
+    .writing-sidebar-right .ghostwriter-chat-container .chat-messages {
+        height: calc(100vh - 250px);
+    }
+    .writing-sidebar-right .writing-sidebar-header {
+        background-color: #f4f1ee;
+        color: #111827;
+        border-bottom: none;
+        padding: 1.25rem 1.25rem 0.5rem 1.25rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+    .writing-sidebar-right .writing-sidebar-content {
+        background-color: #f4f1ee;
+        color: #4b5563;
+        padding: 1.25rem;
+        overflow-y: auto;
+    }
+    .sidebar-card {
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid #e5e7eb;
+    }
+    .writing-sidebar-right .cast-item {
+        border-bottom: 1px solid #f3f4f6;
+    }
+    .writing-sidebar-right .nav-section-title {
+        color: #9ca3af;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-top: 1rem;
+    }
+    /* AI Ghostwriter Sidebar & Chat - Card Theme */
+    .ghostwriter-chat-container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        background-color: #f4f1ee;
+        padding: 1.25rem;
+    }
+    .ghostwriter-chat-card {
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        overflow: hidden;
+        border: 1px solid #e5e7eb;
+    }
+    .chat-messages {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    .chat-bubble {
+        padding: 0.75rem;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        max-width: 90%;
+        line-height: 1.5;
+    }
+    .chat-bubble.ai {
+        background-color: #f3f4f6;
+        color: #1f2937;
+        align-self: flex-start;
+        border-bottom-left-radius: 2px;
+    }
+    .chat-bubble.user {
+        background-color: #3b82f6;
+        color: #ffffff;
+        align-self: flex-end;
+        border-bottom-right-radius: 2px;
+    }
+    .chat-input-area {
+        padding: 1rem;
+        border-top: 1px solid #f3f4f6;
+        display: flex;
+        gap: 0.5rem;
+        background-color: #ffffff;
+    }
+    .chat-input-area input {
+        border-radius: 20px;
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+        background-color: #f9fafb;
+        border: 1px solid #e5e7eb;
+        color: #111827;
+    }
+    .chat-input-area input::placeholder {
+        color: #9ca3af;
+    }
+    .quick-insight-btns {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+        padding: 1rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .insight-btn {
+        background-color: #f9fafb;
+        border: 1px solid #e5e7eb;
+        padding: 0.5rem;
+        border-radius: 6px;
+        font-size: 0.7rem;
+        color: #374151;
+        text-align: left;
+        transition: all 0.2s;
+    }
+    .insight-btn:hover {
+        background-color: #f3f4f6;
+        border-color: #d1d5db;
+        color: #111827;
+    }
+    .insight-btn i {
+        color: #6366f1;
+        margin-right: 0.3rem;
+    }
+    /* Selection Menu Upgrades */
+    #bubble-menu {
+        padding: 6px;
+        border-radius: 50px;
+        background: #111827;
+        border: none;
+    }
+    .bubble-btn {
+        background: none;
+        border: none;
+        color: #d1d5db;
+        padding: 0.5rem 0.8rem;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        border-radius: 50px;
+        transition: color 0.2s;
+    }
+    .bubble-btn:hover {
+        color: #ffffff;
+        background: #374151;
+    }
+    .bubble-divider {
+        width: 1px;
+        background: #374151;
+        margin: 0 4px;
+    }
+    /* Thinking State Animation */
+    @keyframes pulse-subtle {
+        0% {
+            opacity: 0.5;
+        }
+        50% {
+            opacity: 1;
+        }
+        100% {
+            opacity: 0.5;
+        }
+    }
+    .thinking-bubble {
+        animation: pulse-subtle 1.5s infinite;
+        font-style: italic;
+        color: #9ca3af;
+    }
+    /* AI Ghostwrite Response Area */
+    #ai-ghostwrite-response {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        width: 400px;
+        max-height: 500px;
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        border: 1px solid #e5e7eb;
+        display: none;
+        flex-direction: column;
+        z-index: 100;
+    }
+    /* Quill Overrides */
+    .ql-editor {
+        min-height: 500px;
+        font-family: 'Merriweather', serif !important;
+        font-size: 1.15rem !important;
+        line-height: 1.8 !important;
+        padding: 0 !important;
+    }
+    .ql-container.ql-snow {
+        border: none !important;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div id="writing-mode-container">
+    <!-- Left Sidebar: Manuscript & Nav -->
+    <aside class="writing-sidebar" id="sidebar-left">
+        <div class="writing-sidebar-header">
+            <span>Binder</span>
+            <i class="bi bi-layout-sidebar sidebar-toggle" onclick="toggleSidebar('left')"></i>
+        </div>
+        <div class="writing-sidebar-content">
+            <div class="input-group input-group-sm mb-3">
+                <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" class="form-control border-start-0" placeholder="Search Binder">
+            </div>
+            <nav>
+                <div class="nav-section-title">Manuscript</div>
+                {% for ch in chapters %}
+                <a href="{% url 'writing_mode' ch.pk %}"
+                    class="nav-item-link {% if ch.pk == chapter.pk %}active{% endif %}">
+                    <i class="bi bi-file-text"></i>
+                    <span class="text-truncate">{{ ch.title }}</span>
+                </a>
+                {% endfor %}
+                <div class="nav-section-title">Research</div>
+                <a href="#" class="nav-item-link"><i class="bi bi-folder"></i> Folder</a>
+                <div class="nav-section-title">Characters</div>
+                {% for char in characters|slice:":5" %}
+                <a href="{% url 'character_detail' char.pk %}" class="nav-item-link">
+                    <i class="bi bi-person"></i>
+                    <span class="text-truncate">{{ char.name }}</span>
+                </a>
+                {% endfor %}
+                <a href="{% url 'character_list' %}" class="nav-item-link text-muted small"><i class="bi bi-plus"></i>
+                    View All</a>
+                <div class="nav-section-title">Scenes</div>
+                <a href="{% url 'timeline_view' %}" class="nav-item-link"><i class="bi bi-geo-alt"></i> Timeline</a>
+                <div class="nav-section-title">Production</div>
+                <a href="#" class="nav-item-link" onclick="switchSidebarTab('audit')">
+                    <i class="bi bi-clipboard-check text-warning"></i>
+                    <span>Style Audit</span>
+                </a>
+                <a href="#" class="nav-item-link" onclick="switchSidebarTab('team')">
+                    <i class="bi bi-people-fill text-primary"></i>
+                    <span>Team Studio</span>
+                </a>
+                <a href="#" class="nav-item-link" onclick="switchSidebarTab('scrapbook')">
+                    <i class="bi bi-journal-bookmark text-info"></i>
+                    <span>Scrapbook</span>
+                </a>
+                <a href="#" class="nav-item-link" onclick="switchSidebarTab('export')">
+                    <i class="bi bi-file-earmark-arrow-up text-success"></i>
+                    <span>Export & Publish</span>
+                </a>
+            </nav>
+            <div class="mt-auto pt-4">
+                <button class="btn btn-sm btn-outline-secondary w-100 mb-2"><i class="bi bi-archive"></i>
+                    Archive</button>
+                <button class="btn btn-sm btn-outline-dark w-100 mb-2"><i class="bi bi-plus-lg"></i> Add New
+                    Chapter</button>
+                <button class="btn btn-sm btn-outline-secondary w-100"><i class="bi bi-file-earmark-arrow-up"></i>
+                    Import Text</button>
+            </div>
+        </div>
+    </aside>
+    <!-- Main Editor Area -->
+    <main id="writing-main">
+        <!-- Toolbar -->
+        <div id="writing-toolbar">
+            <div class="toolbar-group">
+                <i class="bi bi-layout-sidebar sidebar-toggle" onclick="toggleSidebar('left')"></i>
+                <div class="dropdown">
+                    <button class="toolbar-btn dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <span class="badge bg-primary me-2">{{ chapter.chapter_number }}</span> {{
+                        chapter.title|truncatechars:20 }}
+                    </button>
+                    <ul class="dropdown-menu shadow border-0">
+                        <li><a class="dropdown-item py-2" href="{% url 'dashboard' %}"><i
+                                    class="bi bi-house-fill me-2"></i> Exit to Dashboard</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li class="dropdown-header small text-uppercase fw-bold">Manuscript</li>
+                        {% for ch in chapters %}
+                        <li><a class="dropdown-item {% if ch.pk == chapter.pk %}active{% endif %}"
+                                href="{% url 'writing_mode' ch.pk %}">Ch. {{ ch.chapter_number }}: {{ ch.title }}</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <div class="toolbar-group">
+                <button class="toolbar-btn" id="btn-ai-writing"><i class="bi bi-magic"></i> AI Writing</button>
+                <button class="toolbar-btn"><i class="bi bi-eye"></i> Review</button>
+                <button class="toolbar-btn"><i class="bi bi-palette"></i> Style</button>
+                <button class="toolbar-btn"><i class="bi bi-clock-history"></i> History</button>
+                <button class="toolbar-btn"><i class="bi bi-arrow-repeat"></i> Sync</button>
+                <button class="toolbar-btn"><i class="bi bi-fullscreen"></i> Focus</button>
+            </div>
+            <div class="toolbar-group">
+                <button class="toolbar-btn btn-primary-action" id="btn-save-manuscript">
+                    <i class="bi bi-save"></i> Save
+                </button>
+                <button class="toolbar-btn"><i class="bi bi-download"></i></button>
+                <button class="toolbar-btn"><i class="bi bi-upload"></i></button>
+            </div>
+        </div>
+        <!-- Editor Viewport -->
+        <div id="editor-viewport">
+            <div id="editor-page">
+                <div class="chapter-title-header">
+                    <div class="chapter-number-small">{{ chapter.chapter_number }}</div>
+                    <h1 class="chapter-title-text">{{ chapter.title }}</h1>
+                </div>
+                <div id="writing-editor">
+                    {{ chapter.content|safe }}
+                </div>
+            </div>
+        </div>
+        <!-- Hidden inputs for auto-save -->
+        <form id="auto-save-form" style="display:none;">
+            {% csrf_token %}
+            <input type="hidden" name="content" id="hidden-content">
+        </form>
+    </main>
+    <!-- Right Sidebar: Dark Thin Icon Dock + Sliding Drawer -->
+    <aside class="writing-sidebar writing-sidebar-right" id="sidebar-right">
+        <!-- Narrow Icon Bar (Fixed on the far right) -->
+        <div class="sidebar-icon-bar">
+            <div class="sidebar-icon" id="icon-cast" onclick="switchSidebarTab('cast')" title="Chapter Cast">
+                <i class="bi bi-people"></i>
+            </div>
+            <div class="sidebar-icon" id="icon-ghostwriter" onclick="switchSidebarTab('ghostwriter')"
+                title="Ghostwriter">
+                <i class="bi bi-stars"></i>
+            </div>
+            <div class="sidebar-icon" id="icon-audit" onclick="switchSidebarTab('audit')" title="AI Audit">
+                <i class="bi bi-clipboard-check"></i>
+            </div>
+            <div class="sidebar-icon" id="icon-team" onclick="switchSidebarTab('team')" title="Collaboration">
+                <i class="bi bi-people-fill"></i>
+            </div>
+            <div class="sidebar-icon" id="icon-scrapbook" onclick="switchSidebarTab('scrapbook')" title="Scrapbook">
+                <i class="bi bi-journal-bookmark"></i>
+            </div>
+            <div class="sidebar-icon" id="icon-export" onclick="switchSidebarTab('export')" title="Export">
+                <i class="bi bi-file-earmark-arrow-up"></i>
+            </div>
+            <div class="sidebar-icon" id="icon-map" onclick="switchSidebarTab('map')" title="Relationship Map">
+                <i class="bi bi-diagram-3"></i>
+            </div>
+            <div class="sidebar-icon" id="icon-timeline" onclick="switchSidebarTab('timeline')"
+                title="Project Timeline">
+                <i class="bi bi-clock-history"></i>
+            </div>
+            <div class="mt-auto mb-4">
+                <div class="sidebar-icon" title="Settings">
+                    <i class="bi bi-gear"></i>
+                </div>
+            </div>
+        </div>
+        <!-- Main Content Area (Drawer) -->
+        <div class="sidebar-content-area">
+            <div id="sidebar-tab-cast">
+                <div class="writing-sidebar-header">
+                    <span>Chapter Cast</span>
+                    <i class="bi bi-x-lg cursor-pointer small" onclick="closeSidebarRight()"></i>
+                </div>
+                <div class="writing-sidebar-content">
+                    <div class="sidebar-card">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="small fw-bold text-uppercase text-muted mb-0">Characters</h6>
+                            <button class="btn btn-sm p-0 text-dark"><i class="bi bi-plus-lg"></i></button>
+                        </div>
+                        {% if chapter_cast %}
+                        {% for char in chapter_cast %}
+                        <div class="cast-item d-flex align-items-center mb-2 pb-2">
+                            <div class="cast-avatar" style="background-color: {{ char.color_code }};">
+                                {{ char.name|slice:":1" }}
+                            </div>
+                            <div>
+                                <div class="fw-semibold small text-dark">{{ char.name }}</div>
+                                <div class="text-muted" style="font-size: 0.65rem;">{{ char.get_role_display }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="text-center py-4 text-muted">
+                            <i class="bi bi-people fs-2 opacity-20"></i>
+                            <p class="small mt-2">No characters found.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="sidebar-card">
+                        <div class="nav-section-title mt-0 mb-3">Relationships</div>
+                        <p class="text-muted small italic mb-0" style="font-size: 0.75rem;">Select character to see
+                            dynamics.</p>
+                    </div>
+                </div>
+            </div>
+            <div id="sidebar-tab-ghostwriter" style="display: none;">
+                <div class="writing-sidebar-header">
+                    <span>Ghostwriter</span>
+                    <i class="bi bi-x-lg cursor-pointer small" onclick="closeSidebarRight()"></i>
+                </div>
+                <div class="ghostwriter-chat-container">
+                    <div class="ghostwriter-chat-card">
+                        <div class="quick-insight-btns">
+                            <button class="insight-btn" onclick="askGhostwriter('Summarize the current plot')"><i
+                                    class="bi bi-text-paragraph"></i> Summarise</button>
+                            <button class="insight-btn"
+                                onclick="askGhostwriter('What character dynamics are active here?')"><i
+                                    class="bi bi-people"></i> Dynamics</button>
+                            <button class="insight-btn"
+                                onclick="askGhostwriter('Check for plot holes in this scene')"><i
+                                    class="bi bi-search"></i> Plot Check</button>
+                            <button class="insight-btn"
+                                onclick="askGhostwriter('Suggest character actions for this beat')"><i
+                                    class="bi bi-lightning"></i> suggestions</button>
+                        </div>
+                        <div class="chat-messages" id="ghostwriter-messages">
+                            <div class="chat-bubble ai">
+                                Hello! I am your Story Ghostwriter. How can I help with Chapter {{
+                                chapter.chapter_number }}?
+                            </div>
+                        </div>
+                        <div class="chat-input-area">
+                            <input type="text" class="form-control" id="ghostwriter-input"
+                                placeholder="Ask about your story..."
+                                onkeypress="if(event.key === 'Enter') sendToGhostwriter()">
+                            <button class="btn btn-primary btn-sm rounded-circle" onclick="sendToGhostwriter()"><i
+                                    class="bi bi-send"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- AI Audit Tab -->
+            <div id="sidebar-tab-audit" style="display: none;">
+                <div class="writing-sidebar-header">
+                    <span>Style & Voice Audit</span>
+                    <i class="bi bi-x-lg cursor-pointer small" onclick="closeSidebarRight()"></i>
+                </div>
+                <div class="writing-sidebar-content">
+                    <div class="sidebar-card">
+                        <h6 class="text-uppercase small fw-bold text-warning mb-3">Manuscript Health</h6>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="small fw-medium">Readability</span>
+                            <span class="badge bg-success bg-opacity-10 text-success">SMOOTH</span>
+                        </div>
+                        <div class="progress mb-3" style="height: 4px;">
+                            <div class="progress-bar bg-success" style="width: 85%"></div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="small fw-medium">Voice Match</span>
+                            <span class="badge bg-primary bg-opacity-10 text-primary">CONSISTENT</span>
+                        </div>
+                        <div class="progress mb-4" style="height: 4px;">
+                            <div class="progress-bar bg-primary" style="width: 88%"></div>
+                        </div>
+                        <div class="p-3 rounded bg-light border">
+                            <p class="small text-muted mb-0 italic">"The emotional arc in this chapter is strong, but
+                                sentence length in Scene 2 is 40% higher than your series benchmark."</p>
+                        </div>
+                    </div>
+                    <div class="sidebar-card">
+                        <h6 class="text-uppercase small fw-bold text-muted mb-3">Genre Benchmarks</h6>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between small mb-1">
+                                <span>Raymond Chandler</span>
+                                <span class="fw-bold">82%</span>
+                            </div>
+                            <div class="progress" style="height: 4px;">
+                                <div class="progress-bar bg-warning" style="width: 82%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="d-flex justify-content-between small mb-1">
+                                <span>Stephen King</span>
+                                <span class="fw-bold">64%</span>
+                            </div>
+                            <div class="progress" style="height: 4px;">
+                                <div class="progress-bar bg-gray-300" style="width: 64%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Team & Collaboration Tab -->
+            <div id="sidebar-tab-team" style="display: none;">
+                <div class="writing-sidebar-header">
+                    <span>Production Studio</span>
+                    <i class="bi bi-x-lg cursor-pointer small" onclick="closeSidebarRight()"></i>
+                </div>
+                <div class="writing-sidebar-content">
+                    <div class="sidebar-card">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="text-uppercase small fw-bold text-primary mb-0">Team Access</h6>
+                            <button class="btn btn-link btn-sm p-0 text-decoration-none">+ INVITE</button>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <div class="p-2 rounded border bg-light flex-grow-1">
+                                <span class="badge bg-success rounded-circle p-1 me-1">JD</span>
+                                <span class="small">Editor (Jane)</span>
+                            </div>
+                            <div class="p-2 rounded border bg-light flex-grow-1">
+                                <span class="badge bg-primary rounded-circle p-1 me-1">MK</span>
+                                <span class="small">Beta (Mike)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sidebar-card">
+                        <h6 class="text-uppercase small fw-bold text-muted mb-3">Revision History</h6>
+                        <div class="list-group list-group-flush">
+                            <div
+                                class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center bg-transparent">
+                                <div>
+                                    <div class="small fw-bold">Ch. {{ chapter.chapter_number }}: Current</div>
+                                    <div class="text-muted" style="font-size: 0.7rem;">Saved 2 mins ago</div>
+                                </div>
+                                <span class="badge bg-primary bg-opacity-10 text-primary">ACTIVE</span>
+                            </div>
+                            <a href="#"
+                                class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center bg-transparent text-decoration-none">
+                                <div>
+                                    <div class="small fw-bold">Original Draft</div>
+                                    <div class="text-muted" style="font-size: 0.7rem;">Yesterday at 11:45 PM</div>
+                                </div>
+                                <button class="btn btn-sm btn-outline-primary py-0 px-2"
+                                    style="font-size: 0.7rem;">RESTORE</button>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Scrapbook Tab -->
+            <div id="sidebar-tab-scrapbook" style="display: none;">
+                <div class="writing-sidebar-header">
+                    <span>Scrapbook & Snippets</span>
+                    <i class="bi bi-x-lg cursor-pointer small" onclick="closeSidebarRight()"></i>
+                </div>
+                <div class="writing-sidebar-content">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="text-uppercase small fw-bold text-muted mb-0">Saved Snippets</h6>
+                        <button class="btn btn-sm btn-dark"><i class="bi bi-plus-lg"></i></button>
+                    </div>
+                    <div class="sidebar-card bg-amber-50 border-amber-100 mb-2">
+                        <p class="small text-dark mb-0 italic">"The rain tasted like iron and old pennies..."</p>
+                    </div>
+                    <div class="sidebar-card bg-blue-50 border-blue-100 mb-2">
+                        <p class="small text-dark mb-0 italic">"Metaphor regarding the shifting tides of Agnes's
+                            soul..."</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Export Tab -->
+            <div id="sidebar-tab-export" style="display: none;">
+                <div class="writing-sidebar-header">
+                    <span>Export & Publishing</span>
+                    <i class="bi bi-x-lg cursor-pointer small" onclick="closeSidebarRight()"></i>
+                </div>
+                <div class="writing-sidebar-content">
+                    <div class="sidebar-card">
+                        <h6 class="text-uppercase small fw-bold text-success mb-3">Manuscript Export</h6>
+                        <div class="row g-2 mb-4">
+                            <div class="col-4">
+                                <div
+                                    class="p-2 border rounded text-center cursor-pointer border-success bg-success bg-opacity-10">
+                                    <i class="bi bi-file-earmark-word d-block mb-1 text-success"></i>
+                                    <span class="x-small fw-bold">.DOCX</span>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="p-2 border rounded text-center cursor-pointer hover-bg-light">
+                                    <i class="bi bi-file-earmark-pdf d-block mb-1 text-muted"></i>
+                                    <span class="x-small fw-bold text-muted">.PDF</span>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="p-2 border rounded text-center cursor-pointer hover-bg-light">
+                                    <i class="bi bi-book d-block mb-1 text-muted"></i>
+                                    <span class="x-small fw-bold text-muted">.EPUB</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-check form-switch small mb-3">
+                            <input class="form-check-input" type="checkbox" checked id="switchExportFM">
+                            <label class="form-check-label" for="switchExportFM">Standard Manuscript Format</label>
+                        </div>
+                        <button class="btn btn-success w-100 fw-bold border-0 shadow-sm"
+                            style="background-color: #10b981; color: white;">
+                            GENERATE DOWNLOAD
+                        </button>
+                    </div>
+                    <div class="p-3 border rounded border-dashed text-muted x-small font-serif leading-relaxed">
+                        AARON TEMPLE — "THE GILDED CAGE" — PAGE 1<br><br>
+                        Agnes sat by the window. The reflection of the city lights danced against the cold
+                        glass. She knew the secret was safe...
+                    </div>
+                </div>
+            </div>
+            <!-- Map Tab Placeholder -->
+            <div id="sidebar-tab-map" style="display: none;">
+                <div class="writing-sidebar-header">
+                    <span>Relationship Map</span>
+                    <i class="bi bi-x-lg cursor-pointer small" onclick="closeSidebarRight()"></i>
+                </div>
+                <div class="writing-sidebar-content">
+                    <div class="text-center py-5">
+                        <i class="bi bi-diagram-3 fs-1 text-muted opacity-20"></i>
+                        <p class="small mt-3">Visualizing character dynamics...</p>
+                        <a href="{% url 'timeline_view' %}" class="btn btn-sm btn-outline-primary mt-2">Open Full
+                            Map</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Timeline Tab Placeholder -->
+            <div id="sidebar-tab-timeline" style="display: none;">
+                <div class="writing-sidebar-header">
+                    <span>Project Timeline</span>
+                    <i class="bi bi-x-lg cursor-pointer small" onclick="closeSidebarRight()"></i>
+                </div>
+                <div class="writing-sidebar-content">
+                    <div class="text-center py-5">
+                        <i class="bi bi-clock-history fs-1 text-muted opacity-20"></i>
+                        <p class="small mt-3">Loading story events...</p>
+                        <a href="{% url 'timeline_view' %}" class="btn btn-sm btn-outline-primary mt-2">Open Full
+                            Timeline</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+</div>
+<!-- Floating Toolbar for Selection (Bubble Menu) -->
+<div id="bubble-menu" style="display:none; position:absolute; z-index:1000;" class="d-flex align-items-center">
+    <button class="bubble-btn" onclick="applyMagic('bold')"><i class="bi bi-type-bold"></i></button>
+    <button class="bubble-btn" onclick="applyMagic('italic')"><i class="bi bi-type-italic"></i></button>
+    <div class="bubble-divider"></div>
+    <div class="dropdown">
+        <button class="bubble-btn" data-bs-toggle="dropdown">
+            <i class="bi bi-stars"></i> Magic
+        </button>
+        <ul class="dropdown-menu dropdown-menu-dark shadow">
+            <li><a class="dropdown-item" href="#" onclick="applyMagic('improve')"><i
+                        class="bi bi-pencil-square me-2"></i>
+                    Improve Prose</a></li>
+            <li><a class="dropdown-item" href="#" onclick="applyMagic('expand')"><i
+                        class="bi bi-arrows-angle-expand me-2"></i>
+                    Expand Scene</a></li>
+            <li><a class="dropdown-item" href="#" onclick="applyMagic('show-dont-tell')"><i class="bi bi-eye me-2"></i>
+                    Show,
+                    Don't Tell</a></li>
+            <li>
+                <hr class="dropdown-divider">
+            </li>
+            <li class="dropdown-header">Tone</li>
+            <li><a class="dropdown-item" href="#" onclick="applyMagic('tone-intense')">Intense</a></li>
+            <li><a class="dropdown-item" href="#" onclick="applyMagic('tone-playful')">Playful</a></li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<!-- Quill JS -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+<script>
+    function toggleSidebar(side) {
+        const sidebar = document.getElementById(`sidebar-${side}`);
+        sidebar.classList.toggle('collapsed');
+    }
+    // Sidebar Tab Switching
+    window.switchSidebarTab = function (tab) {
+        const sidebar = document.getElementById('sidebar-right');
+        const icon = document.getElementById(`icon-${tab}`);
+        if (!icon) return;
+        const isCurrentActive = icon.classList.contains('active');
+        if (isCurrentActive && sidebar.classList.contains('expanded')) {
+            closeSidebarRight();
+            return;
+        }
+        document.querySelectorAll('.sidebar-icon').forEach(i => i.classList.remove('active'));
+        document.querySelectorAll('[id^="sidebar-tab-"]').forEach(t => t.style.display = 'none');
+        sidebar.classList.add('expanded');
+        icon.classList.add('active');
+        const targetTab = document.getElementById(`sidebar-tab-${tab}`);
+        if (targetTab) targetTab.style.display = 'block';
+    }
+    window.closeSidebarRight = function () {
+        const sidebar = document.getElementById('sidebar-right');
+        sidebar.classList.remove('expanded');
+        document.querySelectorAll('.sidebar-icon').forEach(i => i.classList.remove('active'));
+    }
+    // Ghostwriter Chat
+    window.sendToGhostwriter = function () {
+        const input = document.getElementById('ghostwriter-input');
+        const query = input.value.trim();
+        if (!query) return;
+        addChatBubble('user', query);
+        input.value = '';
+        const thinkingId = addChatBubble('ai thinking-bubble', 'Ghostwriter is thinking...');
+        fetch("{% url 'api_ai_consultant' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({
+                query: query,
+                scene_content: quill.getText()
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                const thinkingElem = document.getElementById(thinkingId);
+                if (data.status === 'success') {
+                    thinkingElem.innerText = data.response;
+                    thinkingElem.classList.remove('thinking-bubble');
+                } else {
+                    thinkingElem.innerText = "Error: " + data.message;
+                    thinkingElem.classList.add('text-danger');
+                }
+            })
+            .catch(error => {
+                document.getElementById(thinkingId).innerText = "Failed to connect to AI.";
+            });
+    }
+    window.askGhostwriter = function (query) {
+        switchSidebarTab('ghostwriter');
+        document.getElementById('ghostwriter-input').value = query;
+        sendToGhostwriter();
+    }
+    function addChatBubble(role, text) {
+        const container = document.getElementById('ghostwriter-messages');
+        const id = 'chat-' + Date.now();
+        container.innerHTML += `<div class="chat-bubble ${role}" id="${id}">${text}</div>`;
+        container.scrollTop = container.scrollHeight;
+        return id;
+    }
+    // Magic Bubble Menu Actions
+    window.applyMagic = function (action) {
+        const selection = quill.getSelection();
+        if (!selection || selection.length === 0) return;
+        const selectedText = quill.getText(selection.index, selection.length);
+        if (action === 'bold') {
+            quill.format('bold', !quill.getFormat().bold);
+            return;
+        }
+        if (action === 'italic') {
+            quill.format('italic', !quill.getFormat().italic);
+            return;
+        }
+        // AI Actions
+        const btnMagic = document.querySelector('.bubble-btn .bi-stars').parentElement;
+        const originalHtml = btnMagic.innerHTML;
+        btnMagic.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> ...';
+        let instruction = "";
+        switch (action) {
+            case 'improve': instruction = "Improve the prose and flow of this selection."; break;
+            case 'expand': instruction = "Expand on this scene, adding more sensory detail."; break;
+            case 'show-dont-tell': instruction = "Rewrite this to follow 'Show, Don't Tell' principles."; break;
+            case 'tone-intense': instruction = "Rewrite this selection with a more intense, high-stakes tone."; break;
+            case 'tone-playful': instruction = "Rewrite this selection with a more playful, lighthearted tone."; break;
+        }
+        fetch("{% url 'api_generate_prose' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({
+                chapter_id: "{{ chapter.pk }}",
+                current_text: quill.getText(),
+                instruction: `Focusing ONLY on this segment: "${selectedText}". ${instruction} Return only the improved segment.`
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.generated_text) {
+                    quill.deleteText(selection.index, selection.length);
+                    quill.insertText(selection.index, data.generated_text);
+                    quill.setSelection(selection.index, data.generated_text.length);
+                }
+            })
+            .finally(() => {
+                btnMagic.innerHTML = originalHtml;
+                document.getElementById('bubble-menu').style.display = 'none';
+            });
+    }
+    // Quill Selection Handling for Bubble Menu
+    quill.on('selection-change', function (range) {
+        const menu = document.getElementById('bubble-menu');
+        if (range && range.length > 0) {
+            const bounds = quill.getBounds(range.index, range.length);
+            const editorPos = document.getElementById('writing-editor').getBoundingClientRect();
+            menu.style.display = 'flex';
+            menu.style.left = (bounds.left + editorPos.left + (bounds.width / 2) - (menu.offsetWidth / 2)) + 'px';
+            menu.style.top = (bounds.top + editorPos.top - 50) + 'px';
+        } else {
+            menu.style.display = 'none';
+        }
+    });
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialize Quill
+        var quill = new Quill('#writing-editor', {
+            theme: 'snow',
+            modules: {
+                toolbar: false // Handle toolbar manually
+            },
+            placeholder: 'Type here...'
+        });
+        window.quill = quill; // Make global for other functions
+        // Hide the default toolbar that quill adds if theme is snow
+        const qlToolbar = document.querySelector('.ql-toolbar');
+        if (qlToolbar) qlToolbar.style.display = 'none';
+        // Auto-save logic
+        let timeout = null;
+        function saveContent() {
+            const content = quill.root.innerHTML;
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            const btnSave = document.getElementById('btn-save-manuscript');
+            btnSave.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> Saving...';
+            fetch("{% url 'chapter_edit' chapter.pk %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: new URLSearchParams({
+                    'content': content,
+                    'title': "{{ chapter.title }}",
+                    'chapter_number': "{{ chapter.chapter_number }}"
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    btnSave.innerHTML = '<i class="bi bi-check2"></i> Saved';
+                    setTimeout(() => {
+                        btnSave.innerHTML = '<i class="bi bi-save"></i> Save';
+                    }, 2000);
+                })
+                .catch(error => {
+                    console.error('Save failed:', error);
+                    btnSave.innerHTML = '<i class="bi bi-exclamation-triangle"></i> Error';
+                });
+        }
+        quill.on('text-change', function () {
+            clearTimeout(timeout);
+            timeout = setTimeout(saveContent, 3000); // Auto-save after 3s of inactivity
+        });
+        document.getElementById('btn-save-manuscript').addEventListener('click', saveContent);
+        // AI Writing Hook
+        const btnAI = document.getElementById('btn-ai-writing');
+        if (btnAI) {
+            btnAI.addEventListener('click', function () {
+                const currentText = quill.getText();
+                const selection = quill.getSelection(true);
+                btnAI.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> Writing...';
+                btnAI.disabled = true;
+                fetch("{% url 'api_generate_prose' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify({
+                        chapter_id: "{{ chapter.pk }}",
+                        current_text: currentText,
+                        instruction: "Continue the story naturally."
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.generated_text) {
+                            quill.insertText(selection.index, data.generated_text);
+                            quill.setSelection(selection.index + data.generated_text.length);
+                        }
+                    })
+                    .finally(() => {
+                        btnAI.innerHTML = '<i class="bi bi-magic"></i> AI Writing';
+                        btnAI.disabled = false;
+                    });
+            });
+        }
+        // CSS handles full-width layout via .writing-mode-active class on body
+        document.body.classList.add('writing-mode-active');
+    });
+</script>
 {% endblock %}

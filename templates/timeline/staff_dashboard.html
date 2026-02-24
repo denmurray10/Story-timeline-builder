@@ -1,395 +1,370 @@
-{% extends 'timeline/base.html' %}
-{% load static %}
-
-{% block title %}Staff Dashboard - Story Timeline Builder{% endblock %}
-
-{% block extra_css %}
-<style>
-    :root {
-        --staff-primary: #1e293b;
-        /* slate-800 */
-        --staff-accent: #3b82f6;
-        /* blue-500 */
-        --staff-bg: #f8fafc;
-    }
-
-    .staff-card {
-        background: white;
-        border-radius: 16px;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        transition: transform 0.2s ease;
-    }
-
-    .staff-stat-card {
-        border-left: 4px solid var(--staff-accent);
-    }
-
-    .table-staff th {
-        font-weight: 600;
-        color: #475569;
-        text-transform: uppercase;
-        font-size: 0.75rem;
-        letter-spacing: 0.05em;
-        padding: 1rem;
-        background: #f1f5f9;
-    }
-
-    .table-staff td {
-        padding: 1rem;
-        vertical-align: middle;
-        font-size: 0.9rem;
-    }
-
-    .activity-badge {
-        font-size: 0.7rem;
-        font-weight: 700;
-        padding: 2px 8px;
-        border-radius: 6px;
-    }
-
-    .badge-add {
-        background: #dcfce7;
-        color: #166534;
-    }
-
-    .badge-change {
-        background: #eef2ff;
-        color: #3730a3;
-    }
-
-    .badge-delete {
-        background: #fee2e2;
-        color: #991b1b;
-    }
-
-    .staff-sidebar-link {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        padding: 0.75rem 1rem;
-        color: #475569;
-        text-decoration: none;
-        border-radius: 12px;
-        font-weight: 500;
-        transition: all 0.2s;
-    }
-
-    .staff-sidebar-link:hover {
-        background: #f1f5f9;
-        color: var(--staff-accent);
-    }
-
-    .staff-sidebar-link.active {
-        background: #eff6ff;
-        color: #2563eb;
-    }
-
-    .user-avatar-sm {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        background: #e2e8f0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        font-size: 0.8rem;
-    }
-</style>
-{% endblock %}
-
-{% block content %}
-<div class="row g-4 mb-4">
-    <div class="col-12 d-flex justify-content-between align-items-center">
-        <div>
-            <h1 class="font-serif">Staff Overview</h1>
-            <p class="text-muted mb-0">Platform health and administrative control center.</p>
-        </div>
-        <div>
-            <a href="/admin/" class="btn btn-outline-dark rounded-pill px-4">
-                <i class="bi bi-shield-lock me-2"></i> Django Admin
-            </a>
-        </div>
-    </div>
-</div>
-
-<!-- Stats Grid -->
-<div class="row g-3 mb-5">
-    <div class="col-md-3">
-        <div class="staff-card staff-stat-card p-4">
-            <div class="text-muted small fw-bold text-uppercase mb-1">Total Users</div>
-            <div class="h2 mb-1 fw-bold">{{ stats.total_users }}</div>
-            <div class="text-success small"><i class="bi bi-person-check me-1"></i> {{ stats.active_users }} active
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="staff-card p-4" style="border-left-color: #10b981;">
-            <div class="text-muted small fw-bold text-uppercase mb-1">Total Books</div>
-            <div class="h2 mb-1 fw-bold">{{ stats.total_books }}</div>
-            <div class="text-muted small">{{ stats.total_chapters }} chapters written</div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="staff-card p-4" style="border-left-color: #f59e0b;">
-            <div class="text-muted small fw-bold text-uppercase mb-1">Blog Posts</div>
-            <div class="h2 mb-1 fw-bold">{{ stats.total_posts }}</div>
-            <div class="text-muted small">Engagement: High</div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="staff-card p-4" style="border-left-color: #8b5cf6;">
-            <div class="text-muted small fw-bold text-uppercase mb-1">World Entries</div>
-            <div class="h2 mb-1 fw-bold">{{ stats.total_world_entries }}</div>
-            <div class="text-muted small">Lore Depth: Solid</div>
-        </div>
-    </div>
-</div>
-
-{% if deepseek_balance %}
-<div class="row g-3 mb-5">
-    <div class="col-12">
-        <div class="staff-card p-4"
-            style="border-left: 4px solid #000; background: linear-gradient(to right, #ffffff, #f1f5f9);">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <div class="text-muted small fw-bold text-uppercase mb-1">DeepSeek API Balance</div>
-                    <div class="d-flex align-items-baseline gap-2">
-                        <span class="h1 mb-0 fw-bold">{{ deepseek_balance.balance_infos.0.total_balance }}</span>
-                        <span class="text-muted fw-bold">{{ deepseek_balance.balance_infos.0.currency }}</span>
-                    </div>
-                </div>
-                <div class="px-4 border-start border-end">
-                    <div class="text-muted small fw-bold text-uppercase mb-1">Today's Usage</div>
-                    <div class="d-flex align-items-baseline gap-2">
-                        <span class="h3 mb-0 fw-bold">${{ usage_stats.estimated_cost|floatformat:4 }}</span>
-                        <span class="text-muted small">({{ usage_stats.deepseek_tokens|default:0 }} tokens)</span>
-                    </div>
-                </div>
-                <div class="text-end">
-                    <div class="small text-muted mb-1">Status:
-                        {% if deepseek_balance.is_available %}
-                        <span class="text-success fw-bold">Active</span>
-                        {% else %}
-                        <span class="text-danger fw-bold">Low Balance</span>
-                        {% endif %}
-                    </div>
-                    <a href="https://platform.deepseek.com/" target="_blank"
-                        class="btn btn-sm btn-dark rounded-pill px-3">Top Up</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endif %}
-
-<div class="row g-3 mb-5">
-    {% for service in ai_services %}
-    <div class="col-md-6">
-        <div class="staff-card p-3 d-flex align-items-center justify-content-between">
-            <div class="d-flex align-items-center gap-3">
-                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center"
-                    style="width: 40px; height: 40px;">
-                    <i class="bi bi-cpu text-dark"></i>
-                </div>
-                <div>
-                    <div class="fw-bold">{{ service.name }}</div>
-                    <div class="text-muted small">{{ service.model }}</div>
-                </div>
-            </div>
-            <div>
-                {% if service.status == 'Active' %}
-                <span class="badge rounded-pill bg-success-subtle text-success px-3">Connected</span>
-                {% else %}
-                <span class="badge rounded-pill bg-danger-subtle text-danger px-3">Disconnected</span>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-    {% endfor %}
-</div>
-
-<div class="row g-4">
-    <!-- Left Column: Analytics & Users -->
-    <div class="col-lg-8">
-
-        <!-- Analytics Section -->
-        <div class="staff-card mb-4 overflow-hidden">
-            <div class="p-4 border-bottom bg-light d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 fw-bold"><i class="bi bi-graph-up me-2"></i> Traffic Analytics</h5>
-                <span class="badge bg-primary rounded-pill">Last 30 Days</span>
-            </div>
-            <div class="p-4">
-                <div class="row g-4 text-center">
-                    <div class="col-3">
-                        <div class="h4 mb-0 fw-bold">{{ analytics.sessions }}</div>
-                        <div class="text-muted small">Sessions</div>
-                    </div>
-                    <div class="col-3">
-                        <div class="h4 mb-0 fw-bold">{{ analytics.page_views }}</div>
-                        <div class="text-muted small">Page Views</div>
-                    </div>
-                    <div class="col-3">
-                        <div class="h4 mb-0 fw-bold">{{ analytics.bounce_rate }}</div>
-                        <div class="text-muted small">Bounce Rate</div>
-                    </div>
-                    <div class="col-3">
-                        <div class="h4 mb-0 fw-bold">{{ analytics.avg_duration }}</div>
-                        <div class="text-muted small">Avg. Duration</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Recent Users -->
-        <div class="staff-card overflow-hidden">
-            <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 fw-bold"><i class="bi bi-people me-2"></i> Recent Registrations</h5>
-                <a href="/admin/auth/user/" class="btn btn-sm btn-link text-decoration-none p-0">View All</a>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-staff mb-0">
-                    <thead>
-                        <tr>
-                            <th>User</th>
-                            <th>Status</th>
-                            <th>Joined</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for user in recent_users %}
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center gap-3">
-                                    <div class="user-avatar-sm">{{ user.username|slice:":1"|upper }}</div>
-                                    <div>
-                                        <div class="fw-bold text-dark">{{ user.username }}</div>
-                                        <div class="text-muted small">{{ user.email }}</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                {% if user.is_active %}
-                                <span
-                                    class="badge bg-success-subtle text-success border border-success-subtle">Active</span>
-                                {% else %}
-                                <span
-                                    class="badge bg-danger-subtle text-danger border border-danger-subtle">Inactive</span>
-                                {% endif %}
-                            </td>
-                            <td class="text-muted small">{{ user.date_joined|date:"M d, Y" }}</td>
-                            <td>
-                                <div class="d-flex gap-1">
-                                    <a href="/admin/auth/user/{{ user.id }}/change/" class="btn btn-sm btn-light border"
-                                        title="Edit User">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                    <a href="/admin/auth/user/{{ user.id }}/password/"
-                                        class="btn btn-sm btn-light border" title="Reset Password">
-                                        <i class="bi bi-key"></i>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- Right Column: Blog & Activity -->
-    <div class="col-lg-4">
-
-        <!-- Quick Actions -->
-        <div class="staff-card mb-4 p-4">
-            <h5 class="mb-3 fw-bold">Management Panel</h5>
-            <div class="d-grid gap-2">
-                <a href="/admin/blog/post/add/" class="staff-sidebar-link">
-                    <i class="bi bi-journal-plus text-success"></i> New Blog Post
-                </a>
-                <a href="/admin/auth/user/add/" class="staff-sidebar-link">
-                    <i class="bi bi-person-plus text-primary"></i> Register New User
-                </a>
-                <a href="/admin/timeline/book/" class="staff-sidebar-link">
-                    <i class="bi bi-book text-warning"></i> Audit All Books
-                </a>
-                <a href="/admin/auth/user/" class="staff-sidebar-link">
-                    <i class="bi bi-key text-info"></i> Reset Passwords
-                </a>
-            </div>
-        </div>
-
-        <!-- System Activity -->
-        <div class="staff-card overflow-hidden">
-            <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 fw-bold"><i class="bi bi-clock-history me-2"></i> System Activity</h5>
-            </div>
-            <div class="p-3" style="max-height: 400px; overflow-y: auto;">
-                {% for log in recent_activity %}
-                <div class="mb-3 pb-3 border-bottom last-child-no-border">
-                    <div class="d-flex justify-content-between align-items-start mb-1">
-                        <span
-                            class="activity-badge {% if log.is_addition %}badge-add{% elif log.is_change %}badge-change{% else %}badge-delete{% endif %}">
-                            {{ log.get_action_flag_display }}
-                        </span>
-                        <small class="text-muted">{{ log.action_time|timesince }} ago</small>
-                    </div>
-                    <div class="small fw-semibold text-dark">{{ log.user.username }}</div>
-                    <div class="small text-muted">{{ log.object_repr|truncatechars:50 }}</div>
-                </div>
-                {% empty %}
-                <div class="text-center py-4 text-muted small">No recent activity detected.</div>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Blog Management Section -->
-<div class="row mt-4">
-    <div class="col-12">
-        <div class="staff-card overflow-hidden">
-            <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 fw-bold"><i class="bi bi-journal-text me-2"></i> Managed Blog Posts</h5>
-                <a href="/admin/blog/post/" class="btn btn-sm btn-dark rounded-pill px-3">Manage Assets</a>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-staff mb-0">
-                    <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Author</th>
-                            <th>Status</th>
-                            <th>Date</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for post in blog_posts %}
-                        <tr>
-                            <td class="fw-bold">{{ post.title }}</td>
-                            <td>{{ post.author.username }}</td>
-                            <td>
-                                {% if post.status == 1 %}
-                                <span class="badge bg-success rounded-pill">Published</span>
-                                {% else %}
-                                <span class="badge bg-secondary rounded-pill">Draft</span>
-                                {% endif %}
-                            </td>
-                            <td class="small text-muted">{{ post.created_on|date:"M d" }}</td>
-                            <td>
-                                <a href="/admin/blog/post/{{ post.id }}/change/"
-                                    class="btn btn-sm btn-outline-primary">Edit</a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
+{% extends 'timeline/base.html' %}
+{% load static %}
+{% block title %}Staff Dashboard - Story Timeline Builder{% endblock %}
+{% block extra_css %}
+<style>
+    :root {
+        --staff-primary: #1e293b;
+        /* slate-800 */
+        --staff-accent: #3b82f6;
+        /* blue-500 */
+        --staff-bg: #f8fafc;
+    }
+    .staff-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s ease;
+    }
+    .staff-stat-card {
+        border-left: 4px solid var(--staff-accent);
+    }
+    .table-staff th {
+        font-weight: 600;
+        color: #475569;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        padding: 1rem;
+        background: #f1f5f9;
+    }
+    .table-staff td {
+        padding: 1rem;
+        vertical-align: middle;
+        font-size: 0.9rem;
+    }
+    .activity-badge {
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 6px;
+    }
+    .badge-add {
+        background: #dcfce7;
+        color: #166534;
+    }
+    .badge-change {
+        background: #eef2ff;
+        color: #3730a3;
+    }
+    .badge-delete {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    .staff-sidebar-link {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        color: #475569;
+        text-decoration: none;
+        border-radius: 12px;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+    .staff-sidebar-link:hover {
+        background: #f1f5f9;
+        color: var(--staff-accent);
+    }
+    .staff-sidebar-link.active {
+        background: #eff6ff;
+        color: #2563eb;
+    }
+    .user-avatar-sm {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.8rem;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="row g-4 mb-4">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="font-serif">Staff Overview</h1>
+            <p class="text-muted mb-0">Platform health and administrative control center.</p>
+        </div>
+        <div>
+            <a href="/admin/" class="btn btn-outline-dark rounded-pill px-4">
+                <i class="bi bi-shield-lock me-2"></i> Django Admin
+            </a>
+        </div>
+    </div>
+</div>
+<!-- Stats Grid -->
+<div class="row g-3 mb-5">
+    <div class="col-md-3">
+        <div class="staff-card staff-stat-card p-4">
+            <div class="text-muted small fw-bold text-uppercase mb-1">Total Users</div>
+            <div class="h2 mb-1 fw-bold">{{ stats.total_users }}</div>
+            <div class="text-success small"><i class="bi bi-person-check me-1"></i> {{ stats.active_users }} active
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="staff-card p-4" style="border-left-color: #10b981;">
+            <div class="text-muted small fw-bold text-uppercase mb-1">Total Books</div>
+            <div class="h2 mb-1 fw-bold">{{ stats.total_books }}</div>
+            <div class="text-muted small">{{ stats.total_chapters }} chapters written</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="staff-card p-4" style="border-left-color: #f59e0b;">
+            <div class="text-muted small fw-bold text-uppercase mb-1">Blog Posts</div>
+            <div class="h2 mb-1 fw-bold">{{ stats.total_posts }}</div>
+            <div class="text-muted small">Engagement: High</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="staff-card p-4" style="border-left-color: #8b5cf6;">
+            <div class="text-muted small fw-bold text-uppercase mb-1">World Entries</div>
+            <div class="h2 mb-1 fw-bold">{{ stats.total_world_entries }}</div>
+            <div class="text-muted small">Lore Depth: Solid</div>
+        </div>
+    </div>
+</div>
+{% if deepseek_balance %}
+<div class="row g-3 mb-5">
+    <div class="col-12">
+        <div class="staff-card p-4"
+            style="border-left: 4px solid #000; background: linear-gradient(to right, #ffffff, #f1f5f9);">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="text-muted small fw-bold text-uppercase mb-1">DeepSeek API Balance</div>
+                    <div class="d-flex align-items-baseline gap-2">
+                        <span class="h1 mb-0 fw-bold">{{ deepseek_balance.balance_infos.0.total_balance }}</span>
+                        <span class="text-muted fw-bold">{{ deepseek_balance.balance_infos.0.currency }}</span>
+                    </div>
+                </div>
+                <div class="px-4 border-start border-end">
+                    <div class="text-muted small fw-bold text-uppercase mb-1">Today's Usage</div>
+                    <div class="d-flex align-items-baseline gap-2">
+                        <span class="h3 mb-0 fw-bold">${{ usage_stats.estimated_cost|floatformat:4 }}</span>
+                        <span class="text-muted small">({{ usage_stats.deepseek_tokens|default:0 }} tokens)</span>
+                    </div>
+                </div>
+                <div class="text-end">
+                    <div class="small text-muted mb-1">Status:
+                        {% if deepseek_balance.is_available %}
+                        <span class="text-success fw-bold">Active</span>
+                        {% else %}
+                        <span class="text-danger fw-bold">Low Balance</span>
+                        {% endif %}
+                    </div>
+                    <a href="https://platform.deepseek.com/" target="_blank"
+                        class="btn btn-sm btn-dark rounded-pill px-3">Top Up</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+<div class="row g-3 mb-5">
+    {% for service in ai_services %}
+    <div class="col-md-6">
+        <div class="staff-card p-3 d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-3">
+                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center"
+                    style="width: 40px; height: 40px;">
+                    <i class="bi bi-cpu text-dark"></i>
+                </div>
+                <div>
+                    <div class="fw-bold">{{ service.name }}</div>
+                    <div class="text-muted small">{{ service.model }}</div>
+                </div>
+            </div>
+            <div>
+                {% if service.status == 'Active' %}
+                <span class="badge rounded-pill bg-success-subtle text-success px-3">Connected</span>
+                {% else %}
+                <span class="badge rounded-pill bg-danger-subtle text-danger px-3">Disconnected</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+<div class="row g-4">
+    <!-- Left Column: Analytics & Users -->
+    <div class="col-lg-8">
+        <!-- Analytics Section -->
+        <div class="staff-card mb-4 overflow-hidden">
+            <div class="p-4 border-bottom bg-light d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-graph-up me-2"></i> Traffic Analytics</h5>
+                <span class="badge bg-primary rounded-pill">Last 30 Days</span>
+            </div>
+            <div class="p-4">
+                <div class="row g-4 text-center">
+                    <div class="col-3">
+                        <div class="h4 mb-0 fw-bold">{{ analytics.sessions }}</div>
+                        <div class="text-muted small">Sessions</div>
+                    </div>
+                    <div class="col-3">
+                        <div class="h4 mb-0 fw-bold">{{ analytics.page_views }}</div>
+                        <div class="text-muted small">Page Views</div>
+                    </div>
+                    <div class="col-3">
+                        <div class="h4 mb-0 fw-bold">{{ analytics.bounce_rate }}</div>
+                        <div class="text-muted small">Bounce Rate</div>
+                    </div>
+                    <div class="col-3">
+                        <div class="h4 mb-0 fw-bold">{{ analytics.avg_duration }}</div>
+                        <div class="text-muted small">Avg. Duration</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Recent Users -->
+        <div class="staff-card overflow-hidden">
+            <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-people me-2"></i> Recent Registrations</h5>
+                <a href="/admin/auth/user/" class="btn btn-sm btn-link text-decoration-none p-0">View All</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-staff mb-0">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Status</th>
+                            <th>Joined</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in recent_users %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="user-avatar-sm">{{ user.username|slice:":1"|upper }}</div>
+                                    <div>
+                                        <div class="fw-bold text-dark">{{ user.username }}</div>
+                                        <div class="text-muted small">{{ user.email }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                {% if user.is_active %}
+                                <span
+                                    class="badge bg-success-subtle text-success border border-success-subtle">Active</span>
+                                {% else %}
+                                <span
+                                    class="badge bg-danger-subtle text-danger border border-danger-subtle">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-muted small">{{ user.date_joined|date:"M d, Y" }}</td>
+                            <td>
+                                <div class="d-flex gap-1">
+                                    <a href="/admin/auth/user/{{ user.id }}/change/" class="btn btn-sm btn-light border"
+                                        title="Edit User">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="/admin/auth/user/{{ user.id }}/password/"
+                                        class="btn btn-sm btn-light border" title="Reset Password">
+                                        <i class="bi bi-key"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- Right Column: Blog & Activity -->
+    <div class="col-lg-4">
+        <!-- Quick Actions -->
+        <div class="staff-card mb-4 p-4">
+            <h5 class="mb-3 fw-bold">Management Panel</h5>
+            <div class="d-grid gap-2">
+                <a href="/admin/blog/post/add/" class="staff-sidebar-link">
+                    <i class="bi bi-journal-plus text-success"></i> New Blog Post
+                </a>
+                <a href="/admin/auth/user/add/" class="staff-sidebar-link">
+                    <i class="bi bi-person-plus text-primary"></i> Register New User
+                </a>
+                <a href="/admin/timeline/book/" class="staff-sidebar-link">
+                    <i class="bi bi-book text-warning"></i> Audit All Books
+                </a>
+                <a href="/admin/auth/user/" class="staff-sidebar-link">
+                    <i class="bi bi-key text-info"></i> Reset Passwords
+                </a>
+            </div>
+        </div>
+        <!-- System Activity -->
+        <div class="staff-card overflow-hidden">
+            <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-clock-history me-2"></i> System Activity</h5>
+            </div>
+            <div class="p-3" style="max-height: 400px; overflow-y: auto;">
+                {% for log in recent_activity %}
+                <div class="mb-3 pb-3 border-bottom last-child-no-border">
+                    <div class="d-flex justify-content-between align-items-start mb-1">
+                        <span
+                            class="activity-badge {% if log.is_addition %}badge-add{% elif log.is_change %}badge-change{% else %}badge-delete{% endif %}">
+                            {{ log.get_action_flag_display }}
+                        </span>
+                        <small class="text-muted">{{ log.action_time|timesince }} ago</small>
+                    </div>
+                    <div class="small fw-semibold text-dark">{{ log.user.username }}</div>
+                    <div class="small text-muted">{{ log.object_repr|truncatechars:50 }}</div>
+                </div>
+                {% empty %}
+                <div class="text-center py-4 text-muted small">No recent activity detected.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Blog Management Section -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="staff-card overflow-hidden">
+            <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-journal-text me-2"></i> Managed Blog Posts</h5>
+                <a href="/admin/blog/post/" class="btn btn-sm btn-dark rounded-pill px-3">Manage Assets</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-staff mb-0">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for post in blog_posts %}
+                        <tr>
+                            <td class="fw-bold">{{ post.title }}</td>
+                            <td>{{ post.author.username }}</td>
+                            <td>
+                                {% if post.status == 1 %}
+                                <span class="badge bg-success rounded-pill">Published</span>
+                                {% else %}
+                                <span class="badge bg-secondary rounded-pill">Draft</span>
+                                {% endif %}
+                            </td>
+                            <td class="small text-muted">{{ post.created_on|date:"M d" }}</td>
+                            <td>
+                                <a href="/admin/blog/post/{{ post.id }}/change/"
+                                    class="btn btn-sm btn-outline-primary">Edit</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
