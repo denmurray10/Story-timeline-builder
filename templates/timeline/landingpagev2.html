@@ -531,11 +531,21 @@
             height: 100%;
             transition: width 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
+
+        /* Fix for blurry lines caused by off-screen drawer shadows */
+        [id$="-drawer"] {
+            box-shadow: none !important;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.5s ease-in-out !important;
+        }
+
+        [id$="-drawer"]:not(.translate-x-full) {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+        }
     </style>
 </head>
 
 <body
-    class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-sans transition-colors duration-300 antialiased selection:bg-accent selection:text-primary">
+    class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-sans transition-colors duration-300 antialiased selection:bg-accent selection:text-primary overflow-x-hidden">
     <nav id="main-nav"
         class="fixed w-full z-50 left-0 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md border-b border-transparent">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
