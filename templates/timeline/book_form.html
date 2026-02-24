@@ -24,7 +24,18 @@
                             </a>
                             {% endif %}
                         </label>
+                        {% if field.name == 'series' %}
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="flex-grow-1">
+                                {{ field }} 
+                            </div>
+                            <button type="button" class="btn btn-outline-danger btn-sm px-2 delete-series-btn" title="Delete selected series">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                        {% else %}
                         {{ field }} 
+                        {% endif %}
                         {% if field.help_text %}
                         <small class="form-text text-muted">{{ field.help_text|safe }}</small>
                         {% endif %} 
@@ -37,7 +48,7 @@
                         {% endif %}
                     </div>
                     {% endfor %}
-                    <div class="d-flex justify-content-between">
+                    <div class="d-flex justify-content-between mt-4">
                         <a href="{% if book %}{% url 'book_detail' book.pk %}{% else %}{% url 'book_list' %}{% endif %}" class="btn btn-secondary">
                             <i class="bi bi-x-circle"></i> Cancel
                         </a>
@@ -50,4 +61,70 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const seriesSelect = document.getElementById('id_series');
+    const deleteBtn = document.querySelector('.delete-series-btn');
+    
+    if (seriesSelect && deleteBtn) {
+        // Only show delete button if a valid series is selected (not the blank '-' option)
+        const toggleDeleteBtn = () => {
+            if (seriesSelect.value && seriesSelect.value !== '') {
+                deleteBtn.style.display = 'block';
+            } else {
+                deleteBtn.style.display = 'none';
+            }
+        };
+        
+        seriesSelect.addEventListener('change', toggleDeleteBtn);
+        // Initial check
+        toggleDeleteBtn();
+        
+        deleteBtn.addEventListener('click', function() {
+            const seriesId = seriesSelect.value;
+            const seriesName = seriesSelect.options[seriesSelect.selectedIndex].text;
+            
+            if (!seriesId) return;
+            
+            if (confirm(`Are you sure you want to delete the series "${seriesName}"? Books assigned to it will be moved to the Stand-alone section.`)) {
+                
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                
+                fetch(`/series/${seriesId}/delete/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if(response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Network response was not ok');
+                })
+                .then(data => {
+                    if(data.status === 'success') {
+                        // Remove option from dropdown
+                        const opt = seriesSelect.querySelector(`option[value="${seriesId}"]`);
+                        if (opt) opt.remove();
+                        // Reset to default
+                        seriesSelect.value = '';
+                        toggleDeleteBtn();
+                    } else {
+                        alert(data.message || 'Error deleting series.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('There was a problem deleting the series.');
+                });
+            }
+        });
+    }
+});
+</script>
 {% endblock %}

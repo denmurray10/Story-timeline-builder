@@ -489,9 +489,23 @@ def dashboard(request):
     mood_elements = []
     
     # 1. Random Tag (Theme or Location)
-    random_tag = Tag.objects.filter(user=request.user).order_by('?').first()
-    if random_tag:
+    random_tags = list(Tag.objects.filter(user=request.user))
+    if random_tags:
+        random_tag = random.choice(random_tags)
         mood_elements.append({'type': 'tag', 'content': random_tag.name, 'color': random_tag.color})
+        
+    # 2. Random Key Event
+    key_events = list(Event.objects.filter(user=request.user, importance__gte=3))
+    if key_events:
+        random_event = random.choice(key_events)
+        mood_elements.append({'type': 'event', 'content': random_event.title})
+        
+    # 3. Random Character Motivation
+    motivated_chars = list(Character.objects.filter(user=request.user).exclude(motivation=''))
+    if motivated_chars:
+        random_char = random.choice(motivated_chars)
+        mood_elements.append({'type': 'motivation', 'char': random_char.name, 'content': random_char.motivation})
+
     
     # --- NEW: Timeline Integrity Data ---
     # 1. Fuzzy Dates
@@ -934,6 +948,18 @@ def series_create(request):
     else:
         form = SeriesForm()
     return render(request, 'timeline/series_form.html', {'form': form})
+    
+@login_required
+@require_POST
+def series_delete(request, pk):
+    """Delete a series via JSON request."""
+    series = get_object_or_404(Series, pk=pk, user=request.user)
+    try:
+        series.delete()
+        return JsonResponse({'status': 'success', 'message': 'Series deleted successfully'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
 
 
 @login_required

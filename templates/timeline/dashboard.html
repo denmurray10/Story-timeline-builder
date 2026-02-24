@@ -742,6 +742,73 @@
                 });
             });
         }
+        
+        // Today's Focus Widget Logic
+        const btnAddFocus = document.getElementById('btn-add-focus-task');
+        const focusContainer = document.getElementById('add-focus-task-container');
+        const inputNewFocus = document.getElementById('input-new-focus-task');
+        const btnSaveFocus = document.getElementById('btn-save-focus-task');
+        const focusList = document.getElementById('focus-tasks-list');
+
+        if (btnAddFocus) {
+            btnAddFocus.addEventListener('click', () => {
+                focusContainer.style.display = focusContainer.style.display === 'none' ? 'block' : 'none';
+                if (focusContainer.style.display === 'block') inputNewFocus.focus();
+            });
+
+            btnSaveFocus.addEventListener('click', () => {
+                const text = inputNewFocus.value.trim();
+                if (!text) return;
+                fetch('{% url "api_add_focus_task" %}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                    body: JSON.stringify({ task: text })
+                }).then(r => r.json()).then(data => {
+                    if (data.status === 'success') {
+                        const emptyState = document.getElementById('focus-empty-state');
+                        if (emptyState) emptyState.remove();
+                        const li = document.createElement('li');
+                        li.className = 'focus-task-item d-flex align-items-center mb-2';
+                        li.dataset.taskId = data.task_id;
+                        li.innerHTML = `<i class="bi bi-circle text-muted me-2"></i><span class="focus-task-text">${text}</span>`;
+                        li.style.cursor = 'pointer';
+                        attachFocusTaskListener(li);
+                        focusList.appendChild(li);
+                        inputNewFocus.value = '';
+                        focusContainer.style.display = 'none';
+                    }
+                });
+            });
+
+            inputNewFocus.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') btnSaveFocus.click();
+            });
+
+            function attachFocusTaskListener(item) {
+                item.style.cursor = 'pointer';
+                item.addEventListener('click', function() {
+                    const taskId = this.dataset.taskId;
+                    fetch(`/api/ai/focus-tasks/${taskId}/toggle/`, {
+                        method: 'POST',
+                        headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+                    }).then(r => r.json()).then(data => {
+                        if (data.status === 'success') {
+                            const icon = this.querySelector('i');
+                            const textSpan = this.querySelector('.focus-task-text');
+                            if (data.is_completed) {
+                                icon.className = 'bi bi-check-circle-fill text-success me-2';
+                                textSpan.classList.add('completed');
+                            } else {
+                                icon.className = 'bi bi-circle text-muted me-2';
+                                textSpan.classList.remove('completed');
+                            }
+                        }
+                    });
+                });
+            }
+
+            document.querySelectorAll('.focus-task-item').forEach(attachFocusTaskListener);
+        }
     });
 </script>
 {% endblock %}
