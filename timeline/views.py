@@ -38,38 +38,11 @@ from .forms import (
 )
 from .utils.ai_context import ContextResolver
 from .context_engine import ContextEngine
+from .utils.ai_clients import _call_ai_json, _call_ai_text, _log_ai_usage
+from .utils.ai_synthesis import synthesize_book_summary
 import datetime
 from django.contrib.auth.views import LoginView as DjangoLoginView
 
-def _log_ai_usage(user, service, model, prompt_tokens, completion_tokens):
-    """Logs AI usage for cost and token tracking."""
-    # Rough cost estimates in USD per 1M tokens
-    pricing = {
-        'deepseek-chat': {'input': 0.14, 'output': 0.28},
-        'deepseek-reasoner': {'input': 0.55, 'output': 2.19},
-        'gemini-1.5-flash': {'input': 0.075, 'output': 0.30}, # Estimates
-        'gemini-1.5-pro': {'input': 3.50, 'output': 10.50},  # Estimates
-    }
-    
-    total_tokens = prompt_tokens + completion_tokens
-    cost = 0
-    
-    if model in pricing:
-        cost = (prompt_tokens * pricing[model]['input'] / 1000000) + \
-               (completion_tokens * pricing[model]['output'] / 1000000)
-    
-    try:
-        AIUsageLog.objects.create(
-            user=user if user and user.is_authenticated else None,
-            service_name=service,
-            model_name=model,
-            prompt_tokens=prompt_tokens,
-            completion_tokens=completion_tokens,
-            total_tokens=total_tokens,
-            cost_estimate=cost
-        )
-    except Exception as e:
-        print(f"Error logging AI usage: {e}")
 
 def handler404(request, exception):
     """Custom 404 error handler."""
@@ -146,40 +119,8 @@ class CustomLoginView(DjangoLoginView):
             '[{"text": "Quote here...", "author": "Name here"}, ...]'
         )
 
-        try:
-            if deepseek_key:
-                client = OpenAI(api_key=deepseek_key, base_url="https://api.deepseek.com")
-                response = client.chat.completions.create(
-                    model="deepseek-chat",
-                    messages=[
-                        {"role": "system", "content": "You are a helpful story writing coach. Output JSON only."},
-                        {"role": "user", "content": prompt},
-                    ],
-                    response_format={'type': 'json_object'} if "deepseek-chat" in str(deepseek_key) else None, # Some accounts might not support this yet
-                    stream=False
-                )
-                text = response.choices[0].message.content.strip()
-                _log_ai_usage(None, 'DeepSeek', 'deepseek-chat', response.usage.prompt_tokens, response.usage.completion_tokens)
-            else:
-                genai.configure(api_key=gemini_key)
-                model = genai.GenerativeModel('gemini-1.5-flash')
-                response = model.generate_content(prompt)
-                text = response.text.strip()
-                # Gemini usage tracking is slightly different, often in response.usage_metadata
-                try:
-                    _log_ai_usage(None, 'Gemini', 'gemini-1.5-flash', response.usage_metadata.prompt_token_count, response.usage_metadata.candidates_token_count)
-                except: pass
-            
-            # Clean up markdown if present
-            if '```json' in text:
-                text = text.split('```json')[1].split('```')[0].strip()
-            elif '```' in text:
-                text = text.split('```')[1].split('```')[0].strip()
-                
-            return json.loads(text)
-        except Exception as e:
-            print(f"Daily Quote Generation Error: {e}")
-            return None
+        # Use shared JSON helper for consistency and UK English enforcement
+        return _call_ai_json(prompt, system_message="You are a helpful story writing coach. Output JSON only. Always use British English.")
 
 # ============== Authentication Views ==============
 
@@ -943,9 +884,24 @@ def book_edit(request, pk):
     """Edit an existing book."""
     book = get_object_or_404(Book, pk=pk, user=request.user)
     if request.method == 'POST':
+        old_status = book.status
         form = BookForm(request.POST, request.FILES, instance=book)
         if form.is_valid():
-            form.save()
+            book = form.save()
+            
+            # AUTOMATION: If status changed to Complete or Published, trigger AI Summary Synthesis
+            if book.status in ['complete', 'published'] and old_status not in ['complete', 'published']:
+                def auto_synthesize(b_id):
+                    # Sleep slightly to ensure DB transaction is committed
+                    time.sleep(2)
+                    b = Book.objects.get(id=b_id)
+                    synthesize_book_summary(b, use_reasoner=True)
+                
+                thread = threading.Thread(target=auto_synthesize, args=(book.id,))
+                thread.daemon = True
+                thread.start()
+                messages.info(request, "Book status updated. DeepSeek Reasoner is now synthesizing a fresh Story Summary in the background.")
+            
             messages.success(request, f'Book "{book.title}" updated successfully!')
             return redirect('book_detail', pk=book.pk)
     else:
@@ -1576,55 +1532,6 @@ def extract_text_from_file(file):
         print(f"Error processing file: {e}")
     return text
 
-def _call_ai_json(prompt, system_message="You are a professional literary analyst. Always respond with valid JSON.", max_retries=3, deepseek_model="deepseek-chat", prefer_gemini=False):
-    """Helper to call AI and return parsed JSON with retry logic."""
-    if not settings.DEEPSEEK_API_KEY and not settings.GEMINI_API_KEY:
-        return None
-    
-    for attempt in range(max_retries):
-        try:
-            # Use Gemini if preferred or if DeepSeek key is missing
-            # BUT if deepseek_model is 'deepseek-reasoner', we override prefer_gemini
-            should_use_gemini = (prefer_gemini and settings.GEMINI_API_KEY) or not settings.DEEPSEEK_API_KEY
-            if deepseek_model == 'deepseek-reasoner':
-                should_use_gemini = False if settings.DEEPSEEK_API_KEY else True
-
-            if should_use_gemini:
-                genai.configure(api_key=settings.GEMINI_API_KEY)
-                # If we were forced to Gemini but wanted reasoner, use pro
-                model_name = 'gemini-1.5-pro' if deepseek_model == 'deepseek-reasoner' else 'gemini-1.5-flash'
-                model = genai.GenerativeModel(model_name)
-                response = model.generate_content(f"{system_message}\n\nTask:\n{prompt}")
-                content = response.text
-                try:
-                    _log_ai_usage(None, 'Gemini', model_name, response.usage_metadata.prompt_token_count, response.usage_metadata.candidates_token_count)
-                except: pass
-            else:
-                client = OpenAI(api_key=settings.DEEPSEEK_API_KEY, base_url="https://api.deepseek.com")
-                response = client.chat.completions.create(
-                    model=deepseek_model,
-                    messages=[
-                        {"role": "system", "content": system_message},
-                        {"role": "user", "content": prompt},
-                    ],
-                    stream=False,
-                    timeout=60
-                )
-                content = response.choices[0].message.content
-                _log_ai_usage(None, 'DeepSeek', deepseek_model, response.usage.prompt_tokens, response.usage.completion_tokens)
-
-            if "```json" in content:
-                content = content.split("```json")[1].split("```")[0].strip()
-            elif "```" in content:
-                content = content.split("```")[1].split("```")[0].strip()
-            
-            return json.loads(content)
-        except Exception as e:
-            print(f"AI Call Error (attempt {attempt + 1}/{max_retries}): {e}")
-            if attempt < max_retries - 1:
-                time.sleep(2 ** attempt)  # Exponential backoff: 1s, 2s, 4s
-            else:
-                return None
 
 def analyze_characters_with_ai(text):
     """Initial pass to identify characters and roles from a large chunk of text."""
@@ -2296,23 +2203,8 @@ def api_ai_consultant(request):
         context += "Do NOT hallucinate names or backstories. "
         context += "Use UK English spelling and grammar (e.g., 'colour', 'organise', 'centre')."
 
-        # 2. Call AI Provider
-        if settings.DEEPSEEK_API_KEY:
-            client = OpenAI(api_key=settings.DEEPSEEK_API_KEY, base_url="https://api.deepseek.com")
-            response = client.chat.completions.create(
-                model="deepseek-chat",
-                messages=[
-                    {"role": "system", "content": "You are a professional Story Consultant."},
-                    {"role": "user", "content": context},
-                ],
-                stream=False
-            )
-            ai_response = response.choices[0].message.content
-        else:
-            genai.configure(api_key=settings.GEMINI_API_KEY)
-            model = genai.GenerativeModel('gemini-3-flash-preview')
-            response = model.generate_content(context)
-            ai_response = response.text
+        # 2. Call AI Provider using shared helper
+        ai_response = _call_ai_text(context, system_message="You are a professional Story Consultant. Always use British English.", user=request.user)
 
         return JsonResponse({
             'status': 'success', 
@@ -2338,27 +2230,8 @@ def api_character_deep_dive(request):
         
         CHARACTER DETAILS:\r\n        Role: {character.get_role_display()}\r\n        Description: {character.description}\r\n        Motivation: {character.motivation}\r\n        Goals: {character.goals}\r\n        Traits: {character.traits}\r\n        \r\n        Please generate ONE thought-provoking, insightful deep-dive question or writing prompt that will help the author understand this character's internal world or backstory better. \r\n        Focus on emotion, conflict, or hidden secrets. \r\n        Keep it to a single paragraph. \r\n        Use UK English spelling and grammar (e.g., 'colour', 'behaviour', 'authorised').\r\n        """
 
-        # Call AI Provider
-        if settings.DEEPSEEK_API_KEY:
-            client = OpenAI(api_key=settings.DEEPSEEK_API_KEY, base_url="https://api.deepseek.com")
-            response = client.chat.completions.create(
-                model="deepseek-chat",
-                messages=[
-                    {"role": "system", "content": "You are a professional Creative Writing Coach."},
-                    {"role": "user", "content": prompt},
-                ],
-                stream=False
-            )
-            ai_response = response.choices[0].message.content
-            _log_ai_usage(request.user, 'DeepSeek', 'deepseek-chat', response.usage.prompt_tokens, response.usage.completion_tokens)
-        else:
-            genai.configure(api_key=settings.GEMINI_API_KEY)
-            model = genai.GenerativeModel('gemini-3-flash-preview')
-            response = model.generate_content(prompt)
-            ai_response = response.text
-            try:
-                _log_ai_usage(request.user, 'Gemini', 'gemini-1.5-flash', response.usage_metadata.prompt_token_count, response.usage_metadata.candidates_token_count)
-            except: pass
+        # Call AI Provider using shared helper
+        ai_response = _call_ai_text(prompt, system_message="You are a professional Creative Writing Coach. Always use British English.", user=request.user)
 
         # Save to database
         character.deep_dive_notes = ai_response
@@ -3089,6 +2962,22 @@ def api_deep_scan_status(request, book_id):
         'error': status.error_message
     })
 
+@login_required
+@require_POST
+def api_generate_book_summary(request, book_id):
+    """
+    Synthesises a global story summary from chapters and characters.
+    Uses DeepSeek Reasoner for high-quality global understanding.
+    """
+    book = get_object_or_404(Book, pk=book_id, user=request.user)
+    
+    summary_text, error = synthesize_book_summary(book, use_reasoner=True)
+    if error:
+        return JsonResponse({'status': 'error', 'message': error}, status=400)
+        
+    return JsonResponse({'status': 'success', 'summary': summary_text})
+
+
 def _ensure_relationship_cache(char_a, char_b, book):
     """
     Internal helper to run the 3-pass R1 analysis and populate caches.
@@ -3263,47 +3152,6 @@ def _perform_relationship_analysis(char_a, char_b, book, interaction_summaries, 
 
     return ai_response
 
-def _call_ai_text(prompt, system_message="You are a creative writing assistant.", max_retries=3):
-    """
-    Helper to call AI and return raw text (for prose generation).
-    Prioritizes DeepSeek, falls back to Gemini.
-    """
-    deepseek_key = getattr(settings, 'DEEPSEEK_API_KEY', None)
-    gemini_key = getattr(settings, 'GEMINI_API_KEY', None)
-
-    if not deepseek_key and not gemini_key:
-        return "Error: AI API Key not configured."
-    
-    for attempt in range(max_retries):
-        try:
-            if deepseek_key:
-                client = OpenAI(api_key=deepseek_key, base_url="https://api.deepseek.com")
-                response = client.chat.completions.create(
-                    model="deepseek-chat",
-                    messages=[
-                        {"role": "system", "content": system_message},
-                        {"role": "user", "content": prompt},
-                    ],
-                    stream=False
-                )
-                ai_response = response.choices[0].message.content
-                _log_ai_usage(None, 'DeepSeek', 'deepseek-chat', response.usage.prompt_tokens, response.usage.completion_tokens)
-                return ai_response
-            else:
-                genai.configure(api_key=gemini_key)
-                model = genai.GenerativeModel('gemini-1.5-flash')
-                response = model.generate_content(f"{system_message}\n\nTask:\n{prompt}")
-                ai_response = response.text
-                try:
-                    _log_ai_usage(None, 'Gemini', 'gemini-1.5-flash', response.usage_metadata.prompt_token_count, response.usage_metadata.candidates_token_count)
-                except: pass
-                return ai_response
-        except Exception as e:
-            print(f"AI Text Call Error (attempt {attempt + 1}): {e}")
-            if attempt < max_retries - 1:
-                time.sleep(1)
-            else:
-                return f"Error generating text: {str(e)}"
 
 @require_POST
 @login_required

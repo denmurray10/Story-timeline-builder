@@ -98,6 +98,7 @@ urlpatterns = [
     path('api/ai/character-sync/', views.api_sync_character_data, name='api_character_sync'),
     path('api/books/<int:book_id>/deep-scan/trigger/', views.api_trigger_deep_scan, name='api_trigger_deep_scan'),
     path('api/books/<int:book_id>/deep-scan/status/', views.api_deep_scan_status, name='api_deep_scan_status'),
+    path('api/books/<int:book_id>/generate-summary/', views.api_generate_book_summary, name='api_generate_book_summary'),
     path('api/ai/generate-prose/', views.api_generate_prose, name='api_generate_prose'),
     path('account/', views.account, name='account'),
     path('search/', views.search_results, name='search_results'),

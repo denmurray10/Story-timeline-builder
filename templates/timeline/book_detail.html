@@ -136,9 +136,7 @@
                         </span>
                     </div>
                     <h1 class="font-serif text-5xl md:text-6xl text-black leading-tight m-0">{{ book.title }}</h1>
-                    <p class="text-xl text-text-muted font-light max-w-2xl text-balance font-serif italic m-0">
-                        {{ book.description|default:"Your story begins here." }}
-                    </p>
+
                 </div>
                 <div class="flex items-center gap-3">
                     <button id="btn-deep-scan"
@@ -221,6 +219,24 @@
                     </div>
 
                     <div class="absolute top-0 right-0 w-64 h-64 bg-accent/10 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+                </section>
+
+                <!-- Story Summary -->
+                <section class="bg-white rounded-2xl border border-border-subtle p-8 shadow-sm relative overflow-hidden">
+                    <div class="flex items-center gap-2 mb-6">
+                        <span class="material-symbols-outlined text-black">auto_awesome</span>
+                        <h2 class="font-serif text-2xl text-black m-0">Story Summary</h2>
+                    </div>
+                    <div id="summary-content" class="prose prose-sm max-w-none text-text-muted leading-relaxed">
+                        {% if book.description %}
+                            {{ book.description|linebreaks }}
+                        {% else %}
+                            <p class="italic">No summary has been provided for this manuscript yet. Run a <strong>Deep Story Scan</strong> to analyze your chapters, then set the book status to <strong>Complete</strong> or <strong>Published</strong> to automatically generate a professional premise using DeepSeek Reasoner.</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Subtle background decoration -->
+                    <div class="absolute -bottom-8 -left-8 w-32 h-32 bg-accent/5 rounded-full blur-2xl pointer-events-none"></div>
                 </section>
 
                 <!-- Chapter List -->
@@ -574,7 +590,6 @@
             requestAnimationFrame(updateTimelineScroll);
         });
         updateTimelineScroll();
-
 
     });
 </script>
