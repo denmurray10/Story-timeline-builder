@@ -315,22 +315,22 @@
                             class="text-xs font-bold uppercase tracking-wider text-black hover:underline no-underline">View All</a>
                     </div>
 
-                    <div class="relative">
-                        <!-- Vertical Timeline Line -->
-                        <div class="absolute left-[11px] top-6 bottom-32 w-px bg-border-subtle"></div>
+                    <div class="relative" id="timeline-container-sidebar">
+                        <!-- Background Timeline Line -->
+                        <div class="absolute left-[11px] top-6 bottom-32 w-[2px] bg-border-subtle z-0"></div>
+                        <!-- Active Progress Line -->
+                        <div id="timeline-progress-line" class="absolute left-[11px] top-6 w-[2px] bg-black z-10 transition-all duration-700 ease-in-out" style="height: 0;"></div>
 
-                        <div id="events-container" class="space-y-6">
-                            {% for event in events %}
-                            <div class="relative pl-10 event-item {% if forloop.counter > 3 %}hidden hidden-event{% endif %}">
+                        <div id="events-container" class="space-y-12">
+                            {% for event in events|slice:":5" %}
+                            <div class="relative pl-10 event-item" data-index="{{ forloop.counter0 }}">
                                 <!-- Node -->
-                                <div class="absolute left-0 top-1 w-6 h-6 rounded-full border-2 border-border-subtle bg-white z-10 flex items-center justify-center">
-                                    {% if not event.is_written %}
-                                    <div class="w-2.5 h-2.5 rounded-full border border-dashed border-border-subtle"></div>
-                                    {% endif %}
+                                <div class="absolute left-0 top-1 w-6 h-6 rounded-full border-2 border-border-subtle bg-white z-20 flex items-center justify-center transition-colors duration-300 js-timeline-node">
+                                    <div class="w-2.5 h-2.5 rounded-full transition-colors duration-300 js-timeline-dot {% if not event.is_written %}border border-dashed border-border-subtle{% endif %}"></div>
                                 </div>
 
                                 <!-- Event Card -->
-                                <div class="bg-white p-5 rounded-2xl border border-border-subtle hover:shadow-md transition-all group {% if not event.is_written %}bg-gray-50/50{% endif %}">
+                                <div class="bg-white py-3.5 px-5 rounded-2xl border border-border-subtle hover:shadow-md transition-all group {% if not event.is_written %}bg-gray-50/50{% endif %}">
                                     <div class="flex justify-between items-start mb-2">
                                         <span class="text-[10px] font-bold uppercase tracking-wider text-text-muted">
                                             {{ event.story_date|upper|default:"Undefined Time" }}
@@ -340,7 +340,7 @@
                                     </div>
                                     <h4 class="font-serif text-lg text-black mb-1 m-0">{{ event.title }}</h4>
                                     {% if event.description %}
-                                    <p class="text-xs text-text-muted mb-4 m-0 line-clamp-2" title="{{ event.description }}">
+                                    <p class="text-xs text-text-muted mb-3 m-0 line-clamp-2" title="{{ event.description }}">
                                         {{ event.description }}
                                     </p>
                                     {% endif %}
@@ -356,12 +356,6 @@
                             <p class="text-sm text-text-muted text-center py-4 italic">No major events recorded yet.</p>
                             {% endfor %}
                         </div>
-
-                        {% if events.count > 3 %}
-                        <button id="btn-view-more-events" class="w-full py-3 mt-6 text-xs font-bold uppercase tracking-wider text-text-muted hover:text-black transition-colors border border-border-subtle rounded-xl hover:bg-white bg-transparent">
-                            View More
-                        </button>
-                        {% endif %}
 
                         <a href="{% url 'event_create' %}?book={{ book.pk }}"
                             class="w-full py-4 border-2 border-dashed border-border-subtle rounded-xl flex items-center justify-center gap-2 text-text-muted hover:border-black hover:text-black transition-all group no-underline mt-6 bg-transparent">
@@ -519,25 +513,60 @@
             btnCloseX.style.display = 'block';
         }
 
-        // View More Events Toggle
-        const btnViewMore = document.getElementById('btn-view-more-events');
-        if (btnViewMore) {
-            btnViewMore.onclick = function() {
-                const hiddenEvents = document.querySelectorAll('.hidden-event');
-                const currentText = btnViewMore.innerText.toUpperCase();
-                const isExpanding = currentText.includes('MORE');
+        // Timeline Scroll Progress Logic
+        const timelineContainer = document.getElementById('timeline-container-sidebar');
+        const eventItems = document.querySelectorAll('.event-item');
+        const progressLine = document.getElementById('timeline-progress-line');
+
+        function updateTimelineScroll() {
+            if (!timelineContainer || !progressLine || eventItems.length === 0) return;
+            
+            const screenMiddle = window.innerHeight / 2;
+            let lastActiveIndex = 0; 
+            
+            eventItems.forEach((item, index) => {
+                const rect = item.getBoundingClientRect();
+                const node = item.querySelector('.js-timeline-node');
+                const dot = item.querySelector('.js-timeline-dot');
                 
-                hiddenEvents.forEach(el => {
-                    if (isExpanding) {
-                        el.classList.remove('hidden');
-                    } else {
-                        el.classList.add('hidden');
-                    }
-                });
-                
-                btnViewMore.innerText = isExpanding ? 'View Less' : 'View More';
-            };
+                if (rect.top <= screenMiddle) {
+                    lastActiveIndex = index;
+                    node.classList.remove('border-border-subtle');
+                    node.classList.add('border-black');
+                    dot.classList.add('bg-black');
+                    dot.classList.remove('border-border-subtle');
+                } else if (index > 0) {
+                    node.classList.add('border-border-subtle');
+                    node.classList.remove('border-black');
+                    dot.classList.remove('bg-black');
+                }
+            });
+
+            // Ensure first node is always active if nothing else is
+            const firstItem = eventItems[0];
+            const firstNode = firstItem.querySelector('.js-timeline-node');
+            const firstDot = firstItem.querySelector('.js-timeline-dot');
+            firstNode.classList.add('border-black');
+            firstDot.classList.add('bg-black');
+
+            // Update line height
+            const activeItem = eventItems[lastActiveIndex];
+            const activeNode = activeItem.querySelector('.js-timeline-node');
+            const containerRect = timelineContainer.getBoundingClientRect();
+            const nodeRect = activeNode.getBoundingClientRect();
+            const relativeTop = nodeRect.top - containerRect.top;
+            progressLine.style.height = `${Math.max(0, relativeTop + 12)}px`;
         }
+
+        window.addEventListener('scroll', () => {
+            requestAnimationFrame(updateTimelineScroll);
+        });
+        window.addEventListener('resize', () => {
+            requestAnimationFrame(updateTimelineScroll);
+        });
+        updateTimelineScroll();
+
+
     });
 </script>
 {% endblock %}
