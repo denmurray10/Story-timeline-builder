@@ -1579,19 +1579,21 @@
                     class="reveal slide-up delay-200 relative min-h-[500px] overflow-hidden rounded-2xl transition-all duration-500 order-1 lg:order-2">
 
                     <!-- Default State: Marketing Text -->
-                    <div id="codex-default" class="p-8 custom-scrollbar">
+                    <div id="codex-default" class="px-4 py-10 lg:p-10 custom-scrollbar text-center lg:text-left">
                         <div
-                            class="flex items-center gap-2 mb-4 text-xs font-bold text-blue-500 uppercase tracking-widest">
-                            <span class="w-8 h-[1px] bg-blue-500"></span> Narrative Engineering
+                            class="flex items-center justify-center lg:justify-start gap-2 mb-4 text-xs font-bold text-blue-500 uppercase tracking-widest">
+                            <span class="w-8 h-[1px] bg-blue-500"></span> Narrative Engineering <span
+                                class="w-8 h-[1px] bg-blue-500 lg:hidden"></span>
                         </div>
                         <h2 class="text-4xl md:text-[2.5rem] font-serif text-primary dark:text-white mb-6 font-bold">
                             The Architecture of Conflict</h2>
-                        <p class="text-lg text-gray-600 dark:text-gray-400 leading-[1.4rem] mb-8">
+                        <p
+                            class="text-lg text-gray-600 dark:text-gray-400 leading-[1.4rem] mb-8 max-w-3xl mx-auto lg:mx-0">
                             A novel's complexity lies in the density of its relationships. This dynamic map evolves in
                             real-time with your manuscript, providing a living visualization of the shifting alliances
                             and deep-seated rivalries that drive your plot.
                         </p>
-                        <div class="space-y-6">
+                        <div class="space-y-6 text-left max-w-xl mx-auto lg:max-w-none lg:mx-0">
                             <div class="flex gap-4">
                                 <span class="material-icons-outlined text-blue-500 text-sm mt-1">check_circle</span>
                                 <div>
@@ -2928,61 +2930,75 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row items-center gap-16">
                 <!-- Left Content: Feature List -->
-                <div class="reveal slide-up w-full md:w-1/2">
+                <div class="reveal slide-up w-full md:w-1/2 text-center lg:text-left">
                     <div
-                        class="flex items-center gap-2 mb-4 text-xs font-bold text-purple-500 uppercase tracking-widest">
-                        <span class="w-8 h-[1px] bg-purple-500"></span> STORY ORGANISATION
+                        class="flex items-center justify-center lg:justify-start gap-2 mb-4 text-xs font-bold text-purple-500 uppercase tracking-widest">
+                        <span class="w-8 h-[1px] bg-purple-500"></span> STORY ORGANISATION <span
+                            class="w-8 h-[1px] bg-purple-500 lg:hidden"></span>
                     </div>
                     <h2
                         class="text-4xl md:text-[2.5rem] font-serif text-primary dark:text-white mb-6 font-bold leading-tight">
                         The Intelligent Story Bible</h2>
-                    <p class="text-lg text-gray-600 dark:text-gray-400 leading-[1.4rem] mb-8">
+                    <p class="text-lg text-gray-600 dark:text-gray-400 leading-[1.4rem] mb-8 max-w-3xl mx-auto lg:mx-0">
                         Transform narrative complexity into a structured, living reference. The Codex is far more than a
                         wiki — it is an intelligent, automated repository that catalogues every character, location, and
                         storyline across your series, ensuring nothing is ever lost in the creative process.
                     </p>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
-                        <div class="flex flex-col gap-3">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10 text-left">
+                        <div class="flex gap-4">
                             <div
-                                class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                                class="flex-shrink-0 w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
                                 <span class="material-icons-outlined text-purple-500">menu_book</span>
                             </div>
-                            <h4 class="font-bold text-gray-900 dark:text-white">Centralised Wiki</h4>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Unite characters, locations, factions,
-                                and lore within a single, fully searchable archive, with deep-linked entries accessible
-                                from anywhere within your manuscript.</p>
+                            <div>
+                                <h4 class="font-bold text-gray-900 dark:text-white mb-1">Centralised Wiki</h4>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Unite characters, locations,
+                                    factions,
+                                    and lore within a single, fully searchable archive, with deep-linked entries
+                                    accessible
+                                    from anywhere within your manuscript.</p>
+                            </div>
                         </div>
-                        <div class="flex flex-col gap-3">
+                        <div class="flex gap-4">
                             <div
-                                class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                                class="flex-shrink-0 w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
                                 <span class="material-icons-outlined text-purple-500">grid_view</span>
                             </div>
-                            <h4 class="font-bold text-gray-900 dark:text-white">Appearance Heatmaps</h4>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Automatically track and visualise the
-                                frequency of entity mentions across every scene, generating at-a-glance density maps
-                                that
-                                reveal narrative balance and surface gaps in your storytelling.</p>
+                            <div>
+                                <h4 class="font-bold text-gray-900 dark:text-white mb-1">Appearance Heatmaps</h4>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Automatically track and visualise
+                                    the
+                                    frequency of entity mentions across every scene, generating at-a-glance density maps
+                                    that reveal narrative balance and surface gaps in your storytelling.</p>
+                            </div>
                         </div>
-                        <div class="flex flex-col gap-3">
+                        <div class="flex gap-4">
                             <div
-                                class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                                class="flex-shrink-0 w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
                                 <span class="material-icons-outlined text-purple-500">hub</span>
                             </div>
-                            <h4 class="font-bold text-gray-900 dark:text-white">Reputation Systems</h4>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Monitor evolving character reputations
-                                and shifting faction dynamics in real time, providing a living portrait of your story's
-                                complex social and political landscape.</p>
+                            <div>
+                                <h4 class="font-bold text-gray-900 dark:text-white mb-1">Reputation Systems</h4>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Monitor evolving character
+                                    reputations
+                                    and shifting faction dynamics in real time, providing a living portrait of your
+                                    story's
+                                    complex social and political landscape.</p>
+                            </div>
                         </div>
-                        <div class="flex flex-col gap-3">
+                        <div class="flex gap-4">
                             <div
-                                class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                                class="flex-shrink-0 w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
                                 <span class="material-icons-outlined text-purple-500">layers</span>
                             </div>
-                            <h4 class="font-bold text-gray-900 dark:text-white">Series Support</h4>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Scale effortlessly from a single scene
-                                to an expansive shared universe, with cross-book library synchronisation to maintain
-                                consistency and continuity across your entire series.</p>
+                            <div>
+                                <h4 class="font-bold text-gray-900 dark:text-white mb-1">Series Support</h4>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Scale effortlessly from a single
+                                    scene
+                                    to an expansive shared universe, with cross-book library synchronisation to maintain
+                                    consistency and continuity across your entire series.</p>
+                            </div>
                         </div>
                     </div>
 
@@ -3190,60 +3206,74 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row-reverse items-center gap-16">
                 <!-- Right Content: Feature List -->
-                <div class="reveal slide-up w-full md:w-1/2">
+                <div class="reveal slide-up w-full md:w-1/2 text-center lg:text-left">
                     <div
-                        class="flex items-center gap-2 mb-4 text-xs font-bold text-emerald-500 uppercase tracking-widest">
-                        <span class="w-8 h-[1px] bg-emerald-500"></span> ARCHITECT MODE
+                        class="flex items-center justify-center lg:justify-start gap-2 mb-4 text-xs font-bold text-emerald-500 uppercase tracking-widest">
+                        <span class="w-8 h-[1px] bg-emerald-500"></span> ARCHITECT MODE <span
+                            class="w-8 h-[1px] bg-emerald-500 lg:hidden"></span>
                     </div>
                     <h2
                         class="text-4xl md:text-[2.5rem] font-serif text-primary dark:text-white mb-6 font-bold leading-tight">
                         Command Your Narrative</h2>
-                    <p class="text-lg text-gray-600 dark:text-gray-400 leading-[1.4rem] mb-8">
+                    <p class="text-lg text-gray-600 dark:text-gray-400 leading-[1.4rem] mb-8 max-w-3xl mx-auto lg:mx-0">
                         Structure is the foundation of compelling fiction. Architect Mode equips you with the tools to
                         chart your story's full scope — from three-act frameworks to intricate, multi-threaded timelines
                         — guided by an AI that understands the internal logic of your world.
                     </p>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10 mb-10">
-                        <div class="flex flex-col gap-3">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10 mb-10 text-left">
+                        <div class="flex gap-4">
                             <div
-                                class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                                class="flex-shrink-0 w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
                                 <span class="material-icons-outlined text-emerald-500">account_tree</span>
                             </div>
-                            <h4 class="font-bold text-gray-900 dark:text-white">Multi-View Planning</h4>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Transition fluidly between Vertical
-                                Outlines, Gantt Timelines, and Beat Sheets to suit every stage of your structural
-                                workflow.</p>
+                            <div>
+                                <h4 class="font-bold text-gray-900 dark:text-white mb-1">Multi-View Planning</h4>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Transition fluidly between Vertical
+                                    Outlines, Gantt Timelines, and Beat Sheets to suit every stage of your structural
+                                    workflow.</p>
+                            </div>
                         </div>
-                        <div class="flex flex-col gap-3">
+                        <div class="flex gap-4">
                             <div
-                                class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                                class="flex-shrink-0 w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
                                 <span class="material-icons-outlined text-emerald-500">psychology_alt</span>
                             </div>
-                            <h4 class="font-bold text-gray-900 dark:text-white">Brainstorming Assistant</h4>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">When momentum stalls, the AI draws on
-                                your established character motives to generate credible plot developments and explore
-                                the downstream consequences of every narrative decision.</p>
+                            <div>
+                                <h4 class="font-bold text-gray-900 dark:text-white mb-1">Brainstorming Assistant</h4>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">When momentum stalls, the AI draws
+                                    on
+                                    your established character motives to generate credible plot developments and
+                                    explore
+                                    the downstream consequences of every narrative decision.</p>
+                            </div>
                         </div>
-                        <div class="flex flex-col gap-3">
+                        <div class="flex gap-4">
                             <div
-                                class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                                class="flex-shrink-0 w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
                                 <span class="material-icons-outlined text-emerald-500">compare</span>
                             </div>
-                            <h4 class="font-bold text-gray-900 dark:text-white">Alternative Realities</h4>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Maintain multiple versions of the same
-                                scene simultaneously. Explore divergent 'What If?' pathways and experiment freely,
-                                without ever compromising your primary draft.</p>
+                            <div>
+                                <h4 class="font-bold text-gray-900 dark:text-white mb-1">Alternative Realities</h4>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Maintain multiple versions of the
+                                    same
+                                    scene simultaneously. Explore divergent 'What If?' pathways and experiment freely,
+                                    without ever compromising your primary draft.</p>
+                            </div>
                         </div>
-                        <div class="flex flex-col gap-3">
+                        <div class="flex gap-4">
                             <div
-                                class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                                class="flex-shrink-0 w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
                                 <span class="material-icons-outlined text-emerald-500">speed</span>
                             </div>
-                            <h4 class="font-bold text-gray-900 dark:text-white">Pacing Analysis</h4>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Visualise the momentum of your narrative
-                                arc in real time. Pinpoint pacing issues and mid-story lulls before they undermine your
-                                reader's engagement.</p>
+                            <div>
+                                <h4 class="font-bold text-gray-900 dark:text-white mb-1">Pacing Analysis</h4>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Visualise the momentum of your
+                                    narrative
+                                    arc in real time. Pinpoint pacing issues and mid-story lulls before they undermine
+                                    your
+                                    reader's engagement.</p>
+                            </div>
                         </div>
                     </div>
 
@@ -3436,20 +3466,22 @@
 
     <section class="py-24 bg-white dark:bg-surface-dark relative -mt-[140px] lg:mt-0">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col-reverse md:flex-row items-center gap-16">
-                <div class="reveal slide-up w-full md:w-1/2">
-                    <div class="flex items-center gap-2 mb-4 text-xs font-bold text-blue-500 uppercase tracking-widest">
-                        <span class="w-8 h-[1px] bg-blue-500"></span> DEEP FOCUS
+            <div class="flex flex-col md:flex-row items-center gap-16">
+                <div class="reveal slide-up w-full md:w-1/2 text-center lg:text-left">
+                    <div
+                        class="flex items-center justify-center lg:justify-start gap-2 mb-4 text-xs font-bold text-blue-500 uppercase tracking-widest">
+                        <span class="w-8 h-[1px] bg-blue-500"></span> DEEP FOCUS <span
+                            class="w-8 h-[1px] bg-blue-500 lg:hidden"></span>
                     </div>
                     <h2 class="text-4xl md:text-[2.5rem] font-serif text-primary dark:text-white mb-6 font-bold">
                         Uncompromised Immersion</h2>
-                    <p class="text-lg text-gray-600 dark:text-gray-400 leading-[1.4rem] mb-8">
+                    <p class="text-lg text-gray-600 dark:text-gray-400 leading-[1.4rem] mb-8 max-w-3xl mx-auto lg:mx-0">
                         The Minimalist Writing Pad strips away interface distractions to cultivate a genuine state of
                         creative focus. Activate Zen Mode for a distraction-free, full-screen writing environment with
                         fully customisable typography — including dedicated support for dyslexia-friendly fonts and
                         granular spacing controls.
                     </p>
-                    <div class="space-y-4 mb-8">
+                    <div class="space-y-4 mb-8 text-left">
                         <div class="flex items-center gap-3">
                             <span class="material-icons-outlined text-blue-500 text-sm">check_circle</span>
                             <span class="text-sm text-gray-600 dark:text-gray-400"><strong>Rich Text
@@ -3540,28 +3572,29 @@
     </section>
 
     <!-- Transition: Focus to Analysis -->
-    <div class="h-16 bg-gradient-to-b from-white to-gray-50 dark:from-black dark:to-surface-dark"></div>
+    <div class="h-20 lg:h-32 bg-gradient-to-b from-white to-gray-50 dark:from-surface-dark dark:to-black"></div>
 
     <!-- Deep Manuscript Analysis Section -->
-    <section class="py-24 bg-gray-50 dark:bg-black overflow-hidden relative -mt-[180px] lg:mt-0">
+    <section class="py-24 bg-gray-50 dark:bg-black overflow-hidden relative -mt-[130px] lg:mt-0">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row-reverse items-center gap-16">
                 <!-- Left Content: Feature List -->
-                <div class="reveal slide-up w-full md:w-1/2">
+                <div class="reveal slide-up w-full md:w-1/2 text-center lg:text-left">
                     <div
-                        class="flex items-center gap-2 mb-4 text-xs font-bold text-amber-500 uppercase tracking-widest">
-                        <span class="w-8 h-[1px] bg-amber-500"></span> STYLE & VOICE MASTERY
+                        class="flex items-center justify-center lg:justify-start gap-2 mb-4 text-xs font-bold text-amber-500 uppercase tracking-widest">
+                        <span class="w-8 h-[1px] bg-amber-500"></span> STYLE & VOICE MASTERY <span
+                            class="w-8 h-[1px] bg-amber-500 lg:hidden"></span>
                     </div>
                     <h2
                         class="text-4xl md:text-[2.5rem] font-serif text-primary dark:text-white mb-6 font-bold leading-tight">
                         Your Intelligent Beta Reader</h2>
-                    <p class="text-lg text-gray-600 dark:text-gray-400 leading-[1.4rem] mb-8">
+                    <p class="text-lg text-gray-600 dark:text-gray-400 leading-[1.4rem] mb-8 max-w-3xl mx-auto lg:mx-0">
                         Move beyond surface-level grammar checks. Benchmark your manuscript directly against published
                         works in your genre to ensure your pacing, vocabulary, and prose rhythm hold their own against
                         the industry's best.
                     </p>
 
-                    <div class="space-y-6 mb-10">
+                    <div class="space-y-6 mb-10 text-left">
                         <div class="flex gap-4">
                             <div
                                 class="flex-shrink-0 w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
@@ -3807,22 +3840,23 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row items-center gap-16">
                 <!-- Left Content: Feature List -->
-                <div class="reveal slide-up w-full md:w-1/2">
+                <div class="reveal slide-up w-full md:w-1/2 text-center lg:text-left">
                     <div
-                        class="flex items-center gap-2 mb-4 text-xs font-bold text-violet-500 uppercase tracking-widest">
-                        <span class="w-8 h-[1px] bg-violet-500"></span> THE COLLABORATIVE MUSE
+                        class="flex items-center justify-center lg:justify-start gap-2 mb-4 text-xs font-bold text-violet-500 uppercase tracking-widest">
+                        <span class="w-8 h-[1px] bg-violet-500"></span> THE COLLABORATIVE MUSE <span
+                            class="w-8 h-[1px] bg-violet-500 lg:hidden"></span>
                     </div>
                     <h2
                         class="text-4xl md:text-[2.5rem] font-serif text-primary dark:text-white mb-6 font-bold leading-tight">
                         AI Brainstorming & Collaboration</h2>
-                    <p class="text-lg text-gray-600 dark:text-gray-400 leading-[1.4rem] mb-8">
+                    <p class="text-lg text-gray-600 dark:text-gray-400 leading-[1.4rem] mb-8 max-w-3xl mx-auto lg:mx-0">
                         Introduce a creative partner that goes beyond conversation. The Contextual Chat Interface
                         maintains a live understanding of your entire story — from high-level structural outlines down
                         to the sentence currently on your screen — enabling genuinely intelligent, context-aware
                         collaboration at every stage of the writing process.
                     </p>
 
-                    <div class="space-y-6 mb-10">
+                    <div class="space-y-6 mb-10 text-left">
                         <div class="flex gap-4">
                             <div
                                 class="flex-shrink-0 w-12 h-12 rounded-2xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center">
@@ -4043,27 +4077,28 @@
     </section>
 
     <!-- Transition 2: Map to Drafting Section -->
-    <div class="h-32 bg-gradient-to-b from-white to-gray-50 dark:from-surface-dark dark:to-black"></div>
+    <div class="h-20 lg:h-32 bg-gradient-to-b from-white to-gray-50 dark:from-surface-dark dark:to-black"></div>
     <!-- Drafting & Team Studio Section -->
-    <section class="py-24 bg-gray-50 dark:bg-black overflow-hidden relative">
+    <section class="py-24 bg-gray-50 dark:bg-black overflow-hidden relative -mt-[140px] lg:mt-0">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row-reverse items-center gap-16">
                 <!-- Left Content -->
-                <div class="reveal slide-up w-full md:w-1/2">
+                <div class="reveal slide-up w-full md:w-1/2 text-center lg:text-left">
                     <div
-                        class="flex items-center gap-2 mb-4 text-xs font-bold text-indigo-500 uppercase tracking-widest">
-                        <span class="w-8 h-[1px] bg-indigo-500"></span> WORKFLOW & TEAM
+                        class="flex items-center justify-center lg:justify-start gap-2 mb-4 text-xs font-bold text-indigo-500 uppercase tracking-widest">
+                        <span class="w-8 h-[1px] bg-indigo-500"></span> WORKFLOW & TEAM <span
+                            class="w-8 h-[1px] bg-indigo-500 lg:hidden"></span>
                     </div>
                     <h2
                         class="text-4xl md:text-[2.5rem] font-serif text-primary dark:text-white mb-6 font-bold leading-tight">
                         Professional Drafting Studio</h2>
-                    <p class="text-lg text-gray-600 dark:text-gray-400 leading-[1.4rem] mb-8">
+                    <p class="text-lg text-gray-600 dark:text-gray-400 leading-[1.4rem] mb-8 max-w-3xl mx-auto lg:mx-0">
                         Manage your manuscript with the reliability and precision your creative work demands. Whether
                         operating across multiple Pen Names or working alongside a Beta Reading Team, every draft,
                         revision, and collaboration is securely preserved and instantly accessible.
                     </p>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10 text-left">
                         <div class="flex gap-4">
                             <div
                                 class="flex-shrink-0 w-12 h-12 rounded-2xl bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
@@ -4831,9 +4866,9 @@
         </div>
     </div>
     <!-- Transition 4: Export to Testimonial Section -->
-    <div class="h-16 bg-white dark:bg-surface-dark">
+    <div class="h-20 lg:h-32 bg-white dark:bg-surface-dark">
     </div>
-    <section class="py-24 bg-white dark:bg-surface-dark relative">
+    <section class="py-24 bg-white dark:bg-surface-dark relative -mt-[140px] lg:mt-0">
         <div class="reveal slide-up max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <span class="material-icons-outlined text-4xl text-yellow-500 mb-8 opacity-50">format_quote</span>
             <blockquote class="text-3xl md:text-4xl font-serif text-primary dark:text-white leading-tight mb-10">
@@ -4851,9 +4886,10 @@
         </div>
     </section>
     <!-- Transition 5: Testimonial to CTA -->
-    <div class="h-32 bg-gradient-to-b from-white to-background-light dark:from-surface-dark dark:to-background-dark">
+    <div
+        class="h-20 lg:h-32 bg-gradient-to-b from-white to-background-light dark:from-surface-dark dark:to-background-dark">
     </div>
-    <section class="py-24 bg-background-light dark:bg-background-dark relative">
+    <section class="py-24 bg-background-light dark:bg-background-dark relative -mt-[140px] lg:mt-0">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 class="text-5xl md:text-6xl font-serif text-primary dark:text-white mb-6">Ready to tell your story?</h2>
             <p class="text-xl text-gray-600 dark:text-gray-400 mb-10">Join 15,000+ writers who have found their flow.
