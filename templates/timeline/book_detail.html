@@ -311,59 +311,62 @@
                 <section>
                     <div class="flex items-center justify-between mb-6">
                         <h2 class="font-serif text-2xl text-black m-0">Key Events</h2>
-                        <a href="{% url 'event_create' %}?book={{ book.pk }}"
-                            class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-background-light text-text-muted hover:text-black transition-colors no-underline"
-                            title="Add Event">
-                            <span class="material-symbols-outlined text-[20px]">add</span>
-                        </a>
+                        <a href="{% url 'timeline_view' %}?book={{ book.pk }}"
+                            class="text-xs font-bold uppercase tracking-wider text-black hover:underline no-underline">View All</a>
                     </div>
 
-                    <div class="grid grid-cols-1 gap-4">
-                        {% for event in events %}
-                        <!-- Assign a random colored left border for visual interest, similar to the Stitch design -->
-                        {% cycle 'bg-bg-white0' 'bg-red-400' 'bg-amber-400' 'bg-emerald-400' 'bg-teal-500' as color_class silent %}
-                        {% cycle 'text-text-main' 'text-red-500' 'text-amber-600' 'text-emerald-600' 'text-teal-600' as text_color_class silent %}
+                    <div class="relative">
+                        <!-- Vertical Timeline Line -->
+                        <div class="absolute left-[11px] top-6 bottom-32 w-px bg-border-subtle"></div>
 
-                        <div
-                            class="bg-surface-light p-4 rounded-xl border border-border-subtle hover:border-gray-300 transition-colors relative overflow-hidden group">
-                            <div class="absolute top-0 left-0 w-1 h-full {{ color_class }}"></div>
-                            <div class="pl-3">
-                                <div class="flex justify-between items-start mb-2">
-                                    <span class="text-[10px] font-bold uppercase tracking-wider {{ text_color_class }}">
-                                        {% if event.chapter %}Chapter {{ event.chapter.chapter_number }}{% else %}General Event{% endif %}
-                                    </span>
-                                    <a href="{% url 'event_detail' event.pk %}"
-                                        class="material-symbols-outlined text-gray-300 text-[16px] group-hover:text-black transition-colors no-underline">open_in_new</a>
-                                </div>
-                                <h4 class="font-serif text-lg text-black mb-1 m-0">{{ event.title }}</h4>
-                                {% if event.description %}
-                                <p class="text-xs text-text-muted mb-3 m-0 line-clamp-2"
-                                    title="{{ event.description }}">{{ event.description }}</p>
-                                {% endif %}
-
-                                {% if event.characters.all %}
-                                <div class="flex flex-wrap gap-2 mt-2">
-                                    {% for char in event.characters.all|slice:":3" %}
-                                    <span
-                                        class="px-2 py-1 rounded-full bg-background-light text-[10px] font-medium text-text-muted border border-border-subtle truncate max-w-[100px]">{{ char.name }}</span>
-                                    {% endfor %}
-                                    {% if event.characters.count > 3 %}
-                                    <span
-                                        class="px-2 py-1 rounded-full bg-background-light text-[10px] font-medium text-text-muted border border-border-subtle">+{{ event.characters.count|add:"-3" }}</span>
+                        <div id="events-container" class="space-y-6">
+                            {% for event in events %}
+                            <div class="relative pl-10 event-item {% if forloop.counter > 3 %}hidden hidden-event{% endif %}">
+                                <!-- Node -->
+                                <div class="absolute left-0 top-1 w-6 h-6 rounded-full border-2 border-border-subtle bg-white z-10 flex items-center justify-center">
+                                    {% if not event.is_written %}
+                                    <div class="w-2.5 h-2.5 rounded-full border border-dashed border-border-subtle"></div>
                                     {% endif %}
                                 </div>
-                                {% endif %}
+
+                                <!-- Event Card -->
+                                <div class="bg-white p-5 rounded-2xl border border-border-subtle hover:shadow-md transition-all group {% if not event.is_written %}bg-gray-50/50{% endif %}">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <span class="text-[10px] font-bold uppercase tracking-wider text-text-muted">
+                                            {{ event.story_date|upper|default:"Undefined Time" }}
+                                        </span>
+                                        <a href="{% url 'event_detail' event.pk %}"
+                                            class="material-symbols-outlined text-gray-300 text-[16px] group-hover:text-black transition-colors no-underline">open_in_new</a>
+                                    </div>
+                                    <h4 class="font-serif text-lg text-black mb-1 m-0">{{ event.title }}</h4>
+                                    {% if event.description %}
+                                    <p class="text-xs text-text-muted mb-4 m-0 line-clamp-2" title="{{ event.description }}">
+                                        {{ event.description }}
+                                    </p>
+                                    {% endif %}
+
+                                    <div class="flex items-center gap-2">
+                                        <span class="px-2.5 py-1 bg-background-light text-[10px] font-bold uppercase tracking-wider rounded-lg text-text-muted border border-border-subtle">
+                                            {% if event.chapter %}Ch {{ event.chapter.chapter_number }}{% else %}Planned{% endif %}
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
+                            {% empty %}
+                            <p class="text-sm text-text-muted text-center py-4 italic">No major events recorded yet.</p>
+                            {% endfor %}
                         </div>
-                        {% empty %}
-                        <p class="text-sm text-text-muted text-center py-4 italic">No major events recorded yet.</p>
-                        {% endfor %}
+
+                        {% if events.count > 3 %}
+                        <button id="btn-view-more-events" class="w-full py-3 mt-6 text-xs font-bold uppercase tracking-wider text-text-muted hover:text-black transition-colors border border-border-subtle rounded-xl hover:bg-white bg-transparent">
+                            View More
+                        </button>
+                        {% endif %}
 
                         <a href="{% url 'event_create' %}?book={{ book.pk }}"
-                            class="w-full py-4 border-2 border-dashed border-border-subtle rounded-xl flex items-center justify-center gap-2 text-text-muted hover:border-primary hover:text-black transition-all group no-underline mt-2">
-                            <span
-                                class="material-symbols-outlined group-hover:scale-110 transition-transform">add_circle</span>
-                            <span class="text-sm font-medium">Add New Event</span>
+                            class="w-full py-4 border-2 border-dashed border-border-subtle rounded-xl flex items-center justify-center gap-2 text-text-muted hover:border-black hover:text-black transition-all group no-underline mt-6 bg-transparent">
+                            <span class="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">add</span>
+                            <span class="text-sm font-medium">Add Event</span>
                         </a>
                     </div>
                 </section>
@@ -514,6 +517,26 @@
             scanError.style.display = 'block';
             errorMsg.innerText = msg;
             btnCloseX.style.display = 'block';
+        }
+
+        // View More Events Toggle
+        const btnViewMore = document.getElementById('btn-view-more-events');
+        if (btnViewMore) {
+            btnViewMore.onclick = function() {
+                const hiddenEvents = document.querySelectorAll('.hidden-event');
+                const currentText = btnViewMore.innerText.toUpperCase();
+                const isExpanding = currentText.includes('MORE');
+                
+                hiddenEvents.forEach(el => {
+                    if (isExpanding) {
+                        el.classList.remove('hidden');
+                    } else {
+                        el.classList.add('hidden');
+                    }
+                });
+                
+                btnViewMore.innerText = isExpanding ? 'View Less' : 'View More';
+            };
         }
     });
 </script>
