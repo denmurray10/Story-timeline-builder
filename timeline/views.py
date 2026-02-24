@@ -1668,6 +1668,88 @@ Generate 3-6 scenes depending on chapter complexity."""
         return JsonResponse({'status': 'success', 'outline': data})
     return JsonResponse({'status': 'error', 'message': 'AI could not generate an outline. Please try again.'})
 
+@login_required
+@require_POST
+def api_chapter_deep_scan(request, pk):
+    """
+    Perform a targeted deep scan of a single chapter.
+    Extracts summary and events directly from the content.
+    """
+    chapter = get_object_or_404(Chapter, pk=pk, book__user=request.user)
+    
+    if not chapter.content:
+        return JsonResponse({'status': 'error', 'message': 'No content found in this chapter to scan.'})
+
+    prompt = f"""
+    Perform a DEEP SCAN of the following chapter.
+    
+    Extract:
+    1. A concise 2-3 paragraph summary.
+    2. All key events/scenes (title, description, involved characters, tone, tension level 1-10).
+    
+    Book: {chapter.book.title}
+    Chapter {chapter.chapter_number}: {chapter.title}
+    
+    Content:
+    {chapter.content[:20000]}
+    
+    Return ONLY a JSON object:
+    {{
+      "summary": "...",
+      "events": [
+        {{
+          "title": "...",
+          "description": "...",
+          "characters": ["Name1", "Name2"],
+          "tone": "...",
+          "tension": 5
+        }}
+      ]
+    }}
+    """
+    
+    # Using deepseek-reasoner for extraction
+    import json
+    data = _call_ai_json(prompt, deepseek_model="deepseek-reasoner")
+    
+    if data:
+        # Update chapter description
+        if 'summary' in data:
+            chapter.description = data['summary']
+            chapter.save()
+            
+        # Create events
+        if 'events' in data:
+            from .models import Character, Event
+            char_map = {c.name.lower(): c for c in Character.objects.filter(user=request.user)}
+            
+            for ev_data in data['events']:
+                # Avoid duplicates by title in the same chapter
+                if not Event.objects.filter(chapter=chapter, title=ev_data['title']).exists():
+                    event = Event.objects.create(
+                        user=request.user,
+                        book=chapter.book,
+                        chapter=chapter,
+                        title=ev_data['title'],
+                        description=ev_data['description'],
+                        # Normalize tone if it's long
+                        emotional_tone=str(ev_data.get('tone', 'neutral')).lower()[:20],
+                        tension_level=ev_data.get('tension', 5),
+                        sequence_order=chapter.events.count() + 1
+                    )
+                    
+                    # Link characters
+                    if 'characters' in ev_data:
+                        for cname in ev_data['characters']:
+                            c_obj = char_map.get(cname.lower())
+                            if c_obj:
+                                event.characters.add(c_obj)
+
+        return JsonResponse({'status': 'success', 'data': data})
+        
+    return JsonResponse({'status': 'error', 'message': 'AI failed to analyze the chapter.'})
+
+
 
 @login_required
 @require_POST

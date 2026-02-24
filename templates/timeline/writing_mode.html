@@ -90,9 +90,9 @@
                 <a href="#" class="nav-item-link" onclick="switchSidebarTab('export')"><i class="bi bi-file-earmark-arrow-up text-success"></i><span>Export & Publish</span></a>
             </nav>
             <div class="mt-auto pt-4 flex flex-col gap-2">
-                <button class="btn-premium btn-premium-light !py-2 !text-xs !w-full"><i class="bi bi-archive"></i> Archive</button>
-                <button class="btn-premium btn-premium-dark !py-2 !text-xs !w-full"><i class="bi bi-plus-lg"></i> Add New Chapter</button>
-                <button class="btn-premium btn-premium-light !py-2 !text-xs !w-full"><i class="bi bi-file-earmark-arrow-up"></i> Import Text</button>
+                <a href="#" class="btn-premium btn-premium-light !py-2 !text-xs !w-full"><i class="bi bi-archive"></i> Archive</a>
+                <a href="{% url 'chapter_create' book.pk %}" class="btn-premium btn-premium-dark !py-2 !text-xs !w-full"><i class="bi bi-plus-lg"></i> Add New Chapter</a>
+                <a href="{% url 'chapter_bulk_upload' book.pk %}" class="btn-premium btn-premium-light !py-2 !text-xs !w-full"><i class="bi bi-file-earmark-arrow-up"></i> Import Text</a>
             </div>
         </div>
     </aside>

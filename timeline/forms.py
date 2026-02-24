@@ -82,6 +82,14 @@ class ChapterForm(forms.ModelForm):
             "is_complete": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["word_count"].required = False
+        self.fields["is_complete"].required = False
+        self.fields["description"].required = False
+        self.fields["content"].required = False
+        self.fields["chapter_file"].required = False
+
 
 class CharacterForm(forms.ModelForm):
     """Form for creating/editing characters."""

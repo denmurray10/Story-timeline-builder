@@ -49,6 +49,7 @@ urlpatterns = [
     path('chapters/<int:pk>/delete/', views.chapter_delete, name='chapter_delete'),
     path('api/chapters/<int:pk>/scene-outline/', views.api_scene_outline, name='api_scene_outline'),
     path('api/chapters/<int:pk>/summary/', views.api_chapter_summary, name='api_chapter_summary'),
+    path('api/chapters/<int:pk>/deep-scan/', views.api_chapter_deep_scan, name='api_chapter_deep_scan'),
     
     # Characters
     path('characters/', views.character_list, name='character_list'),
