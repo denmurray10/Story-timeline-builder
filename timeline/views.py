@@ -2738,6 +2738,8 @@ def api_sync_character_data(request):
             
         # Update ONLY empty fields
         updated_fields = []
+        
+        # Original 4 fields
         if not character.description and match.get('description'):
             character.description = match['description']
             updated_fields.append('description')
@@ -2751,6 +2753,26 @@ def api_sync_character_data(request):
             character.traits = match['traits']
             updated_fields.append('traits')
             
+        # New 6 Deep Psychology fields
+        if not character.fears and match.get('fears'):
+            character.fears = match['fears']
+            updated_fields.append('fears')
+        if not character.flaws and match.get('flaws'):
+            character.flaws = match['flaws']
+            updated_fields.append('flaws')
+        if not character.internal_conflicts and match.get('internal_conflicts'):
+            character.internal_conflicts = match['internal_conflicts']
+            updated_fields.append('internal_conflicts')
+        if not character.unfulfilled_desires and match.get('unfulfilled_desires'):
+            character.unfulfilled_desires = match['unfulfilled_desires']
+            updated_fields.append('unfulfilled_desires')
+        if not character.secrets and match.get('secrets'):
+            character.secrets = match['secrets']
+            updated_fields.append('secrets')
+        if not character.regrets and match.get('regrets'):
+            character.regrets = match['regrets']
+            updated_fields.append('regrets')
+            
         if updated_fields:
             character.save()
             return JsonResponse({
@@ -2760,7 +2782,13 @@ def api_sync_character_data(request):
                     'description': character.description,
                     'motivation': character.motivation,
                     'goals': character.goals,
-                    'personality_traits': character.traits
+                    'personality_traits': character.traits,
+                    'fears': character.fears,
+                    'flaws': character.flaws,
+                    'internal_conflicts': character.internal_conflicts,
+                    'unfulfilled_desires': character.unfulfilled_desires,
+                    'secrets': character.secrets,
+                    'regrets': character.regrets
                 }
             })
         else:
@@ -2852,16 +2880,28 @@ def analyze_single_character_with_ai(character_name, text):
     
     Provide the following fields based ONLY on the story content:
     - description: A detailed multi-paragraph description covering physical appearance, personality, and background.
-    - motivation: What drives this character? Their desires, fears, and internal conflicts.
-    - goals: Their specific objectives in the story.
+    - motivation: What drives this character? Their broad desires and needs.
+    - goals: Their specific, concrete objectives in the story right now.
     - traits: Key personality traits and quirks.
+    - fears: Their deepest phobias or anxieties.
+    - flaws: Their character defects or moral shortcomings that cause problems.
+    - internal_conflicts: The emotional tug-of-war they experience when making decisions.
+    - unfulfilled_desires: What do they secretly yearn for but cannot achieve?
+    - secrets: Information they are fiercely hiding from the world.
+    - regrets: Past actions or mistakes they feel deep remorse over.
 
     Return ONLY a JSON object:
     {{
       "description": "...",
       "motivation": "...",
       "goals": "...",
-      "traits": "..."
+      "traits": "...",
+      "fears": "...",
+      "flaws": "...",
+      "internal_conflicts": "...",
+      "unfulfilled_desires": "...",
+      "secrets": "...",
+      "regrets": "..."
     }}
 
     If a field cannot be determined from the text, return an empty string for that field.

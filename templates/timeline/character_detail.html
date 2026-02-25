@@ -507,10 +507,6 @@
                 <span class="text-muted" style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">
                     Introduced In: <strong class="text-dark">{{ character.introduction_book.title|default:"Unknown Book" }}</strong>
                 </span>
-                <span class="mx-2 text-muted">|</span>
-                <span class="text-muted" style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">
-                    Theme: <span class="d-inline-block rounded-circle align-middle" style="width: 14px; height: 14px; background-color: {{ character.color_code|default:'#6366f1' }}; border: 1px solid rgba(0,0,0,0.1);"></span>
-                </span>
             </div>
         </div>
         <div class="col-md-5 mt-4 mt-md-0 d-flex flex-wrap justify-content-md-end gap-2">
@@ -697,27 +693,69 @@
                     </div>
                 </div>
 
-                <!-- Psychology Panel -->
-                <div class="card-premium draggable-card mb-4" id="card-psychology">
-                    <div class="card-header-premium border-bottom-0">
+                <!-- Fears & Phobias Card -->
+                <div class="card-premium draggable-card mb-4" id="card-fears">
+                    <div class="card-header-premium border-bottom-0 pb-0">
                         <i class="bi bi-grip-vertical drag-handle"></i>
-                        <i class="bi bi-heart-pulse text-muted"></i> Deep Psychology
+                        <i class="bi bi-emoji-dizzy text-purple-500"></i> Fears & Phobias
                     </div>
-                    <div class="card-body p-4 pt-0">
-                        <div class="mb-4">
-                            <div class="d-flex align-items-center gap-2 mb-2">
-                                <i class="bi bi-star-fill text-warning"></i>
-                                <label class="trait-label m-0 text-dark">Core Desire</label>
-                            </div>
-                            <textarea name="core_desire" class="form-control-premium" style="min-height: 100px;" placeholder="What does this character crave?">{{ form.core_desire.value|default_if_none:'' }}</textarea>
-                        </div>
-                        <div class="mb-0">
-                            <div class="d-flex align-items-center gap-2 mb-2">
-                                <i class="bi bi-virus text-danger"></i>
-                                <label class="trait-label m-0 text-dark">Fatal Flaw</label>
-                            </div>
-                            <textarea name="fatal_flaw" class="form-control-premium" style="min-height: 100px;" placeholder="What leads to their undoing?">{{ form.fatal_flaw.value|default_if_none:'' }}</textarea>
-                        </div>
+                    <div class="card-body p-4 pt-3">
+                        <textarea name="fears" class="form-control-premium" style="min-height: 100px;" placeholder="Their deepest phobias or anxieties.">{{ form.fears.value|default_if_none:'' }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Character Flaws Card -->
+                <div class="card-premium draggable-card mb-4" id="card-flaws">
+                    <div class="card-header-premium border-bottom-0 pb-0">
+                        <i class="bi bi-grip-vertical drag-handle"></i>
+                        <i class="bi bi-exclamation-triangle text-orange-500"></i> Character Flaws
+                    </div>
+                    <div class="card-body p-4 pt-3">
+                        <textarea name="flaws" class="form-control-premium" style="min-height: 100px;" placeholder="Character defects or moral shortcomings.">{{ form.flaws.value|default_if_none:'' }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Internal Conflicts Card -->
+                <div class="card-premium draggable-card mb-4" id="card-internal-conflicts">
+                    <div class="card-header-premium border-bottom-0 pb-0">
+                        <i class="bi bi-grip-vertical drag-handle"></i>
+                        <i class="bi bi-yin-yang text-dark"></i> Internal Conflicts
+                    </div>
+                    <div class="card-body p-4 pt-3">
+                        <textarea name="internal_conflicts" class="form-control-premium" style="min-height: 100px;" placeholder="The emotional tug-of-war they experience.">{{ form.internal_conflicts.value|default_if_none:'' }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Unfulfilled Desires Card -->
+                <div class="card-premium draggable-card mb-4" id="card-unfulfilled-desires">
+                    <div class="card-header-premium border-bottom-0 pb-0">
+                        <i class="bi bi-grip-vertical drag-handle"></i>
+                        <i class="bi bi-cloud-rain text-info"></i> Unfulfilled Desires
+                    </div>
+                    <div class="card-body p-4 pt-3">
+                        <textarea name="unfulfilled_desires" class="form-control-premium" style="min-height: 100px;" placeholder="What they secretly yearn for but cannot achieve.">{{ form.unfulfilled_desires.value|default_if_none:'' }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Secrets Card -->
+                <div class="card-premium draggable-card mb-4" id="card-secrets">
+                    <div class="card-header-premium border-bottom-0 pb-0">
+                        <i class="bi bi-grip-vertical drag-handle"></i>
+                        <i class="bi bi-incognito text-slate-700"></i> Secrets
+                    </div>
+                    <div class="card-body p-4 pt-3">
+                        <textarea name="secrets" class="form-control-premium" style="min-height: 100px;" placeholder="Information they are fiercely hiding.">{{ form.secrets.value|default_if_none:'' }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Regrets Card -->
+                <div class="card-premium draggable-card mb-4" id="card-regrets">
+                    <div class="card-header-premium border-bottom-0 pb-0">
+                        <i class="bi bi-grip-vertical drag-handle"></i>
+                        <i class="bi bi-arrow-counterclockwise text-secondary"></i> Regrets
+                    </div>
+                    <div class="card-body p-4 pt-3">
+                        <textarea name="regrets" class="form-control-premium" style="min-height: 100px;" placeholder="Past actions or mistakes they feel deep remorse over.">{{ form.regrets.value|default_if_none:'' }}</textarea>
                     </div>
                 </div>
 
@@ -838,6 +876,36 @@
     </div>
   </div>
 </div>
+
+<!-- AI Sync Confirmation Modal -->
+<div class="modal fade" id="syncConfirmModal" tabindex="-1" aria-labelledby="syncConfirmModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-5">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title font-dm-serif text-primary" id="syncConfirmModalLabel"><i class="bi bi-arrow-repeat"></i> Sync AI</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4 text-dark" style="font-size: 0.95rem; line-height: 1.6;">
+        <p class="mb-3"><strong>Penn</strong> will automatically fill in any <strong>empty fields</strong> in this character's profile based on their appearances in the book manuscript.</p>
+        <p class="mb-2 fw-bold" style="font-size: 0.85rem; text-transform: uppercase;">Status of fields to sync:</p>
+        <ul class="mb-4 list-unstyled ms-1" style="font-size: 0.9rem;">
+            <li id="status-description" class="mb-2"><i class="bi bi-circle me-2"></i>Biography & Arc</li>
+            <li id="status-motivation" class="mb-2"><i class="bi bi-circle me-2"></i>Motivation</li>
+            <li id="status-goals" class="mb-2"><i class="bi bi-circle me-2"></i>Goals & Objectives</li>
+            <li id="status-traits" class="mb-2"><i class="bi bi-circle me-2"></i>Personality Traits</li>
+            <li id="status-psychology" class="mb-2"><i class="bi bi-circle me-2"></i>Deep Psychology (Fears, Flaws, Conflicts, etc)</li>
+        </ul>
+        <p class="mb-0 text-muted" style="font-size: 0.85rem;"><i class="bi bi-shield-check text-success"></i> Existing text will never be overwritten.</p>
+      </div>
+      <div class="modal-footer border-0 pt-0 justify-content-between">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary d-flex align-items-center gap-2" id="confirmSyncBtn">
+            <i class="bi bi-magic"></i> Proceed & Sync
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
@@ -919,13 +987,72 @@
 
         // Sync Trigger
         const syncBtn = document.getElementById('syncCharacterBtn');
+        const syncConfirmModal = new bootstrap.Modal(document.getElementById('syncConfirmModal'));
+        let isSyncing = false;
+
+        function updateSyncFieldStatus(id, isPopulated) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const icon = el.querySelector('i');
+            if (isPopulated) {
+                el.className = 'mb-2 text-success fw-medium';
+                icon.className = 'bi bi-check-circle-fill me-2';
+            } else {
+                el.className = 'mb-2 text-danger fw-medium';
+                icon.className = 'bi bi-exclamation-circle-fill me-2';
+            }
+        }
+
         if (syncBtn) {
             syncBtn.addEventListener('click', function() {
-                if (!confirm('Sync empty boxes using AI analysis from the book?')) return;
+                if (isSyncing) return;
                 
-                const icon = this.querySelector('i');
+                // Show analyzing state
+                const icon = syncBtn.querySelector('i');
                 const origClass = icon.className;
                 icon.className = 'bi bi-arrow-repeat animate-spin fs-6 text-primary';
+                
+                // Simulate Penn checking the fields
+                setTimeout(() => {
+                    // Check standard fields
+                    const hasDesc = document.querySelector('textarea[name="description"]')?.value.trim() !== '';
+                    const hasMotiv = document.querySelector('textarea[name="motivation"]')?.value.trim() !== '';
+                    const hasGoals = document.querySelector('textarea[name="goals"]')?.value.trim() !== '';
+                    const hasTraits = document.querySelector('textarea[name="traits"]')?.value.trim() !== '';
+                    
+                    // Deep psych requires all 6 to be filled to be "green/safe"
+                    const hasPsych = ['fears', 'flaws', 'internal_conflicts', 'unfulfilled_desires', 'secrets', 'regrets']
+                        .every(name => {
+                            const el = document.querySelector(`textarea[name="${name}"]`);
+                            return el && el.value.trim() !== '';
+                        });
+                    
+                    updateSyncFieldStatus('status-description', hasDesc);
+                    updateSyncFieldStatus('status-motivation', hasMotiv);
+                    updateSyncFieldStatus('status-goals', hasGoals);
+                    updateSyncFieldStatus('status-traits', hasTraits);
+                    updateSyncFieldStatus('status-psychology', hasPsych);
+                    
+                    // Restore button and show modal
+                    icon.className = origClass;
+                    syncConfirmModal.show();
+                }, 600);
+            });
+        }
+
+        const confirmSyncBtn = document.getElementById('confirmSyncBtn');
+        if (confirmSyncBtn) {
+            confirmSyncBtn.addEventListener('click', function() {
+                if (isSyncing) return;
+                isSyncing = true;
+                
+                const icon = syncBtn.querySelector('i');
+                const origClass = icon.className;
+                icon.className = 'bi bi-arrow-repeat animate-spin fs-6 text-primary';
+                
+                // Update modal button state
+                this.disabled = true;
+                this.innerHTML = '<i class="bi bi-arrow-repeat animate-spin"></i> Syncing...';
                 
                 fetch("{% url 'api_character_sync' %}", {
                     method: 'POST',
@@ -935,13 +1062,19 @@
                 .then(res => res.json())
                 .then(data => {
                     icon.className = origClass;
+                    isSyncing = false;
+                    syncConfirmModal.hide();
+                    
                     if (data.status === 'success') {
-                        alert('Sync complete! Refreshing metadata...');
+                        // Reload the page to show the new synced data immediately
                         window.location.reload();
                     } else alert('Error: ' + data.message);
                 })
                 .catch(err => {
                     icon.className = origClass;
+                    isSyncing = false;
+                    syncConfirmModal.hide();
+                    alert('An error occurred during sync.');
                 });
             });
         }

@@ -136,8 +136,12 @@ class CharacterForm(forms.ModelForm):
             "eyes",
             "hair",
             "age",
-            "core_desire",
-            "fatal_flaw",
+            "fears",
+            "flaws",
+            "internal_conflicts",
+            "unfulfilled_desires",
+            "secrets",
+            "regrets",
         ]
         widgets = {
             "name": forms.TextInput(attrs={"class": "form-control"}),
@@ -158,8 +162,12 @@ class CharacterForm(forms.ModelForm):
             "eyes": forms.TextInput(attrs={"class": "form-control"}),
             "hair": forms.TextInput(attrs={"class": "form-control"}),
             "age": forms.TextInput(attrs={"class": "form-control"}),
-            "core_desire": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
-            "fatal_flaw": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
+            "fears": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
+            "flaws": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
+            "internal_conflicts": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
+            "unfulfilled_desires": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
+            "secrets": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
+            "regrets": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
         }
 
     def __init__(self, *args, **kwargs):

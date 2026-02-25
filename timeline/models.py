@@ -190,6 +190,14 @@ class Character(models.Model):
     age = models.CharField(max_length=50, blank=True)
     core_desire = models.TextField(blank=True, help_text="What the character wants most")
     fatal_flaw = models.TextField(blank=True, help_text="The weakness that potentially leads to their downfall")
+    
+    # Deep Psychology Fields
+    fears = models.TextField(blank=True, help_text="Their deepest phobias or anxieties")
+    flaws = models.TextField(blank=True, help_text="Character defects or moral shortcomings")
+    internal_conflicts = models.TextField(blank=True, help_text="The emotional tug-of-war they experience")
+    unfulfilled_desires = models.TextField(blank=True, help_text="What they secretly yearn for but cannot achieve")
+    secrets = models.TextField(blank=True, help_text="Information they are fiercely hiding")
+    regrets = models.TextField(blank=True, help_text="Past actions or mistakes they feel deep remorse over")
 
     introduction_book = models.ForeignKey(
         Book,
