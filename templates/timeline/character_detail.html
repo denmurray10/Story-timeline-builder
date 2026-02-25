@@ -6,6 +6,7 @@
 <style>
     :root {
         --char-accent: {{ character.color_code|default:"#6366f1" }};
+        --role-color: {% if character.role == 'protagonist' %}#0d6efd{% elif character.role == 'antagonist' %}#dc3545{% elif character.role == 'supporting' %}#198754{% else %}#6c757d{% endif %};
     }
     
     .font-dm-serif {
@@ -223,26 +224,232 @@
     .drag-handle { cursor: grab; color: #d1d5db; margin-right: 8px; opacity: 0; transition: opacity 0.2s ease, color 0.2s ease; }
     .card-premium:hover .drag-handle { color: #6366f1; opacity: 1; }
 
-    /* Key Events Timeline CSS */
-    .event-card-hover {
-        background-color: transparent;
-        transition: all 0.2s ease;
-        border: 1px solid transparent;
+    /* ── Key Events – Double-Sided Zigzag Timeline ── */
+    .ke-card {
+        max-height: 720px;
     }
-    .event-card-hover:hover {
-        background-color: #f8fafc;
-        border-color: #e2e8f0;
-        transform: translateX(4px);
+    .ke-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.5rem;
     }
-    .event-card-hover .timeline-icon {
+    .ke-count {
+        font-size: 0.6rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #94a3b8;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 999px;
+        padding: 0.3em 0.75em;
+    }
+    .ke-body {
+        padding: 0 !important;
+        overflow-y: auto;
+        overflow-x: hidden;
+        flex-grow: 1;
+    }
+    .ke-body::-webkit-scrollbar { width: 4px; }
+    .ke-body::-webkit-scrollbar-track { background: transparent; }
+    .ke-body::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
+    .ke-body::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+
+    /* The zigzag list container */
+    .ke-list {
+        position: relative;
+        padding: 0.75rem 0.75rem;
+    }
+    /* Central vertical line — positioned via JS between first & last dots */
+    .ke-list::before {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: var(--line-top, 50%);
+        bottom: var(--line-bottom, 50%);
+        width: 2px;
+        transform: translateX(-50%);
+        background: #d1d5db;
+        border-radius: 2px;
+        z-index: 0;
+    }
+
+    /* Individual event row – uses CSS grid for left/right placement */
+    .ke-event {
+        position: relative;
+        display: grid;
+        grid-template-columns: 1fr 14px 1fr;
+        align-items: center;
+        gap: 0;
+        padding: 0;
         opacity: 0;
-        transform: translateX(-10px);
+        transform: translateY(6px);
+        animation: keReveal 0.35s ease forwards;
+        z-index: 2;
+    }
+    @keyframes keReveal {
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Centre dot column */
+    .ke-dot-col {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        z-index: 5;
+    }
+    .ke-dot {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: #ffffff;
+        border: 3px solid #d1d5db;
+        transition: all 0.25s ease;
+        flex-shrink: 0;
+        position: relative;
+        z-index: 5;
+        outline: 3px solid #ffffff;
+    }
+    .ke-dot.is-written {
+        background: var(--role-color, #6366f1);
+        border-color: var(--role-color, #6366f1);
+        outline: 3px solid #ffffff;
+    }
+    .ke-event:hover .ke-dot {
+        transform: scale(1.25);
+        border-color: var(--role-color, #6366f1);
+    }
+    .ke-event:hover .ke-dot.is-written {
+        outline: 3px solid #ffffff;
+        box-shadow: 0 0 0 2px color-mix(in srgb, var(--role-color, #6366f1) 25%, transparent);
+    }
+
+    /* Content card on either side */
+    .ke-content {
+        min-width: 0;
+        text-decoration: none !important;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.35rem;
+        padding: 0.35rem 0.55rem;
+        border-radius: 8px;
+        border: 1px solid transparent;
+        background: transparent;
         transition: all 0.2s ease;
     }
-    .event-card-hover:hover .timeline-icon {
+    .ke-content:hover {
+        background: #f8fafc;
+        border-color: #e2e8f0;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+    .ke-content > div {
+        flex: 1;
+        min-width: 0;
+    }
+
+    /* Left-side event: content on left, spacer on right */
+    .ke-event.ke-left .ke-content {
+        grid-column: 1;
+        grid-row: 1;
+        justify-content: flex-end;
+        text-align: right;
+        flex-direction: row-reverse;
+    }
+    .ke-event.ke-left .ke-dot-col { grid-column: 2; grid-row: 1; }
+    .ke-event.ke-left .ke-spacer { grid-column: 3; grid-row: 1; }
+    .ke-event.ke-left .ke-meta { justify-content: flex-end; }
+
+    /* Right-side event: spacer on left, content on right */
+    .ke-event.ke-right .ke-spacer { grid-column: 1; grid-row: 1; }
+    .ke-event.ke-right .ke-dot-col { grid-column: 2; grid-row: 1; }
+    .ke-event.ke-right .ke-content {
+        grid-column: 3;
+        grid-row: 1;
+        text-align: left;
+    }
+
+    .ke-spacer { display: block; }
+
+    .ke-meta {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        margin-bottom: 0.2rem;
+        flex-wrap: wrap;
+    }
+    .ke-chapter-badge {
+        font-size: 0.55rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #64748b;
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        border-radius: 5px;
+        padding: 0.2em 0.5em;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25em;
+        line-height: 1;
+    }
+    .ke-status {
+        font-size: 0.5rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        padding: 0.2em 0.5em;
+        border-radius: 5px;
+        line-height: 1;
+    }
+    .ke-status-drafted {
+        color: #16a34a;
+        background: rgba(22, 163, 74, 0.08);
+        border: 1px solid rgba(22, 163, 74, 0.2);
+    }
+    .ke-title {
+        font-size: 0.78rem;
+        font-weight: 650;
+        color: #1e293b;
+        line-height: 1.3;
+        margin: 0;
+        transition: color 0.2s;
+    }
+    .ke-content:hover .ke-title {
+        color: var(--role-color, #6366f1);
+    }
+    .ke-arrow {
+        opacity: 0;
+        transition: all 0.2s ease;
+        color: var(--role-color, #6366f1);
+        font-size: 0.75rem;
+        flex-shrink: 0;
+        margin-top: 0.15rem;
+    }
+    .ke-content:hover .ke-arrow {
         opacity: 1;
-        transform: translateX(0);
-        color: var(--char-accent, #6366f1);
+    }
+
+    /* Empty state */
+    .ke-empty {
+        text-align: center;
+        padding: 3rem 1.5rem;
+    }
+    .ke-empty-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+    }
+    .ke-empty-icon i {
+        font-size: 1.25rem;
+        color: #94a3b8;
     }
 </style>
 {% endblock %}
@@ -527,67 +734,60 @@
                     </div>
                 </div>
 
-                <!-- Events Timeline Card -->
-                <div class="card-premium draggable-card mb-4 d-flex flex-column" id="card-timeline" style="max-height: 600px;">
-                    <div class="card-header-premium border-bottom-0 pb-2 flex-wrap justify-content-between">
+                <!-- Events Timeline Card (Double-Sided Zigzag) -->
+                <div class="card-premium draggable-card mb-4 d-flex flex-column ke-card" id="card-timeline">
+                    <div class="card-header-premium border-bottom-0 pb-2 ke-header">
                         <div class="d-flex align-items-center gap-2">
                             <i class="bi bi-grip-vertical drag-handle"></i>
                             <i class="bi bi-clock-history text-muted"></i> Key Events
                         </div>
-                        <span class="badge bg-light text-muted border rounded-pill px-2 py-1" style="font-size: 0.65rem; font-weight: 700;">{{ events.count }} Total</span>
+                        <span class="ke-count">{{ events.count }} Event{{ events.count|pluralize }}</span>
                     </div>
-                    <div class="card-body p-4 pt-2 overflow-auto position-relative flex-grow-1" id="timeline-container-sidebar">
-                        <!-- Background Timeline Line -->
-                        <div class="position-absolute" style="left: 31px; top: 30px; bottom: 30px; width: 2px; background: #f1f5f9; z-index: 0; border-radius: 4px;"></div>
-                        <!-- Active Progress Line -->
-                        <div id="timeline-progress-line" class="position-absolute" style="left: 31px; top: 30px; width: 2px; background: var(--char-accent, #6366f1); z-index: 10; transition: height 0.7s ease-in-out; height: 0; border-radius: 4px;"></div>
-                        
-                        <div class="d-flex flex-column gap-2 position-relative z-10 ms-1">
-                            {% if events %}
-                                {% for event in events %}
-                                <div class="position-relative ps-5 event-item pb-2">
-                                    <div class="d-flex align-items-center gap-0">
-                                        <!-- Node -->
-                                        <div class="rounded-circle bg-white d-flex align-items-center justify-content-center shrink-0 js-timeline-node" style="width: 18px; height: 18px; margin-left: -37px; position: relative; z-index: 20; border: 4px solid white; box-shadow: 0 0 0 1px #e2e8f0; margin-right: 18px;">
-                                            <div class="rounded-circle js-timeline-dot {% if event.is_written %}bg-primary{% else %}bg-transparent border border-secondary border-opacity-50{% endif %}" style="width: 10px; height: 10px; transition: all 0.3s ease;"></div>
+                    <div class="ke-body" id="timeline-container-sidebar">
+                        {% if events %}
+                        <div class="ke-list">
+                            {% for event in events %}
+                            <div class="ke-event {% cycle 'ke-left' 'ke-right' %}" style="animation-delay: {{ forloop.counter0 }}00ms;">
+                                <a href="{% url 'event_detail' event.pk %}" class="ke-content">
+                                    <i class="bi bi-arrow-{% cycle 'left' 'right' %} ke-arrow"></i>
+                                    <div style="min-width: 0;">
+                                        <div class="ke-meta">
+                                            {% if event.chapter %}
+                                            <span class="ke-chapter-badge">
+                                                <i class="bi bi-book"></i> Ch. {{ event.chapter.chapter_number }}
+                                            </span>
+                                            {% elif event.story_date %}
+                                            <span class="ke-chapter-badge">
+                                                <i class="bi bi-calendar3"></i> {{ event.story_date }}
+                                            </span>
+                                            {% else %}
+                                            <span class="ke-chapter-badge">
+                                                <i class="bi bi-bookmark"></i> Planned
+                                            </span>
+                                            {% endif %}
+                                            {% if event.is_written %}
+                                            <span class="ke-status ke-status-drafted">Drafted</span>
+                                            {% endif %}
                                         </div>
-
-                                        <!-- Card Content -->
-                                        <a href="{% url 'event_detail' event.pk %}" class="flex-grow-1 text-decoration-none event-card-hover rounded-4 p-3 d-flex justify-content-between align-items-center shadow-sm" style="box-shadow: 0 1px 3px rgba(0,0,0,0.02) !important;">
-                                            <div>
-                                                <div class="d-flex align-items-center gap-2 mb-1">
-                                                    <span class="text-muted tracking-widest fw-bold uppercase" style="font-size: 0.6rem;">
-                                                        {% if event.chapter %}
-                                                            <i class="bi bi-book opacity-50 me-1"></i> Ch. {{ event.chapter.chapter_number }}
-                                                        {% elif event.story_date %}
-                                                            <i class="bi bi-calendar3 opacity-50 me-1"></i> {{ event.story_date|upper }}
-                                                        {% else %}
-                                                            <i class="bi bi-bookmark opacity-50 me-1"></i> Planned
-                                                        {% endif %}
-                                                    </span>
-                                                    {% if event.is_written %}
-                                                    <span class="badge rounded-pill bg-success bg-opacity-10 text-success border border-success border-opacity-25" style="font-size: 0.5rem; padding: 0.3em 0.6em;">Drafted</span>
-                                                    {% endif %}
-                                                </div>
-                                                <h6 class="m-0 fw-bold text-dark" style="font-size: 0.95rem; line-height: 1.3;">
-                                                    {{ event.title }}
-                                                </h6>
-                                            </div>
-                                            <i class="bi bi-chevron-right fs-6 timeline-icon"></i>
-                                        </a>
+                                        <h6 class="ke-title">{{ event.title }}</h6>
                                     </div>
+                                </a>
+                                <div class="ke-dot-col">
+                                    <div class="ke-dot {% if event.is_written %}is-written{% endif %}"></div>
                                 </div>
-                                {% endfor %}
-                            {% else %}
-                                <div class="text-center py-5">
-                                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 56px; height: 56px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
-                                        <i class="bi bi-calendar-x text-muted fs-4 opacity-50"></i>
-                                    </div>
-                                    <div class="fw-bold text-dark" style="font-size: 0.9rem;">No Plot assigned</div>
-                                    <div class="text-muted mt-1" style="font-size: 0.75rem;">This character hasn't been added to any events yet.</div>
-                                </div>
-                            {% endif %}
+                                <span class="ke-spacer"></span>
+                            </div>
+                            {% endfor %}
                         </div>
+                        {% else %}
+                        <div class="ke-empty">
+                            <div class="ke-empty-icon">
+                                <i class="bi bi-calendar-x"></i>
+                            </div>
+                            <div class="fw-bold text-dark" style="font-size: 0.88rem;">No events yet</div>
+                            <div class="text-muted mt-1" style="font-size: 0.75rem; max-width: 220px; margin: 0 auto;">This character hasn't been linked to any plot events.</div>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -751,54 +951,6 @@
             });
         }
 
-        // Timeline Scroll Progress Logic
-        const timelineContainer = document.getElementById('timeline-container-sidebar');
-        const eventItems = document.querySelectorAll('.event-item');
-        const progressLine = document.getElementById('timeline-progress-line');
-
-        function updateTimelineScroll() {
-            if (!timelineContainer || !progressLine || eventItems.length === 0) return;
-            
-            const screenMiddle = window.innerHeight / 2;
-            let lastActiveIndex = 0; 
-            
-            eventItems.forEach((item, index) => {
-                const rect = item.getBoundingClientRect();
-                const node = item.querySelector('.js-timeline-node');
-                const dot = item.querySelector('.js-timeline-dot');
-                
-                if (rect.top <= screenMiddle) {
-                    lastActiveIndex = index;
-                    if(node){
-                        node.classList.remove('border-light');
-                        node.classList.add('border-primary');
-                    }
-                    if(dot){
-                        dot.style.backgroundColor = 'var(--char-accent)';
-                        dot.classList.add('bg-primary');
-                        dot.classList.remove('border-dashed');
-                        dot.classList.remove('border-secondary');
-                    }
-                } else {
-                    if(node && index > 0){
-                        node.classList.add('border-light');
-                        node.classList.remove('border-primary');
-                    }
-                }
-            });
-
-            // Update line height
-            const activeItem = eventItems[lastActiveIndex];
-            if (activeItem) {
-                const activeNode = activeItem.querySelector('.js-timeline-node');
-                const containerRect = timelineContainer.getBoundingClientRect();
-                const nodeRect = activeNode.getBoundingClientRect();
-                const relativeTop = nodeRect.top - containerRect.top;
-                progressLine.style.height = `${Math.max(0, relativeTop + 12)}px`;
-            }
-        }
-
-        window.addEventListener('scroll', updateTimelineScroll);
         // Initialize Auto-resize for textareas
         function resizeTextarea(textarea) {
             textarea.style.height = 'auto';
@@ -812,8 +964,26 @@
             setTimeout(() => resizeTextarea(textarea), 100);
         });
 
-        if (timelineContainer) timelineContainer.addEventListener('scroll', updateTimelineScroll);
-        updateTimelineScroll();
+        // Position timeline line between first & last dots
+        function positionTimelineLine() {
+            const list = document.querySelector('.ke-list');
+            if (!list) return;
+            const dots = list.querySelectorAll('.ke-dot');
+            if (dots.length < 2) {
+                list.style.setProperty('--line-top', '50%');
+                list.style.setProperty('--line-bottom', '50%');
+                return;
+            }
+            const listRect = list.getBoundingClientRect();
+            const firstDot = dots[0].getBoundingClientRect();
+            const lastDot = dots[dots.length - 1].getBoundingClientRect();
+            const startY = (firstDot.top + firstDot.height / 2) - listRect.top;
+            const endY = listRect.bottom - (lastDot.top + lastDot.height / 2);
+            list.style.setProperty('--line-top', startY + 'px');
+            list.style.setProperty('--line-bottom', endY + 'px');
+        }
+        setTimeout(positionTimelineLine, 400);
+        window.addEventListener('resize', positionTimelineLine);
 
         // Initialize Sortable
         const columns = ['char-col-1', 'char-col-2', 'char-col-3'];
