@@ -1425,6 +1425,14 @@ def api_book_create(request):
         characters_overview = data.get('characters', '').strip()
         themes = data.get('themes', '').strip()
         ending_notes = data.get('ending', '').strip()
+        
+        # New AI Enrichment Fields
+        story_hook = data.get('story_hook', '').strip()
+        inciting_incident = data.get('inciting_incident', '').strip()
+        protagonist_motivation = data.get('protagonist_motivation', '').strip()
+        target_audience = data.get('target_audience', '').strip()
+        world_atmosphere = data.get('world_atmosphere', '').strip()
+        
         ai_assisted = data.get('ai_assisted', True)
         series_id = data.get('series_id')
 
@@ -1448,6 +1456,11 @@ def api_book_create(request):
             characters_overview=characters_overview,
             themes=themes,
             ending_notes=ending_notes,
+            story_hook=story_hook,
+            inciting_incident=inciting_incident,
+            protagonist_motivation=protagonist_motivation,
+            target_audience=target_audience,
+            world_atmosphere=world_atmosphere,
             ai_assisted=ai_assisted,
             word_count_target=word_count_target if word_count_target else 160000,
             status='drafting',

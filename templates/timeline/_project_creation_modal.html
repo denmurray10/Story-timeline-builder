@@ -320,10 +320,46 @@
                         </div>
                     </div>
 
-                    <!-- Step 3: Characters -->
+                    <!-- Step 3: Story Hook -->
                     <div class="tf-step" id="tf-step-3" data-step="3">
                         <div class="d-flex gap-3">
                             <span class="text-branddark font-serif fs-4" style="font-family: 'DM Serif Display', serif !important;">3 <i class="bi bi-arrow-right fs-5"></i></span>
+                            <div class="w-100">
+                                <h2 class="tf-question-title">What is the primary hook of this story?</h2>
+                                <p class="tf-question-desc">What is the one thing that would make someone want to read this?</p>
+                                
+                                <textarea class="tf-input tf-textarea" id="tfProjectHook" placeholder="e.g. In a world where silence is deadly, a musician discovers a song that can kill..."></textarea>
+                                
+                                <div class="tf-actions">
+                                    <button class="tf-btn" onclick="tfNextStep()">OK <i class="bi bi-check2"></i></button>
+                                    <span class="tf-hint">press <kbd>Shift</kbd> + <kbd>Enter</kbd></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Inciting Incident -->
+                    <div class="tf-step" id="tf-step-4" data-step="4">
+                        <div class="d-flex gap-3">
+                            <span class="text-branddark font-serif fs-4" style="font-family: 'DM Serif Display', serif !important;">4 <i class="bi bi-arrow-right fs-5"></i></span>
+                            <div class="w-100">
+                                <h2 class="tf-question-title">What event sets this story in motion?</h2>
+                                <p class="tf-question-desc">What changes for your protagonist on page one?</p>
+                                
+                                <textarea class="tf-input tf-textarea" id="tfProjectIncident" placeholder="e.g. A mysterious letter arrives, revealing a hidden inheritance..."></textarea>
+                                
+                                <div class="tf-actions">
+                                    <button class="tf-btn" onclick="tfNextStep()">OK <i class="bi bi-check2"></i></button>
+                                    <span class="tf-hint">press <kbd>Shift</kbd> + <kbd>Enter</kbd></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 5: Characters -->
+                    <div class="tf-step" id="tf-step-5" data-step="5">
+                        <div class="d-flex gap-3">
+                            <span class="text-branddark font-serif fs-4" style="font-family: 'DM Serif Display', serif !important;">5 <i class="bi bi-arrow-right fs-5"></i></span>
                             <div class="w-100">
                                 <h2 class="tf-question-title">Who are the characters?</h2>
                                 <p class="tf-question-desc">Identify the protagonist, antagonist, and key supporting roles.</p>
@@ -338,10 +374,28 @@
                         </div>
                     </div>
 
-                    <!-- Step 4: Genre -->
-                    <div class="tf-step" id="tf-step-4" data-step="4">
+                    <!-- Step 6: Protagonist Motivation -->
+                    <div class="tf-step" id="tf-step-6" data-step="6">
                         <div class="d-flex gap-3">
-                            <span class="text-branddark font-serif fs-4" style="font-family: 'DM Serif Display', serif !important;">4 <i class="bi bi-arrow-right fs-5"></i></span>
+                            <span class="text-branddark font-serif fs-4" style="font-family: 'DM Serif Display', serif !important;">6 <i class="bi bi-arrow-right fs-5"></i></span>
+                            <div class="w-100">
+                                <h2 class="tf-question-title">What is your main character’s greatest desire or fear?</h2>
+                                <p class="tf-question-desc">This helps Penn suggest internal conflicts that resonate with your plot.</p>
+                                
+                                <textarea class="tf-input tf-textarea" id="tfProjectMotivation" placeholder="e.g. To find their lost sibling at any cost, fearing they are the last of their kind..."></textarea>
+                                
+                                <div class="tf-actions">
+                                    <button class="tf-btn" onclick="tfNextStep()">OK <i class="bi bi-check2"></i></button>
+                                    <span class="tf-hint">press <kbd>Shift</kbd> + <kbd>Enter</kbd></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 7: Genre -->
+                    <div class="tf-step" id="tf-step-7" data-step="7">
+                        <div class="d-flex gap-3">
+                            <span class="text-branddark font-serif fs-4" style="font-family: 'DM Serif Display', serif !important;">7 <i class="bi bi-arrow-right fs-5"></i></span>
                             <div class="w-100">
                                 <h2 class="tf-question-title">What genre is this story in?</h2>
                                 <p class="tf-question-desc">High Fantasy, Noir Mystery, Cyberpunk, etc. (optional)</p>
@@ -356,10 +410,28 @@
                         </div>
                     </div>
 
-                    <!-- Step 5: Series -->
-                    <div class="tf-step" id="tf-step-5" data-step="5">
+                    <!-- Step 8: Tone -->
+                    <div class="tf-step" id="tf-step-8" data-step="8">
                         <div class="d-flex gap-3">
-                            <span class="text-branddark font-serif fs-4" style="font-family: 'DM Serif Display', serif !important;">5 <i class="bi bi-arrow-right fs-5"></i></span>
+                            <span class="text-branddark font-serif fs-4" style="font-family: 'DM Serif Display', serif !important;">8 <i class="bi bi-arrow-right fs-5"></i></span>
+                            <div class="w-100">
+                                <h2 class="tf-question-title">Who is your target audience or what is the intended tone?</h2>
+                                <p class="tf-question-desc">e.g., Young Adult, Epic, Dark, Lighthearted, etc. (optional)</p>
+                                
+                                <input type="text" class="tf-input" id="tfProjectTone" placeholder="e.g. Gritty Noir">
+                                
+                                <div class="tf-actions">
+                                    <button class="tf-btn" onclick="tfNextStep()">OK <i class="bi bi-check2"></i></button>
+                                    <span class="tf-hint">press <kbd>Enter</kbd></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 9: Series -->
+                    <div class="tf-step" id="tf-step-9" data-step="9">
+                        <div class="d-flex gap-3">
+                            <span class="text-branddark font-serif fs-4" style="font-family: 'DM Serif Display', serif !important;">9 <i class="bi bi-arrow-right fs-5"></i></span>
                             <div class="w-100">
                                 <h2 class="tf-question-title">Is this part of an existing series?</h2>
                                 <p class="tf-question-desc">Select a series below or leave blank for a standalone work.</p>
@@ -379,10 +451,10 @@
                         </div>
                     </div>
 
-                    <!-- Step 6: Themes -->
-                    <div class="tf-step" id="tf-step-6" data-step="6">
+                    <!-- Step 10: Themes -->
+                    <div class="tf-step" id="tf-step-10" data-step="10">
                         <div class="d-flex gap-3">
-                            <span class="text-branddark font-serif fs-4" style="font-family: 'DM Serif Display', serif !important;">6 <i class="bi bi-arrow-right fs-5"></i></span>
+                            <span class="text-branddark font-serif fs-4" style="font-family: 'DM Serif Display', serif !important;">10 <i class="bi bi-arrow-right fs-5"></i></span>
                             <div class="w-100">
                                 <h2 class="tf-question-title">What themes are inherent to this conflict?</h2>
                                 <p class="tf-question-desc">Note the underlying ideas you want to explore (e.g. Redemption, Betrayal).</p>
@@ -397,10 +469,28 @@
                         </div>
                     </div>
 
-                    <!-- Step 7: Ending -->
-                    <div class="tf-step" id="tf-step-7" data-step="7">
+                    <!-- Step 11: World Atmosphere -->
+                    <div class="tf-step" id="tf-step-11" data-step="11">
                         <div class="d-flex gap-3">
-                            <span class="text-branddark font-serif fs-4" style="font-family: 'DM Serif Display', serif !important;">7 <i class="bi bi-arrow-right fs-5"></i></span>
+                            <span class="text-branddark font-serif fs-4" style="font-family: 'DM Serif Display', serif !important;">11 <i class="bi bi-arrow-right fs-5"></i></span>
+                            <div class="w-100">
+                                <h2 class="tf-question-title">What is the atmosphere of your world?</h2>
+                                <p class="tf-question-desc">Describe the 'vibe'—is it gritty, hopeful, mysterious, or whimsical?</p>
+                                
+                                <textarea class="tf-input tf-textarea" id="tfProjectAtmosphere" placeholder="e.g. A decaying Victorian city shrouded in perpetual fog..."></textarea>
+                                
+                                <div class="tf-actions">
+                                    <button class="tf-btn" onclick="tfNextStep()">OK <i class="bi bi-check2"></i></button>
+                                    <span class="tf-hint">press <kbd>Shift</kbd> + <kbd>Enter</kbd></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 12: Ending -->
+                    <div class="tf-step" id="tf-step-12" data-step="12">
+                        <div class="d-flex gap-3">
+                            <span class="text-branddark font-serif fs-4" style="font-family: 'DM Serif Display', serif !important;">12 <i class="bi bi-arrow-right fs-5"></i></span>
                             <div class="w-100">
                                 <h2 class="tf-question-title">Where will the story end?</h2>
                                 <p class="tf-question-desc">Know your destination before mapping the journey.</p>
@@ -415,10 +505,10 @@
                         </div>
                     </div>
 
-                    <!-- Step 8: Word Count -->
-                    <div class="tf-step" id="tf-step-8" data-step="8">
+                    <!-- Step 13: Word Count -->
+                    <div class="tf-step" id="tf-step-13" data-step="13">
                         <div class="d-flex gap-3">
-                            <span class="text-branddark font-serif fs-4" style="font-family: 'DM Serif Display', serif !important;">8 <i class="bi bi-arrow-right fs-5"></i></span>
+                            <span class="text-branddark font-serif fs-4" style="font-family: 'DM Serif Display', serif !important;">13 <i class="bi bi-arrow-right fs-5"></i></span>
                             <div class="w-100">
                                 <h2 class="tf-question-title">What is your target word count?</h2>
                                 <p class="tf-question-desc">Set a goal for your manuscript (optional).</p>
@@ -433,10 +523,10 @@
                         </div>
                     </div>
 
-                    <!-- Step 9: AI Assistant -->
-                    <div class="tf-step" id="tf-step-9" data-step="9">
+                    <!-- Step 14: AI Assistant -->
+                    <div class="tf-step" id="tf-step-14" data-step="14">
                         <div class="d-flex gap-3">
-                            <span class="text-branddark font-serif fs-4" style="font-family: 'DM Serif Display', serif !important;">9 <i class="bi bi-arrow-right fs-5"></i></span>
+                            <span class="text-branddark font-serif fs-4" style="font-family: 'DM Serif Display', serif !important;">14 <i class="bi bi-arrow-right fs-5"></i></span>
                             <div class="w-100">
                                 <h2 class="tf-question-title">Enhanced write mode?</h2>
                                 <p class="tf-question-desc">Would you like to be assisted with Penn, our AI co-writer?</p>
@@ -490,7 +580,7 @@
 
 <script>
     let currentStep = 1;
-    const totalSteps = 9;
+    const totalSteps = 14;
     let selectedSeriesId = null;
     let aiAssisted = true;
 
@@ -600,10 +690,15 @@
         const payload = {
             title: document.getElementById('tfProjectTitle').value.trim(),
             description: document.getElementById('tfProjectDesc').value.trim(),
+            story_hook: document.getElementById('tfProjectHook').value.trim(),
+            inciting_incident: document.getElementById('tfProjectIncident').value.trim(),
             characters: document.getElementById('tfProjectCharacters').value.trim(),
+            protagonist_motivation: document.getElementById('tfProjectMotivation').value.trim(),
             genre: document.getElementById('tfProjectGenre').value.trim(),
+            target_audience: document.getElementById('tfProjectTone').value.trim(),
             series_id: selectedSeriesId,
             themes: document.getElementById('tfProjectThemes').value.trim(),
+            world_atmosphere: document.getElementById('tfProjectAtmosphere').value.trim(),
             ending: document.getElementById('tfProjectEnding').value.trim(),
             word_count_target: document.getElementById('tfProjectTarget').value.trim() || 160000,
             ai_assisted: aiAssisted
@@ -663,18 +758,22 @@
 
         if (e.key === 'Enter') {
             const activeEl = document.activeElement;
-            const textareas = ['tfProjectDesc', 'tfProjectCharacters', 'tfProjectEnding'];
+            const textareas = [
+                'tfProjectDesc', 'tfProjectHook', 'tfProjectIncident', 
+                'tfProjectCharacters', 'tfProjectMotivation', 
+                'tfProjectAtmosphere', 'tfProjectEnding'
+            ];
             
             if (textareas.includes(activeEl.id)) {
                 if (e.shiftKey) {
                     e.preventDefault();
                     tfNextStep();
                 }
-            } else if (activeEl.id === 'tfProjectTarget' || currentStep === 8) {
+            } else if (activeEl.id === 'tfProjectTarget' || currentStep === 13) {
                  e.preventDefault();
                  tfNextStep();
-            } else if (currentStep === 9) {
-                 // No auto-enter for step 9 choices yet
+            } else if (currentStep === 14) {
+                 // No auto-enter for step 14 choices yet
             } else {
                 e.preventDefault();
                 tfNextStep();
