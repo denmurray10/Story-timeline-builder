@@ -520,9 +520,7 @@
             <button type="button" id="deepDiveBtn" class="btn-action">
                 <i class="bi bi-magic fs-6 text-primary"></i> Deep Dive
             </button>
-            <button type="submit" form="main-character-form" class="btn-action btn-action-primary">
-                <i class="bi bi-floppy fs-6"></i> Save Changes
-            </button>
+
         </div>
     </div>
 
@@ -970,6 +968,9 @@
                         }
                         
                         if (avatarIdInput) avatarIdInput.value = '';
+                        
+                        // Automatically save the newly uploaded image
+                        if (typeof autoSave === 'function') autoSave();
                     }
                     reader.readAsDataURL(this.files[0]);
                 }
@@ -1057,6 +1058,39 @@
                     allTextareas.forEach(ta => resizeTextarea(ta));
                 }, 200);
             } catch(e) { console.error("Layout load error", e); }
+        }
+
+        // Auto-save logic
+        const form = document.getElementById('main-character-form');
+        let autoSaveTimer;
+        
+        function autoSave() {
+            clearTimeout(autoSaveTimer);
+            autoSaveTimer = setTimeout(() => {
+                const formData = new FormData(form);
+                fetch('{% url "character_detail" character.pk %}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    console.log('Character auto-saved', data);
+                })
+                .catch(err => console.error('Auto-save failed', err));
+            }, 1000); // 1-second debounce
+        }
+
+        if (form) {
+            form.querySelectorAll('input, select, textarea').forEach(input => {
+                // Ignore file inputs; they shouldn't trigger auto-save normally
+                if (input.type !== 'file' && input.type !== 'hidden') {
+                    input.addEventListener('input', autoSave);
+                    input.addEventListener('change', autoSave);
+                }
+            });
         }
     });
 </script>

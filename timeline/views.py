@@ -2224,9 +2224,13 @@ def character_detail(request, pk):
         form = CharacterForm(request.POST, request.FILES, instance=character, user=request.user)
         if form.is_valid():
             form.save()
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'status': 'success'})
             from django.contrib import messages
             messages.success(request, f'Character "{character.name}" updated successfully!')
             return redirect('character_detail', pk=character.pk)
+        elif request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'status': 'error', 'errors': form.errors}, status=400)
     else:
         form = CharacterForm(instance=character, user=request.user)
     
