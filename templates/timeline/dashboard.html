@@ -532,7 +532,10 @@
                         {% if book.image %}
                         <img src="{{ book.image.url }}" alt="{{ book.title }} Cover" style="height: 48px; width: 36px; object-fit: cover; margin-right: 12px; border-radius: 6px;">
                         {% else %}
-                        <img src="{% static 'img/book-cover.png' %}" alt="No Cover" style="height: 48px; width: 36px; object-fit: cover; margin-right: 12px; border-radius: 6px;">
+                        <div style="height: 48px; width: 36px; margin-right: 12px; border-radius: 6px; background-color: rgba(244, 235, 217, 0.15); border: 1px dashed rgba(244, 235, 217, 0.5); display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">
+                            <span class="material-symbols-outlined" style="font-size: 14px; opacity: 0.4; color: #6b7280; margin-bottom: 1px;">auto_stories</span>
+                            <span style="font-size: 5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; opacity: 0.5; color: #6b7280; line-height: 1; font-family: 'Inter', sans-serif;">Draft<br>Cover</span>
+                        </div>
                         {% endif %}
                         <div class="flex-grow-1">
                             <div class="d-flex justify-content-between align-items-center">
@@ -542,13 +545,6 @@
                                 </span>
                             </div>
                         </div>
-                    </div>
-                    <div class="dash-muted mb-2" style="font-size: 0.7rem; line-height: 1.2;">
-                        <div><i class="bi bi-files me-1"></i> {{ book.chapter_count|default:"0" }} Chapters</div>
-                        <div><i class="bi bi-pencil-square me-1"></i> {{ book.current_word_count|default:"0" }} Words</div>
-                    </div>
-                    <div class="dash-progress-bg mb-2" style="height:4px;">
-                        <div class="dash-progress-fill" style="height: 100%; border-radius: 999px; background-color: #6366f1; width: {{ book.progress_percentage }}%;"></div>
                     </div>
                 </div>
                 {% endfor %}

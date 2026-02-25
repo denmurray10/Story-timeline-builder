@@ -41,14 +41,13 @@
         {% endif %}
 
         <div class="flex flex-col md:flex-row p-5 gap-6 items-start md:items-center relative z-0">
-            <!-- Book Cover placeholder -->
-            <div class="w-full md:w-24 h-32 bg-gray-200 rounded-md shadow-inner flex-shrink-0 relative overflow-hidden group-hover:scale-[1.02] transition-transform">
+            <div class="w-full md:w-24 h-32 bg-background-light rounded-md shadow-inner flex-shrink-0 relative overflow-hidden group-hover:scale-[1.02] transition-transform border border-border-subtle/50">
                 {% if book.image %}
                 <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('{{ book.image.url }}');"></div>
                 {% else %}
-                <div class="absolute inset-0 bg-cover bg-center" style="background-color: {% cycle '#2c3e50' '#8e44ad' '#c0392b' '#27ae60' '#f39c12' %};"></div>
-                <div class="absolute inset-0 flex items-center justify-center text-white/20 font-serif text-4xl" style="font-family: 'DM Serif Display', serif !important;">
-                    {{ forloop.counter }}
+                <div class="absolute inset-0 flex flex-col items-center justify-center bg-accent/10 border-2 border-dashed border-accent/20 text-text-muted gap-2">
+                    <span class="material-symbols-outlined text-4xl opacity-20">auto_stories</span>
+                    <span class="text-[9px] font-bold uppercase tracking-widest text-center px-4 opacity-40">Draft Cover</span>
                 </div>
                 {% endif %}
             </div>
