@@ -187,82 +187,6 @@
 
         <!-- Main Workspace -->
         <div class="flex flex-1 overflow-hidden relative bg-[#F2F0EB] dark:bg-[#121212]">
-            <!-- Left Navigation Rail (Story OS Production Bar) - Exact Mockup Style -->
-            <nav class="w-14 border-r border-slate-200 dark:border-white/5 flex flex-col items-center py-4 gap-4 bg-white dark:bg-black z-10">
-                <div class="group relative cursor-pointer" onclick="toggleDrawer('world')">
-                    <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors" title="Story Bible">
-                        <span class="material-symbols-outlined text-[20px]">menu_book</span>
-                    </button>
-                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Story Bible</div>
-                </div>
-
-                <div class="group relative cursor-pointer">
-                    <button class="p-2 text-blue-500 transition-colors" title="Manuscript">
-                        <span class="material-symbols-outlined text-[20px]">edit_note</span>
-                        <div class="absolute right-1.5 top-1.5 w-1.5 h-1.5 bg-blue-500 rounded-full border-2 border-white dark:border-[#1a2c2e] animate-pulse"></div>
-                    </button>
-                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Active Draft</div>
-                </div>
-
-                <div class="group relative cursor-pointer" onclick="toggleDrawer('history')">
-                    <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors" title="Draft Management">
-                        <span class="material-symbols-outlined text-[20px]">history</span>
-                    </button>
-                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Version History</div>
-                </div>
-
-                <div class="group relative cursor-pointer" onclick="toggleDrawer('audit')">
-                    <button class="p-2 text-slate-400 hover:text-amber-500 transition-colors" title="Manuscript Health">
-                        <span class="material-symbols-outlined text-[20px]">fact_check</span>
-                    </button>
-                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Style Audit</div>
-                </div>
-
-                <div class="group relative cursor-pointer">
-                    <button class="p-2 text-slate-400 hover:text-indigo-500 transition-colors" title="Collaboration">
-                        <span class="material-symbols-outlined text-[20px]">groups</span>
-                    </button>
-                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Team Access</div>
-                </div>
-
-                <div class="group relative cursor-pointer" onclick="toggleDrawer('reference')">
-                    <button class="p-2 text-slate-400 hover:text-purple-500 transition-colors" title="Snippets">
-                        <span class="material-symbols-outlined text-[20px]">collections_bookmark</span>
-                    </button>
-                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Reference Stitch</div>
-                </div>
-
-                <div class="group relative cursor-pointer">
-                    <button class="p-2 text-slate-400 hover:text-emerald-500 transition-colors" title="Publishing">
-                        <span class="material-symbols-outlined text-[20px]">file_download</span>
-                    </button>
-                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Export & Publish</div>
-                </div>
-
-                <div class="flex-1"></div>
-
-                <div class="group relative cursor-pointer" onclick="toggleZenMode()">
-                    <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors" title="Zen Mode">
-                        <span class="material-symbols-outlined text-[20px]">self_improvement</span>
-                    </button>
-                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Zen Mode</div>
-                </div>
-
-                <div class="group relative cursor-pointer" onclick="toggleTheme()">
-                    <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors" title="Toggle Theme">
-                        <span class="material-symbols-outlined text-[20px]" id="theme-icon">dark_mode</span>
-                    </button>
-                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Switch Appearance</div>
-                </div>
-
-                <div class="group relative cursor-pointer">
-                    <button class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors" title="Settings">
-                        <span class="material-symbols-outlined text-[20px]">settings</span>
-                    </button>
-                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Preferences</div>
-                </div>
-            </nav>
-
             <!-- LEFT DRAWER STACK -->
             <div id="left-drawer-stack" class="flex h-full shrink-0 items-start transition-all duration-300">
                 <!-- Codex Drawer -->
@@ -377,6 +301,83 @@
                     </div>
                 </aside>
             </div>
+
+            <!-- Left Navigation Rail (Story OS Production Bar) - Moved Inwards -->
+            <nav id="left-nav-rail" class="w-14 border-l border-r border-slate-200 dark:border-white/5 flex flex-col items-center py-4 gap-4 bg-white dark:bg-black z-10 transition-all duration-300">
+                <div class="group relative cursor-pointer" onclick="toggleDrawer('world')">
+                    <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors" title="Story Bible">
+                        <span class="material-symbols-outlined text-[20px]">menu_book</span>
+                    </button>
+                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Story Bible</div>
+                </div>
+
+                <div class="group relative cursor-pointer">
+                    <button class="p-2 text-blue-500 transition-colors" title="Manuscript">
+                        <span class="material-symbols-outlined text-[20px]">edit_note</span>
+                        <div class="absolute right-1.5 top-1.5 w-1.5 h-1.5 bg-blue-500 rounded-full border-2 border-white dark:border-[#1a2c2e] animate-pulse"></div>
+                    </button>
+                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Active Draft</div>
+                </div>
+
+                <div class="group relative cursor-pointer" onclick="toggleDrawer('history')">
+                    <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors" title="Draft Management">
+                        <span class="material-symbols-outlined text-[20px]">history</span>
+                    </button>
+                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Version History</div>
+                </div>
+
+                <div class="group relative cursor-pointer" onclick="toggleDrawer('audit')">
+                    <button class="p-2 text-slate-400 hover:text-amber-500 transition-colors" title="Manuscript Health">
+                        <span class="material-symbols-outlined text-[20px]">fact_check</span>
+                    </button>
+                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Style Audit</div>
+                </div>
+
+                <div class="group relative cursor-pointer">
+                    <button class="p-2 text-slate-400 hover:text-indigo-500 transition-colors" title="Collaboration">
+                        <span class="material-symbols-outlined text-[20px]">groups</span>
+                    </button>
+                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Team Access</div>
+                </div>
+
+                <div class="group relative cursor-pointer" onclick="toggleDrawer('reference')">
+                    <button class="p-2 text-slate-400 hover:text-purple-500 transition-colors" title="Snippets">
+                        <span class="material-symbols-outlined text-[20px]">collections_bookmark</span>
+                    </button>
+                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Reference Stitch</div>
+                </div>
+
+                <div class="group relative cursor-pointer">
+                    <button class="p-2 text-slate-400 hover:text-emerald-500 transition-colors" title="Publishing">
+                        <span class="material-symbols-outlined text-[20px]">file_download</span>
+                    </button>
+                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Export & Publish</div>
+                </div>
+
+                <div class="flex-1"></div>
+
+                <div class="group relative cursor-pointer" onclick="toggleZenMode()">
+                    <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors" title="Zen Mode">
+                        <span class="material-symbols-outlined text-[20px]">self_improvement</span>
+                    </button>
+                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Zen Mode</div>
+                </div>
+
+                <div class="group relative cursor-pointer" onclick="toggleTheme()">
+                    <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors" title="Toggle Theme">
+                        <span class="material-symbols-outlined text-[20px]" id="theme-icon">dark_mode</span>
+                    </button>
+                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Switch Appearance</div>
+                </div>
+
+                <div class="group relative cursor-pointer">
+                    <button class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors" title="Settings">
+                        <span class="material-symbols-outlined text-[20px]">settings</span>
+                    </button>
+                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Preferences</div>
+                </div>
+            </nav>
+
 
             <!-- Center: Writing Canvas -->
             <main class="flex-1 overflow-y-auto relative scroll-smooth no-scrollbar">
@@ -675,9 +676,24 @@
         
         const isOpen = drawer.classList.contains(widthClass);
         
+        // If it's a left drawer, close all other left drawers first (Exclusive mode)
+        if (isLeft && (forceOpen || !isOpen)) {
+            ['world', 'audit', 'reference', 'history'].forEach(otherId => {
+                if (otherId !== id) {
+                    const otherDrawer = document.getElementById(`drawer-${otherId}`);
+                    if (otherDrawer) {
+                        otherDrawer.classList.add('w-0');
+                        otherDrawer.classList.remove('w-64');
+                    }
+                }
+            });
+        }
+        
         if (forceOpen || !isOpen) {
             drawer.classList.remove('w-0');
             drawer.classList.add(widthClass);
+            
+            // Add border separation based on direction
             if (!isLeft) {
                 drawer.classList.add('border-l', 'border-slate-200', 'dark:border-white/5');
             }
@@ -686,7 +702,7 @@
             drawer.classList.remove(widthClass, 'border-l', 'border-slate-200', 'dark:border-white/5');
         }
 
-        // Apply Symmetric Cushioning to keep editor centered if possible
+        // Apply Symmetric Cushioning
         updateLayoutSymmetry();
     };
 
@@ -719,6 +735,16 @@
         // This keeps the editor centered as long as drawers don't "touch" it
         mainCanvas.style.paddingLeft = `${leftPush}px`;
         mainCanvas.style.paddingRight = `${rightPush}px`;
+
+        // Also adjust rail borders if needed (visual polish)
+        const leftRail = document.getElementById('left-nav-rail');
+        if (leftWidth > 0) {
+            leftRail.classList.add('border-l');
+        } else {
+            // Optional: remove border-l if at the very edge? 
+            // Actually, keep it for consistency or remove it for "flush" look
+            // leftRail.classList.remove('border-l'); 
+        }
     }
 
     // Initial check
