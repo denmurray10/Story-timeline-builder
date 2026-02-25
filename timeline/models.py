@@ -73,6 +73,14 @@ class Book(models.Model):
     characters_overview = models.TextField(blank=True, default='')
     themes = models.TextField(blank=True, default='')
     ending_notes = models.TextField(blank=True, default='')
+    
+    # New AI Enrichment Fields
+    story_hook = models.TextField(blank=True, default='')
+    inciting_incident = models.TextField(blank=True, default='')
+    protagonist_motivation = models.TextField(blank=True, default='')
+    target_audience = models.TextField(blank=True, default='')
+    world_atmosphere = models.TextField(blank=True, default='')
+    
     ai_assisted = models.BooleanField(default=True)
     
     import_progress = models.PositiveIntegerField(default=0)

@@ -1,3 +1,4 @@
+{% load static %}
 <style>
 /* Custom Typeform-Style Modal CSS */
 #projectCreationModal .modal-content {
@@ -274,9 +275,8 @@
         <div class="modal-content">
             
             <div class="modal-header">
-                <div class="tf-logo d-flex align-items-center gap-2">
-                    <span class="material-symbols-outlined text-branddark" style="font-size: 24px;">book_4</span>
-                    <span class="font-serif fw-bold text-branddark" style="font-family: 'DM Serif Display', serif !important; font-size: 1.2rem;">New Project</span>
+                <div class="tf-logo d-flex align-items-center">
+                    <img src="{% static 'img/logo.png' %}" alt="Logo" style="height: 4.5rem; width: auto;">
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
