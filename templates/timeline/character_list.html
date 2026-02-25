@@ -162,11 +162,8 @@
                     <span class="font-medium text-xs">{{ character.events.count }} Events</span>
                 </div>
                 <div class="flex gap-2">
-                    <a href="{% url 'character_detail' character.pk %}" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full text-slate-400 hover:text-primary transition-colors flex items-center justify-center">
-                        <span class="material-symbols-outlined text-[20px]">visibility</span>
-                    </a>
-                    <a href="{% url 'character_edit' character.pk %}" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full text-slate-400 hover:text-primary transition-colors flex items-center justify-center">
-                        <span class="material-symbols-outlined text-[20px]">edit</span>
+                    <a href="{% url 'character_detail' character.pk %}" class="px-4 py-1.5 bg-slate-100 hover:bg-black hover:text-white rounded-full text-slate-600 text-[11px] font-bold tracking-widest uppercase transition-all flex items-center justify-center text-decoration-none">
+                        View Profile
                     </a>
                 </div>
             </div>

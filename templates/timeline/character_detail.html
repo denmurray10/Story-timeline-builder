@@ -222,6 +222,28 @@
     .sortable-ghost { opacity: 0.4; border: 2px dashed #6366f1 !important; }
     .drag-handle { cursor: grab; color: #d1d5db; margin-right: 8px; opacity: 0; transition: opacity 0.2s ease, color 0.2s ease; }
     .card-premium:hover .drag-handle { color: #6366f1; opacity: 1; }
+
+    /* Key Events Timeline CSS */
+    .event-card-hover {
+        background-color: transparent;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+    }
+    .event-card-hover:hover {
+        background-color: #f8fafc;
+        border-color: #e2e8f0;
+        transform: translateX(4px);
+    }
+    .event-card-hover .timeline-icon {
+        opacity: 0;
+        transform: translateX(-10px);
+        transition: all 0.2s ease;
+    }
+    .event-card-hover:hover .timeline-icon {
+        opacity: 1;
+        transform: translateX(0);
+        color: var(--char-accent, #6366f1);
+    }
 </style>
 {% endblock %}
 
@@ -239,7 +261,15 @@
             </nav>
             <h1 class="font-dm-serif display-4 fw-bold text-dark mb-2" style="line-height: 1;">{{ character.name }}</h1>
             <div class="d-flex align-items-center gap-3">
+                {% if character.role == 'protagonist' %}
                 <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 uppercase tracking-widest py-2 px-3">
+                {% elif character.role == 'antagonist' %}
+                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 uppercase tracking-widest py-2 px-3">
+                {% elif character.role == 'supporting' %}
+                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 uppercase tracking-widest py-2 px-3">
+                {% else %}
+                <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 uppercase tracking-widest py-2 px-3">
+                {% endif %}
                     {{ character.get_role_display }}
                 </span>
                 <span class="text-muted" style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">
@@ -319,39 +349,15 @@
                             <i class="bi bi-grip-vertical drag-handle"></i>
                             <i class="bi bi-info-circle text-muted"></i> Meta Data
                         </div>
-                        <div class="form-check form-switch m-0">
-                            <input class="form-check-input scale-75" type="checkbox" role="switch" name="is_active" id="id_is_active" {% if form.is_active.value %}checked{% endif %}>
-                            <label class="form-check-label fw-bold ms-1" for="id_is_active" style="font-size: 0.75rem;">Active</label>
-                        </div>
                     </div>
                     <div class="card-body p-4">
                         <div class="mb-3">
                             <label class="trait-label text-dark">Character Role</label>
-                            <select name="role" class="form-select form-select-sm border-0 bg-light fw-bold" style="font-size: 0.85rem;">
-                                {% for choice in form.role.field.choices %}
-                                <option value="{{ choice.0 }}" {% if form.role.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
-                                {% endfor %}
-                            </select>
+                            <div class="fw-bold px-1 {% if character.role == 'protagonist' %}text-primary{% elif character.role == 'antagonist' %}text-danger{% elif character.role == 'supporting' %}text-success{% else %}text-muted{% endif %}" style="font-size: 0.9rem;">{{ character.get_role_display }}</div>
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-0">
                             <label class="trait-label text-dark">Debut Book</label>
-                            <select name="introduction_book" class="form-select form-select-sm border-0 bg-light" style="font-size: 0.8rem;">
-                                {% for choice in form.introduction_book.field.choices %}
-                                <option value="{{ choice.0 }}" {% if form.introduction_book.value == choice.0|stringformat:"i" or form.introduction_book.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="trait-label text-dark">Debut Chapter</label>
-                            <select name="introduction_chapter" class="form-select form-select-sm border-0 bg-light" style="font-size: 0.8rem;">
-                                {% for choice in form.introduction_chapter.field.choices %}
-                                <option value="{{ choice.0 }}" {% if form.introduction_chapter.value == choice.0|stringformat:"i" or form.introduction_chapter.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <label class="trait-label m-0 text-dark">Theme Tint</label>
-                            <input type="color" name="color_code" class="form-control form-control-color border-0 p-0" value="{{ form.color_code.value|default:'#6366f1' }}" style="height: 24px; width: 40px; border-radius: 4px; cursor:pointer;">
+                            <div class="text-muted px-1" style="font-size: 0.85rem; font-weight: 500;">{{ character.introduction_book.title|default:"Unknown Book" }}</div>
                         </div>
                     </div>
                 </div> <!-- End card-meta -->
@@ -522,47 +528,63 @@
                 </div>
 
                 <!-- Events Timeline Card -->
-                <div class="card-premium draggable-card mb-4" id="card-timeline">
-                    <div class="card-header-premium border-bottom">
-                        <i class="bi bi-grip-vertical drag-handle"></i>
-                        <i class="bi bi-clock-history text-muted"></i> Key Events
+                <div class="card-premium draggable-card mb-4 d-flex flex-column" id="card-timeline" style="max-height: 600px;">
+                    <div class="card-header-premium border-bottom-0 pb-2 flex-wrap justify-content-between">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-grip-vertical drag-handle"></i>
+                            <i class="bi bi-clock-history text-muted"></i> Key Events
+                        </div>
+                        <span class="badge bg-light text-muted border rounded-pill px-2 py-1" style="font-size: 0.65rem; font-weight: 700;">{{ events.count }} Total</span>
                     </div>
-                    <div class="card-body p-4 overflow-auto position-relative" style="max-height: 500px;" id="timeline-container-sidebar">
+                    <div class="card-body p-4 pt-2 overflow-auto position-relative flex-grow-1" id="timeline-container-sidebar">
                         <!-- Background Timeline Line -->
-                        <div class="position-absolute" style="left: 31px; top: 30px; bottom: 30px; width: 2px; background: #e2e8f0; z-index: 0;"></div>
+                        <div class="position-absolute" style="left: 31px; top: 30px; bottom: 30px; width: 2px; background: #f1f5f9; z-index: 0; border-radius: 4px;"></div>
                         <!-- Active Progress Line -->
-                        <div id="timeline-progress-line" class="position-absolute" style="left: 31px; top: 30px; width: 2px; background: var(--char-accent, #6366f1); z-index: 10; transition: height 0.7s ease-in-out; height: 0;"></div>
+                        <div id="timeline-progress-line" class="position-absolute" style="left: 31px; top: 30px; width: 2px; background: var(--char-accent, #6366f1); z-index: 10; transition: height 0.7s ease-in-out; height: 0; border-radius: 4px;"></div>
                         
-                        <div class="d-flex flex-column gap-5 position-relative z-10">
+                        <div class="d-flex flex-column gap-2 position-relative z-10 ms-1">
                             {% if events %}
                                 {% for event in events %}
-                                <div class="position-relative ps-5 event-item">
-                                    <div class="d-flex gap-4">
+                                <div class="position-relative ps-5 event-item pb-2">
+                                    <div class="d-flex align-items-center gap-0">
                                         <!-- Node -->
-                                        <div class="rounded-circle border-2 border-white bg-white shadow-sm d-flex align-items-center justify-content-center shrink-0 js-timeline-node" style="width: 24px; height: 24px; margin-left: -29px; position: relative; z-index: 20;">
-                                            <div class="rounded-circle js-timeline-dot {% if event.is_written %}bg-primary{% else %}border border-dashed border-secondary{% endif %}" style="width: 10px; height: 10px;"></div>
+                                        <div class="rounded-circle bg-white d-flex align-items-center justify-content-center shrink-0 js-timeline-node" style="width: 18px; height: 18px; margin-left: -37px; position: relative; z-index: 20; border: 4px solid white; box-shadow: 0 0 0 1px #e2e8f0; margin-right: 18px;">
+                                            <div class="rounded-circle js-timeline-dot {% if event.is_written %}bg-primary{% else %}bg-transparent border border-secondary border-opacity-50{% endif %}" style="width: 10px; height: 10px; transition: all 0.3s ease;"></div>
                                         </div>
 
-                                        <!-- Card -->
-                                        <div class="flex-grow-1 bg-white rounded-3 p-3 shadow-sm hover-shadow-lg transition">
-                                            <div class="d-flex justify-content-between align-items-start mb-1">
-                                                <span class="text-[10px] font-bold uppercase tracking-wider text-muted">
-                                                    {% if event.chapter %}Chapter {{ event.chapter.chapter_number }}{% else %}{{ event.story_date|upper|default:"Planned" }}{% endif %}
-                                                </span>
-                                            </div>
-                                            <h6 class="m-0 fw-bold text-dark" style="font-size: 0.9rem;">
-                                                <a href="{% url 'event_detail' event.pk %}" class="text-dark text-decoration-none hover-primary">
+                                        <!-- Card Content -->
+                                        <a href="{% url 'event_detail' event.pk %}" class="flex-grow-1 text-decoration-none event-card-hover rounded-4 p-3 d-flex justify-content-between align-items-center shadow-sm" style="box-shadow: 0 1px 3px rgba(0,0,0,0.02) !important;">
+                                            <div>
+                                                <div class="d-flex align-items-center gap-2 mb-1">
+                                                    <span class="text-muted tracking-widest fw-bold uppercase" style="font-size: 0.6rem;">
+                                                        {% if event.chapter %}
+                                                            <i class="bi bi-book opacity-50 me-1"></i> Ch. {{ event.chapter.chapter_number }}
+                                                        {% elif event.story_date %}
+                                                            <i class="bi bi-calendar3 opacity-50 me-1"></i> {{ event.story_date|upper }}
+                                                        {% else %}
+                                                            <i class="bi bi-bookmark opacity-50 me-1"></i> Planned
+                                                        {% endif %}
+                                                    </span>
+                                                    {% if event.is_written %}
+                                                    <span class="badge rounded-pill bg-success bg-opacity-10 text-success border border-success border-opacity-25" style="font-size: 0.5rem; padding: 0.3em 0.6em;">Drafted</span>
+                                                    {% endif %}
+                                                </div>
+                                                <h6 class="m-0 fw-bold text-dark" style="font-size: 0.95rem; line-height: 1.3;">
                                                     {{ event.title }}
-                                                </a>
-                                            </h6>
-                                        </div>
+                                                </h6>
+                                            </div>
+                                            <i class="bi bi-chevron-right fs-6 timeline-icon"></i>
+                                        </a>
                                     </div>
                                 </div>
                                 {% endfor %}
                             {% else %}
-                                <div class="text-center py-5 text-muted">
-                                    <i class="bi bi-calendar-x fs-1 opacity-25 mb-3 d-block"></i>
-                                    <span class="uppercase tracking-widest fw-bold" style="font-size: 0.7rem;">Not assigned to any plot events</span>
+                                <div class="text-center py-5">
+                                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 56px; height: 56px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
+                                        <i class="bi bi-calendar-x text-muted fs-4 opacity-50"></i>
+                                    </div>
+                                    <div class="fw-bold text-dark" style="font-size: 0.9rem;">No Plot assigned</div>
+                                    <div class="text-muted mt-1" style="font-size: 0.75rem;">This character hasn't been added to any events yet.</div>
                                 </div>
                             {% endif %}
                         </div>
