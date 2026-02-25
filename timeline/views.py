@@ -2309,9 +2309,9 @@ def api_generate_portrait(request, pk):
     try:
         character = get_object_or_404(Character, pk=pk, user=request.user)
         
-        # Build prompt from character details
-        desc = character.description if character.description else "A character"
-        traits = character.traits if character.traits else ""
+        # Build prompt from character details — truncated to stay within API limits
+        desc = (character.description or "A character")[:300]
+        traits = (character.traits or "")[:150]
         prompt = f"ultra realistic close up portrait of {character.name}, {desc}. {traits}. hyper detail, cinematic lighting, magic neon, Canon EOS R3, nikon, f/1.4, ISO 200, 1/160s, 8K, RAW, unedited, symmetrical balance, in-frame, 8K"
         
         getimg_api_key = "key-UDd6UDTyum504olT8Hn3KIxMjKUQbdyG73HePVbzHYSdDsE0LkrgZ8uZIRhSCYhV967umbnUs1GyYaVcbmKIC0PmKNqIawV"
