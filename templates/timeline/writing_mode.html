@@ -1,317 +1,596 @@
 {% extends 'timeline/base.html' %}
 {% load static %}
+
 {% block title %}Writing Mode - {{ chapter.title }}{% endblock %}
+
 {% block extra_css %}
+<!-- Tailwind and Google Fonts are used in this redesign -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13daec", 
+                        "primary-dark": "#0ea5b5",
+                        "accent-green": "#22c55e",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#102022",
+                        "text-main": "#111718",
+                        "text-muted": "#618689",
+                    },
+                    fontFamily: {
+                        "display": ["Noto Serif", "serif"],
+                        "sans": ["Noto Sans", "sans-serif"],
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "2xl": "2rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+</script>
+
 <style>
-    body.writing-mode-active { overflow: hidden; }
+    /* Reset & Base Overrides for Writing Mode */
+    body.writing-mode-active { 
+        overflow: hidden; 
+        background-color: #f6f8f8;
+    }
+    .dark body.writing-mode-active {
+        background-color: #102022;
+    }
+    
     body.writing-mode-active .sidebar,
     body.writing-mode-active .navbar,
-    body.writing-mode-active .d-flex.justify-content-end.align-items-center.mb-3 { display: none !important; }
-    body.writing-mode-active .main-content { width: 100% !important; flex: 0 0 100% !important; max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
-    body.writing-mode-active .page-container { max-width: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; }
-    #writing-mode-container { display: flex; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #f4f1ee; overflow: hidden; z-index: 9999; }
-    * { scrollbar-width: none; -ms-overflow-style: none; }
-    *::-webkit-scrollbar { display: none; }
-    .writing-sidebar { width: 260px; background-color: #ffffff; border-right: 1px solid #e5e7eb; display: flex; flex-direction: column; transition: width 0.3s ease; }
-    .writing-sidebar.collapsed { width: 0; overflow: hidden; border-right: none; }
-    .writing-sidebar-header { padding: 1rem; border-bottom: 1px solid #f3f4f6; font-weight: 600; display: flex; justify-content: space-between; align-items: center; background-color: #ffffff; }
-    .writing-sidebar-content { flex-grow: 1; overflow-y: auto; padding: 1rem; background-color: #ffffff; }
-    .nav-section-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: #9ca3af; margin-top: 1.5rem; margin-bottom: 0.5rem; }
-    .nav-item-link { display: flex; align-items: center; padding: 0.5rem; color: #4b5563; text-decoration: none; border-radius: 6px; font-size: 0.9rem; margin-bottom: 2px; }
-    .nav-item-link:hover, .nav-item-link.active { background-color: #f3f4f6; color: #111827; }
-    .nav-item-link i { margin-right: 0.75rem; width: 16px; text-align: center; }
-    #writing-main { flex-grow: 1; display: flex; flex-direction: column; background-color: #f4f1ee; position: relative; }
-    #writing-toolbar { height: 56px; background-color: #ffffff; border-bottom: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; z-index: 10; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); }
-    .toolbar-group { display: flex; align-items: center; gap: 0.5rem; }
-    #editor-viewport { flex-grow: 1; overflow-y: auto; padding: 3rem 1rem; display: flex; justify-content: center; }
-    #editor-page { width: 100%; max-width: 800px; background-color: #ffffff; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); min-height: 1000px; padding: 4rem 5rem; border-radius: 30px; }
-    #writing-editor { font-family: 'Merriweather', serif; font-size: 1.15rem; line-height: 1.8; color: #111827; outline: none; }
-    .chapter-title-header { font-family: 'Inter', sans-serif; text-align: center; margin-bottom: 3rem; }
-    .chapter-number-small { font-size: 1.5rem; color: #d1d5db; margin-bottom: 0.5rem; }
-    .chapter-title-text { font-size: 2.5rem; font-weight: 700; color: #111827; }
-    .writing-sidebar-right { width: 50px; background-color: #000000; border-left: 1px solid #111111; display: flex; flex-direction: row; color: #e5e7eb; transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow: visible; z-index: 1000; position: relative; }
-    .writing-sidebar-right.expanded { width: 800px !important; min-width: 800px !important; max-width: 800px !important; }
-    .sidebar-icon-bar { width: 50px; min-width: 50px; background-color: #000000; display: flex; flex-direction: column; align-items: center; padding-top: 1rem; gap: 1.5rem; z-index: 10; border-right: none; }
-    .sidebar-icon { color: #9ca3af; font-size: 1.25rem; cursor: pointer; transition: all 0.2s; width: 100%; text-align: center; padding: 0.75rem 0; position: relative; }
-    .sidebar-icon:hover { color: #ffffff; }
-    .sidebar-icon.active { color: #ffffff; background-color: #1f2937; }
-    .sidebar-icon.active::after { content: ''; position: absolute; right: 0; top: 20%; height: 60%; width: 3px; background-color: #6366f1; border-radius: 3px 0 0 3px; }
-    .sidebar-content-area { flex-grow: 1; display: none; flex-direction: column; overflow: hidden; background-color: #f4f1ee; border-right: 1px solid #e5e7eb; }
-    .writing-sidebar-right.expanded .sidebar-content-area { display: flex; }
-    .writing-sidebar-right .cast-avatar { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; margin-right: 0.75rem; color: white; font-weight: 600; }
-    .writing-sidebar-right .ghostwriter-chat-container .chat-messages { height: calc(100vh - 250px); }
-    .writing-sidebar-right .writing-sidebar-header { background-color: #f4f1ee; color: #111827; border-bottom: none; padding: 1.25rem 1.25rem 0.5rem 1.25rem; display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 1.1rem; }
-    .writing-sidebar-right .writing-sidebar-content { background-color: #f4f1ee; color: #4b5563; padding: 1.25rem; overflow-y: auto; }
-    .sidebar-card { background-color: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); padding: 1.25rem; margin-bottom: 1.5rem; border: 1px solid #e5e7eb; }
-    .writing-sidebar-right .cast-item { border-bottom: 1px solid #f3f4f6; }
-    .writing-sidebar-right .nav-section-title { color: #9ca3af; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 1rem; }
-    .ghostwriter-chat-container { display: flex; flex-direction: column; height: 100%; background-color: #f4f1ee; padding: 1.25rem; }
-    .ghostwriter-chat-card { background-color: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); display: flex; flex-direction: column; height: 100%; overflow: hidden; border: 1px solid #e5e7eb; }
-    .chat-messages { flex-grow: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; }
-    .chat-bubble { padding: 0.75rem; border-radius: 12px; font-size: 0.85rem; max-width: 90%; line-height: 1.5; }
-    .chat-bubble.ai { background-color: #f3f4f6; color: #1f2937; align-self: flex-start; border-bottom-left-radius: 2px; }
-    .chat-bubble.user { background-color: #3b82f6; color: #ffffff; align-self: flex-end; border-bottom-right-radius: 2px; }
-    .chat-input-area { padding: 1rem; border-top: 1px solid #f3f4f6; display: flex; gap: 0.5rem; background-color: #ffffff; }
-    .chat-input-area input { border-radius: 20px; padding: 0.5rem 1rem; font-size: 0.85rem; background-color: #f9fafb; border: 1px solid #e5e7eb; color: #111827; }
-    .chat-input-area input::placeholder { color: #9ca3af; }
-    .quick-insight-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; padding: 1rem; border-bottom: 1px solid #e5e7eb; }
-    #bubble-menu { padding: 6px; border-radius: 50px; background: #111827; border: none; }
-    .bubble-btn { background: none; border: none; color: #d1d5db; padding: 0.5rem 0.8rem; font-size: 0.9rem; display: flex; align-items: center; gap: 0.4rem; border-radius: 50px; transition: color 0.2s; }
-    .bubble-btn:hover { color: #ffffff; background: #374151; }
-    .bubble-divider { width: 1px; background: #374151; margin: 0 4px; }
-    @keyframes pulse-subtle { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
-    .thinking-bubble { animation: pulse-subtle 1.5s infinite; font-style: italic; color: #9ca3af; }
-    #ai-ghostwrite-response { position: fixed; bottom: 2rem; right: 2rem; width: 400px; max-height: 500px; background-color: #ffffff; border-radius: 12px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); border: 1px solid #e5e7eb; display: none; flex-direction: column; z-index: 100; }
-    .ql-editor { min-height: 500px; font-family: 'Merriweather', serif !important; font-size: 1.15rem !important; line-height: 1.8 !important; padding: 0 !important; }
-    .ql-container.ql-snow { border: none !important; }
+    body.writing-mode-active footer:not(.writing-footer),
+    body.writing-mode-active .d-flex.justify-content-end.align-items-center.mb-3,
+    body.writing-mode-active .alert { 
+        display: none !important; 
+    }
+    
+    body.writing-mode-active .main-content { 
+        width: 100% !important; 
+        flex: 0 0 100% !important; 
+        max-width: 100% !important; 
+        padding: 0 !important; 
+        margin: 0 !important; 
+    }
+
+    /* Custom scrollbar for clean look */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+    
+    .writing-area {
+        line-height: 1.8;
+    }
+
+    /* Quill Overrides to match design */
+    #writing-editor {
+        border: none !important;
+        padding: 0 !important;
+    }
+    .ql-editor {
+        padding: 0 !important;
+        font-family: 'Noto Serif', serif !important;
+        font-size: 1.125rem !important;
+        line-height: 1.8 !important;
+        color: inherit !important;
+    }
+    .ql-container {
+        font-family: inherit !important;
+    }
+    #writing-mode-container {
+        height: 100vh;
+        width: 100vw;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 9999;
+    }
+
+    /* Selection Bubble Tooltip */
+    #bubble-menu {
+        background-color: #111827;
+        color: white;
+        border-radius: 999px;
+        padding: 6px 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    }
+    .bubble-btn {
+        background: none;
+        border: none;
+        color: #d1d5db;
+        padding: 4px 8px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        border-radius: 999px;
+        transition: all 0.2s;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    .bubble-btn:hover { color: white; background: rgba(255,255,255,0.1); }
+    .bubble-divider { width: 1px; height: 16px; background: rgba(255,255,255,0.1); margin: 0 4px; }
 </style>
 {% endblock %}
+
 {% block content %}
-<div id="writing-mode-container">
-    <aside class="writing-sidebar" id="sidebar-left">
-        <div class="writing-sidebar-header"><span>Binder</span><i class="bi bi-layout-sidebar sidebar-toggle" onclick="toggleSidebar('left')"></i></div>
-        <div class="writing-sidebar-content">
-            <div class="input-group input-group-sm mb-3">
-                <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
-                <input type="text" class="form-control border-start-0" placeholder="Search Binder">
+<div id="writing-mode-container" class="bg-background-light dark:bg-background-dark text-text-main font-sans flex items-center justify-center">
+    <!-- Main Container Card (Now Full Screen) -->
+    <div class="w-full h-full bg-white dark:bg-[#1a2c2e] flex flex-col relative overflow-hidden">
+        
+        <!-- Header / Toolbar Area -->
+        <header class="h-16 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between px-6 bg-white dark:bg-[#1a2c2e] z-20">
+            <!-- Left: Status Strip -->
+            <div class="flex items-center gap-2 text-sm">
+                <span class="font-medium text-text-muted">DRAFT V2.4</span>
+                <span class="text-slate-300 dark:text-slate-600">/</span>
+                <span class="font-medium text-text-muted">CH_{{ chapter.chapter_number }}</span>
+                <span class="text-slate-300 dark:text-slate-600">/</span>
+                <span class="font-bold text-primary dark:text-primary">SCENE_01</span>
             </div>
-            <nav>
-                <div class="nav-section-title">Manuscript</div>
-                {% for ch in chapters %}<a href="{% url 'writing_mode' ch.pk %}" class="nav-item-link {% if ch.pk == chapter.pk %}active{% endif %}"><i class="bi bi-file-text"></i><span class="text-truncate">{{ ch.title }}</span></a>{% endfor %}
-                <div class="nav-section-title">Research</div><a href="#" class="nav-item-link"><i class="bi bi-folder"></i> Folder</a>
-                <div class="nav-section-title">Characters</div>
-                {% for char in characters|slice:":5" %}<a href="{% url 'character_detail' char.pk %}" class="nav-item-link"><i class="bi bi-person"></i><span class="text-truncate">{{ char.name }}</span></a>{% endfor %}
-                <a href="{% url 'character_list' %}" class="nav-item-link text-muted small"><i class="bi bi-plus"></i> View All</a>
-                <div class="nav-section-title">Scenes</div><a href="{% url 'timeline_view' %}" class="nav-item-link"><i class="bi bi-geo-alt"></i> Timeline</a>
-                <div class="nav-section-title">Production</div>
-                <a href="#" class="nav-item-link" onclick="switchSidebarTab('audit')"><i class="bi bi-clipboard-check text-warning"></i><span>Style Audit</span></a>
-                <a href="#" class="nav-item-link" onclick="switchSidebarTab('team')"><i class="bi bi-people-fill text-primary"></i><span>Team Studio</span></a>
-                <a href="#" class="nav-item-link" onclick="switchSidebarTab('scrapbook')"><i class="bi bi-journal-bookmark text-info"></i><span>Scrapbook</span></a>
-                <a href="#" class="nav-item-link" onclick="switchSidebarTab('export')"><i class="bi bi-file-earmark-arrow-up text-success"></i><span>Export & Publish</span></a>
+
+            <!-- Center: Rich Text Toolbar (Stylized) -->
+            <div class="flex items-center gap-1 bg-background-light dark:bg-background-dark px-2 py-1.5 rounded-full border border-slate-200 dark:border-slate-700">
+                <button class="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full text-slate-600 dark:text-slate-300 transition-colors" onclick="applyMagic('bold')">
+                    <span class="material-symbols-outlined text-[20px]">format_bold</span>
+                </button>
+                <button class="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full text-slate-600 dark:text-slate-300 transition-colors" onclick="applyMagic('italic')">
+                    <span class="material-symbols-outlined text-[20px]">format_italic</span>
+                </button>
+                <button class="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full text-slate-600 dark:text-slate-300 transition-colors" onclick="applyMagic('underline')">
+                    <span class="material-symbols-outlined text-[20px]">format_underlined</span>
+                </button>
+                <div class="w-px h-4 bg-slate-300 dark:bg-slate-600 mx-1"></div>
+                <button class="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full text-slate-600 dark:text-slate-300 transition-colors">
+                    <span class="material-symbols-outlined text-[20px]">format_align_left</span>
+                </button>
+                <div class="w-px h-4 bg-slate-300 dark:bg-slate-600 mx-1"></div>
+                <!-- Font Selector -->
+                <div class="relative group">
+                    <button class="flex items-center gap-1 px-3 py-1.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full text-sm font-medium text-slate-700 dark:text-slate-200 transition-colors">
+                        Noto Serif
+                        <span class="material-symbols-outlined text-[16px]">expand_more</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right: AI Toggle & Actions -->
+            <div class="flex items-center gap-4">
+                <button class="flex items-center gap-2 bg-accent-green/10 text-accent-green px-4 py-1.5 rounded-full border border-accent-green/20 hover:bg-accent-green/20 transition-colors" id="btn-save-manuscript">
+                    <span class="material-symbols-outlined text-[18px]">save</span>
+                    <span class="text-xs font-bold tracking-wider">SAVE</span>
+                </button>
+                <button class="flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full border border-primary/20 hover:bg-primary/20 transition-colors" onclick="toggleDrawer('ghostwriter')">
+                    <span class="material-symbols-outlined text-[18px] fill-current">smart_toy</span>
+                    <span class="text-xs font-bold tracking-wider">PENN AI</span>
+                </button>
+                <button class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-500 transition-colors" onclick="window.location.href='{% url 'dashboard' %}'">
+                    <span class="material-symbols-outlined">exit_to_app</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <div class="flex flex-1 overflow-hidden relative">
+            <!-- Left Navigation Rail (Story OS Production Bar) - Exact Mockup Style -->
+            <nav class="w-14 border-r border-slate-100 dark:border-slate-700 flex flex-col items-center py-4 gap-4 bg-white dark:bg-[#1a2c2e] z-10">
+                <div class="group relative cursor-pointer" onclick="window.location.href='{% url 'world_list' %}'">
+                    <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors" title="Story Bible">
+                        <span class="material-symbols-outlined text-[20px]">menu_book</span>
+                    </button>
+                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Codex Wiki</div>
+                </div>
+
+                <div class="group relative cursor-pointer">
+                    <button class="p-2 text-blue-500 transition-colors" title="Manuscript">
+                        <span class="material-symbols-outlined text-[20px]">edit_note</span>
+                        <div class="absolute right-1.5 top-1.5 w-1.5 h-1.5 bg-blue-500 rounded-full border-2 border-white dark:border-[#1a2c2e] animate-pulse"></div>
+                    </button>
+                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Active Draft</div>
+                </div>
+
+                <div class="group relative cursor-pointer" onclick="window.location.href='{% url 'horizontal_timeline' %}'">
+                    <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors" title="Draft Management">
+                        <span class="material-symbols-outlined text-[20px]">history</span>
+                    </button>
+                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Version History</div>
+                </div>
+
+                <div class="group relative cursor-pointer">
+                    <button class="p-2 text-slate-400 hover:text-amber-500 transition-colors" title="Manuscript Health">
+                        <span class="material-symbols-outlined text-[20px]">fact_check</span>
+                    </button>
+                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Style Audit</div>
+                </div>
+
+                <div class="group relative cursor-pointer">
+                    <button class="p-2 text-slate-400 hover:text-indigo-500 transition-colors" title="Collaboration">
+                        <span class="material-symbols-outlined text-[20px]">groups</span>
+                    </button>
+                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Team Access</div>
+                </div>
+
+                <div class="group relative cursor-pointer">
+                    <button class="p-2 text-slate-400 hover:text-purple-500 transition-colors" title="Snippets">
+                        <span class="material-symbols-outlined text-[20px]">collections_bookmark</span>
+                    </button>
+                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Scrapbook</div>
+                </div>
+
+                <div class="group relative cursor-pointer">
+                    <button class="p-2 text-slate-400 hover:text-emerald-500 transition-colors" title="Publishing">
+                        <span class="material-symbols-outlined text-[20px]">file_download</span>
+                    </button>
+                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Export & Publish</div>
+                </div>
+
+                <div class="flex-1"></div>
+
+                <div class="group relative cursor-pointer" onclick="toggleZenMode()">
+                    <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors" title="Zen Mode">
+                        <span class="material-symbols-outlined text-[20px]">self_improvement</span>
+                    </button>
+                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Zen Mode</div>
+                </div>
+
+                <div class="group relative cursor-pointer" onclick="toggleTheme()">
+                    <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors" title="Toggle Theme">
+                        <span class="material-symbols-outlined text-[20px]" id="theme-icon">dark_mode</span>
+                    </button>
+                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Switch Appearance</div>
+                </div>
+
+                <div class="group relative cursor-pointer">
+                    <button class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors" title="Settings">
+                        <span class="material-symbols-outlined text-[20px]">settings</span>
+                    </button>
+                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Preferences</div>
+                </div>
             </nav>
-            <div class="mt-auto pt-4 flex flex-col gap-2">
-                <a href="#" class="btn-premium btn-premium-light !py-2 !text-xs !w-full"><i class="bi bi-archive"></i> Archive</a>
-                <a href="{% url 'chapter_create' book.pk %}" class="btn-premium btn-premium-dark !py-2 !text-xs !w-full"><i class="bi bi-plus-lg"></i> Add New Chapter</a>
-                <a href="{% url 'chapter_bulk_upload' book.pk %}" class="btn-premium btn-premium-light !py-2 !text-xs !w-full"><i class="bi bi-file-earmark-arrow-up"></i> Import Text</a>
-            </div>
-        </div>
-    </aside>
-    <main id="writing-main">
-        <div id="writing-toolbar">
-            <div class="toolbar-group">
-                <i class="bi bi-layout-sidebar sidebar-toggle" onclick="toggleSidebar('left')"></i>
-                <div class="dropdown">
-                    <button class="toolbar-btn dropdown-toggle" type="button" data-bs-toggle="dropdown"><span class="badge bg-primary me-2">{{ chapter.chapter_number }}</span> {{ chapter.title|truncatechars:20 }}</button>
-                    <ul class="dropdown-menu shadow border-0">
-                        <li><a class="dropdown-item py-2" href="{% url 'dashboard' %}"><i class="bi bi-house-fill me-2"></i> Exit to Dashboard</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li class="dropdown-header small text-uppercase fw-bold">Manuscript</li>
-                        {% for ch in chapters %}<li><a class="dropdown-item {% if ch.pk == chapter.pk %}active{% endif %}" href="{% url 'writing_mode' ch.pk %}">Ch. {{ ch.chapter_number }}: {{ ch.title }}</a></li>{% endfor %}
-                    </ul>
-                </div>
-            </div>
-            <div class="toolbar-group">
-                <button class="btn-premium btn-premium-light !py-1.5 !px-3 !text-xs" id="btn-ai-writing"><i class="bi bi-magic"></i> AI Writing</button>
-                <button class="btn-premium btn-premium-light !py-1.5 !px-3 !text-xs"><i class="bi bi-eye"></i> Review</button>
-                <button class="btn-premium btn-premium-light !py-1.5 !px-3 !text-xs"><i class="bi bi-palette"></i> Style</button>
-                <button class="btn-premium btn-premium-light !py-1.5 !px-3 !text-xs"><i class="bi bi-clock-history"></i> History</button>
-                <button class="btn-premium btn-premium-light !py-1.5 !px-3 !text-xs"><i class="bi bi-arrow-repeat"></i> Sync</button>
-                <button class="btn-premium btn-premium-light !py-1.5 !px-3 !text-xs"><i class="bi bi-fullscreen"></i> Focus</button>
-            </div>
-            <div class="toolbar-group">
-                <button class="btn-premium btn-premium-dark !py-1.5 !px-4 !text-xs" id="btn-save-manuscript"><i class="bi bi-save"></i> Save</button>
-                <button class="btn-premium btn-premium-light !size-8 !p-0 !flex !items-center !justify-center"><i class="bi bi-download"></i></button>
-                <button class="btn-premium btn-premium-light !size-8 !p-0 !flex !items-center !justify-center"><i class="bi bi-upload"></i></button>
-            </div>
-        </div>
-        <div id="editor-viewport"><div id="editor-page"><div class="chapter-title-header"><div class="chapter-number-small">{{ chapter.chapter_number }}</div><h1 class="chapter-title-text">{{ chapter.title }}</h1></div><div id="writing-editor">{{ chapter.content|safe }}</div></div></div>
-        <form id="auto-save-form" style="display:none;">{% csrf_token %}<input type="hidden" name="content" id="hidden-content"></form>
-    </main>
-    <aside class="writing-sidebar writing-sidebar-right" id="sidebar-right">
-        <div class="sidebar-icon-bar">
-            <div class="sidebar-icon" id="icon-cast" onclick="switchSidebarTab('cast')" title="Chapter Cast"><i class="bi bi-people"></i></div>
-            <div class="sidebar-icon" id="icon-ghostwriter" onclick="switchSidebarTab('ghostwriter')" title="Ghostwriter"><i class="bi bi-stars"></i></div>
-            <div class="sidebar-icon" id="icon-audit" onclick="switchSidebarTab('audit')" title="AI Audit"><i class="bi bi-clipboard-check"></i></div>
-            <div class="sidebar-icon" id="icon-team" onclick="switchSidebarTab('team')" title="Collaboration"><i class="bi bi-people-fill"></i></div>
-            <div class="sidebar-icon" id="icon-scrapbook" onclick="switchSidebarTab('scrapbook')" title="Scrapbook"><i class="bi bi-journal-bookmark"></i></div>
-            <div class="sidebar-icon" id="icon-export" onclick="switchSidebarTab('export')" title="Export"><i class="bi bi-file-earmark-arrow-up"></i></div>
-            <div class="sidebar-icon" id="icon-map" onclick="switchSidebarTab('map')" title="Relationship Map"><i class="bi bi-diagram-3"></i></div>
-            <div class="sidebar-icon" id="icon-timeline" onclick="switchSidebarTab('timeline')" title="Project Timeline"><i class="bi bi-clock-history"></i></div>
-            <div class="mt-auto mb-4"><div class="sidebar-icon" title="Settings"><i class="bi bi-gear"></i></div></div>
-        </div>
-        <div class="sidebar-content-area">
-            <div id="sidebar-tab-cast">
-                <div class="writing-sidebar-header"><span>Chapter Cast</span><i class="bi bi-x-lg cursor-pointer small" onclick="closeSidebarRight()"></i></div>
-                <div class="writing-sidebar-content">
-                    <div class="sidebar-card">
-                        <div class="d-flex justify-content-between align-items-center mb-3"><h6 class="small fw-bold text-uppercase text-muted mb-0">Characters</h6><button class="btn btn-sm p-0 text-dark"><i class="bi bi-plus-lg"></i></button></div>
-                        {% if chapter_cast %}{% for char in chapter_cast %}<div class="cast-item d-flex align-items-center mb-2 pb-2"><div class="cast-avatar" style="background-color: {{ char.color_code }};">{{ char.name|slice:":1" }}</div><div><div class="fw-semibold small text-dark">{{ char.name }}</div><div class="text-muted" style="font-size: 0.65rem;">{{ char.get_role_display }}</div></div></div>{% endfor %}{% else %}<div class="text-center py-4 text-muted"><i class="bi bi-people fs-2 opacity-20"></i><p class="small mt-2">No characters found.</p></div>{% endif %}
+
+            <!-- Center: Writing Canvas -->
+            <main class="flex-1 overflow-y-auto bg-white dark:bg-[#1a2c2e] relative scroll-smooth no-scrollbar">
+                <div class="max-w-[1000px] mx-auto pt-16 pb-32 px-12">
+                    <h1 class="text-4xl font-display font-bold text-text-main dark:text-white mb-8 leading-tight">{{ chapter.title }}</h1>
+                    <div id="writing-editor" class="writing-area font-display text-lg text-slate-700 dark:text-slate-300">
+                        {{ chapter.content|safe }}
                     </div>
                 </div>
-            </div>
-            <div id="sidebar-tab-ghostwriter" style="display: none;">
-                <div class="writing-sidebar-header"><span>Ghostwriter</span><i class="bi bi-x-lg cursor-pointer small" onclick="closeSidebarRight()"></i></div>
-                <div class="ghostwriter-chat-container">
-                    <div class="ghostwriter-chat-card">
-                        <div class="quick-insight-btns">
-                            <button class="btn-premium btn-premium-light !p-2 !text-[10px] !text-left !block" onclick="askGhostwriter('Summarize the current plot')"><i class="bi bi-text-paragraph"></i> Summarise</button>
-                            <button class="btn-premium btn-premium-light !p-2 !text-[10px] !text-left !block" onclick="askGhostwriter('What character dynamics are active here?')"><i class="bi bi-people"></i> Dynamics</button>
-                            <button class="btn-premium btn-premium-light !p-2 !text-[10px] !text-left !block" onclick="askGhostwriter('Check for plot holes in this scene')"><i class="bi bi-search"></i> Plot Check</button>
-                            <button class="btn-premium btn-premium-light !p-2 !text-[10px] !text-left !block" onclick="askGhostwriter('Suggest character actions for this beat')"><i class="bi bi-lightning"></i> Suggestions</button>
+
+                <!-- Floating Sidebar Drawers -->
+                <div id="drawer-ghostwriter" class="absolute top-0 right-0 h-full w-80 bg-white dark:bg-[#1f3638] border-l border-slate-100 dark:border-slate-700 transform translate-x-full transition-transform duration-300 shadow-2xl z-30 flex flex-col p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="font-bold text-text-main dark:text-white">Penn Assistant</h3>
+                        <button onclick="toggleDrawer('ghostwriter')" class="text-slate-400 hover:text-slate-600"><span class="material-symbols-outlined">close</span></button>
+                    </div>
+                    <div class="flex-1 overflow-y-auto mb-4 space-y-4 text-sm" id="ghostwriter-messages">
+                        <div class="p-3 bg-primary/5 dark:bg-primary/10 rounded-xl">
+                            Hello! I'm Penn. How can I help with Chapter {{ chapter.chapter_number }}?
                         </div>
-                        <div class="chat-messages" id="ghostwriter-messages"><div class="chat-bubble ai">Hello! I am your Story Ghostwriter. How can I help with Chapter {{ chapter.chapter_number }}?</div></div>
-                        <div class="chat-input-area"><input type="text" class="form-control" id="ghostwriter-input" placeholder="Ask about your story..." onkeypress="if(event.key === 'Enter') sendToGhostwriter()"><button class="btn btn-primary btn-sm rounded-circle" onclick="sendToGhostwriter()"><i class="bi bi-send"></i></button></div>
+                    </div>
+                    <div class="relative">
+                        <input type="text" id="ghostwriter-input" class="w-full bg-background-light dark:bg-background-dark border-none rounded-xl py-3 px-4 text-sm focus:ring-2 focus:ring-primary" placeholder="Ask Penn..." onkeypress="if(event.key === 'Enter') sendToGhostwriter()">
+                        <button class="absolute right-2 top-1.5 p-1.5 text-primary" onclick="sendToGhostwriter()">
+                            <span class="material-symbols-outlined">send</span>
+                        </button>
                     </div>
                 </div>
-            </div>
-            <div id="sidebar-tab-audit" style="display: none;">
-                <div class="writing-sidebar-header"><span>Style & Voice Audit</span><i class="bi bi-x-lg cursor-pointer small" onclick="closeSidebarRight()"></i></div>
-                <div class="writing-sidebar-content">
-                    <div class="sidebar-card">
-                        <h6 class="text-uppercase small fw-bold text-warning mb-3">Manuscript Health</h6>
-                        <div class="d-flex justify-content-between align-items-center mb-2"><span class="small fw-medium">Readability</span><span class="badge bg-success bg-opacity-10 text-success">SMOOTH</span></div>
-                        <div class="progress mb-3" style="height: 4px;"><div class="progress-bar bg-success" style="width: 85%"></div></div>
-                        <div class="d-flex justify-content-between align-items-center mb-2"><span class="small fw-medium">Voice Match</span><span class="badge bg-primary bg-opacity-10 text-primary">CONSISTENT</span></div>
-                        <div class="progress mb-4" style="height: 4px;"><div class="progress-bar bg-primary" style="width: 88%"></div></div>
-                        <div class="p-3 rounded bg-light border"><p class="small text-muted mb-0 italic">"The emotional arc in this chapter is strong, but sentence length in Scene 2 is 40% higher than your series benchmark."</p></div>
-                    </div>
+            </main>
+
+            <!-- Right: Story Intelligence Rail (Mockup Style) -->
+            <aside class="w-14 border-l border-slate-100 dark:border-slate-700 flex flex-col items-center py-4 gap-4 bg-white dark:bg-[#1a2c2e] z-10 transition-all duration-500">
+                <!-- Tactical AI -->
+                <div class="group relative cursor-pointer" onclick="toggleDrawer('ghostwriter')" title="AI Assistant">
+                    <button class="p-2 text-emerald-500 transition-colors">
+                        <span class="material-symbols-outlined text-[20px]">history_edu</span>
+                    </button>
+                    <div class="absolute right-full mr-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Penn AI</div>
                 </div>
-            </div>
-            <div id="sidebar-tab-team" style="display: none;">
-                <div class="writing-sidebar-header"><span>Production Studio</span><i class="bi bi-x-lg cursor-pointer small" onclick="closeSidebarRight()"></i></div>
-                <div class="writing-sidebar-content">
-                    <div class="sidebar-card">
-                        <div class="d-flex justify-content-between align-items-center mb-3"><h6 class="text-uppercase small fw-bold text-primary mb-0">Team Access</h6><button class="btn btn-link btn-sm p-0 text-decoration-none">+ INVITE</button></div>
-                        <div class="d-flex gap-2"><div class="p-2 rounded border bg-light flex-grow-1"><span class="badge bg-success rounded-circle p-1 me-1">JD</span><span class="small">Editor (Jane)</span></div><div class="p-2 rounded border bg-light flex-grow-1"><span class="badge bg-primary rounded-circle p-1 me-1">MK</span><span class="small">Beta (Mike)</span></div></div>
-                    </div>
+
+                <!-- Editorial Insights -->
+                <div class="group relative cursor-pointer" title="Insights">
+                    <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors">
+                        <span class="material-symbols-outlined text-[20px]">insights</span>
+                    </button>
+                    <div class="absolute right-full mr-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Editorial Insights</div>
                 </div>
-            </div>
-            <div id="sidebar-tab-scrapbook" style="display: none;">
-                <div class="writing-sidebar-header"><span>Scrapbook & Snippets</span><i class="bi bi-x-lg cursor-pointer small" onclick="closeSidebarRight()"></i></div>
-                <div class="writing-sidebar-content">
-                    <div class="d-flex justify-content-between align-items-center mb-3"><h6 class="text-uppercase small fw-bold text-muted mb-0">Saved Snippets</h6><button class="btn btn-sm btn-dark"><i class="bi bi-plus-lg"></i></button></div>
-                    <div class="sidebar-card bg-amber-50 border-amber-100 mb-2"><p class="small text-dark mb-0 italic">"The rain tasted like iron and old pennies..."</p></div>
+
+                <!-- Scene Analytics -->
+                <div class="group relative cursor-pointer" title="Analytics">
+                    <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors">
+                        <span class="material-symbols-outlined text-[20px]">equalizer</span>
+                    </button>
+                    <div class="absolute right-full mr-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Scene Analytics</div>
                 </div>
-            </div>
-            <div id="sidebar-tab-export" style="display: none;">
-                <div class="writing-sidebar-header"><span>Export & Publishing</span><i class="bi bi-x-lg cursor-pointer small" onclick="closeSidebarRight()"></i></div>
-                <div class="writing-sidebar-content">
-                    <div class="sidebar-card">
-                        <h6 class="text-uppercase small fw-bold text-success mb-3">Manuscript Export</h6>
-                        <button class="btn btn-success w-100 fw-bold border-0 shadow-sm" style="background-color: #10b981; color: white;">GENERATE DOWNLOAD</button>
-                    </div>
+
+                <!-- Sticky Notes -->
+                <div class="group relative cursor-pointer" title="Comments">
+                    <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors">
+                        <span class="material-symbols-outlined text-[20px]">comment</span>
+                    </button>
+                    <div class="absolute right-full mr-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Sticky Notes</div>
                 </div>
-            </div>
+
+                <!-- Timeline Anchors -->
+                <div class="group relative cursor-pointer" title="Timeline Anchors">
+                    <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors">
+                        <span class="material-symbols-outlined text-[20px]">anchor</span>
+                    </button>
+                    <div class="absolute right-full mr-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Timeline Anchors</div>
+                </div>
+
+                <div class="flex-1"></div>
+
+                <!-- Focus Mode -->
+                <div class="group relative cursor-pointer" onclick="toggleFullScreen()" title="Focus Mode">
+                    <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors">
+                        <span class="material-symbols-outlined text-[20px]" id="fullscreen-icon">fullscreen</span>
+                    </button>
+                    <div class="absolute right-full mr-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Focus Mode</div>
+                </div>
+
+                <!-- Help -->
+                <div class="group relative cursor-pointer" title="Help">
+                    <button class="p-2 text-slate-300 hover:text-slate-500 transition-colors">
+                        <span class="material-symbols-outlined text-[20px]">help_outline</span>
+                    </button>
+                    <div class="absolute right-full mr-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Support</div>
+                </div>
+            </aside>
         </div>
-    </aside>
-</div>
-<div id="bubble-menu" style="display:none; position:absolute; z-index:1000;" class="d-flex align-items-center">
-    <button class="bubble-btn" onclick="applyMagic('bold')"><i class="bi bi-type-bold"></i></button>
-    <button class="bubble-btn" onclick="applyMagic('italic')"><i class="bi bi-type-italic"></i></button>
-    <div class="bubble-divider"></div>
-    <div class="dropdown">
-        <button class="bubble-btn" data-bs-toggle="dropdown"><i class="bi bi-stars"></i> Magic</button>
-        <ul class="dropdown-menu dropdown-menu-dark shadow">
-            <li><a class="dropdown-item" href="#" onclick="applyMagic('improve')"><i class="bi bi-pencil-square me-2"></i> Improve Prose</a></li>
-            <li><a class="dropdown-item" href="#" onclick="applyMagic('expand')"><i class="bi bi-arrows-angle-expand me-2"></i> Expand Scene</a></li>
-            <li><a class="dropdown-item" href="#" onclick="applyMagic('show-dont-tell')"><i class="bi bi-eye me-2"></i> Show, Don't Tell</a></li>
-        </ul>
+
+        <!-- Bottom: Story Timeline Strip -->
+        <footer class="writing-footer h-14 border-t border-slate-100 dark:border-slate-700 bg-white dark:bg-[#1a2c2e] flex items-center px-6 relative z-20">
+            <div class="flex items-center gap-4 w-full">
+                <span class="text-xs font-bold text-text-muted uppercase tracking-wider mr-2">Timeline</span>
+                <div class="flex-1 relative h-8 flex items-center">
+                    <!-- Timeline Line -->
+                    <div class="absolute w-full h-0.5 bg-slate-200 dark:bg-slate-700 rounded-full"></div>
+                    
+                    <!-- Simplified Visual Timeline Markers -->
+                    <div class="absolute left-[10%] -translate-x-1/2 flex flex-col items-center group cursor-pointer">
+                        <div class="w-2.5 h-2.5 rounded-full bg-slate-300 dark:bg-slate-600 group-hover:bg-primary transition-colors ring-4 ring-white dark:ring-[#1a2c2e]"></div>
+                        <span class="absolute top-4 text-[10px] text-slate-400 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">Setup</span>
+                    </div>
+                    <div class="absolute left-[25%] -translate-x-1/2 flex flex-col items-center group cursor-pointer">
+                        <div class="w-2.5 h-2.5 rounded-full bg-slate-300 dark:bg-slate-600 group-hover:bg-primary transition-colors ring-4 ring-white dark:ring-[#1a2c2e]"></div>
+                        <span class="absolute top-4 text-[10px] font-medium text-text-muted whitespace-nowrap">Inciting Incident</span>
+                    </div>
+                    <div class="absolute left-[42%] -translate-x-1/2 flex flex-col items-center cursor-pointer z-10">
+                        <div class="w-3.5 h-3.5 rounded-full bg-primary ring-4 ring-primary/20 dark:ring-primary/30 shadow-sm"></div>
+                        <div class="absolute -top-7 bg-text-main text-white text-[10px] px-2 py-0.5 rounded-md font-medium whitespace-nowrap shadow-md">
+                            Current Scene
+                            <div class="absolute bottom-[-4px] left-1/2 -translate-x-1/2 w-2 h-2 bg-text-main rotate-45"></div>
+                        </div>
+                    </div>
+                    <div class="absolute left-[85%] -translate-x-1/2 flex flex-col items-center group cursor-pointer">
+                        <div class="w-2.5 h-2.5 rounded-full bg-slate-200 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 group-hover:border-primary transition-colors ring-4 ring-white dark:ring-[#1a2c2e]"></div>
+                        <span class="absolute top-4 text-[10px] text-slate-400 whitespace-nowrap group-hover:text-primary transition-colors">Climax</span>
+                    </div>
+                </div>
+                <!-- Auth Saved Tag -->
+                <div class="flex items-center gap-2 ml-4 text-[10px] font-bold text-accent-green opacity-50">
+                    <span class="material-symbols-outlined text-sm">cloud_done</span>
+                    SYNCED
+                </div>
+            </div>
+        </footer>
     </div>
 </div>
+
+<!-- Text Selection Bubble Menu -->
+<div id="bubble-menu" style="display:none; position:absolute; z-index:10000;">
+    <button class="bubble-btn" onclick="applyMagic('bold')"><span class="material-symbols-outlined text-[18px]">format_bold</span></button>
+    <button class="bubble-btn" onclick="applyMagic('italic')"><span class="material-symbols-outlined text-[18px]">format_italic</span></button>
+    <div class="bubble-divider"></div>
+    <button class="bubble-btn text-primary" onclick="applyMagic('improve')">
+        <span class="material-symbols-outlined text-[18px]">auto_awesome</span> Improve
+    </button>
+</div>
+
+<form id="auto-save-form" style="display:none;">
+    {% csrf_token %}
+    <input type="hidden" name="content" id="hidden-content">
+</form>
 {% endblock %}
+
 {% block extra_js %}
-<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <script>
-    function toggleSidebar(side) { const sidebar = document.getElementById(`sidebar-${side}`); sidebar.classList.toggle('collapsed'); }
-    window.switchSidebarTab = function (tab) {
-        const sidebar = document.getElementById('sidebar-right');
-        const icon = document.getElementById(`icon-${tab}`);
-        if (!icon) return;
-        const isCurrentActive = icon.classList.contains('active');
-        if (isCurrentActive && sidebar.classList.contains('expanded')) { closeSidebarRight(); return; }
-        document.querySelectorAll('.sidebar-icon').forEach(i => i.classList.remove('active'));
-        document.querySelectorAll('[id^="sidebar-tab-"]').forEach(t => t.style.display = 'none');
-        sidebar.classList.add('expanded');
-        icon.classList.add('active');
-        const targetTab = document.getElementById(`sidebar-tab-${tab}`);
-        if (targetTab) targetTab.style.display = 'block';
+    // Drawer Logic
+    window.toggleDrawer = function(id) {
+        const drawer = document.getElementById(`drawer-${id}`);
+        if (drawer.classList.contains('translate-x-full')) {
+            drawer.classList.remove('translate-x-full');
+        } else {
+            drawer.classList.add('translate-x-full');
+        }
+    };
+
+    // Theme & Zen Logic
+    window.toggleTheme = function() {
+        document.documentElement.classList.toggle('dark');
+        const icon = document.getElementById('theme-icon');
+        icon.innerText = document.documentElement.classList.contains('dark') ? 'light_mode' : 'dark_mode';
+    };
+
+    window.toggleZenMode = function() {
+        const nav = document.querySelector('nav');
+        const header = document.querySelector('header');
+        const footer = document.querySelector('footer');
+        const aside = document.querySelector('aside');
+        
+        const isZen = document.body.classList.toggle('zen-mode-active');
+        
+        if (isZen) {
+            nav.classList.add('hidden');
+            header.classList.add('opacity-0', 'pointer-events-none');
+            footer.classList.add('opacity-0', 'pointer-events-none');
+            aside.classList.add('hidden');
+        } else {
+            nav.classList.remove('hidden');
+            header.classList.remove('opacity-0', 'pointer-events-none');
+            footer.classList.remove('opacity-0', 'pointer-events-none');
+            aside.classList.remove('hidden');
+        }
+    };
+
+    window.toggleFullScreen = function() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen();
+            document.getElementById('fullscreen-icon').innerText = 'fullscreen_exit';
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+                document.getElementById('fullscreen-icon').innerText = 'fullscreen';
+            }
+        }
+    };
+
+    // Editor Init
+    document.addEventListener('DOMContentLoaded', function () {
+        var quill = new Quill('#writing-editor', { 
+            theme: 'snow', 
+            modules: { toolbar: false }, 
+            placeholder: 'Begin your journey...' 
+        });
+        window.quill = quill;
+
+        // Stats tracking
+        let initialWordCount = quill.getText().trim().split(/\s+/).length;
+        if (quill.getText().trim() === "") initialWordCount = 0;
+
+        quill.on('text-change', function() {
+            let currentWordCount = quill.getText().trim().split(/\s+/).length;
+            if (quill.getText().trim() === "") currentWordCount = 0;
+            document.getElementById('stat-session-words').innerText = Math.max(0, currentWordCount - initialWordCount);
+        });
+
+        // Selection Bubble Logic
+        quill.on('selection-change', function (range) {
+            const menu = document.getElementById('bubble-menu');
+            if (range && range.length > 0) {
+                const bounds = quill.getBounds(range.index, range.length);
+                const surfacePos = document.getElementById('writing-editor').getBoundingClientRect();
+                
+                menu.style.display = 'flex';
+                menu.style.left = (bounds.left + surfacePos.left + (bounds.width / 2) - (menu.offsetWidth / 2)) + 'px';
+                menu.style.top = (bounds.top + surfacePos.top - 50) + 'px';
+            } else { menu.style.display = 'none'; }
+        });
+
+        // Autosave Logic
+        let timeout = null;
+        function saveContent() {
+            const content = quill.root.innerHTML;
+            const btnSave = document.getElementById('btn-save-manuscript');
+            const originalHtml = btnSave.innerHTML;
+            btnSave.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin">sync</span><span class="text-xs font-bold tracking-wider">SAVING...</span>';
+            
+            fetch("{% url 'chapter_edit' chapter.pk %}", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value, 'X-Requested-With': 'XMLHttpRequest' },
+                body: new URLSearchParams({ 'content': content, 'title': "{{ chapter.title }}", 'chapter_number': "{{ chapter.chapter_number }}" })
+            }).then(() => {
+                btnSave.innerHTML = '<span class="material-symbols-outlined text-[18px]">done</span><span class="text-xs font-bold tracking-wider">SAVED</span>';
+                setTimeout(() => { btnSave.innerHTML = originalHtml; }, 2000);
+            });
+        }
+
+        quill.on('text-change', function () {
+            clearTimeout(timeout);
+            timeout = setTimeout(saveContent, 3000);
+        });
+        document.getElementById('btn-save-manuscript').addEventListener('click', saveContent);
+
+        document.body.classList.add('writing-mode-active');
+    });
+
+    // Magic Logic
+    window.applyMagic = function (action) {
+        const selection = quill.getSelection();
+        if (!selection || selection.length === 0) return;
+        
+        if (action === 'bold') { quill.format('bold', !quill.getFormat().bold); return; }
+        if (action === 'italic') { quill.format('italic', !quill.getFormat().italic); return; }
+        if (action === 'underline') { quill.format('underline', !quill.getFormat().underline); return; }
+        
+        const selectedText = quill.getText(selection.index, selection.length);
+        let instruction = "";
+        if (action === 'improve') instruction = "Improve the prose and flow of this selection.";
+
+        fetch("{% url 'api_generate_prose' %}", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value },
+            body: JSON.stringify({ 
+                chapter_id: "{{ chapter.pk }}", 
+                current_text: quill.getText(), 
+                instruction: `Focusing ONLY on this segment: "${selectedText}". ${instruction} Return only the improved segment.` 
+            })
+        }).then(response => response.json()).then(data => {
+            if (data.generated_text) { 
+                quill.deleteText(selection.index, selection.length); 
+                quill.insertText(selection.index, data.generated_text); 
+                quill.setSelection(selection.index, data.generated_text.length); 
+            }
+        });
     }
-    window.closeSidebarRight = function () { const sidebar = document.getElementById('sidebar-right'); sidebar.classList.remove('expanded'); document.querySelectorAll('.sidebar-icon').forEach(i => i.classList.remove('active')); }
+
+    // Ghostwriter Logic
     window.sendToGhostwriter = function () {
         const input = document.getElementById('ghostwriter-input');
         const query = input.value.trim();
         if (!query) return;
-        addChatBubble('user', query);
+        
+        const msgContainer = document.getElementById('ghostwriter-messages');
+        msgContainer.innerHTML += `
+            <div class="p-3 bg-slate-100 dark:bg-white/5 rounded-xl text-right ml-4">
+                ${query}
+            </div>
+            <div id="penn-thinking" class="p-3 bg-primary/5 dark:bg-primary/10 rounded-xl animate-pulse">
+                Penn is reflecting...
+            </div>
+        `;
+        msgContainer.scrollTop = msgContainer.scrollHeight;
         input.value = '';
-        const thinkingId = addChatBubble('ai thinking-bubble', 'Ghostwriter is thinking...');
+
         fetch("{% url 'api_ai_consultant' %}", {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value },
             body: JSON.stringify({ query: query, scene_content: quill.getText() })
         }).then(response => response.json()).then(data => {
-            const thinkingElem = document.getElementById(thinkingId);
-            if (data.status === 'success') { thinkingElem.innerText = data.response; thinkingElem.classList.remove('thinking-bubble'); }
-            else { thinkingElem.innerText = "Error: " + data.message; thinkingElem.classList.add('text-danger'); }
-        }).catch(error => { document.getElementById(thinkingId).innerText = "Failed to connect to AI."; });
-    }
-    window.askGhostwriter = function (query) { switchSidebarTab('ghostwriter'); document.getElementById('ghostwriter-input').value = query; sendToGhostwriter(); }
-    function addChatBubble(role, text) { const container = document.getElementById('ghostwriter-messages'); const id = 'chat-' + Date.now(); container.innerHTML += `<div class="chat-bubble ${role}" id="${id}">${text}</div>`; container.scrollTop = container.scrollHeight; return id; }
-    window.applyMagic = function (action) {
-        const selection = quill.getSelection();
-        if (!selection || selection.length === 0) return;
-        const selectedText = quill.getText(selection.index, selection.length);
-        if (action === 'bold') { quill.format('bold', !quill.getFormat().bold); return; }
-        if (action === 'italic') { quill.format('italic', !quill.getFormat().italic); return; }
-        const btnMagic = document.querySelector('.bubble-btn .bi-stars').parentElement;
-        const originalHtml = btnMagic.innerHTML;
-        btnMagic.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> ...';
-        let instruction = "";
-        switch (action) {
-            case 'improve': instruction = "Improve the prose and flow of this selection."; break;
-            case 'expand': instruction = "Expand on this scene, adding more sensory detail."; break;
-            case 'show-dont-tell': instruction = "Rewrite this to follow 'Show, Don't Tell' principles."; break;
-        }
-        fetch("{% url 'api_generate_prose' %}", {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value },
-            body: JSON.stringify({ chapter_id: "{{ chapter.pk }}", current_text: quill.getText(), instruction: `Focusing ONLY on this segment: "${selectedText}". ${instruction} Return only the improved segment.` })
-        }).then(response => response.json()).then(data => {
-            if (data.generated_text) { quill.deleteText(selection.index, selection.length); quill.insertText(selection.index, data.generated_text); quill.setSelection(selection.index, data.generated_text.length); }
-        }).finally(() => { btnMagic.innerHTML = originalHtml; document.getElementById('bubble-menu').style.display = 'none'; });
-    }
-    document.addEventListener('DOMContentLoaded', function () {
-        var quill = new Quill('#writing-editor', { theme: 'snow', modules: { toolbar: false }, placeholder: 'Type here...' });
-        window.quill = quill;
-        const qlToolbar = document.querySelector('.ql-toolbar');
-        if (qlToolbar) qlToolbar.style.display = 'none';
-        quill.on('selection-change', function (range) {
-            const menu = document.getElementById('bubble-menu');
-            if (range && range.length > 0) {
-                const bounds = quill.getBounds(range.index, range.length);
-                const editorPos = document.getElementById('writing-editor').getBoundingClientRect();
-                menu.style.display = 'flex';
-                menu.style.left = (bounds.left + editorPos.left + (bounds.width / 2) - (menu.offsetWidth / 2)) + 'px';
-                menu.style.top = (bounds.top + editorPos.top - 50) + 'px';
-            } else { menu.style.display = 'none'; }
+            const thinking = document.getElementById('penn-thinking');
+            if (data.status === 'success') {
+                thinking.id = '';
+                thinking.classList.remove('animate-pulse');
+                thinking.innerText = data.response;
+            }
         });
-        function saveContent() {
-            const content = quill.root.innerHTML;
-            const btnSave = document.getElementById('btn-save-manuscript');
-            btnSave.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> Saving...';
-            fetch("{% url 'chapter_edit' chapter.pk %}", {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value, 'X-Requested-With': 'XMLHttpRequest' },
-                body: new URLSearchParams({ 'content': content, 'title': "{{ chapter.title }}", 'chapter_number': "{{ chapter.chapter_number }}" })
-            }).then(response => response.json()).then(data => {
-                btnSave.innerHTML = '<i class="bi bi-check2"></i> Saved';
-                setTimeout(() => { btnSave.innerHTML = '<i class="bi bi-save"></i> Save'; }, 2000);
-            }).catch(error => { btnSave.innerHTML = '<i class="bi bi-exclamation-triangle"></i> Error'; });
-        }
-        let timeout = null;
-        quill.on('text-change', function () { clearTimeout(timeout); timeout = setTimeout(saveContent, 3000); });
-        document.getElementById('btn-save-manuscript').addEventListener('click', saveContent);
-        document.body.classList.add('writing-mode-active');
-    });
+    }
 </script>
 {% endblock %}
