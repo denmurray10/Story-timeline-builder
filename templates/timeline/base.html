@@ -270,6 +270,11 @@
     </div>
     {% endblock full_layout %}
 
+    <!-- Global Project Creation Modal -->
+    {% if user.is_authenticated %}
+        {% include 'timeline/_project_creation_modal.html' %}
+    {% endif %}
+
     <footer class="footer text-center py-3 mt-4">
         <div class="container"><small>&copy; 2026 Story Timeline Builder</small></div>
     </footer>

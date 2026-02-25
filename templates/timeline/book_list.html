@@ -70,10 +70,10 @@
                         <span class="material-symbols-outlined text-lg">upload</span>
                         Import with AI
                     </a>
-                    <a href="{% url 'book_create' %}" class="btn-premium btn-premium-dark !py-2.5">
+                    <button data-bs-toggle="modal" data-bs-target="#projectCreationModal" class="btn-premium btn-premium-dark !py-2.5">
                         <span class="material-symbols-outlined text-lg">add</span>
                         New Project
-                    </a>
+                    </button>
                 </div>
             </div>
 
@@ -127,10 +127,10 @@
                         <span class="material-symbols-outlined text-6xl text-text-muted/30 mb-4">auto_stories</span>
                         <h3 class="font-serif text-2xl text-branddark mb-2" style="font-family: 'DM Serif Display', serif !important;">No Active Books</h3>
                         <p class="text-text-muted mb-6" style="font-family: 'Inter', sans-serif !important;">Create your first book to start building your story timeline.</p>
-                        <a href="{% url 'book_create' %}" class="btn-premium btn-premium-dark">
+                        <button data-bs-toggle="modal" data-bs-target="#projectCreationModal" class="btn-premium btn-premium-dark">
                             <span class="material-symbols-outlined text-lg">add</span>
                             Create First Book
-                        </a>
+                        </button>
                     </div>
                     {% endif %}
                 </div>

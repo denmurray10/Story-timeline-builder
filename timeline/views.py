@@ -16,6 +16,7 @@ import requests
 from django.core.files.base import ContentFile
 from django.db.models import Count, Sum, Q
 from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
 import json
 import re
 import hashlib
@@ -42,6 +43,9 @@ from .context_engine import ContextEngine
 from .utils.ai_clients import _call_ai_json, _call_ai_text, _log_ai_usage
 from .utils.ai_synthesis import synthesize_book_summary
 import datetime
+import logging
+
+logger = logging.getLogger(__name__)
 from django.contrib.auth.views import LoginView as DjangoLoginView
 
 
@@ -1400,6 +1404,73 @@ def api_book_progress(request, pk):
 
 
 @login_required
+def api_series_list(request):
+    """Returns a list of series owned by the user."""
+    series = Series.objects.filter(user=request.user).order_by('title')
+    data = [{'id': s.id, 'title': s.title} for s in series]
+    return JsonResponse({'status': 'success', 'series': data})
+
+
+@login_required
+@csrf_exempt
+@require_POST
+def api_book_create(request):
+    """API endpoint to create a new book from the Typeform modal."""
+    try:
+        data = json.loads(request.body)
+        title = data.get('title', '').strip()
+        description = data.get('description', '').strip()
+        word_count_target = data.get('word_count_target')
+        genre = data.get('genre', '').strip()
+        characters_overview = data.get('characters', '').strip()
+        themes = data.get('themes', '').strip()
+        ending_notes = data.get('ending', '').strip()
+        ai_assisted = data.get('ai_assisted', True)
+        series_id = data.get('series_id')
+
+        if not title:
+            return JsonResponse({'status': 'error', 'message': 'Title is required.'}, status=400)
+
+        # Get next series order for this user
+        next_order = Book.objects.filter(user=request.user).count() + 1
+        
+        # Handle series assignment
+        series = None
+        if series_id:
+            series = Series.objects.filter(pk=series_id, user=request.user).first()
+
+        book = Book.objects.create(
+            user=request.user,
+            series=series,
+            title=title,
+            description=description,
+            genre=genre,
+            characters_overview=characters_overview,
+            themes=themes,
+            ending_notes=ending_notes,
+            ai_assisted=ai_assisted,
+            word_count_target=word_count_target if word_count_target else 160000,
+            status='drafting',
+            series_order=next_order
+        )
+
+        # Create a default first chapter so the user can start writing immediately
+        chapter = Chapter.objects.create(
+            book=book,
+            chapter_number=1,
+            title="Chapter 1",
+            content=""
+        )
+
+        return JsonResponse({
+            'status': 'success',
+            'book_id': book.id,
+            'chapter_id': chapter.id,
+            'message': 'Project created successfully.'
+        })
+    except Exception as e:
+        logger.error(f"Error creating book API: {e}")
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 def book_delete(request, pk):
     """Delete a book."""
     book = get_object_or_404(Book, pk=pk, user=request.user)
@@ -2078,10 +2149,25 @@ def writing_mode(request, pk=None):
     """
     Distraction-free Writing Mode (Edit Mode).
     If pk is provided, loads that chapter. 
+    If pk belongs to a book, loads its first chapter.
     Otherwise, picks the most recently updated chapter for the user.
     """
     if pk:
-        chapter = get_object_or_404(Chapter, pk=pk, book__user=request.user)
+        # 1. Try to find as a chapter ID
+        chapter = Chapter.objects.filter(pk=pk, book__user=request.user).first()
+        
+        if not chapter:
+            # 2. Try to find as a book ID
+            book = Book.objects.filter(pk=pk, user=request.user).first()
+            if book:
+                chapter = book.chapters.order_by('chapter_number').first()
+                if not chapter:
+                    # Fallback to book detail if no chapters exist
+                    messages.info(request, "Create your first chapter to start writing.")
+                    return redirect('book_detail', pk=book.pk)
+            else:
+                # Neither chapter nor book
+                return redirect('book_list')
     else:
         chapter = Chapter.objects.filter(book__user=request.user).order_by('-updated_at').first()
         if not chapter:

@@ -68,6 +68,13 @@ class Book(models.Model):
         ],
         default='planning'
     )
+    # New Story Bible Fields
+    genre = models.CharField(max_length=100, blank=True, default='')
+    characters_overview = models.TextField(blank=True, default='')
+    themes = models.TextField(blank=True, default='')
+    ending_notes = models.TextField(blank=True, default='')
+    ai_assisted = models.BooleanField(default=True)
+    
     import_progress = models.PositiveIntegerField(default=0)
     import_status_message = models.CharField(max_length=255, blank=True, default='')
     last_import_update = models.DateTimeField(auto_now=True)

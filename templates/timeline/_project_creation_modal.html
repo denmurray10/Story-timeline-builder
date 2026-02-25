@@ -1,0 +1,721 @@
+<style>
+/* Custom Typeform-Style Modal CSS */
+#projectCreationModal .modal-content {
+    background-color: var(--bg-body, #f4f1ee);
+    border: none;
+    border-radius: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+#projectCreationModal .modal-header {
+    border-bottom: none;
+    padding: 2rem 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#projectCreationModal .btn-close {
+    opacity: 0.6;
+    transition: opacity 0.2s;
+    background-size: 1rem;
+    z-index: 1055;
+}
+
+#projectCreationModal .btn-close:hover {
+    opacity: 1;
+}
+
+#projectCreationModal .modal-body {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Form Container & Steps */
+.tf-form-container {
+    width: 100%;
+    max-width: 700px;
+    position: relative;
+}
+
+.tf-step {
+    display: none;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    position: absolute;
+    width: 100%;
+    top: 50%;
+    left: 0;
+    margin-top: -150px;
+}
+
+.tf-step.active {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+    z-index: 10;
+    pointer-events: all;
+}
+
+.tf-step.fade-out-up {
+    display: block;
+    opacity: 0;
+    transform: translateY(-40px);
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Typography & Inputs */
+.tf-question-title {
+    font-family: 'DM Serif Display', serif !important;
+    font-size: 2.5rem;
+    color: var(--text-heading, #1A1A1A);
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+}
+
+.tf-question-desc {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 1.1rem;
+    color: var(--text-muted, #666666);
+    margin-bottom: 2rem;
+    font-weight: 300;
+}
+
+.tf-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid rgba(0,0,0,0.1);
+    padding: 10px 0;
+    font-size: 1.8rem;
+    font-family: 'Inter', sans-serif !important;
+    color: var(--text-heading, #1A1A1A);
+    transition: border-color 0.3s;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+.tf-input:focus {
+    border-bottom-color: var(--text-heading, #1A1A1A);
+}
+
+.tf-input::placeholder {
+    color: rgba(0,0,0,0.2);
+}
+
+.tf-textarea {
+    resize: none;
+    font-size: 1.4rem;
+    line-height: 1.5;
+    min-height: 120px;
+}
+
+/* Buttons */
+.tf-actions {
+    margin-top: 2.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.tf-btn {
+    background-color: var(--text-heading, #1A1A1A);
+    color: white;
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 0.8rem 2rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tf-btn:hover {
+    background-color: #000;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+}
+
+.tf-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: translateY(0);
+}
+
+.tf-hint {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.85rem;
+    color: var(--text-muted, #666666);
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.tf-hint kbd {
+    background-color: rgba(0,0,0,0.05);
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 4px;
+    padding: 0.1rem 0.4rem;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.tf-choice-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-top: 1rem;
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.tf-choice {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(255,255,255,0.6);
+    border: 1px solid rgba(0,0,0,0.08);
+    padding: 0.8rem 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 500;
+    font-size: 1.1rem;
+    color: var(--text-heading, #1A1A1A);
+}
+
+.tf-choice:hover {
+    background: rgba(255,255,255,0.9);
+    border-color: rgba(0,0,0,0.15);
+    transform: translateX(5px);
+}
+
+.tf-choice.selected {
+    background: var(--text-heading, #1A1A1A);
+    color: white !important;
+    border-color: var(--text-heading, #1A1A1A);
+}
+
+.tf-choice-key {
+    background: white;
+    color: var(--text-heading, #1A1A1A);
+    border: 1px solid rgba(0,0,0,0.2);
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+
+.tf-choice.selected .tf-choice-key {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border-color: transparent;
+}
+
+.tf-progress-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.tf-progress-text {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted, #666666);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.tf-nav-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    color: var(--text-heading, #1A1A1A);
+    opacity: 0.5;
+    transition: opacity 0.2s;
+}
+
+.tf-nav-btn:hover {
+    opacity: 1;
+}
+
+.tf-nav-btn:disabled {
+    opacity: 0.2;
+    cursor: not-allowed;
+}
+</style>
+
+<!-- Full-screen Modal -->
+<div class="modal tf-modal" id="projectCreationModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+            
+            <div class="modal-header">
+                <div class="tf-logo d-flex align-items-center gap-2">
+                    <span class="material-symbols-outlined text-branddark" style="font-size: 24px;">book_4</span>
+                    <span class="font-serif fw-bold text-branddark" style="font-family: 'DM Serif Display', serif !important; font-size: 1.2rem;">New Project</span>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="tf-form-container">
+                    
+                    <!-- Step 1: Title -->
+                    <div class="tf-step active" id="tf-step-1" data-step="1">
+                        <div class="d-flex gap-3">
+                            <span class="text-branddark font-serif fs-4" style="font-family: 'DM Serif Display', serif !important;">1 <i class="bi bi-arrow-right fs-5"></i></span>
+                            <div class="w-100">
+                                <h2 class="tf-question-title">What is the working title of your story?</h2>
+                                <p class="tf-question-desc">Every great journey begins with a name. You can always change this later.</p>
+                                
+                                <input type="text" class="tf-input" id="tfProjectTitle" placeholder="e.g. The Winds of Winter" autocomplete="off" autofocus>
+                                
+                                <div class="tf-actions">
+                                    <button class="tf-btn" onclick="tfNextStep()">OK <i class="bi bi-check2"></i></button>
+                                    <span class="tf-hint">press <kbd>Enter</kbd></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Conflict Summary -->
+                    <div class="tf-step" id="tf-step-2" data-step="2">
+                        <div class="d-flex gap-3">
+                            <span class="text-branddark font-serif fs-4" style="font-family: 'DM Serif Display', serif !important;">2 <i class="bi bi-arrow-right fs-5"></i></span>
+                            <div class="w-100">
+                                <h2 class="tf-question-title">What is your story about?</h2>
+                                <p class="tf-question-desc">Summarize the core conflict in one or two sentences.</p>
+                                
+                                <textarea class="tf-input tf-textarea" id="tfProjectDesc" placeholder="e.g. A disgraced knight must protect the heir to a fallen kingdom..."></textarea>
+                                
+                                <div class="tf-actions">
+                                    <button class="tf-btn" onclick="tfNextStep()">OK <i class="bi bi-check2"></i></button>
+                                    <span class="tf-hint">press <kbd>Shift</kbd> + <kbd>Enter</kbd></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Characters -->
+                    <div class="tf-step" id="tf-step-3" data-step="3">
+                        <div class="d-flex gap-3">
+                            <span class="text-branddark font-serif fs-4" style="font-family: 'DM Serif Display', serif !important;">3 <i class="bi bi-arrow-right fs-5"></i></span>
+                            <div class="w-100">
+                                <h2 class="tf-question-title">Who are the characters?</h2>
+                                <p class="tf-question-desc">Identify the protagonist, antagonist, and key supporting roles.</p>
+                                
+                                <textarea class="tf-input tf-textarea" id="tfProjectCharacters" placeholder="Protagonist: ... Antagonist: ..."></textarea>
+                                
+                                <div class="tf-actions">
+                                    <button class="tf-btn" onclick="tfNextStep()">OK <i class="bi bi-check2"></i></button>
+                                    <span class="tf-hint">press <kbd>Shift</kbd> + <kbd>Enter</kbd></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Genre -->
+                    <div class="tf-step" id="tf-step-4" data-step="4">
+                        <div class="d-flex gap-3">
+                            <span class="text-branddark font-serif fs-4" style="font-family: 'DM Serif Display', serif !important;">4 <i class="bi bi-arrow-right fs-5"></i></span>
+                            <div class="w-100">
+                                <h2 class="tf-question-title">What genre is this story in?</h2>
+                                <p class="tf-question-desc">High Fantasy, Noir Mystery, Cyberpunk, etc. (optional)</p>
+                                
+                                <input type="text" class="tf-input" id="tfProjectGenre" placeholder="e.g. Science Fiction">
+                                
+                                <div class="tf-actions">
+                                    <button class="tf-btn" onclick="tfNextStep()">OK <i class="bi bi-check2"></i></button>
+                                    <span class="tf-hint">press <kbd>Enter</kbd></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 5: Series -->
+                    <div class="tf-step" id="tf-step-5" data-step="5">
+                        <div class="d-flex gap-3">
+                            <span class="text-branddark font-serif fs-4" style="font-family: 'DM Serif Display', serif !important;">5 <i class="bi bi-arrow-right fs-5"></i></span>
+                            <div class="w-100">
+                                <h2 class="tf-question-title">Is this part of an existing series?</h2>
+                                <p class="tf-question-desc">Select a series below or leave blank for a standalone work.</p>
+                                
+                                <div class="tf-choice-container" id="tfSeriesList">
+                                    <div class="tf-choice selected" onclick="tfSelectSeries(null, this)">
+                                        <div class="tf-choice-key">A</div>
+                                        Standalone / New Series
+                                    </div>
+                                    <!-- Series items injected here -->
+                                </div>
+                                
+                                <div class="tf-actions">
+                                    <button class="tf-btn mt-3" onclick="tfNextStep()">OK <i class="bi bi-check2"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 6: Themes -->
+                    <div class="tf-step" id="tf-step-6" data-step="6">
+                        <div class="d-flex gap-3">
+                            <span class="text-branddark font-serif fs-4" style="font-family: 'DM Serif Display', serif !important;">6 <i class="bi bi-arrow-right fs-5"></i></span>
+                            <div class="w-100">
+                                <h2 class="tf-question-title">What themes are inherent to this conflict?</h2>
+                                <p class="tf-question-desc">Note the underlying ideas you want to explore (e.g. Redemption, Betrayal).</p>
+                                
+                                <input type="text" class="tf-input" id="tfProjectThemes" placeholder="e.g. Legacy and Loss">
+                                
+                                <div class="tf-actions">
+                                    <button class="tf-btn" onclick="tfNextStep()">OK <i class="bi bi-check2"></i></button>
+                                    <span class="tf-hint">press <kbd>Enter</kbd></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 7: Ending -->
+                    <div class="tf-step" id="tf-step-7" data-step="7">
+                        <div class="d-flex gap-3">
+                            <span class="text-branddark font-serif fs-4" style="font-family: 'DM Serif Display', serif !important;">7 <i class="bi bi-arrow-right fs-5"></i></span>
+                            <div class="w-100">
+                                <h2 class="tf-question-title">Where will the story end?</h2>
+                                <p class="tf-question-desc">Know your destination before mapping the journey.</p>
+                                
+                                <textarea class="tf-input tf-textarea" id="tfProjectEnding" placeholder="e.g. The hero returns home, but find things changed..."></textarea>
+                                
+                                <div class="tf-actions">
+                                    <button class="tf-btn" onclick="tfNextStep()">OK <i class="bi bi-check2"></i></button>
+                                    <span class="tf-hint">press <kbd>Shift</kbd> + <kbd>Enter</kbd></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 8: Word Count -->
+                    <div class="tf-step" id="tf-step-8" data-step="8">
+                        <div class="d-flex gap-3">
+                            <span class="text-branddark font-serif fs-4" style="font-family: 'DM Serif Display', serif !important;">8 <i class="bi bi-arrow-right fs-5"></i></span>
+                            <div class="w-100">
+                                <h2 class="tf-question-title">What is your target word count?</h2>
+                                <p class="tf-question-desc">Set a goal for your manuscript (optional).</p>
+                                
+                                <input type="number" class="tf-input" id="tfProjectTarget" placeholder="e.g. 80000" min="0" step="5000">
+                                
+                                <div class="tf-actions">
+                                    <button class="tf-btn" onclick="tfNextStep()">OK <i class="bi bi-check2"></i></button>
+                                    <span class="tf-hint">press <kbd>Enter</kbd></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 9: AI Assistant -->
+                    <div class="tf-step" id="tf-step-9" data-step="9">
+                        <div class="d-flex gap-3">
+                            <span class="text-branddark font-serif fs-4" style="font-family: 'DM Serif Display', serif !important;">9 <i class="bi bi-arrow-right fs-5"></i></span>
+                            <div class="w-100">
+                                <h2 class="tf-question-title">Enhanced write mode?</h2>
+                                <p class="tf-question-desc">Would you like to be assisted with Penn, our AI co-writer?</p>
+                                
+                                <div class="tf-choice-container">
+                                    <div class="tf-choice selected" id="tfAiYes" onclick="tfSelectAi(true, this)">
+                                        <div class="tf-choice-key">Y</div>
+                                        Yes, I'd love some help from Penn
+                                    </div>
+                                    <div class="tf-choice" id="tfAiNo" onclick="tfSelectAi(false, this)">
+                                        <div class="tf-choice-key">N</div>
+                                        No, I'll write solo for now
+                                    </div>
+                                </div>
+                                
+                                <div class="tf-actions">
+                                    <button class="tf-btn mt-3" onclick="tfSubmitForm()" id="tfSubmitBtn">Finish & Create Project <i class="bi bi-magic"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div class="tf-step" id="tf-step-loading">
+                        <div class="text-center w-100 py-5">
+                            <div class="spinner-border text-branddark mb-4" role="status" style="width: 3rem; height: 3rem;">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <h2 class="tf-question-title">Preparing your manuscript...</h2>
+                            <p class="tf-question-desc">Setting up your story bible and word editor.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="modal-footer tf-footer border-0">
+                <div class="tf-progress-container">
+                    <button class="tf-nav-btn" id="tfPrevBtn" onclick="tfPrevStep()" disabled>
+                        <i class="bi bi-chevron-up fs-4"></i>
+                    </button>
+                    <button class="tf-nav-btn" id="tfNextNavBtn" onclick="tfNextStep()">
+                        <i class="bi bi-chevron-down fs-4"></i>
+                    </button>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentStep = 1;
+    const totalSteps = 9;
+    let selectedSeriesId = null;
+    let aiAssisted = true;
+
+    function tfShowStep(step) {
+        const steps = document.querySelectorAll('.tf-step[data-step]');
+        
+        steps.forEach(el => {
+            const elStep = parseInt(el.dataset.step);
+            if (el.classList.contains('active')) {
+                el.classList.remove('active');
+                if (elStep < step) {
+                    el.classList.add('fade-out-up');
+                    setTimeout(() => {
+                        if (!el.classList.contains('active')) {
+                            el.style.display = 'none';
+                            el.classList.remove('fade-out-up');
+                        }
+                    }, 500);
+                } else {
+                    el.style.display = 'none';
+                    el.classList.remove('fade-out-up');
+                }
+            } else if (elStep !== step && !el.classList.contains('fade-out-up')) {
+                el.style.display = 'none';
+            }
+        });
+
+        const targetStep = document.getElementById(`tf-step-${step}`);
+        if(targetStep) {
+            targetStep.style.display = 'block';
+            targetStep.offsetHeight; 
+            setTimeout(() => {
+                targetStep.classList.add('active');
+                const input = targetStep.querySelector('input, textarea');
+                if(input) {
+                    input.focus();
+                    if(input.tagName === 'INPUT') input.select();
+                }
+            }, 10);
+        }
+
+        document.getElementById('tfPrevBtn').disabled = step === 1;
+        document.getElementById('tfNextNavBtn').disabled = step === totalSteps;
+    }
+
+    function tfNextStep() {
+        if (currentStep < totalSteps) {
+            if (currentStep === 1) {
+                const title = document.getElementById('tfProjectTitle').value.trim();
+                if (!title) {
+                    document.getElementById('tfProjectTitle').focus();
+                    return;
+                }
+            }
+            currentStep++;
+            tfShowStep(currentStep);
+        }
+    }
+
+    function tfPrevStep() {
+        if (currentStep > 1) {
+            currentStep--;
+            tfShowStep(currentStep);
+        }
+    }
+
+    function tfSelectSeries(id, el) {
+        selectedSeriesId = id;
+        el.parentElement.querySelectorAll('.tf-choice').forEach(c => c.classList.remove('selected'));
+        el.classList.add('selected');
+        // Auto advance after short delay for better UX
+        setTimeout(tfNextStep, 400);
+    }
+
+    function tfSelectAi(val, el) {
+        aiAssisted = val;
+        el.parentElement.querySelectorAll('.tf-choice').forEach(c => c.classList.remove('selected'));
+        el.classList.add('selected');
+    }
+
+    async function tfFetchSeries() {
+        try {
+            const response = await fetch('/api/series/');
+            const data = await response.json();
+            if (data.status === 'success') {
+                const container = document.getElementById('tfSeriesList');
+                // Keep the "Standalone" option
+                const standalone = container.querySelector('.tf-choice');
+                container.innerHTML = '';
+                container.appendChild(standalone);
+                
+                data.series.forEach((s, index) => {
+                    const char = String.fromCharCode(66 + index); // B, C, D...
+                    const div = document.createElement('div');
+                    div.className = 'tf-choice';
+                    div.onclick = () => tfSelectSeries(s.id, div);
+                    div.innerHTML = `<div class="tf-choice-key">${char}</div> ${s.title}`;
+                    container.appendChild(div);
+                });
+            }
+        } catch (e) {
+            console.error("Failed to fetch series", e);
+        }
+    }
+
+    function tfSubmitForm() {
+        const payload = {
+            title: document.getElementById('tfProjectTitle').value.trim(),
+            description: document.getElementById('tfProjectDesc').value.trim(),
+            characters: document.getElementById('tfProjectCharacters').value.trim(),
+            genre: document.getElementById('tfProjectGenre').value.trim(),
+            series_id: selectedSeriesId,
+            themes: document.getElementById('tfProjectThemes').value.trim(),
+            ending: document.getElementById('tfProjectEnding').value.trim(),
+            word_count_target: document.getElementById('tfProjectTarget').value.trim() || 160000,
+            ai_assisted: aiAssisted
+        };
+
+        if (!payload.title) {
+            currentStep = 1;
+            tfShowStep(1);
+            return;
+        }
+
+        document.querySelectorAll('.tf-step').forEach(el => {
+            el.classList.remove('active');
+            el.style.display = 'none';
+        });
+        document.querySelector('.tf-footer').style.display = 'none';
+        
+        const loadingStep = document.getElementById('tf-step-loading');
+        loadingStep.style.display = 'block';
+        setTimeout(() => loadingStep.classList.add('active'), 10);
+
+        fetch('/api/books/create/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                window.location.href = `/write/${data.chapter_id}/`;
+            } else {
+                alert('Error creating project: ' + data.message);
+                loadingStep.classList.remove('active');
+                loadingStep.style.display = 'none';
+                document.querySelector('.tf-footer').style.display = 'flex';
+                currentStep = 1;
+                tfShowStep(1);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An unexpected error occurred.');
+            loadingStep.classList.remove('active');
+            loadingStep.style.display = 'none';
+            document.querySelector('.tf-footer').style.display = 'flex';
+            currentStep = 1;
+            tfShowStep(1);
+        });
+    }
+
+    document.addEventListener('keydown', (e) => {
+        const modal = document.getElementById('projectCreationModal');
+        if (!modal.classList.contains('show')) return;
+
+        if (e.key === 'Enter') {
+            const activeEl = document.activeElement;
+            const textareas = ['tfProjectDesc', 'tfProjectCharacters', 'tfProjectEnding'];
+            
+            if (textareas.includes(activeEl.id)) {
+                if (e.shiftKey) {
+                    e.preventDefault();
+                    tfNextStep();
+                }
+            } else if (activeEl.id === 'tfProjectTarget' || currentStep === 8) {
+                 e.preventDefault();
+                 tfNextStep();
+            } else if (currentStep === 9) {
+                 // No auto-enter for step 9 choices yet
+            } else {
+                e.preventDefault();
+                tfNextStep();
+            }
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const modal = document.getElementById('projectCreationModal');
+        
+        modal.addEventListener('shown.bs.modal', function () {
+            currentStep = 1;
+            selectedSeriesId = null;
+            aiAssisted = true;
+            
+            // Clear inputs
+            const inputs = modal.querySelectorAll('input, textarea');
+            inputs.forEach(i => i.value = '');
+            
+            // Reset choices
+            modal.querySelectorAll('.tf-choice').forEach(c => c.classList.remove('selected'));
+            document.querySelector('[onclick*="tfSelectSeries(null"]').classList.add('selected');
+            document.getElementById('tfAiYes').classList.add('selected');
+
+            tfFetchSeries();
+            tfShowStep(1);
+        });
+    });
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>

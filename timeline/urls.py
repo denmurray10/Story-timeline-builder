@@ -111,4 +111,6 @@ urlpatterns = [
     path('changelog/', views.changelog, name='changelog'),
     path('subscribe/newsletter/', views.subscribe_newsletter, name='subscribe_newsletter'),
     path('subscribe/thank-you/', views.subscribe_thank_you, name='subscribe_thank_you'),
+    path('api/books/create/', views.api_book_create, name='api_book_create'),
+    path('api/series/', views.api_series_list, name='api_series_list'),
 ]
