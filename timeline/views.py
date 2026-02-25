@@ -2217,15 +2217,40 @@ def character_list(request):
 
 @login_required
 def character_detail(request, pk):
-    """Detail view for a single character."""
+    """Combined detail and edit view for a single character."""
     character = get_object_or_404(Character, pk=pk, user=request.user)
+    
+    if request.method == 'POST':
+        form = CharacterForm(request.POST, request.FILES, instance=character, user=request.user)
+        if form.is_valid():
+            form.save()
+            from django.contrib import messages
+            messages.success(request, f'Character "{character.name}" updated successfully!')
+            return redirect('character_detail', pk=character.pk)
+    else:
+        form = CharacterForm(instance=character, user=request.user)
+    
     events = character.events.all().order_by('sequence_order')
     pov_events = character.pov_events.all().order_by('sequence_order')
+    
+    # Get relationships for the relationship map
+    from .models import CharacterRelationship
+    relationships = CharacterRelationship.objects.filter(
+        Q(character_a=character) | Q(character_b=character)
+    ).select_related('character_a', 'character_b')
+    
+    # Get all books for the introduction selector if needed
+    from .models import Book
+    books = Book.objects.filter(user=request.user)
     
     context = {
         'character': character,
         'events': events,
         'pov_events': pov_events,
+        'form': form,
+        'relationships': relationships,
+        'books': books,
+        'is_edit': request.GET.get('edit') == 'true'
     }
     return render(request, 'timeline/character_detail.html', context)
 

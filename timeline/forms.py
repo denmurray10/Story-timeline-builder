@@ -132,6 +132,12 @@ class CharacterForm(forms.ModelForm):
             "is_active",
             "profile_image",
             "avatar_id",
+            "height",
+            "eyes",
+            "hair",
+            "age",
+            "core_desire",
+            "fatal_flaw",
         ]
         widgets = {
             "name": forms.TextInput(attrs={"class": "form-control"}),
@@ -148,6 +154,12 @@ class CharacterForm(forms.ModelForm):
             "is_active": forms.CheckboxInput(attrs={"class": "form-check-input"}),
             "profile_image": forms.FileInput(attrs={"class": "form-control"}),
             "avatar_id": forms.HiddenInput(),
+            "height": forms.TextInput(attrs={"class": "form-control"}),
+            "eyes": forms.TextInput(attrs={"class": "form-control"}),
+            "hair": forms.TextInput(attrs={"class": "form-control"}),
+            "age": forms.TextInput(attrs={"class": "form-control"}),
+            "core_desire": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
+            "fatal_flaw": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
         }
 
     def __init__(self, *args, **kwargs):

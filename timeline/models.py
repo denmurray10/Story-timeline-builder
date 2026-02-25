@@ -183,6 +183,14 @@ class Character(models.Model):
         default='#3498db',
         help_text="Hex color code for timeline visualization (e.g., #3498db)"
     )
+    # Architectural V2 Fields
+    height = models.CharField(max_length=50, blank=True, help_text="e.g. 5'10\"")
+    eyes = models.CharField(max_length=50, blank=True)
+    hair = models.CharField(max_length=50, blank=True)
+    age = models.CharField(max_length=50, blank=True)
+    core_desire = models.TextField(blank=True, help_text="What the character wants most")
+    fatal_flaw = models.TextField(blank=True, help_text="The weakness that potentially leads to their downfall")
+
     introduction_book = models.ForeignKey(
         Book,
         on_delete=models.SET_NULL,

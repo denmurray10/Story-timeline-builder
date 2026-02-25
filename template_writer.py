@@ -1,4 +1,6 @@
-{% extends 'timeline/base.html' %}
+import sys
+
+content = """{% extends 'timeline/base.html' %}
 {% load static %}
 {% block title %}{{ character.name }} - Character Profile{% endblock %}
 
@@ -289,7 +291,35 @@
                             </div>
                         </div>
 
+                        <!-- Physical Specs -->
+                        <h6 class="uppercase tracking-widest text-muted border-bottom pb-2 mb-3" style="font-size: 0.65rem; font-weight: 800;">Physical Attributes</h6>
+                        <div class="row g-2 mb-4">
+                            <div class="col-6">
+                                <label class="trait-label">Age</label>
+                                <input type="text" name="age" class="form-control-premium" value="{{ form.age.value|default_if_none:'' }}">
+                            </div>
+                            <div class="col-6">
+                                <label class="trait-label">Height</label>
+                                <input type="text" name="height" class="form-control-premium" value="{{ form.height.value|default_if_none:'' }}">
+                            </div>
+                            <div class="col-6">
+                                <label class="trait-label">Eyes</label>
+                                <input type="text" name="eyes" class="form-control-premium" value="{{ form.eyes.value|default_if_none:'' }}">
+                            </div>
+                            <div class="col-6">
+                                <label class="trait-label">Hair</label>
+                                <input type="text" name="hair" class="form-control-premium" value="{{ form.hair.value|default_if_none:'' }}">
+                            </div>
+                        </div>
                         
+                        <!-- Avatars -->
+                        <h6 class="uppercase tracking-widest text-muted border-bottom pb-2 mb-3 mt-2" style="font-size: 0.65rem; font-weight: 800;">Default Avatars</h6>
+                        <div class="row g-2 mb-4" id="avatar-selector">
+                            <div class="col-3"><div class="avatar-option {% if character.avatar_id == 'hero' %}selected{% endif %}" data-id="hero"><img src="{% static 'img/avatars/hero.svg' %}"></div></div>
+                            <div class="col-3"><div class="avatar-option {% if character.avatar_id == 'villain' %}selected{% endif %}" data-id="villain"><img src="{% static 'img/avatars/villain.svg' %}"></div></div>
+                            <div class="col-3"><div class="avatar-option {% if character.avatar_id == 'sage' %}selected{% endif %}" data-id="sage"><img src="{% static 'img/avatars/sage.svg' %}"></div></div>
+                            <div class="col-3"><div class="avatar-option {% if character.avatar_id == 'rogue' %}selected{% endif %}" data-id="rogue"><img src="{% static 'img/avatars/rogue.svg' %}"></div></div>
+                        </div>
 
                         <!-- Brand Colour -->
                         <label class="trait-label">Theme Tint</label>
@@ -395,56 +425,72 @@
             <div class="col-lg-4">
                 <div class="d-flex flex-column gap-4 h-100">
                     
+                    <!-- System Details -->
+                    <div class="card-premium" style="background: #0f172a;">
+                        <div class="card-body p-4 text-white">
+                            <h6 class="uppercase tracking-widest text-secondary border-bottom border-secondary border-opacity-25 pb-3 mb-4" style="font-size: 0.7rem; font-weight: 800;">System Attributes</h6>
+                            
+                            <div class="d-flex flex-column gap-3">
+                                <div>
+                                    <label class="trait-label text-secondary mb-1">Archetype Role</label>
+                                    <select name="role" class="form-select bg-dark text-white border-secondary border-opacity-50" style="font-size: 0.9rem;">
+                                        {% for choice in form.role.field.choices %}
+                                        <option value="{{ choice.0 }}" {% if form.role.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <label class="trait-label text-secondary mb-1">Debut Book</label>
+                                        <select name="introduction_book" class="form-select bg-dark text-white border-secondary border-opacity-50 px-2 py-1" style="font-size: 0.8rem;">
+                                            {% for choice in form.introduction_book.field.choices %}
+                                            <option value="{{ choice.0 }}" {% if form.introduction_book.value == choice.0|stringformat:"i" or form.introduction_book.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="trait-label text-secondary mb-1">Debut Chapter</label>
+                                        <select name="introduction_chapter" class="form-select bg-dark text-white border-secondary border-opacity-50 px-2 py-1" style="font-size: 0.8rem;">
+                                            {% for choice in form.introduction_chapter.field.choices %}
+                                            <option value="{{ choice.0 }}" {% if form.introduction_chapter.value == choice.0|stringformat:"i" or form.introduction_chapter.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- Events Timeline -->
                     <div class="card-premium flex-grow-1">
-                        <div class="card-header-premium bg-light border-bottom">
-                            <i class="bi bi-clock-history text-muted"></i> Key Events Timeline
+                        <div class="card-header-premium bg-light">
+                            <i class="bi bi-clock-history text-muted"></i> Story Timeline Context
                         </div>
-                        <div class="card-body p-4 overflow-auto position-relative" style="max-height: 700px;" id="timeline-container-sidebar">
-                            <!-- Background Timeline Line -->
-                            <div class="position-absolute" style="left: 31px; top: 30px; bottom: 30px; width: 2px; background: #e2e8f0; z-index: 0;"></div>
-                            <!-- Active Progress Line -->
-                            <div id="timeline-progress-line" class="position-absolute" style="left: 31px; top: 30px; width: 2px; background: var(--char-accent, #6366f1); z-index: 10; transition: height 0.7s ease-in-out; height: 0;"></div>
+                        <div class="card-body p-4 overflow-auto" style="max-height: 500px;">
                             
-                            <div class="d-flex flex-column gap-5 position-relative z-10">
-                                {% if events %}
-                                    {% for event in events %}
-                                    <div class="position-relative ps-5 event-item">
-                                        <div class="d-flex gap-4">
-                                            <!-- Node -->
-                                            <div class="rounded-circle border-2 border-white bg-white shadow-sm d-flex align-items-center justify-content-center shrink-0 js-timeline-node" style="width: 24px; height: 24px; margin-left: -29px; position: relative; z-index: 20;">
-                                                <div class="rounded-circle js-timeline-dot {% if event.is_written %}bg-primary{% else %}border border-dashed border-secondary{% endif %}" style="width: 10px; height: 10px;"></div>
-                                            </div>
-
-                                            <!-- Card -->
-                                            <div class="flex-grow-1 bg-white border rounded-3 p-3 shadow-sm hover-shadow-lg transition">
-                                                <div class="d-flex justify-content-between align-items-start mb-1">
-                                                    <span class="text-[10px] font-bold uppercase tracking-wider text-muted">
-                                                        {% if event.chapter %}Chapter {{ event.chapter.chapter_number }}{% else %}{{ event.story_date|upper|default:"Planned" }}{% endif %}
-                                                    </span>
-                                                </div>
-                                                <h6 class="m-0 fw-bold text-dark" style="font-size: 0.9rem;">
-                                                    <a href="{% url 'event_detail' event.pk %}" class="text-dark text-decoration-none hover-primary">
-                                                        {{ event.title }}
-                                                    </a>
-                                                </h6>
-                                                {% if event.description %}
-                                                <p class="text-muted m-0 mt-2 line-clamp-2" style="font-size: 0.8rem; line-height: 1.4;" title="{{ event.description }}">
-                                                    {{ event.description }}
-                                                </p>
-                                                {% endif %}
-                                            </div>
+                            {% if events %}
+                                {% for event in events %}
+                                <div class="timeline-event d-flex gap-3">
+                                    <div class="timeline-line"></div>
+                                    <div class="timeline-pill {% if event.is_written %}written{% endif %} shadow-sm">
+                                        {{ forloop.counter }}
+                                    </div>
+                                    <div class="flex-grow-1 bg-white border rounded-3 p-3 shadow-sm hover-shadow-lg transition">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 class="m-0 fw-bold text-dark" style="font-size: 0.9rem;">{{ event.title|truncatechars:35 }}</h6>
+                                            <span class="badge bg-light text-muted border" style="font-size: 0.65rem;">CH {% if event.chapter %}{{ event.chapter.chapter_number }}{% else %}-{% endif %}</span>
                                         </div>
+                                        <p class="text-muted m-0" style="font-size: 0.8rem; line-height: 1.4;">{{ event.description|truncatechars:70 }}</p>
                                     </div>
-                                    {% endfor %}
-                                {% else %}
-                                    <div class="text-center py-5 text-muted">
-                                        <i class="bi bi-calendar-x fs-1 opacity-25 mb-3 d-block"></i>
-                                        <span class="uppercase tracking-widest fw-bold" style="font-size: 0.7rem;">Not assigned to any plot events</span>
-                                    </div>
-                                {% endif %}
-                            </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="text-center py-5 text-muted">
+                                    <i class="bi bi-calendar-x fs-1 opacity-25 mb-3 d-block"></i>
+                                    <span class="uppercase tracking-widest fw-bold" style="font-size: 0.7rem;">Not assigned to any plot events</span>
+                                </div>
+                            {% endif %}
+                            
                         </div>
                         <div class="card-footer bg-white border-top text-center py-3">
                             <span class="badge bg-primary bg-opacity-10 text-primary uppercase tracking-widest p-2">Total Apperances: {{ events.count }}</span>
@@ -585,8 +631,37 @@
             });
         }
 
+        // Avatar Picker
+        const avatarOptions = document.querySelectorAll('.avatar-option');
         const avatarIdInput = document.querySelector('input[name="avatar_id"]');
         const imageInput = document.querySelector('input[name="profile_image"]');
+        
+        avatarOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                avatarOptions.forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+                
+                if (avatarIdInput) avatarIdInput.value = id;
+                
+                const img = this.querySelector('img');
+                const preview = document.getElementById('profilePreview');
+                const placeholder = document.getElementById('profilePlaceholder');
+                
+                if (img && (preview || placeholder)) {
+                    if (preview) {
+                        preview.src = img.src;
+                    } else {
+                        const newPreview = document.createElement('img');
+                        newPreview.id = 'profilePreview';
+                        newPreview.src = img.src;
+                        newPreview.className = 'portrait-img';
+                        placeholder.parentNode.replaceChild(newPreview, placeholder);
+                    }
+                    if (imageInput) imageInput.value = '';
+                }
+            });
+        });
 
         // Profile File Input
         if (imageInput) {
@@ -606,6 +681,7 @@
                             placeholder.parentNode.replaceChild(newPreview, placeholder);
                         }
                         
+                        avatarOptions.forEach(opt => opt.classList.remove('selected'));
                         if (avatarIdInput) avatarIdInput.value = '';
                     }
                     reader.readAsDataURL(this.files[0]);
@@ -613,56 +689,10 @@
             });
         }
 
-        // Timeline Scroll Progress Logic
-        const timelineContainer = document.getElementById('timeline-container-sidebar');
-        const eventItems = document.querySelectorAll('.event-item');
-        const progressLine = document.getElementById('timeline-progress-line');
-
-        function updateTimelineScroll() {
-            if (!timelineContainer || !progressLine || eventItems.length === 0) return;
-            
-            const screenMiddle = window.innerHeight / 2;
-            let lastActiveIndex = 0; 
-            
-            eventItems.forEach((item, index) => {
-                const rect = item.getBoundingClientRect();
-                const node = item.querySelector('.js-timeline-node');
-                const dot = item.querySelector('.js-timeline-dot');
-                
-                if (rect.top <= screenMiddle) {
-                    lastActiveIndex = index;
-                    if(node){
-                        node.classList.remove('border-light');
-                        node.classList.add('border-primary');
-                    }
-                    if(dot){
-                        dot.style.backgroundColor = 'var(--char-accent)';
-                        dot.classList.add('bg-primary');
-                        dot.classList.remove('border-dashed');
-                        dot.classList.remove('border-secondary');
-                    }
-                } else {
-                    if(node && index > 0){
-                        node.classList.add('border-light');
-                        node.classList.remove('border-primary');
-                    }
-                }
-            });
-
-            // Update line height
-            const activeItem = eventItems[lastActiveIndex];
-            if (activeItem) {
-                const activeNode = activeItem.querySelector('.js-timeline-node');
-                const containerRect = timelineContainer.getBoundingClientRect();
-                const nodeRect = activeNode.getBoundingClientRect();
-                const relativeTop = nodeRect.top - containerRect.top;
-                progressLine.style.height = `${Math.max(0, relativeTop + 12)}px`;
-            }
-        }
-
-        window.addEventListener('scroll', updateTimelineScroll);
-        timelineContainer.addEventListener('scroll', updateTimelineScroll);
-        updateTimelineScroll();
     });
 </script>
 {% endblock %}
+"""
+
+with open("c:\\Users\\denni\\OneDrive\\Documents\\Vs projects\\Story-timeline-builder\\Story-timeline-builder-1\\templates\\timeline\\character_detail.html", "w", encoding="utf-8") as f:
+    f.write(content)
