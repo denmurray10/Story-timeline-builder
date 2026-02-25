@@ -55,16 +55,54 @@
     <div class="flex justify-end gap-4 mb-8">
 
         <!-- Right Filters -->
-        <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
-            <div class="relative group">
-                <select id="roleFilter" class="appearance-none bg-white dark:bg-card-dark border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 py-2 pl-4 pr-10 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer shadow-sm">
+        <div class="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto justify-between md:justify-end">
+            <!-- Book/Series Filter -->
+            <div class="relative group w-full md:w-auto">
+                <select id="bookFilter" class="appearance-none !bg-none bg-white dark:bg-card-dark border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 py-2.5 pl-5 pr-12 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer shadow-sm hover:shadow-md transition-all w-full md:min-w-[200px]">
+                    <option value="">All Books & Series</option>
+                    {% if series_list %}
+                    <optgroup label="Series">
+                        {% for series in series_list %}
+                        {% with s_id=series.pk|stringformat:"s" %}
+                        {% with s_val="series-"|add:s_id %}
+                        <option value="{{ s_val }}" {% if selected_book == s_val %}selected{% endif %}>{{ series.title }}</option>
+                        {% endwith %}
+                        {% endwith %}
+                        {% endfor %}
+                    </optgroup>
+                    {% endif %}
+                    <optgroup label="Books">
+                        {% for series in series_list %}
+                            {% for book in series.books.all %}
+                            {% with b_id=book.pk|stringformat:"s" %}
+                            {% with b_val="book-"|add:b_id %}
+                            <option value="{{ b_val }}" {% if selected_book == b_val %}selected{% endif %}>{{ book.title }}</option>
+                            {% endwith %}
+                            {% endwith %}
+                            {% endfor %}
+                        {% endfor %}
+                        {% for book in standalone_books %}
+                        {% with b_id=book.pk|stringformat:"s" %}
+                        {% with b_val="book-"|add:b_id %}
+                        <option value="{{ b_val }}" {% if selected_book == b_val %}selected{% endif %}>{{ book.title }}</option>
+                        {% endwith %}
+                        {% endwith %}
+                        {% endfor %}
+                    </optgroup>
+                </select>
+                <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-[20px]">expand_more</span>
+            </div>
+
+            <!-- Role Filter -->
+            <div class="relative group w-full md:w-auto">
+                <select id="roleFilter" class="appearance-none !bg-none bg-white dark:bg-card-dark border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 py-2.5 pl-5 pr-12 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer shadow-sm hover:shadow-md transition-all w-full md:min-w-[200px]">
                     <option value="">All Roles</option>
                     <option value="protagonist" {% if selected_role == 'protagonist' %}selected{% endif %}>Protagonists</option>
                     <option value="antagonist" {% if selected_role == 'antagonist' %}selected{% endif %}>Antagonists</option>
                     <option value="supporting" {% if selected_role == 'supporting' %}selected{% endif %}>Supporting</option>
                     <option value="minor" {% if selected_role == 'minor' %}selected{% endif %}>Minor</option>
                 </select>
-                <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-[18px]">expand_more</span>
+                <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-[20px]">expand_more</span>
             </div>
             <div class="flex bg-white dark:bg-card-dark rounded-lg p-1 border border-slate-200 dark:border-slate-700 shadow-sm hidden">
                 <button class="p-1.5 rounded-md bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm">
@@ -164,16 +202,27 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        const updateParams = function(paramKey, value) {
+            const url = new URL(window.location.href);
+            if (value) {
+                url.searchParams.set(paramKey, value);
+            } else {
+                url.searchParams.delete(paramKey);
+            }
+            window.location.href = url.toString();
+        };
+
         const roleFilter = document.getElementById('roleFilter');
         if (roleFilter) {
             roleFilter.addEventListener('change', function() {
-                const url = new URL(window.location.href);
-                if (this.value) {
-                    url.searchParams.set('role', this.value);
-                } else {
-                    url.searchParams.delete('role');
-                }
-                window.location.href = url.toString();
+                updateParams('role', this.value);
+            });
+        }
+
+        const bookFilter = document.getElementById('bookFilter');
+        if (bookFilter) {
+            bookFilter.addEventListener('change', function() {
+                updateParams('book', this.value);
             });
         }
     });

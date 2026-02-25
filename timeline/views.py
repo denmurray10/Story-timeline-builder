@@ -2165,13 +2165,37 @@ def character_list(request):
         event_count=Count('events')
     )
     
+    series_list = Series.objects.filter(user=request.user).prefetch_related('books')
+    books = Book.objects.filter(user=request.user, series__isnull=True)
+    
     selected_role = request.GET.get('role', '')
+    selected_book = request.GET.get('book', '')
+    
     if selected_role:
         characters = characters.filter(role=selected_role)
         
+    if selected_book:
+        if selected_book.startswith('series-'):
+            s_id = selected_book.replace('series-', '')
+            characters = characters.filter(
+                Q(introduction_book__series_id=s_id) | 
+                Q(events__book__series_id=s_id) |
+                Q(pov_events__book__series_id=s_id)
+            ).distinct()
+        elif selected_book.startswith('book-'):
+            b_id = selected_book.replace('book-', '')
+            characters = characters.filter(
+                Q(introduction_book_id=b_id) | 
+                Q(events__book_id=b_id) |
+                Q(pov_events__book_id=b_id)
+            ).distinct()
+        
     return render(request, 'timeline/character_list.html', {
         'characters': characters,
-        'selected_role': selected_role
+        'selected_role': selected_role,
+        'selected_book': selected_book,
+        'series_list': series_list,
+        'standalone_books': books,
     })
 
 
