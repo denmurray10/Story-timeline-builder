@@ -2276,25 +2276,6 @@ def character_create(request):
 
 
 @login_required
-def character_edit(request, pk):
-    """Edit an existing character."""
-    character = get_object_or_404(Character, pk=pk, user=request.user)
-    if request.method == 'POST':
-        form = CharacterForm(request.POST, request.FILES, instance=character, user=request.user)
-        if form.is_valid():
-            form.save()
-            messages.success(request, f'Character "{character.name}" updated successfully!')
-            return redirect('character_detail', pk=character.pk)
-    else:
-        form = CharacterForm(instance=character, user=request.user)
-    return render(request, 'timeline/character_form.html', {
-        'form': form,
-        'action': 'Edit',
-        'character': character
-    })
-
-
-@login_required
 def character_delete(request, pk):
     """Delete a character."""
     character = get_object_or_404(Character, pk=pk, user=request.user)
