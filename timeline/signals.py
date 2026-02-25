@@ -66,3 +66,18 @@ def log_delete_activity(sender, instance, **kwargs):
             model_name=model_name,
             object_name=object_name
         )
+
+from django.contrib.auth.models import User
+from .utils.demo_data import clone_demo_data_for_user
+
+@receiver(post_save, sender=User)
+def create_demo_data(sender, instance, created, **kwargs):
+    """
+    When a new user is created, copy the demo 'Alice in Wonderland' data to their account.
+    """
+    if created and instance.id != 1:  # Protect the original demo/admin user
+        try:
+            clone_demo_data_for_user(instance, source_book_id=1)
+        except Exception as e:
+            # We don't want a failure here to completely break user signup
+            print(f"Error copying demo book for {instance}: {e}")
