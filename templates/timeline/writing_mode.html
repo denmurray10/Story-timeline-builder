@@ -135,6 +135,28 @@
     }
     .bubble-btn:hover { color: white; background: rgba(255,255,255,0.1); }
     .bubble-divider { width: 1px; height: 16px; background: rgba(255,255,255,0.1); margin: 0 4px; }
+
+    /* SortableJS refined styles (Dashboard Match) */
+    .sortable-ghost { 
+        opacity: 0.4; 
+        border: 2px dashed #3b82f6 !important; 
+        background: rgba(59, 130, 246, 0.05) !important;
+        border-radius: 1rem !important;
+    }
+    .drag-handle { 
+        cursor: grab !important; 
+        color: #94a3b8; 
+        transition: all 0.2s; 
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .group:hover .drag-handle { 
+        color: #3b82f6; 
+    }
+    .drag-handle:active { 
+        cursor: grabbing !important; 
+    }
 </style>
 {% endblock %}
 
@@ -143,67 +165,35 @@
     <!-- Main Container Card (Now Full Screen) -->
     <div class="w-full h-full bg-white dark:bg-[#1a2c2e] flex flex-col relative overflow-hidden">
         
-        <!-- Header / Toolbar Area -->
-        <header class="h-16 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between px-6 bg-white dark:bg-[#1a2c2e] z-20">
-            <!-- Left: Status Strip -->
-            <div class="flex items-center gap-2 text-sm">
-                <span class="font-medium text-text-muted">DRAFT V2.4</span>
-                <span class="text-slate-300 dark:text-slate-600">/</span>
-                <span class="font-medium text-text-muted">CH_{{ chapter.chapter_number }}</span>
-                <span class="text-slate-300 dark:text-slate-600">/</span>
-                <span class="font-bold text-primary dark:text-primary">SCENE_01</span>
-            </div>
-
-            <!-- Center: Rich Text Toolbar (Stylized) -->
-            <div class="flex items-center gap-1 bg-background-light dark:bg-background-dark px-2 py-1.5 rounded-full border border-slate-200 dark:border-slate-700">
-                <button class="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full text-slate-600 dark:text-slate-300 transition-colors" onclick="applyMagic('bold')">
-                    <span class="material-symbols-outlined text-[20px]">format_bold</span>
-                </button>
-                <button class="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full text-slate-600 dark:text-slate-300 transition-colors" onclick="applyMagic('italic')">
-                    <span class="material-symbols-outlined text-[20px]">format_italic</span>
-                </button>
-                <button class="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full text-slate-600 dark:text-slate-300 transition-colors" onclick="applyMagic('underline')">
-                    <span class="material-symbols-outlined text-[20px]">format_underlined</span>
-                </button>
-                <div class="w-px h-4 bg-slate-300 dark:bg-slate-600 mx-1"></div>
-                <button class="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full text-slate-600 dark:text-slate-300 transition-colors">
-                    <span class="material-symbols-outlined text-[20px]">format_align_left</span>
-                </button>
-                <div class="w-px h-4 bg-slate-300 dark:bg-slate-600 mx-1"></div>
-                <!-- Font Selector -->
-                <div class="relative group">
-                    <button class="flex items-center gap-1 px-3 py-1.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full text-sm font-medium text-slate-700 dark:text-slate-200 transition-colors">
-                        Noto Serif
-                        <span class="material-symbols-outlined text-[16px]">expand_more</span>
-                    </button>
+        <!-- Mockup Style Title Bars -->
+        <header id="mac-title-bar" class="h-8 bg-white dark:bg-black border-b border-slate-200 dark:border-white/5 flex items-center px-4 gap-1.5 shrink-0 z-50 transition-all duration-300">
+            <div class="w-2.5 h-2.5 rounded-full bg-red-400/50"></div>
+            <div class="w-2.5 h-2.5 rounded-full bg-yellow-400/50"></div>
+            <div class="w-2.5 h-2.5 rounded-full bg-green-400/50"></div>
+            <div class="mx-auto text-[9px] text-slate-400 font-bold tracking-[0.2em] uppercase">STORY TIMELINE BUILDER — WRITING MODE</div>
+        </header>
+        <div id="editor-sub-header" class="h-10 flex items-center justify-between px-8 border-b border-slate-200/50 dark:border-white/5 shrink-0 bg-white dark:bg-black z-40 transition-all duration-300">
+            <div class="text-[10px] font-bold text-slate-400 tracking-[0.2em] uppercase">Draft v2.4 / ch_{{ chapter.chapter_number }} / scene_01</div>
+            <div class="flex gap-4 items-center">
+                <div class="flex items-center gap-3 pr-4 border-r border-slate-100 dark:border-white/5">
+                    <button class="p-1 px-3 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 rounded-full text-[10px] font-bold text-slate-500 transition-colors" onclick="window.location.href='{% url 'dashboard' %}'">EXIT</button>
+                </div>
+                <div class="text-[9px] font-bold text-blue-500/60 tracking-wider">SYNC ACTIVE</div>
+                <div class="h-1.5 w-12 bg-blue-100 dark:bg-blue-900/30 rounded-full overflow-hidden relative">
+                    <div class="absolute inset-y-0 left-0 w-full bg-blue-500 animate-pulse"></div>
                 </div>
             </div>
-
-            <!-- Right: AI Toggle & Actions -->
-            <div class="flex items-center gap-4">
-                <button class="flex items-center gap-2 bg-accent-green/10 text-accent-green px-4 py-1.5 rounded-full border border-accent-green/20 hover:bg-accent-green/20 transition-colors" id="btn-save-manuscript">
-                    <span class="material-symbols-outlined text-[18px]">save</span>
-                    <span class="text-xs font-bold tracking-wider">SAVE</span>
-                </button>
-                <button class="flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full border border-primary/20 hover:bg-primary/20 transition-colors" onclick="toggleDrawer('ghostwriter')">
-                    <span class="material-symbols-outlined text-[18px] fill-current">smart_toy</span>
-                    <span class="text-xs font-bold tracking-wider">PENN AI</span>
-                </button>
-                <button class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-500 transition-colors" onclick="window.location.href='{% url 'dashboard' %}'">
-                    <span class="material-symbols-outlined">exit_to_app</span>
-                </button>
-            </div>
-        </header>
+        </div>
 
         <!-- Main Workspace -->
-        <div class="flex flex-1 overflow-hidden relative">
+        <div class="flex flex-1 overflow-hidden relative bg-[#F2F0EB] dark:bg-[#121212]">
             <!-- Left Navigation Rail (Story OS Production Bar) - Exact Mockup Style -->
-            <nav class="w-14 border-r border-slate-100 dark:border-slate-700 flex flex-col items-center py-4 gap-4 bg-white dark:bg-[#1a2c2e] z-10">
-                <div class="group relative cursor-pointer" onclick="window.location.href='{% url 'world_list' %}'">
+            <nav class="w-14 border-r border-slate-200 dark:border-white/5 flex flex-col items-center py-4 gap-4 bg-white dark:bg-black z-10">
+                <div class="group relative cursor-pointer" onclick="toggleDrawer('world')">
                     <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors" title="Story Bible">
                         <span class="material-symbols-outlined text-[20px]">menu_book</span>
                     </button>
-                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Codex Wiki</div>
+                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Story Bible</div>
                 </div>
 
                 <div class="group relative cursor-pointer">
@@ -214,14 +204,14 @@
                     <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Active Draft</div>
                 </div>
 
-                <div class="group relative cursor-pointer" onclick="window.location.href='{% url 'horizontal_timeline' %}'">
+                <div class="group relative cursor-pointer" onclick="toggleDrawer('history')">
                     <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors" title="Draft Management">
                         <span class="material-symbols-outlined text-[20px]">history</span>
                     </button>
                     <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Version History</div>
                 </div>
 
-                <div class="group relative cursor-pointer">
+                <div class="group relative cursor-pointer" onclick="toggleDrawer('audit')">
                     <button class="p-2 text-slate-400 hover:text-amber-500 transition-colors" title="Manuscript Health">
                         <span class="material-symbols-outlined text-[20px]">fact_check</span>
                     </button>
@@ -235,11 +225,11 @@
                     <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Team Access</div>
                 </div>
 
-                <div class="group relative cursor-pointer">
+                <div class="group relative cursor-pointer" onclick="toggleDrawer('reference')">
                     <button class="p-2 text-slate-400 hover:text-purple-500 transition-colors" title="Snippets">
                         <span class="material-symbols-outlined text-[20px]">collections_bookmark</span>
                     </button>
-                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Scrapbook</div>
+                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Reference Stitch</div>
                 </div>
 
                 <div class="group relative cursor-pointer">
@@ -273,135 +263,389 @@
                 </div>
             </nav>
 
+            <!-- LEFT DRAWER STACK -->
+            <div id="left-drawer-stack" class="flex h-full shrink-0 items-start transition-all duration-300">
+                <!-- Codex Drawer -->
+                <aside id="drawer-world" class="w-0 overflow-hidden transition-all duration-300 flex flex-col h-full bg-transparent">
+                    <div class="w-64 flex flex-col h-full">
+                        <div class="p-4 flex items-center justify-between">
+                            <h2 class="text-[10px] font-black tracking-widest uppercase text-slate-400 opacity-60">Story Bible</h2>
+                            <button onclick="toggleDrawer('world')" class="p-1 hover:bg-black/5 dark:hover:bg-white/5 rounded transition-colors">
+                                <span class="material-symbols-outlined text-sm text-slate-400">close</span>
+                            </button>
+                        </div>
+                        <div class="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar">
+                            <div class="p-4 bg-white dark:bg-slate-900 rounded-2xl shadow-md border border-slate-200/50 dark:border-white/10">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="material-symbols-outlined text-blue-500 text-sm">globe</span>
+                                    <span class="text-[10px] font-bold uppercase tracking-tight text-slate-500">World Setting</span>
+                                </div>
+                                <h4 class="text-xs font-bold mb-1">Aethelgard</h4>
+                                <p class="text-[10px] text-slate-500 line-clamp-2">The floating kingdom of the sky-reachers, built upon the bones of ancient giants.</p>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Audit Drawer -->
+                <aside id="drawer-audit" class="w-0 overflow-hidden transition-all duration-300 flex flex-col h-full bg-transparent">
+                    <div class="w-64 flex flex-col h-full">
+                        <div class="p-4 flex items-center justify-between">
+                            <h2 class="text-[10px] font-black tracking-widest uppercase text-slate-400 opacity-60">Manuscript Health</h2>
+                            <button onclick="toggleDrawer('audit')" class="p-1 hover:bg-black/5 dark:hover:bg-white/5 rounded transition-colors">
+                                <span class="material-symbols-outlined text-sm text-slate-400">close</span>
+                            </button>
+                        </div>
+                        <div class="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar">
+                            <div class="p-4 bg-white dark:bg-slate-900 rounded-2xl shadow-md border border-slate-200/50 dark:border-white/10">
+                                <h4 class="text-xs font-bold mb-3">Health Score: 94%</h4>
+                                <div class="space-y-2">
+                                    <div class="flex justify-between text-[9px] font-bold uppercase text-slate-400">
+                                        <span>Pacing</span>
+                                        <span class="text-emerald-500">Excellent</span>
+                                    </div>
+                                    <div class="w-full h-1 bg-slate-100 rounded-full overflow-hidden">
+                                        <div class="bg-emerald-500 h-full w-[90%]"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- History Drawer -->
+                <aside id="drawer-history" class="w-0 overflow-hidden transition-all duration-300 flex flex-col h-full bg-transparent">
+                    <div class="w-64 flex flex-col h-full">
+                        <div class="p-4 flex items-center justify-between">
+                            <h2 class="text-[10px] font-black tracking-widest uppercase text-slate-400 opacity-60">Version History</h2>
+                            <button onclick="toggleDrawer('history')" class="p-1 hover:bg-black/5 dark:hover:bg-white/5 rounded transition-colors">
+                                <span class="material-symbols-outlined text-sm text-slate-400">close</span>
+                            </button>
+                        </div>
+                        <div class="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar">
+                            <div class="border-l-2 border-blue-500/30 pl-4 py-1 space-y-4">
+                                <div class="relative">
+                                    <div class="absolute -left-[21px] top-1 w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
+                                    <div class="text-[10px] font-bold text-slate-700 dark:text-slate-300">Draft v2.4 (Current)</div>
+                                    <div class="text-[9px] text-slate-400 italic">2 minutes ago</div>
+                                </div>
+                                <div class="relative opacity-60">
+                                    <div class="absolute -left-[21px] top-1 w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-700"></div>
+                                    <div class="text-[10px] font-bold text-slate-600">Draft v2.3</div>
+                                    <div class="text-[9px] text-slate-400">1 hour ago</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Reference Stitch Drawer -->
+                <aside id="drawer-reference" class="w-0 overflow-hidden transition-all duration-300 flex flex-col h-full bg-transparent">
+                    <div class="w-64 flex flex-col h-full">
+                        <div class="p-4 flex items-center justify-between">
+                            <h2 class="text-[10px] font-black tracking-widest uppercase text-slate-400 opacity-60">Reference Stitch</h2>
+                            <button onclick="toggleDrawer('reference')" class="p-1 hover:bg-black/5 dark:hover:bg-white/5 rounded transition-colors">
+                                <span class="material-symbols-outlined text-sm text-slate-400">close</span>
+                            </button>
+                        </div>
+                        <div id="stitch-zone" class="flex-1 overflow-y-auto p-3 space-y-4 no-scrollbar min-h-[200px] pointer-events-auto">
+                            <!-- Draggable Demo Cards -->
+                            <div class="p-3 bg-white dark:bg-white/5 border border-slate-200/50 dark:border-white/10 rounded-xl group relative shadow-md hover:shadow-lg transition-shadow">
+                                <!-- Dashboard Style Drag Handle -->
+                                <div class="absolute top-3 left-3 drag-handle">
+                                    <i class="bi bi-grip-vertical text-[20px]"></i>
+                                </div>
+                                <div class="flex items-center gap-2 mb-2 pl-8">
+                                    <div class="w-2 h-2 rounded-full bg-blue-500"></div>
+                                    <span class="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">CHARACTER: ELARA</span>
+                                </div>
+                                <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed italic pl-8">"The last of the star-callers. Driven by the prophecy of the falling sky."</p>
+                            </div>
+
+                            <div class="p-3 bg-white dark:bg-white/5 border border-slate-200/50 dark:border-white/10 rounded-xl group relative shadow-md hover:shadow-lg transition-shadow">
+                                <!-- Dashboard Style Drag Handle -->
+                                <div class="absolute top-3 left-3 drag-handle">
+                                    <i class="bi bi-grip-vertical text-[20px]"></i>
+                                </div>
+                                <div class="flex items-center gap-2 mb-2 pl-8">
+                                    <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+                                    <span class="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">LORE: THE VOID-WEAVE</span>
+                                </div>
+                                <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed pl-8">A fabric made of condensed shadows. Used to bind the Great Serpent.</p>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+
             <!-- Center: Writing Canvas -->
-            <main class="flex-1 overflow-y-auto bg-white dark:bg-[#1a2c2e] relative scroll-smooth no-scrollbar">
-                <div class="max-w-[1000px] mx-auto pt-16 pb-32 px-12">
-                    <h1 class="text-4xl font-display font-bold text-text-main dark:text-white mb-8 leading-tight">{{ chapter.title }}</h1>
-                    <div id="writing-editor" class="writing-area font-display text-lg text-slate-700 dark:text-slate-300">
-                        {{ chapter.content|safe }}
+            <main class="flex-1 overflow-y-auto relative scroll-smooth no-scrollbar">
+                <!-- Writing Pill (Hero Feature) -->
+                <div id="writing-pill-container" class="absolute inset-x-0 top-[40px] flex justify-center pointer-events-none z-50 transition-all duration-500">
+                    <div id="writing-pill" class="pointer-events-auto h-11 flex items-center gap-4 px-6 bg-white dark:bg-slate-900 rounded-full shadow-2xl border border-slate-100 dark:border-white/5 whitespace-nowrap transition-all duration-300">
+                        <!-- STAGE 1: Standard Tools -->
+                        <div id="pill-standard-tools" class="flex items-center gap-4 h-full">
+                            <div class="flex items-center gap-3 pr-4 border-r border-slate-100 dark:border-white/5 h-6">
+                                <button class="text-[11px] font-bold text-slate-700 dark:text-slate-300">Noto Serif</button>
+                                <span class="material-symbols-outlined text-[16px] text-slate-400">expand_more</span>
+                            </div>
+                            <div class="flex items-center gap-3 pr-4 border-r border-slate-100 dark:border-slate-800 h-6">
+                                <button onclick="applyMagic('bold')" class="material-symbols-outlined text-[18px] text-slate-400 hover:text-blue-500 transition-colors">format_bold</button>
+                                <button onclick="applyMagic('italic')" class="material-symbols-outlined text-[18px] text-slate-400 hover:text-blue-500 transition-colors">format_italic</button>
+                                <button onclick="applyMagic('underline')" class="material-symbols-outlined text-[18px] text-slate-400 hover:text-blue-500 transition-colors">format_underlined</button>
+                            </div>
+                            <!-- Penn Launcher -->
+                            <button onclick="switchPillState('ai-main')" class="flex items-center gap-2 text-emerald-600 hover:text-emerald-700 transition-colors group">
+                                <span class="material-symbols-outlined text-[18px] group-hover:rotate-12 transition-transform">history_edu</span>
+                                <span class="text-[10px] font-black tracking-widest uppercase">Penn</span>
+                            </button>
+                        </div>
+
+                        <!-- STAGE 2: AI Main Menu -->
+                        <div id="pill-ai-main" class="hidden items-center gap-4 h-full animate-in fade-in slide-in-from-bottom-2 duration-300">
+                            <button onclick="switchPillState('standard-tools')" class="p-1 rounded-lg bg-slate-50 dark:bg-white/5 text-slate-400 hover:text-slate-600 transition-colors">
+                                <span class="material-symbols-outlined text-sm">arrow_back</span>
+                            </button>
+                            <div class="flex items-center gap-2">
+                                <button onclick="switchPillState('ai-drafting')" class="px-3 py-1 rounded-lg bg-emerald-600 text-white text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-emerald-700 shadow-sm transition-all whitespace-nowrap">Drafting</button>
+                                <button onclick="switchPillState('ai-refine')" class="px-3 py-1 rounded-lg border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 transition-all whitespace-nowrap">Refine</button>
+                                <button onclick="switchPillState('ai-analysis')" class="px-3 py-1 rounded-lg border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 transition-all whitespace-nowrap">Analysis</button>
+                            </div>
+                        </div>
+
+                        <!-- STAGE 3: AI Drafting Sub-Menu -->
+                        <div id="pill-ai-drafting" class="hidden items-center gap-3 h-full animate-in fade-in slide-in-from-right-2 duration-300">
+                            <button onclick="switchPillState('ai-main')" class="p-1 rounded-lg bg-slate-50 dark:bg-white/5 text-slate-400 hover:text-slate-600 transition-colors">
+                                <span class="material-symbols-outlined text-sm">arrow_back</span>
+                            </button>
+                            <div class="flex items-center gap-2">
+                                <button onclick="applyMagic('improve')" class="px-3 py-1 rounded-lg border border-blue-200 bg-blue-50 text-blue-600 text-[10px] font-bold tracking-widest uppercase hover:bg-blue-100 shadow-sm transition-all">Guided Draft</button>
+                                <button class="px-3 py-1 rounded-lg border border-slate-100 text-slate-600 text-[10px] font-bold tracking-widest uppercase hover:bg-slate-50 transition-all">Expand</button>
+                                <button class="px-3 py-1 rounded-lg border border-slate-100 text-slate-600 text-[10px] font-bold tracking-widest uppercase hover:bg-slate-50 transition-all">Dialogue</button>
+                            </div>
+                        </div>
+
+                        <!-- STAGE 4: AI Refine Sub-Menu -->
+                        <div id="pill-ai-refine" class="hidden items-center gap-3 h-full animate-in fade-in slide-in-from-right-2 duration-300">
+                            <button onclick="switchPillState('ai-main')" class="p-1 rounded-lg bg-slate-50 dark:bg-white/5 text-slate-400 hover:text-slate-600 transition-colors">
+                                <span class="material-symbols-outlined text-sm">arrow_back</span>
+                            </button>
+                            <div class="flex items-center gap-2">
+                                <button class="px-3 py-1 rounded-lg border border-slate-100 text-slate-600 text-[10px] font-bold tracking-widest uppercase hover:bg-slate-50 transition-all">Show Don't Tell</button>
+                                <button class="px-3 py-1 rounded-lg border border-slate-100 text-slate-600 text-[10px] font-bold tracking-widest uppercase hover:bg-slate-50 transition-all">Sensory Detail</button>
+                            </div>
+                        </div>
+
+                        <!-- STAGE 5: AI Analysis Sub-Menu -->
+                        <div id="pill-ai-analysis" class="hidden items-center gap-3 h-full animate-in fade-in slide-in-from-right-2 duration-300">
+                            <button onclick="switchPillState('ai-main')" class="p-1 rounded-lg bg-slate-50 dark:bg-white/5 text-slate-400 hover:text-slate-600 transition-colors">
+                                <span class="material-symbols-outlined text-sm">arrow_back</span>
+                            </button>
+                            <div class="flex items-center gap-2">
+                                <button class="px-3 py-1 rounded-lg border border-slate-100 text-slate-600 text-[10px] font-bold tracking-widest uppercase hover:bg-slate-50 transition-all">Pacing Pulse</button>
+                                <button class="px-3 py-1 rounded-lg border border-slate-100 text-slate-600 text-[10px] font-bold tracking-widest uppercase hover:bg-slate-50 transition-all">Continuity</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Floating Sidebar Drawers -->
-                <div id="drawer-ghostwriter" class="absolute top-0 right-0 h-full w-80 bg-white dark:bg-[#1f3638] border-l border-slate-100 dark:border-slate-700 transform translate-x-full transition-transform duration-300 shadow-2xl z-30 flex flex-col p-6">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="font-bold text-text-main dark:text-white">Penn Assistant</h3>
-                        <button onclick="toggleDrawer('ghostwriter')" class="text-slate-400 hover:text-slate-600"><span class="material-symbols-outlined">close</span></button>
-                    </div>
-                    <div class="flex-1 overflow-y-auto mb-4 space-y-4 text-sm" id="ghostwriter-messages">
-                        <div class="p-3 bg-primary/5 dark:bg-primary/10 rounded-xl">
-                            Hello! I'm Penn. How can I help with Chapter {{ chapter.chapter_number }}?
+                <div class="max-w-[1000px] mx-auto flex gap-12 pt-28 pb-32 px-12 relative">
+                    <!-- Marker Gutter (Hero Feature - Hidden until AI integration) -->
+                    <div class="w-8 shrink-0 flex flex-col items-center pt-24 gap-6 opacity-30 hover:opacity-100 transition-opacity hidden">
+                        <div class="w-1 h-48 bg-slate-300 dark:bg-white/10 rounded-full relative">
+                            <div class="absolute top-[20%] left-0 w-full h-8 bg-red-400 rounded-full cursor-help" title="Plot Hole detected"></div>
+                            <div class="absolute top-[60%] left-0 w-full h-4 bg-blue-400 rounded-full cursor-help" title="Character Note"></div>
                         </div>
+                        <span class="material-symbols-outlined text-slate-300 text-[20px]">expand_more</span>
                     </div>
-                    <div class="relative">
-                        <input type="text" id="ghostwriter-input" class="w-full bg-background-light dark:bg-background-dark border-none rounded-xl py-3 px-4 text-sm focus:ring-2 focus:ring-primary" placeholder="Ask Penn..." onkeypress="if(event.key === 'Enter') sendToGhostwriter()">
-                        <button class="absolute right-2 top-1.5 p-1.5 text-primary" onclick="sendToGhostwriter()">
-                            <span class="material-symbols-outlined">send</span>
-                        </button>
-                    </div>
+
+                    <div class="flex-1 max-w-[800px]">
+                        <h1 class="text-4xl font-display font-bold text-text-main dark:text-white mb-12 leading-tight text-center">{{ chapter.title }}</h1>
+                        <div id="writing-editor" class="writing-area font-display text-lg text-slate-700 dark:text-slate-300">
+                            {{ chapter.content|safe }}
+                        </div>
                 </div>
             </main>
 
-            <!-- Right: Story Intelligence Rail (Mockup Style) -->
-            <aside class="w-14 border-l border-slate-100 dark:border-slate-700 flex flex-col items-center py-4 gap-4 bg-white dark:bg-[#1a2c2e] z-10 transition-all duration-500">
-                <!-- Tactical AI -->
-                <div class="group relative cursor-pointer" onclick="toggleDrawer('ghostwriter')" title="AI Assistant">
-                    <button class="p-2 text-emerald-500 transition-colors">
-                        <span class="material-symbols-outlined text-[20px]">history_edu</span>
-                    </button>
-                    <div class="absolute right-full mr-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Penn AI</div>
-                </div>
+            <!-- RIGHT COLLAPSIBLE DRAWER: AI Assistant -->
+            <aside id="drawer-ghostwriter" class="w-0 overflow-hidden transition-all duration-300 flex flex-col shrink-0 z-20">
+                <div class="w-80 flex flex-col h-full p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="font-bold text-text-main dark:text-white">Penn Assistant</h3>
+                        <button onclick="toggleDrawer('ghostwriter')" class="text-slate-400 hover:text-slate-600 transition-colors">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
 
-                <!-- Editorial Insights -->
-                <div class="group relative cursor-pointer" title="Insights">
-                    <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors">
-                        <span class="material-symbols-outlined text-[20px]">insights</span>
-                    </button>
-                    <div class="absolute right-full mr-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Editorial Insights</div>
-                </div>
+                    <!-- Draggable AI Card Source -->
+                    <div id="ai-card-source" class="space-y-4">
+                        <div id="penn-drawer-main" class="p-4 bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-white/10 rounded-2xl shadow-md group relative transition-all duration-300 w-full" data-type="ai-penn">
+                            <!-- Dashboard Style Drag Handle -->
+                            <div class="absolute top-4 left-3 drag-handle">
+                                <i class="bi bi-grip-vertical text-[22px]"></i>
+                            </div>
 
-                <!-- Scene Analytics -->
-                <div class="group relative cursor-pointer" title="Analytics">
-                    <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors">
-                        <span class="material-symbols-outlined text-[20px]">equalizer</span>
-                    </button>
-                    <div class="absolute right-full mr-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Scene Analytics</div>
-                </div>
+                            <div class="flex items-center justify-between gap-2 mb-3 pl-8">
+                                <div class="flex items-center gap-2 text-blue-500">
+                                    <i class="bi bi-chat-heart text-[18px]"></i>
+                                    <span class="text-[10px] font-bold tracking-wider uppercase">Ask Penn...</span>
+                                </div>
+                            </div>
+                            <div class="space-y-3 mb-4 max-h-48 overflow-y-auto no-scrollbar messages-area text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed border-b border-slate-100 dark:border-white/5 pb-3">
+                                <div class="opacity-75">Brainstorming? Character trouble? Just ask.</div>
+                            </div>
+                            <div class="relative">
+                                <div class="flex items-center gap-2 p-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-full shadow-inner focus-within:border-blue-500/50 transition-colors">
+                                    <input type="text" placeholder="Type your question..." 
+                                           class="w-full bg-transparent border-0 px-3 py-1 text-[11px] focus:outline-none focus:ring-0"
+                                           onkeypress="if(event.key === 'Enter') { event.stopPropagation(); window.sendToStitchedPenn('penn-drawer-main', this.value); }">
+                                    <button class="w-7 h-7 flex items-center justify-center bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors shadow-sm" 
+                                            onclick="event.stopPropagation(); const input = this.previousElementSibling; window.sendToStitchedPenn('penn-drawer-main', input.value)">
+                                        <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                <!-- Sticky Notes -->
-                <div class="group relative cursor-pointer" title="Comments">
-                    <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors">
-                        <span class="material-symbols-outlined text-[20px]">comment</span>
-                    </button>
-                    <div class="absolute right-full mr-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Sticky Notes</div>
+                    <div class="flex-1"></div>
+                    <p class="text-[10px] text-slate-400 text-center italic">Drag the card to the left column to keep it open while you write.</p>
                 </div>
+            </aside>
 
-                <!-- Timeline Anchors -->
-                <div class="group relative cursor-pointer" title="Timeline Anchors">
-                    <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors">
-                        <span class="material-symbols-outlined text-[20px]">anchor</span>
-                    </button>
-                    <div class="absolute right-full mr-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Timeline Anchors</div>
+            <!-- Right: Story Intelligence Rail (Production Toolbar) -->
+            <aside class="w-14 border-l border-slate-200 dark:border-white/5 flex flex-col items-center py-4 gap-4 bg-white dark:bg-black z-10 shrink-0">
+                <!-- Intelligence Source for Stitching -->
+                <div id="intelligence-rail-source" class="flex flex-col items-center gap-4">
+                    <!-- Tactical AI (Click to Open Assistant) -->
+                    <div class="group relative cursor-pointer" title="AI Assistant" onclick="toggleDrawer('ghostwriter')">
+                        <button class="p-2 text-emerald-500 transition-colors pointer-events-none">
+                            <span class="material-symbols-outlined text-[20px]">history_edu</span>
+                        </button>
+                        <div class="absolute right-full mr-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Penn AI</div>
+                    </div>
+
+                    <!-- Editorial Insights -->
+                    <div class="group relative cursor-pointer" title="Insights">
+                        <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors">
+                            <span class="material-symbols-outlined text-[20px]">insights</span>
+                        </button>
+                        <div class="absolute right-full mr-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Editorial Insights</div>
+                    </div>
+
+                    <!-- Scene Analytics -->
+                    <div class="group relative cursor-pointer" title="Analytics">
+                        <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors">
+                            <span class="material-symbols-outlined text-[20px]">equalizer</span>
+                        </button>
+                        <div class="absolute right-full mr-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Scene Analytics</div>
+                    </div>
                 </div>
 
                 <div class="flex-1"></div>
 
-                <!-- Focus Mode -->
+                <div class="group relative cursor-pointer" title="Comments">
+                    <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors">
+                        <span class="material-symbols-outlined text-[20px]">comment</span>
+                    </button>
+                    <div class="absolute right-full mr-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Comments</div>
+                </div>
+
                 <div class="group relative cursor-pointer" onclick="toggleFullScreen()" title="Focus Mode">
                     <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors">
                         <span class="material-symbols-outlined text-[20px]" id="fullscreen-icon">fullscreen</span>
                     </button>
-                    <div class="absolute right-full mr-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Focus Mode</div>
+                    <div class="absolute right-full mr-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Fullscreen</div>
                 </div>
 
-                <!-- Help -->
-                <div class="group relative cursor-pointer" title="Help">
+                <div class="group relative cursor-pointer" title="Support">
                     <button class="p-2 text-slate-300 hover:text-slate-500 transition-colors">
                         <span class="material-symbols-outlined text-[20px]">help_outline</span>
                     </button>
-                    <div class="absolute right-full mr-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Support</div>
+                    <div class="absolute right-full mr-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Help</div>
                 </div>
             </aside>
         </div>
 
         <!-- Bottom: Story Timeline Strip -->
-        <footer class="writing-footer h-14 border-t border-slate-100 dark:border-slate-700 bg-white dark:bg-[#1a2c2e] flex items-center px-6 relative z-20">
-            <div class="flex items-center gap-4 w-full">
-                <span class="text-xs font-bold text-text-muted uppercase tracking-wider mr-2">Timeline</span>
+        <footer class="writing-footer h-14 border-t border-slate-200 dark:border-white/5 bg-white dark:bg-black flex items-center px-6 relative z-20 transition-all duration-300">
+            <div class="flex items-center gap-6 w-full">
+                <div class="flex items-center gap-6 border-r border-slate-100 dark:border-white/5 pr-6 h-6">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[16px] text-slate-400">description</span>
+                        <span id="stat-total-words" class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">0 WORDS</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[16px] text-slate-400">schedule</span>
+                        <span id="stat-read-time" class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">0M READ</span>
+                    </div>
+                </div>
+
                 <div class="flex-1 relative h-8 flex items-center">
                     <!-- Timeline Line -->
-                    <div class="absolute w-full h-0.5 bg-slate-200 dark:bg-slate-700 rounded-full"></div>
+                    <div class="absolute w-full h-0.5 bg-slate-200 dark:bg-white/5 rounded-full"></div>
                     
                     <!-- Simplified Visual Timeline Markers -->
                     <div class="absolute left-[10%] -translate-x-1/2 flex flex-col items-center group cursor-pointer">
-                        <div class="w-2.5 h-2.5 rounded-full bg-slate-300 dark:bg-slate-600 group-hover:bg-primary transition-colors ring-4 ring-white dark:ring-[#1a2c2e]"></div>
-                        <span class="absolute top-4 text-[10px] text-slate-400 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">Setup</span>
-                    </div>
-                    <div class="absolute left-[25%] -translate-x-1/2 flex flex-col items-center group cursor-pointer">
-                        <div class="w-2.5 h-2.5 rounded-full bg-slate-300 dark:bg-slate-600 group-hover:bg-primary transition-colors ring-4 ring-white dark:ring-[#1a2c2e]"></div>
-                        <span class="absolute top-4 text-[10px] font-medium text-text-muted whitespace-nowrap">Inciting Incident</span>
+                        <div class="w-2.5 h-2.5 rounded-full bg-slate-300 dark:bg-slate-700 group-hover:bg-primary transition-colors ring-4 ring-white dark:ring-black"></div>
                     </div>
                     <div class="absolute left-[42%] -translate-x-1/2 flex flex-col items-center cursor-pointer z-10">
-                        <div class="w-3.5 h-3.5 rounded-full bg-primary ring-4 ring-primary/20 dark:ring-primary/30 shadow-sm"></div>
-                        <div class="absolute -top-7 bg-text-main text-white text-[10px] px-2 py-0.5 rounded-md font-medium whitespace-nowrap shadow-md">
-                            Current Scene
-                            <div class="absolute bottom-[-4px] left-1/2 -translate-x-1/2 w-2 h-2 bg-text-main rotate-45"></div>
-                        </div>
+                        <div class="w-3.5 h-3.5 rounded-full bg-blue-500 ring-4 ring-blue-500/20 shadow-sm"></div>
                     </div>
                     <div class="absolute left-[85%] -translate-x-1/2 flex flex-col items-center group cursor-pointer">
-                        <div class="w-2.5 h-2.5 rounded-full bg-slate-200 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 group-hover:border-primary transition-colors ring-4 ring-white dark:ring-[#1a2c2e]"></div>
-                        <span class="absolute top-4 text-[10px] text-slate-400 whitespace-nowrap group-hover:text-primary transition-colors">Climax</span>
+                        <div class="w-2.5 h-2.5 rounded-full bg-slate-200 dark:bg-white/5 border border-slate-300 dark:border-white/10 ring-4 ring-white dark:ring-black"></div>
                     </div>
                 </div>
-                <!-- Auth Saved Tag -->
-                <div class="flex items-center gap-2 ml-4 text-[10px] font-bold text-accent-green opacity-50">
-                    <span class="material-symbols-outlined text-sm">cloud_done</span>
-                    SYNCED
+
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2 px-3 py-1 bg-slate-50 dark:bg-white/5 rounded-full border border-slate-100 dark:border-white/5">
+                        <div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">DARK FANTASY PROSE ACTIVE</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-[9px] font-bold text-emerald-500 opacity-60">
+                        <span class="material-symbols-outlined text-[16px]">cloud_done</span>
+                        SYNCED
+                    </div>
                 </div>
             </div>
         </footer>
     </div>
 </div>
+
+<style>
+    /* Global scrollbar hiding for the Writing Pad */
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    /* AI-Ready Inline Styling */
+    .grammar-error {
+        border-bottom: 2px dotted #ef4444; /* Red 500 */
+        background-color: rgba(239, 68, 68, 0.05);
+        cursor: help;
+        transition: background-color 0.2s;
+    }
+    .grammar-error:hover {
+        background-color: rgba(239, 68, 68, 0.1);
+    }
+    .style-suggestion {
+        border-bottom: 2px dotted #3b82f6; /* Blue 500 */
+        background-color: rgba(59, 130, 246, 0.05);
+        cursor: help;
+        transition: background-color 0.2s;
+    }
+    .style-suggestion:hover {
+        background-color: rgba(59, 130, 246, 0.1);
+    }
+    .spelling-error {
+        border-bottom: 2px dotted #f59e0b; /* Amber 500 */
+        cursor: help;
+    }
+</style>
 
 <!-- Text Selection Bubble Menu -->
 <div id="bubble-menu" style="display:none; position:absolute; z-index:10000;">
@@ -421,16 +665,64 @@
 
 {% block extra_js %}
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <script>
-    // Drawer Logic
-    window.toggleDrawer = function(id) {
+    // Updated Multi-Drawer Logic
+    window.toggleDrawer = function(id, forceOpen = false) {
         const drawer = document.getElementById(`drawer-${id}`);
-        if (drawer.classList.contains('translate-x-full')) {
-            drawer.classList.remove('translate-x-full');
+        const isLeft = (id !== 'ghostwriter');
+        const widthClass = isLeft ? 'w-64' : 'w-80';
+        
+        const isOpen = drawer.classList.contains(widthClass);
+        
+        if (forceOpen || !isOpen) {
+            drawer.classList.remove('w-0');
+            drawer.classList.add(widthClass);
+            if (!isLeft) {
+                drawer.classList.add('border-l', 'border-slate-200', 'dark:border-white/5');
+            }
         } else {
-            drawer.classList.add('translate-x-full');
+            drawer.classList.add('w-0');
+            drawer.classList.remove(widthClass, 'border-l', 'border-slate-200', 'dark:border-white/5');
         }
+
+        // Apply Symmetric Cushioning to keep editor centered if possible
+        updateLayoutSymmetry();
     };
+
+    function updateLayoutSymmetry() {
+        const leftStack = document.getElementById('left-drawer-stack');
+        const rightDrawer = document.getElementById('drawer-ghostwriter');
+        const mainCanvas = document.querySelector('main');
+        
+        // Calculate Total Active Widths
+        let leftWidth = 0;
+        ['world', 'audit', 'reference', 'history'].forEach(id => {
+            const d = document.getElementById(`drawer-${id}`);
+            if (d && d.classList.contains('w-64')) leftWidth += 256;
+        });
+
+        const rightWidth = rightDrawer.classList.contains('w-80') ? 320 : 0;
+        
+        // available padding in main to keep content centered
+        // We want the editor page (max-w-[1000px]) to stay centered in the combined space
+        // Total Space = window.innerWidth - (Rails = 112)
+        const totalWorkspace = window.innerWidth - 112;
+        const editorMaxWidth = 1000;
+        const availableMargin = Math.max(0, (totalWorkspace - editorMaxWidth) / 2);
+
+        // Conditional Push: Only push if side-width > available-margin
+        const leftPush = Math.max(0, leftWidth - availableMargin);
+        const rightPush = Math.max(0, rightWidth - availableMargin);
+
+        // Apply padding to main to shift content
+        // This keeps the editor centered as long as drawers don't "touch" it
+        mainCanvas.style.paddingLeft = `${leftPush}px`;
+        mainCanvas.style.paddingRight = `${rightPush}px`;
+    }
+
+    // Initial check
+    window.addEventListener('resize', updateLayoutSymmetry);
 
     // Theme & Zen Logic
     window.toggleTheme = function() {
@@ -441,22 +733,55 @@
 
     window.toggleZenMode = function() {
         const nav = document.querySelector('nav');
-        const header = document.querySelector('header');
+        const header = document.getElementById('mac-title-bar');
+        const subheader = document.getElementById('editor-sub-header');
         const footer = document.querySelector('footer');
-        const aside = document.querySelector('aside');
+        const asideRight = document.querySelector('aside:not(#drawer-reference)');
+        const asideLeft = document.getElementById('drawer-reference');
         
+        // Hide open drawers
+        document.querySelectorAll('aside[id^="drawer-"], div[id^="drawer-"]').forEach(d => {
+            d.classList.add('w-0');
+            d.classList.remove('w-80', 'border-l', 'border-r');
+        });
+
         const isZen = document.body.classList.toggle('zen-mode-active');
         
         if (isZen) {
             nav.classList.add('hidden');
             header.classList.add('opacity-0', 'pointer-events-none');
+            subheader.classList.add('opacity-0', 'pointer-events-none');
             footer.classList.add('opacity-0', 'pointer-events-none');
-            aside.classList.add('hidden');
+            asideRight.classList.add('hidden');
+            asideLeft.classList.add('hidden');
         } else {
             nav.classList.remove('hidden');
             header.classList.remove('opacity-0', 'pointer-events-none');
+            subheader.classList.remove('opacity-0', 'pointer-events-none');
             footer.classList.remove('opacity-0', 'pointer-events-none');
-            aside.classList.remove('hidden');
+            asideRight.classList.remove('hidden');
+            asideLeft.classList.remove('hidden');
+        }
+    };
+
+    window.switchPillState = function (state) {
+        const states = ['standard-tools', 'ai-main', 'ai-drafting', 'ai-refine', 'ai-analysis'];
+        states.forEach(s => {
+            const el = document.getElementById(`pill-${s}`);
+            if (el) {
+                el.classList.add('hidden');
+            }
+        });
+        const target = document.getElementById(`pill-${state}`);
+        const pill = document.getElementById('writing-pill');
+        if (target) {
+            target.classList.remove('hidden');
+        }
+        // Visual transition for AI modes
+        if (state !== 'standard-tools') {
+            pill.classList.add('bg-blue-50/50', 'border-blue-200');
+        } else {
+            pill.classList.remove('bg-blue-50/50', 'border-blue-200');
         }
     };
 
@@ -482,14 +807,133 @@
         window.quill = quill;
 
         // Stats tracking
-        let initialWordCount = quill.getText().trim().split(/\s+/).length;
-        if (quill.getText().trim() === "") initialWordCount = 0;
+        function updateStats() {
+            const text = quill.getText().trim();
+            const wordCount = text ? text.split(/\s+/).length : 0;
+            const readTime = Math.max(1, Math.ceil(wordCount / 200));
+            
+            document.getElementById('stat-total-words').innerText = `${wordCount.toLocaleString()} WORDS`;
+            document.getElementById('stat-read-time').innerText = `${readTime}M READ`;
+        }
 
         quill.on('text-change', function() {
-            let currentWordCount = quill.getText().trim().split(/\s+/).length;
-            if (quill.getText().trim() === "") currentWordCount = 0;
-            document.getElementById('stat-session-words').innerText = Math.max(0, currentWordCount - initialWordCount);
+            updateStats();
         });
+
+        // Initialize stats on load
+        updateStats();
+
+        // Sortable Reference Items
+        if (typeof Sortable !== 'undefined') {
+            // Source: AI Card in Drawer
+            new Sortable(document.getElementById('ai-card-source'), {
+                group: {
+                    name: 'stitch',
+                    pull: 'clone',
+                    put: false
+                },
+                handle: '.drag-handle',
+                ghostClass: 'sortable-ghost',
+                sort: false,
+                animation: 250,
+                onStart: function() {
+                    // Auto-open reference drawer when dragging starts
+                    window.toggleDrawer('reference', true);
+                }
+            });
+
+            // Target: Reference Zone
+            new Sortable(document.getElementById('stitch-zone'), {
+                group: 'stitch',
+                handle: '.drag-handle',
+                ghostClass: 'sortable-ghost',
+                dragClass: 'shadow-lg',
+                animation: 250,
+                onAdd: function (evt) {
+                    const item = evt.item;
+                    const type = item.getAttribute('data-type');
+                    
+                    if (type === 'ai-penn') {
+                        // Transform icon into AI Card (Matching Dashboard Style)
+                        const cardId = 'stitched-ai-' + Date.now();
+                        item.id = cardId;
+                        item.className = "p-4 bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-white/10 rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 w-full group relative";
+                        item.removeAttribute('data-type');
+                        
+                        item.innerHTML = `
+                            <!-- Dashboard Style Drag Handle -->
+                            <div class="absolute top-4 left-3 drag-handle">
+                                <i class="bi bi-grip-vertical text-[22px]"></i>
+                            </div>
+
+                            <div class="flex items-center justify-between gap-2 mb-3 pl-8">
+                                <div class="flex items-center gap-2 text-blue-500">
+                                    <i class="bi bi-chat-heart text-[18px]"></i>
+                                    <span class="text-[10px] font-bold tracking-wider uppercase">Ask Penn...</span>
+                                </div>
+                                <button onclick="this.closest('.p-4').remove()" class="p-1 hover:bg-slate-200 dark:hover:bg-white/10 rounded-full transition-colors">
+                                    <span class="material-symbols-outlined text-[14px] text-slate-400">close</span>
+                                </button>
+                            </div>
+                            <div class="space-y-3 mb-4 max-h-48 overflow-y-auto no-scrollbar messages-area text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed border-b border-slate-100 dark:border-white/5 pb-3">
+                                <div class="opacity-75">Brainstorming? Character trouble? Just ask.</div>
+                            </div>
+                            <div class="relative">
+                                <div class="flex items-center gap-2 p-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-full shadow-inner focus-within:border-blue-500/50 transition-colors">
+                                    <input type="text" placeholder="Type your question..." 
+                                           class="w-full bg-transparent border-0 px-3 py-1 text-[11px] focus:outline-none focus:ring-0"
+                                           onkeypress="if(event.key === 'Enter') window.sendToStitchedPenn('${cardId}', this.value)">
+                                    <button class="w-7 h-7 flex items-center justify-center bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors shadow-sm" 
+                                            onclick="const input = this.previousElementSibling; window.sendToStitchedPenn('${cardId}', input.value)">
+                                        <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+            });
+        }
+
+        // Logic for Stitched AI Card
+        window.sendToStitchedPenn = function(cardId, query) {
+            if (!query.trim()) return;
+            const card = document.getElementById(cardId);
+            const input = card.querySelector('input');
+            const messages = card.querySelector('.messages-area');
+            
+            // Add user message (Dashboard Style)
+            messages.innerHTML += `
+                <div class="flex flex-col gap-1 mt-3">
+                    <div class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">You</div>
+                    <div class="p-2 bg-slate-100 dark:bg-white/5 rounded-lg border border-slate-200/50 dark:border-white/5">${query}</div>
+                </div>
+            `;
+            const thinkingId = 'penn-reply-' + Date.now();
+            messages.innerHTML += `
+                <div class="flex flex-col gap-1 mt-3 transition-all" id="${thinkingId}">
+                    <div class="text-[9px] font-bold text-blue-500 uppercase tracking-tighter">Penn</div>
+                    <div class="p-2 bg-blue-500/5 dark:bg-blue-500/10 rounded-lg border border-blue-500/10 italic text-blue-500/70 animate-pulse">Thinking...</div>
+                </div>
+            `;
+            messages.scrollTop = messages.scrollHeight;
+            input.value = '';
+
+            fetch("{% url 'api_ai_consultant' %}", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value },
+                body: JSON.stringify({ query: query, scene_content: quill.getText() })
+            }).then(response => response.json()).then(data => {
+                const thinking = document.getElementById(thinkingId);
+                if (thinking) {
+                    const bubble = thinking.querySelector('div:last-child');
+                    bubble.classList.remove('italic', 'text-blue-500/70', 'animate-pulse');
+                    bubble.classList.add('text-slate-700', 'dark:text-slate-300');
+                    bubble.innerText = data.response;
+                    messages.scrollTop = messages.scrollHeight;
+                }
+            });
+        };
 
         // Selection Bubble Logic
         quill.on('selection-change', function (range) {
@@ -529,6 +973,15 @@
         document.getElementById('btn-save-manuscript').addEventListener('click', saveContent);
 
         document.body.classList.add('writing-mode-active');
+        
+        // Ensure stitch-zone is visible when empty
+        const stitchZone = document.getElementById('stitch-zone');
+        if (stitchZone && stitchZone.children.length === 0) {
+            stitchZone.innerHTML = '<div class="p-8 border-2 border-dashed border-slate-100 dark:border-white/5 rounded-2xl flex flex-col items-center justify-center text-center opacity-40 animate-pulse"><span class="material-symbols-outlined text-3xl mb-2">add_to_photos</span><p class="text-[10px] font-bold uppercase tracking-widest">Drop items here to stitch</p></div>';
+        }
+        if (stitchZone) {
+            stitchZone.classList.add('min-h-[200px]', 'pointer-events-auto');
+        }
     });
 
     // Magic Logic
