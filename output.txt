@@ -1,0 +1,856 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Characters - Story Timeline Builder</title>
+    <!-- Bootstrap CSS & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+    <link rel="stylesheet" href="/static/css/bootstrap-icons/bootstrap-icons.css" />
+    <link rel="stylesheet" href="/static/css/fonts.css">
+    <link rel="stylesheet" href="/static/css/main.css">
+    <style>
+        /* Story Timeline Builder-inspired pastel light theme */
+        :root {
+            --bg-body: #f5f7fb;
+            --bg-surface: #ffffff;
+            --bg-sidebar: #fbfcff;
+            --bg-input: #ffffff;
+            --accent: #6366f1;
+            --accent-soft: #eef2ff;
+            --pastel-blue: #e0f2fe;
+            --pastel-green: #dcfce7;
+            --pastel-amber: #fef3c7;
+            --pastel-red: #fee2e2;
+            --text-heading: #0f172a;
+            --text-body: #334155;
+            --text-muted: #64748b;
+            --text-subtle: #94a3b8;
+            --border-color: #e2e8f0;
+            --border-strong: #cbd5e1;
+            --radius: 10px;
+            --radius-sm: 7px;
+            --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
+            --shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+            --success: #16a34a;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background-color: #f4f1ee;
+            color: var(--text-body);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* TYPOGRAPHY */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: "DM Sans", system-ui, -apple-system, sans-serif;
+            color: var(--text-heading);
+            letter-spacing: -0.02em;
+        }
+        h1 { font-size: 1.9rem; font-weight: 700; }
+        h4 { font-size: 1.2rem; font-weight: 600; }
+        .text-muted { color: var(--text-muted) !important; }
+
+        /* NAVBAR */
+        .navbar {
+            background-color: var(--bg-surface) !important;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            padding-block: 0.7rem;
+        }
+        .navbar-brand {
+            font-family: "DM Sans", system-ui, sans-serif;
+            font-weight: 700;
+            font-size: 1.35rem;
+            letter-spacing: -0.03em;
+            color: var(--text-heading) !important;
+        }
+        .navbar-brand i { color: var(--accent); margin-right: 6px; }
+        .dashboard-wrapper { margin-top: 40px !important; }
+        .dropdown-toggle { color: black !important; }
+        .navbar-dark .navbar-nav .nav-link { color: var(--text-muted); font-weight: 500; font-size: 0.95rem; }
+
+        /* LAYOUT */
+        .container-fluid { padding-top: 10px; }
+        .sidebar { background-color: #f4f1ee; border-right: none; min-height: calc(100vh - 56px); padding: 1.4rem 20px 0 50px; }
+        .main-content { min-height: calc(100vh - 56px); padding: 2.4rem 2.6rem 3rem; }
+        .page-container { max-width: 1100px; margin: 50px auto 0; width: 100%; }
+        @media (max-width: 767px) { .main-content { padding: 1.5rem 1.2rem 2rem; } }
+
+        /* SIDEBAR NAV */
+        .sidebar .nav-link {
+            color: var(--text-muted);
+            padding: 0.55rem 1.4rem;
+            margin: 0.15rem 0.9rem;
+            border-radius: 999px;
+            font-size: 0.92rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .sidebar .nav-link i { font-size: 1rem; }
+        .sidebar .nav-link.active { background-color: #fff; color: #000; }
+
+        /* CARDS & PANELS */
+        .card { background-color: var(--bg-surface); border-radius: var(--radius); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); margin-bottom: 1.5rem; }
+        .card-header {
+            background: linear-gradient(to right, #f9fafb, #eef2ff);
+            border-bottom: 1px solid var(--border-color);
+            border-top-left-radius: var(--radius);
+            border-top-right-radius: var(--radius);
+            padding: 0.9rem 1.4rem;
+            font-weight: 600;
+            color: var(--text-heading);
+        }
+        .card-body { padding: 1.3rem 1.4rem 1.4rem; }
+        .card-footer { background-color: #f8fafc; border-top: 1px solid var(--border-color); padding: 0.75rem 1.4rem; }
+
+        /* PREMIUM SHARED BUTTON SYSTEM */
+        .btn-premium {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            border: 1px solid transparent;
+            text-decoration: none !important;
+            cursor: pointer;
+            flex-shrink: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-premium:hover {
+            transform: translateY(-1px) scale(1.02);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
+        .btn-premium:active { transform: translateY(0) scale(1); }
+
+        .btn-premium-light { background-color: #ffffff; color: #1a1a1a; border-color: #e5e5e5; }
+        .btn-premium-light:hover { background-color: #f9fafb; border-color: #d1d5db; }
+        .btn-premium-dark { background-color: #000000; color: #ffffff; }
+        .btn-premium-dark:hover { background-color: #1a1a1a; }
+        .btn-premium-danger { background-color: #ffffff; color: #dc2626; border-color: #fecaca; }
+        .btn-premium-danger:hover { background-color: #dc2626; color: #ffffff; border-color: #dc2626; }
+
+        /* Fallback for standard bootstrap .btn to look consistent */
+        .btn { border-radius: 9999px; padding: 10px 20px; font-weight: 500; transition: all 0.2s ease; }
+
+        /* FORMS */
+        .form-control, .form-select {
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-body);
+            font-size: 0.94rem;
+            padding: 0.55rem 0.75rem;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18);
+            background-color: #ffffff;
+            color: var(--text-heading);
+        }
+
+        /* BADGES & TAGS */
+        .badge { border-radius: 999px; font-weight: 600; padding: 0.35em 0.8em; }
+        .bg-secondary { background-color: #eef2ff !important; color: var(--accent); }
+        .bg-success { background-color: var(--pastel-green) !important; color: #166534; }
+        .bg-warning { background-color: var(--pastel-amber) !important; color: #92400e; }
+
+        /* UTILITY */
+        .btn-invert-hover:hover { background-color: #fff !important; color: #212529 !important; border-color: #212529 !important; }
+    </style>
+    
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect" />
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+<link
+    href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap"
+    rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    primary: "#2a19e6",
+                    "primary-dark": "#1e12a6",
+                    "background-light": "#f6f6f8",
+                    "background-dark": "#121121",
+                    "card-light": "#fdfcf8",
+                    "card-dark": "#1e1e2e",
+                    "navy-header": "#16213e",
+                    "navy-header-dark": "#0d1326",
+                    "branddark": "#1A1A1A",
+                    "text-muted": "#666666",
+                },
+                fontFamily: {
+                    display: ["Noto Serif", "serif"],
+                    sans: ["Noto Sans", "sans-serif"],
+                },
+                borderRadius: {
+                    DEFAULT: "1rem",
+                    lg: "1rem",
+                    xl: "1.5rem",
+                    "2xl": "2rem",
+                },
+            },
+        },
+    }
+</script>
+
+</head>
+<body>
+    
+    
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <img src="/static/img/logo.webp" alt="Story Timeline Builder Logo" style="height: 200px; width: auto; margin-right: 10px;">
+            </a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/login/">Login</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/register/">Register</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    
+
+    
+    <div class="container-fluid">
+        <div class="row">
+            
+            
+            <div class="col-md-12 main-content">
+                
+                
+                <div class="page-container">
+                    
+                    
+<main class="relative z-10 flex-grow w-full py-8 md:py-10 max-w-7xl mx-auto h-full px-4 md:px-0">
+    <!-- Title Section -->
+    <div class="flex justify-between items-end mb-6">
+        <div>
+            <h1 class="font-serif text-4xl text-branddark mb-2"
+                style="font-family: 'DM Serif Display', serif !important;">Characters</h1>
+            <p class="text-text-muted font-light" style="font-family: 'Inter', sans-serif !important;">Cast of your story universe.</p>
+        </div>
+    </div>
+
+    <!-- Action Bar -->
+    <div class="flex justify-end gap-4 mb-8">
+
+        <!-- Right Filters -->
+        <div class="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto justify-between md:justify-end">
+            <!-- Book/Series Filter -->
+            <div class="relative group w-full md:w-auto">
+                <select id="bookFilter" class="appearance-none !bg-none btn-premium btn-premium-light !py-2 !pl-5 !pr-12 !text-left w-full md:min-w-[200px]">
+                    <option value="">All Books & Series</option>
+                    
+                    <optgroup label="Series">
+                        
+                        
+                        
+                        <option value="series-2" >Alice&#x27;s Adventures in Wonderland</option>
+                        
+                        
+                        
+                    </optgroup>
+                    
+                    <optgroup label="Books">
+                        
+                            
+                            
+                            
+                            <option value="book-1" >Through The Looking Glass</option>
+                            
+                            
+                            
+                        
+                        
+                    </optgroup>
+                </select>
+                <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-[20px]">expand_more</span>
+            </div>
+
+            <!-- Role Filter -->
+            <div class="relative group w-full md:w-auto">
+                <select id="roleFilter" class="appearance-none !bg-none btn-premium btn-premium-light !py-2 !pl-5 !pr-12 !text-left w-full md:min-w-[200px]">
+                    <option value="">All Roles</option>
+                    <option value="protagonist" >Protagonists</option>
+                    <option value="antagonist" >Antagonists</option>
+                    <option value="supporting" >Supporting</option>
+                    <option value="minor" >Minor</option>
+                </select>
+                <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-[20px]">expand_more</span>
+            </div>
+            <div class="flex bg-white dark:bg-card-dark rounded-lg p-1 border border-slate-200 dark:border-slate-700 shadow-sm hidden">
+                <button class="p-1.5 rounded-md bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm">
+                    <span class="material-symbols-outlined text-[20px]">grid_view</span>
+                </button>
+                <button class="p-1.5 rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+                    <span class="material-symbols-outlined text-[20px]">view_list</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grid Layout -->
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-12">
+        
+        <div class="group bg-[#fdfcf8] dark:bg-[#1e1e2e] rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full relative overflow-hidden text-left">
+
+            <div class="flex justify-between items-start mb-4">
+                
+                <div class="w-16 h-16 rounded-xl bg-cover bg-center shadow-md border border-slate-200" style="background-image: url('/media/character_profiles/char_1_portrait.png')"></div>
+                
+
+                
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-700 uppercase tracking-wider">Protagonist</span>
+                
+            </div>
+
+            <h3 class="font-serif text-2xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-primary transition-colors">
+                <a href="/characters/1/" class="text-inherit text-decoration-none">Alice</a>
+            </h3>
+
+            
+            <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-6 line-clamp-4 font-sans font-light flex-grow">
+                Alice is a young, imaginative girl with a curious and logical mind. Physically, she is depicted as a child of typical stature, with the text focusing more on her actions than her appearance. She wears ordinary clothing suitable for a Victorian-era child, often seen in a domestic setting before her adventure. Her personality is marked by a blend of politeness and assertiveness; she engages in playful conversations with her kittens, shows kindness to the chess pieces, and navigates the absurdities of the looking-glass world with a mix of wonder and frustration. Background-wise, she lives in a comfortable home with her sister and pets, and her familiarity with games like chess and nursery rhymes fuels her journey. Significance to the story is paramount, as she is the lens through which the reader experiences the inverted logic and whimsical challenges of the looking-glass world, ultimately striving to become a Queen in the chessboard landscape.
+
+Alice&#x27;s physicality is rarely detailed, but her movements—such as climbing onto the chimney-piece or floating down stairs—suggest agility and a childlike energy. Her interactions reveal a thoughtful nature, as she worries about the White King catching cold or tries to soothe the flowers. This empathy contrasts with her occasional impatience, such as when she scolds the black kitten. Her background as a well-mannered, educated girl from a privileged household informs her reactions, as she often references lessons, governesses, and social norms. In the story, she represents innocence and curiosity confronting a world where rules are distorted, making her journey a metaphor for growth and self-discovery.
+            </p>
+            
+
+            <div class="mt-auto pt-4 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between text-slate-400 text-sm">
+                <div class="flex items-center gap-1.5" title="Timeline Events">
+                    <span class="material-symbols-outlined text-[18px]">schedule</span>
+                    <span class="font-medium text-xs">33 Events</span>
+                </div>
+                <div class="flex gap-2">
+                    <a href="/characters/1/" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full text-slate-400 hover:text-primary transition-colors flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[20px]">visibility</span>
+                    </a>
+                    <a href="/characters/1/edit/" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full text-slate-400 hover:text-primary transition-colors flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[20px]">edit</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="group bg-[#fdfcf8] dark:bg-[#1e1e2e] rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full relative overflow-hidden text-left">
+
+            <div class="flex justify-between items-start mb-4">
+                
+                <div class="w-16 h-16 rounded-xl bg-cover bg-center shadow-md border border-slate-200" style="background-image: url('/media/character_profiles/char_2_portrait.png')"></div>
+                
+
+                
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-green-100 text-green-800 uppercase tracking-wider">Supporting</span>
+                
+            </div>
+
+            <h3 class="font-serif text-2xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-primary transition-colors">
+                <a href="/characters/2/" class="text-inherit text-decoration-none">Dinah</a>
+            </h3>
+
+            
+            <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-6 line-clamp-4 font-sans font-light flex-grow">
+                Dinah is an elderly cat, physically characterised by her maternal diligence as she washes her kittens. Her appearance is not described in detail, but she is implied to be a domestic pet with the typical attributes of a cat—paws for holding and rubbing. Personality-wise, she is patient and nurturing, focused on grooming her offspring, though Alice humorously chides her for not teaching better manners. Background: She is Alice’s pet cat, living in the household and caring for her two kittens. Significance to the story is minor but foundational, as her washing of the kittens sets the scene for Alice’s daydreaming and subsequent adventure through the looking-glass.
+
+Dinah’s role is largely functional, embodying a sense of normalcy and domesticity that contrasts with the fantastical events to follow. Her methodical washing—holding kittens by the ear and rubbing their faces—showcases a comic yet tender rigidity. As a character, she anchors Alice to the real world, with Alice referencing her during conversations with the kittens. Her presence highlights themes of care and responsibility, albeit in a whimsical context.
+            </p>
+            
+
+            <div class="mt-auto pt-4 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between text-slate-400 text-sm">
+                <div class="flex items-center gap-1.5" title="Timeline Events">
+                    <span class="material-symbols-outlined text-[18px]">schedule</span>
+                    <span class="font-medium text-xs">3 Events</span>
+                </div>
+                <div class="flex gap-2">
+                    <a href="/characters/2/" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full text-slate-400 hover:text-primary transition-colors flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[20px]">visibility</span>
+                    </a>
+                    <a href="/characters/2/edit/" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full text-slate-400 hover:text-primary transition-colors flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[20px]">edit</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="group bg-[#fdfcf8] dark:bg-[#1e1e2e] rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full relative overflow-hidden text-left">
+
+            <div class="flex justify-between items-start mb-4">
+                
+                <div class="w-16 h-16 rounded-xl bg-cover bg-center shadow-md border border-slate-200" style="background-image: url('/media/character_profiles/char_10_portrait.png')"></div>
+                
+
+                
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-green-100 text-green-800 uppercase tracking-wider">Supporting</span>
+                
+            </div>
+
+            <h3 class="font-serif text-2xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-primary transition-colors">
+                <a href="/characters/10/" class="text-inherit text-decoration-none">Fawn</a>
+            </h3>
+
+            
+            <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-6 line-clamp-4 font-sans font-light flex-grow">
+                The Fawn is a gentle, young deer with large, soft eyes and a sweet voice. Physically, it is delicate and graceful, wandering through the wood. Personality-wise, it is initially unafraid of Alice, speaking softly and allowing her to stroke its neck, but it becomes alarmed upon realising she is a human child. Background: It lives in the wood where things have no names, part of the looking-glass world’s fauna. Significance to the story lies in its interaction with Alice that illustrates the loss of identity in the wood; they walk together amiably until names return, causing the Fawn to flee, highlighting themes of fear and recognition.
+
+Its physical beauty is emphasised through Alice’s loving embrace, and its sudden bound away adds drama. The Fawn’s role is symbolic, representing innocence and the primal fear of predators, even in a dreamlike setting. It serves as a poignant moment in Alice’s journey, reinforcing the impact of names and memory.
+            </p>
+            
+
+            <div class="mt-auto pt-4 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between text-slate-400 text-sm">
+                <div class="flex items-center gap-1.5" title="Timeline Events">
+                    <span class="material-symbols-outlined text-[18px]">schedule</span>
+                    <span class="font-medium text-xs">3 Events</span>
+                </div>
+                <div class="flex gap-2">
+                    <a href="/characters/10/" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full text-slate-400 hover:text-primary transition-colors flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[20px]">visibility</span>
+                    </a>
+                    <a href="/characters/10/edit/" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full text-slate-400 hover:text-primary transition-colors flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[20px]">edit</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="group bg-[#fdfcf8] dark:bg-[#1e1e2e] rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full relative overflow-hidden text-left">
+
+            <div class="flex justify-between items-start mb-4">
+                
+                <div class="w-16 h-16 rounded-xl bg-cover bg-center shadow-md border border-slate-200" style="background-image: url('/media/character_profiles/char_9_portrait.png')"></div>
+                
+
+                
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-green-100 text-green-800 uppercase tracking-wider">Supporting</span>
+                
+            </div>
+
+            <h3 class="font-serif text-2xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-primary transition-colors">
+                <a href="/characters/9/" class="text-inherit text-decoration-none">Gnat</a>
+            </h3>
+
+            
+            <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-6 line-clamp-4 font-sans font-light flex-grow">
+                The Gnat is a large insect, about the size of a chicken, with wings that fan Alice. Physically, it is described as very large for a gnat, balancing on twigs and capable of sighing deeply. Personality-wise, it is melancholy, fond of making jokes yet often unhappy, and philosophical about topics like names and insects. Background: It is an inhabitant of the looking-glass world, encountered by Alice during her train journey and in the wood. Significance to the story includes guiding Alice through conversations about insects and leading her to the wood where things have no names, prompting identity questions.
+
+Its physical presence is eerie yet gentle, as it talks closely to Alice’s ear. The Gnat’s sighs are so small they tickle, adding a whimsical touch. Its role is primarily expository, introducing the concept of namelessness and the variety of looking-glass insects, such as the Rocking-horse-fly. The Gnat’s disappearance symbolises the transient nature of encounters in this dreamlike world.
+            </p>
+            
+
+            <div class="mt-auto pt-4 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between text-slate-400 text-sm">
+                <div class="flex items-center gap-1.5" title="Timeline Events">
+                    <span class="material-symbols-outlined text-[18px]">schedule</span>
+                    <span class="font-medium text-xs">3 Events</span>
+                </div>
+                <div class="flex gap-2">
+                    <a href="/characters/9/" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full text-slate-400 hover:text-primary transition-colors flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[20px]">visibility</span>
+                    </a>
+                    <a href="/characters/9/edit/" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full text-slate-400 hover:text-primary transition-colors flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[20px]">edit</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="group bg-[#fdfcf8] dark:bg-[#1e1e2e] rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full relative overflow-hidden text-left">
+
+            <div class="flex justify-between items-start mb-4">
+                
+                <div class="w-16 h-16 rounded-xl bg-cover bg-center shadow-md border border-slate-200" style="background-image: url('/media/character_profiles/char_3_portrait.png')"></div>
+                
+
+                
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-green-100 text-green-800 uppercase tracking-wider">Supporting</span>
+                
+            </div>
+
+            <h3 class="font-serif text-2xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-primary transition-colors">
+                <a href="/characters/3/" class="text-inherit text-decoration-none">Kitty</a>
+            </h3>
+
+            
+            <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-6 line-clamp-4 font-sans font-light flex-grow">
+                Kitty is a playful black kitten, physically small and agile, with a mischievous demeanour. Her appearance is defined by her black fur, and she is often in motion—running after her tail or tangling the ball of worsted. Personality-wise, she is lively and impish, delighting in causing minor chaos, such as unwinding Alice’s worsted, yet she also sits demurely when pretending to help. Background: She is one of Dinah’s kittens, living with Alice. Significance to the story lies in being Alice’s initial companion and conversational partner; Alice uses her as a model for the Red Queen and confides in her about the looking-glass house, bridging the real world and the fantasy.
+
+Kitty’s physical antics, like rolling the worsted into knots, symbolise the untidiness that sparks Alice’s imagination. Her interactions with Alice are affectionate despite the scolding, with Alice giving her little kisses. As a catalyst, Kitty’s mischief leads Alice to threaten putting her through the looking-glass, foreshadowing the adventure. Her role emphasises the playful, often contradictory nature of childhood pets.
+            </p>
+            
+
+            <div class="mt-auto pt-4 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between text-slate-400 text-sm">
+                <div class="flex items-center gap-1.5" title="Timeline Events">
+                    <span class="material-symbols-outlined text-[18px]">schedule</span>
+                    <span class="font-medium text-xs">3 Events</span>
+                </div>
+                <div class="flex gap-2">
+                    <a href="/characters/3/" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full text-slate-400 hover:text-primary transition-colors flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[20px]">visibility</span>
+                    </a>
+                    <a href="/characters/3/edit/" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full text-slate-400 hover:text-primary transition-colors flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[20px]">edit</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="group bg-[#fdfcf8] dark:bg-[#1e1e2e] rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full relative overflow-hidden text-left">
+
+            <div class="flex justify-between items-start mb-4">
+                
+                <div class="w-16 h-16 rounded-xl bg-cover bg-center shadow-md border border-slate-200" style="background-image: url('/media/character_profiles/char_6_portrait.png')"></div>
+                
+
+                
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-green-100 text-green-800 uppercase tracking-wider">Supporting</span>
+                
+            </div>
+
+            <h3 class="font-serif text-2xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-primary transition-colors">
+                <a href="/characters/6/" class="text-inherit text-decoration-none">Red King</a>
+            </h3>
+
+            
+            <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-6 line-clamp-4 font-sans font-light flex-grow">
+                The Red King is a chess piece depicted primarily in a state of sleep. Physically, he wears a tall red night-cap with a tassel and lies crumpled in an untidy heap, snoring loudly. Personality-wise, he is passive and dormant, only active in dreams; when briefly awakened by Alice’s invisible hand, he is astonished and fearful. Background: He is the king of the Red side in the chess game. Significance to the story is philosophical, as Tweedledum and Tweedledee suggest that Alice and the looking-glass world exist only in his dream, raising questions about reality and perception.
+
+His physical presence is almost inert, symbolising the passive nature of royalty in the game. His snoring is described as fit to &quot;snore his head off,&quot; adding humour. The idea that he dreams the events introduces a meta-fictional layer, challenging Alice’s (and the reader’s) sense of existence. His role is minimal in action but profound in thematic impact.
+            </p>
+            
+
+            <div class="mt-auto pt-4 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between text-slate-400 text-sm">
+                <div class="flex items-center gap-1.5" title="Timeline Events">
+                    <span class="material-symbols-outlined text-[18px]">schedule</span>
+                    <span class="font-medium text-xs">30 Events</span>
+                </div>
+                <div class="flex gap-2">
+                    <a href="/characters/6/" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full text-slate-400 hover:text-primary transition-colors flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[20px]">visibility</span>
+                    </a>
+                    <a href="/characters/6/edit/" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full text-slate-400 hover:text-primary transition-colors flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[20px]">edit</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="group bg-[#fdfcf8] dark:bg-[#1e1e2e] rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full relative overflow-hidden text-left">
+
+            <div class="flex justify-between items-start mb-4">
+                
+                <div class="w-16 h-16 rounded-xl bg-cover bg-center shadow-md border border-slate-200" style="background-image: url('/media/character_profiles/char_5_portrait.png')"></div>
+                
+
+                
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-red-100 text-red-800 uppercase tracking-wider">Antagonist</span>
+                
+            </div>
+
+            <h3 class="font-serif text-2xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-primary transition-colors">
+                <a href="/characters/5/" class="text-inherit text-decoration-none">Red Queen</a>
+            </h3>
+
+            
+            <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-6 line-clamp-4 font-sans font-light flex-grow">
+                The Red Queen is a chess piece brought to life, physically imposing and authoritative. Initially seen as a small figure in the ashes, she grows to half a head taller than Alice in the garden, with a stern and regal bearing. Personality-wise, she is domineering, fast-talking, and logically absurd, often making hyperbolic comparisons (e.g., claiming hills are valleys) and insisting on strict etiquette. Background: She is the queen of the Red side in the chess game played across the looking-glass world. Significance to the story is major; she acts as a guide and obstacle for Alice, setting the rules of the chess journey and embodying the nonsensical logic of the realm.
+
+Her physical appearance is not minutely described, but her actions—such as running incredibly fast without moving—emphasise her surreal nature. She is often in motion, dragging Alice along or measuring the ground with pegs. Her dialogue is filled with contradictions and commands, reflecting her role as a ruler who enforces arbitrary rules. As an antagonist, she challenges Alice’s understanding of reality, yet also provides crucial information about the chessboard layout.
+            </p>
+            
+
+            <div class="mt-auto pt-4 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between text-slate-400 text-sm">
+                <div class="flex items-center gap-1.5" title="Timeline Events">
+                    <span class="material-symbols-outlined text-[18px]">schedule</span>
+                    <span class="font-medium text-xs">30 Events</span>
+                </div>
+                <div class="flex gap-2">
+                    <a href="/characters/5/" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full text-slate-400 hover:text-primary transition-colors flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[20px]">visibility</span>
+                    </a>
+                    <a href="/characters/5/edit/" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full text-slate-400 hover:text-primary transition-colors flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[20px]">edit</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="group bg-[#fdfcf8] dark:bg-[#1e1e2e] rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full relative overflow-hidden text-left">
+
+            <div class="flex justify-between items-start mb-4">
+                
+                <div class="w-16 h-16 rounded-xl bg-cover bg-center shadow-md border border-slate-200" style="background-image: url('/media/character_profiles/char_12_portrait.png')"></div>
+                
+
+                
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-green-100 text-green-800 uppercase tracking-wider">Supporting</span>
+                
+            </div>
+
+            <h3 class="font-serif text-2xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-primary transition-colors">
+                <a href="/characters/12/" class="text-inherit text-decoration-none">Rose</a>
+            </h3>
+
+            
+            <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-6 line-clamp-4 font-sans font-light flex-grow">
+                The Rose is another talking flower, physically a rose with petals that it comments on regarding tidiness. Personality-wise, it is somewhat severe, observant, and occasionally kind, offering critiques on Alice’s appearance and manners. Background: It resides in the same garden as the Tiger-lily, part of the community of live flowers. Significance to the story involves interacting with Alice, providing information about the Red Queen and another girl in the garden, and contributing to the garden’s social dynamics.
+
+Its physical description is minimal, but its dialogue reveals a focus on etiquette and appearance, such as noting Alice’s petals are untidy. The Rose’s role complements the Tiger-lily’s, adding depth to the flower society and serving as a catalyst for Alice’s curiosity about the Red Queen. It embodies a more refined, if critical, perspective.
+            </p>
+            
+
+            <div class="mt-auto pt-4 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between text-slate-400 text-sm">
+                <div class="flex items-center gap-1.5" title="Timeline Events">
+                    <span class="material-symbols-outlined text-[18px]">schedule</span>
+                    <span class="font-medium text-xs">5 Events</span>
+                </div>
+                <div class="flex gap-2">
+                    <a href="/characters/12/" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full text-slate-400 hover:text-primary transition-colors flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[20px]">visibility</span>
+                    </a>
+                    <a href="/characters/12/edit/" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full text-slate-400 hover:text-primary transition-colors flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[20px]">edit</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="group bg-[#fdfcf8] dark:bg-[#1e1e2e] rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full relative overflow-hidden text-left">
+
+            <div class="flex justify-between items-start mb-4">
+                
+                <div class="w-16 h-16 rounded-xl bg-cover bg-center shadow-md border border-slate-200" style="background-image: url('/media/character_profiles/char_4_portrait_iznDL5u.png')"></div>
+                
+
+                
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-green-100 text-green-800 uppercase tracking-wider">Supporting</span>
+                
+            </div>
+
+            <h3 class="font-serif text-2xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-primary transition-colors">
+                <a href="/characters/4/" class="text-inherit text-decoration-none">Snowdrop</a>
+            </h3>
+
+            
+            <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-6 line-clamp-4 font-sans font-light flex-grow">
+                Snowdrop is the white kitten, physically contrasting with Kitty through her white fur and more subdued behaviour. She is described as lying quite still while Dinah washes her face, bearing it well. Personality-wise, she is patient and passive, enduring the washing without complaint, which Alice interprets as understanding it is for her good. Background: She is Dinah’s other kitten, sibling to the black kitten. Significance to the story is minimal; she is mentioned briefly when Alice recalls her being pulled by the tail, serving mainly to highlight Kitty’s mischief and the domestic setting.
+
+Snowdrop’s role underscores the theme of order versus chaos, as her cleanliness contrasts with Kitty’s messiness. Her physical presence is passive, often as a subject of care rather than an active participant. This passivity aligns with her symbolic purity, but she lacks deeper development in the narrative.
+            </p>
+            
+
+            <div class="mt-auto pt-4 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between text-slate-400 text-sm">
+                <div class="flex items-center gap-1.5" title="Timeline Events">
+                    <span class="material-symbols-outlined text-[18px]">schedule</span>
+                    <span class="font-medium text-xs">3 Events</span>
+                </div>
+                <div class="flex gap-2">
+                    <a href="/characters/4/" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full text-slate-400 hover:text-primary transition-colors flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[20px]">visibility</span>
+                    </a>
+                    <a href="/characters/4/edit/" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full text-slate-400 hover:text-primary transition-colors flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[20px]">edit</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="group bg-[#fdfcf8] dark:bg-[#1e1e2e] rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full relative overflow-hidden text-left">
+
+            <div class="flex justify-between items-start mb-4">
+                
+                <div class="w-16 h-16 rounded-xl bg-cover bg-center shadow-md border border-slate-200" style="background-image: url('/media/character_profiles/char_11_portrait.png')"></div>
+                
+
+                
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-green-100 text-green-800 uppercase tracking-wider">Supporting</span>
+                
+            </div>
+
+            <h3 class="font-serif text-2xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-primary transition-colors">
+                <a href="/characters/11/" class="text-inherit text-decoration-none">Tiger-lily</a>
+            </h3>
+
+            
+            <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-6 line-clamp-4 font-sans font-light flex-grow">
+                The Tiger-lily is a talking flower in the garden, physically depicted as waving gracefully in the wind. Its appearance is that of a typical tiger-lily, with vibrant colours and petals. Personality-wise, it is proud, outspoken, and easily excited, often criticising other flowers like the daisies and asserting its opinions. Background: It is one of the live flowers in the Garden of Live Flowers, capable of speech due to the hard ground. Significance to the story includes being the first flower to speak to Alice, explaining the nature of the garden and commenting on Alice’s appearance, thereby introducing the animated flora of the looking-glass world.
+
+Its physical movements—waving passionately—convey emotion, and its dialogue reveals a hierarchical view among flowers. The Tiger-lily’s role adds to the story’s whimsy and social satire, as it judges Alice based on colour and petal curl. It helps establish the garden’s rules and the theme of communication across species.
+            </p>
+            
+
+            <div class="mt-auto pt-4 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between text-slate-400 text-sm">
+                <div class="flex items-center gap-1.5" title="Timeline Events">
+                    <span class="material-symbols-outlined text-[18px]">schedule</span>
+                    <span class="font-medium text-xs">0 Events</span>
+                </div>
+                <div class="flex gap-2">
+                    <a href="/characters/11/" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full text-slate-400 hover:text-primary transition-colors flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[20px]">visibility</span>
+                    </a>
+                    <a href="/characters/11/edit/" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full text-slate-400 hover:text-primary transition-colors flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[20px]">edit</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="group bg-[#fdfcf8] dark:bg-[#1e1e2e] rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full relative overflow-hidden text-left">
+
+            <div class="flex justify-between items-start mb-4">
+                
+                <div class="w-16 h-16 rounded-xl bg-cover bg-center shadow-md border border-slate-200" style="background-image: url('/media/character_profiles/char_8_portrait_r6szeP2.png')"></div>
+                
+
+                
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-green-100 text-green-800 uppercase tracking-wider">Supporting</span>
+                
+            </div>
+
+            <h3 class="font-serif text-2xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-primary transition-colors">
+                <a href="/characters/8/" class="text-inherit text-decoration-none">Tweedledee</a>
+            </h3>
+
+            
+            <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-6 line-clamp-4 font-sans font-light flex-grow">
+                Tweedledee is the other twin, physically identical to Tweedledum but with &quot;DEE&quot; on his collar. He shares the same fat, schoolboy-like appearance. Personality-wise, he is equally argumentative, often saying &quot;Contrariwise&quot; to counter his brother, and he displays a similar love for nonsense logic and poetry. Background: He is Tweedledum’s brother from the nursery rhyme, co-inhabiting the wood. Significance to the story mirrors Tweedledum’s; together, they perform the poem &quot;The Walrus and the Carpenter&quot; and debate Alice’s existence in the Red King’s dream, enriching the thematic exploration of reality versus illusion.
+
+His physical comedy, such as trying to hide under an umbrella, adds humour. His recitation of poetry showcases a playful yet melancholic side. As a character, he embodies the duality and redundancy of the twins, emphasising the looking-glass world’s repetitive and mirrored nature.
+            </p>
+            
+
+            <div class="mt-auto pt-4 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between text-slate-400 text-sm">
+                <div class="flex items-center gap-1.5" title="Timeline Events">
+                    <span class="material-symbols-outlined text-[18px]">schedule</span>
+                    <span class="font-medium text-xs">8 Events</span>
+                </div>
+                <div class="flex gap-2">
+                    <a href="/characters/8/" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full text-slate-400 hover:text-primary transition-colors flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[20px]">visibility</span>
+                    </a>
+                    <a href="/characters/8/edit/" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full text-slate-400 hover:text-primary transition-colors flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[20px]">edit</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="group bg-[#fdfcf8] dark:bg-[#1e1e2e] rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full relative overflow-hidden text-left">
+
+            <div class="flex justify-between items-start mb-4">
+                
+                <div class="w-16 h-16 rounded-xl bg-cover bg-center shadow-md border border-slate-200" style="background-image: url('/media/character_profiles/char_7_portrait_EZCPPv6.png')"></div>
+                
+
+                
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-green-100 text-green-800 uppercase tracking-wider">Supporting</span>
+                
+            </div>
+
+            <h3 class="font-serif text-2xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-primary transition-colors">
+                <a href="/characters/7/" class="text-inherit text-decoration-none">Tweedledum</a>
+            </h3>
+
+            
+            <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-6 line-clamp-4 font-sans font-light flex-grow">
+                Tweedledum is one of the twin brothers, physically fat and round, with &quot;DUM&quot; embroidered on his collar. His appearance is comically childlike, resembling a great schoolboy, and he often moves with brisk energy. Personality-wise, he is argumentative, quick-tempered, and proud, prone to outbursts over trivial matters like his new rattle. Background: He originates from the nursery rhyme and lives in the wood with his brother. Significance to the story lies in his interactions with Alice, where he and Tweedledee recite poetry, discuss logic, and prepare for a battle, challenging Alice’s understanding of reality and dreams.
+
+His physical actions, such as stamping wildly or hugging his brother, highlight his emotional volatility. He is often contrasted with Tweedledee, yet they share similar traits. His role adds to the nonsense logic of the looking-glass world, as seen in his discussions about the Red King’s dream. The impending battle over the rattle serves as a satire on petty conflicts.
+            </p>
+            
+
+            <div class="mt-auto pt-4 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between text-slate-400 text-sm">
+                <div class="flex items-center gap-1.5" title="Timeline Events">
+                    <span class="material-symbols-outlined text-[18px]">schedule</span>
+                    <span class="font-medium text-xs">8 Events</span>
+                </div>
+                <div class="flex gap-2">
+                    <a href="/characters/7/" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full text-slate-400 hover:text-primary transition-colors flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[20px]">visibility</span>
+                    </a>
+                    <a href="/characters/7/edit/" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full text-slate-400 hover:text-primary transition-colors flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[20px]">edit</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        
+        <!-- Add New Placeholder -->
+        <a href="/characters/create/" class="group bg-slate-50 dark:bg-card-dark/50 rounded-2xl p-6 border-2 border-dashed border-slate-200 dark:border-slate-700 hover:border-black/30 flex flex-col items-center justify-center gap-4 transition-all duration-300 hover:bg-slate-100 min-h-[320px] text-decoration-none h-full">
+            <div class="w-16 h-16 rounded-full bg-slate-200/50 flex items-center justify-center text-slate-400 group-hover:text-black group-hover:scale-110 transition-all">
+                <span class="material-symbols-outlined text-[32px]">add</span>
+            </div>
+            <div class="text-center">
+                <h3 class="font-serif text-lg font-bold text-slate-700 group-hover:text-black m-0">Create Character</h3>
+                <p class="text-slate-500 text-sm mt-1 m-0">Start a new profile</p>
+            </div>
+        </a>
+    </div>
+    
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const updateParams = function(paramKey, value) {
+            const url = new URL(window.location.href);
+            if (value) {
+                url.searchParams.set(paramKey, value);
+            } else {
+                url.searchParams.delete(paramKey);
+            }
+            window.location.href = url.toString();
+        };
+
+        const roleFilter = document.getElementById('roleFilter');
+        if (roleFilter) {
+            roleFilter.addEventListener('change', function() {
+                updateParams('role', this.value);
+            });
+        }
+
+        const bookFilter = document.getElementById('bookFilter');
+        if (bookFilter) {
+            bookFilter.addEventListener('change', function() {
+                updateParams('book', this.value);
+            });
+        }
+    });
+</script>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+    <footer class="footer text-center py-3 mt-4">
+        <div class="container"><small>&copy; 2026 Story Timeline Builder</small></div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-3gJwYp4gkL8JdTjqDTu7kGKuX3s8mE7Cqc3hF3j4U7E=" crossorigin="anonymous"></script>
+    
+</body>
+</html>

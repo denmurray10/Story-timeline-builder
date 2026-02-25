@@ -2174,6 +2174,8 @@ def character_list(request):
     if selected_role:
         characters = characters.filter(role=selected_role)
         
+    # Determine display labels for custom dropdowns
+    selected_book_title = "All Books & Series"
     if selected_book:
         if selected_book.startswith('series-'):
             s_id = selected_book.replace('series-', '')
@@ -2182,6 +2184,8 @@ def character_list(request):
                 Q(events__book__series_id=s_id) |
                 Q(pov_events__book__series_id=s_id)
             ).distinct()
+            series = series_list.filter(pk=s_id).first()
+            if series: selected_book_title = series.title
         elif selected_book.startswith('book-'):
             b_id = selected_book.replace('book-', '')
             characters = characters.filter(
@@ -2189,11 +2193,23 @@ def character_list(request):
                 Q(events__book_id=b_id) |
                 Q(pov_events__book_id=b_id)
             ).distinct()
+            book = Book.objects.filter(pk=b_id, user=request.user).first()
+            if book: selected_book_title = book.title
+
+    role_labels = {
+        'protagonist': 'Protagonists',
+        'antagonist': 'Antagonists',
+        'supporting': 'Supporting',
+        'minor': 'Minor'
+    }
+    selected_role_title = role_labels.get(selected_role, 'All Roles')
         
     return render(request, 'timeline/character_list.html', {
         'characters': characters,
         'selected_role': selected_role,
+        'selected_role_title': selected_role_title,
         'selected_book': selected_book,
+        'selected_book_title': selected_book_title,
         'series_list': series_list,
         'standalone_books': books,
     })

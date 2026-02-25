@@ -43,66 +43,67 @@
 {% block content %}
 <main class="relative z-10 flex-grow w-full py-8 md:py-10 max-w-7xl mx-auto h-full px-4 md:px-0">
     <!-- Title Section -->
-    <div class="flex justify-between items-end mb-6">
+    <div class="flex justify-between items-end mb-1">
         <div>
             <h1 class="font-serif text-4xl text-branddark mb-2"
                 style="font-family: 'DM Serif Display', serif !important;">Characters</h1>
             <p class="text-text-muted font-light" style="font-family: 'Inter', sans-serif !important;">Cast of your story universe.</p>
         </div>
     </div>
-
     <!-- Action Bar -->
-    <div class="flex justify-end gap-4 mb-8">
-
+    <div class="relative z-40 flex justify-end gap-4 mb-6">
         <!-- Right Filters -->
         <div class="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto justify-between md:justify-end">
-            <!-- Book/Series Filter -->
-            <div class="relative group w-full md:w-auto">
-                <select id="bookFilter" class="appearance-none !bg-none bg-white dark:bg-card-dark border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 py-2.5 pl-5 pr-12 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer shadow-sm hover:shadow-md transition-all w-full md:min-w-[200px]">
-                    <option value="">All Books & Series</option>
+            
+            <!-- Custom Book/Series Dropdown -->
+            <div class="relative w-full md:w-auto custom-dropdown" id="dropdown-book">
+                <button type="button" class="btn-premium btn-premium-light !py-2.5 !px-6 !text-left w-full md:min-w-[300px] !rounded-full dropdown-toggle flex justify-between items-center" style="border-radius: 9999px !important;">
+                    <span class="truncate">{{ selected_book_title }}</span>
+                </button>
+                <div class="dropdown-menu absolute z-[100] right-0 left-0 mt-2 w-full bg-white dark:bg-card-dark border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl overflow-hidden py-2 animate-in fade-in slide-in-from-top-2 duration-200" style="display: none;">
+                    <div class="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Navigation</div>
+                    <button type="button" class="dropdown-item w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-2" data-value="">
+                        <span class="material-symbols-outlined text-[18px]">all_inclusive</span>
+                        All Books & Series
+                    </button>
+                    
                     {% if series_list %}
-                    <optgroup label="Series">
-                        {% for series in series_list %}
-                        {% with s_id=series.pk|stringformat:"s" %}
-                        {% with s_val="series-"|add:s_id %}
-                        <option value="{{ s_val }}" {% if selected_book == s_val %}selected{% endif %}>{{ series.title }}</option>
-                        {% endwith %}
-                        {% endwith %}
-                        {% endfor %}
-                    </optgroup>
+                    <div class="px-3 py-1.5 mt-2 border-t border-slate-100 dark:border-slate-800 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Series</div>
+                    {% for series in series_list %}
+                    <button type="button" class="dropdown-item w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" data-value="series-{{ series.pk }}">
+                        {{ series.title }}
+                    </button>
+                    {% endfor %}
                     {% endif %}
-                    <optgroup label="Books">
-                        {% for series in series_list %}
-                            {% for book in series.books.all %}
-                            {% with b_id=book.pk|stringformat:"s" %}
-                            {% with b_val="book-"|add:b_id %}
-                            <option value="{{ b_val }}" {% if selected_book == b_val %}selected{% endif %}>{{ book.title }}</option>
-                            {% endwith %}
-                            {% endwith %}
-                            {% endfor %}
+
+                    <div class="px-3 py-1.5 mt-2 border-t border-slate-100 dark:border-slate-800 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Individual Books</div>
+                    {% for series in series_list %}
+                        {% for book in series.books.all %}
+                        <button type="button" class="dropdown-item w-full text-left px-6 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" data-value="book-{{ book.pk }}">
+                            {{ book.title }}
+                        </button>
                         {% endfor %}
-                        {% for book in standalone_books %}
-                        {% with b_id=book.pk|stringformat:"s" %}
-                        {% with b_val="book-"|add:b_id %}
-                        <option value="{{ b_val }}" {% if selected_book == b_val %}selected{% endif %}>{{ book.title }}</option>
-                        {% endwith %}
-                        {% endwith %}
-                        {% endfor %}
-                    </optgroup>
-                </select>
-                <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-[20px]">expand_more</span>
+                    {% endfor %}
+                    {% for book in standalone_books %}
+                    <button type="button" class="dropdown-item w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" data-value="book-{{ book.pk }}">
+                        {{ book.title }}
+                    </button>
+                    {% endfor %}
+                </div>
             </div>
 
-            <!-- Role Filter -->
-            <div class="relative group w-full md:w-auto">
-                <select id="roleFilter" class="appearance-none !bg-none bg-white dark:bg-card-dark border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 py-2.5 pl-5 pr-12 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer shadow-sm hover:shadow-md transition-all w-full md:min-w-[200px]">
-                    <option value="">All Roles</option>
-                    <option value="protagonist" {% if selected_role == 'protagonist' %}selected{% endif %}>Protagonists</option>
-                    <option value="antagonist" {% if selected_role == 'antagonist' %}selected{% endif %}>Antagonists</option>
-                    <option value="supporting" {% if selected_role == 'supporting' %}selected{% endif %}>Supporting</option>
-                    <option value="minor" {% if selected_role == 'minor' %}selected{% endif %}>Minor</option>
-                </select>
-                <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-[20px]">expand_more</span>
+            <!-- Custom Role Dropdown -->
+            <div class="relative w-full md:w-auto custom-dropdown" id="dropdown-role">
+                <button type="button" class="btn-premium btn-premium-light !py-2.5 !px-6 !text-left w-full md:min-w-[180px] !rounded-full dropdown-toggle flex justify-between items-center" style="border-radius: 9999px !important;">
+                    <span class="truncate">{{ selected_role_title }}</span>
+                </button>
+                <div class="dropdown-menu absolute z-[100] right-0 left-0 mt-2 w-full bg-white dark:bg-card-dark border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl overflow-hidden py-2 animate-in fade-in slide-in-from-top-2 duration-200" style="display: none;">
+                    <button type="button" class="dropdown-item w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" data-value="">All Roles</button>
+                    <button type="button" class="dropdown-item w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" data-value="protagonist">Protagonists</button>
+                    <button type="button" class="dropdown-item w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" data-value="antagonist">Antagonists</button>
+                    <button type="button" class="dropdown-item w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" data-value="supporting">Supporting</button>
+                    <button type="button" class="dropdown-item w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" data-value="minor">Minor</button>
+                </div>
             </div>
             <div class="flex bg-white dark:bg-card-dark rounded-lg p-1 border border-slate-200 dark:border-slate-700 shadow-sm hidden">
                 <button class="p-1.5 rounded-md bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm">
@@ -119,7 +120,7 @@
     {% if characters %}
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-12">
         {% for character in characters %}
-        <div class="group bg-[#fdfcf8] dark:bg-[#1e1e2e] rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full relative overflow-hidden text-left">
+        <div class="group bg-[#fdfcf8] dark:bg-[#1e1e2e] p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full relative overflow-hidden text-left" style="border-radius: 18px !important;">
 
             <div class="flex justify-between items-start mb-4">
                 {% if character.profile_pic_url %}
@@ -134,12 +135,14 @@
                 <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-700 uppercase tracking-wider">{{ character.get_role_display }}</span>
                 {% elif character.role == 'antagonist' %}
                 <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-red-100 text-red-800 uppercase tracking-wider">{{ character.get_role_display }}</span>
+                {% elif character.role == 'supporting' %}
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-green-100 text-green-800 uppercase tracking-wider">{{ character.get_role_display }}</span>
                 {% else %}
                 <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 uppercase tracking-wider">{{ character.get_role_display }}</span>
                 {% endif %}
             </div>
 
-            <h3 class="font-serif text-2xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-primary transition-colors">
+            <h3 class="font-serif text-2xl font-bold text-slate-900 dark:text-white mb-2 transition-colors {% if character.role == 'protagonist' %}group-hover:text-indigo-600{% elif character.role == 'antagonist' %}group-hover:text-red-600{% elif character.role == 'supporting' %}group-hover:text-green-600{% else %}group-hover:text-slate-500{% endif %}">
                 <a href="{% url 'character_detail' character.pk %}" class="text-inherit text-decoration-none">{{ character.name }}</a>
             </h3>
 
@@ -212,19 +215,45 @@
             window.location.href = url.toString();
         };
 
-        const roleFilter = document.getElementById('roleFilter');
-        if (roleFilter) {
-            roleFilter.addEventListener('change', function() {
-                updateParams('role', this.value);
-            });
-        }
+        const dropdowns = document.querySelectorAll('.custom-dropdown');
+        
+        dropdowns.forEach(dropdown => {
+            const toggle = dropdown.querySelector('.dropdown-toggle');
+            const menu = dropdown.querySelector('.dropdown-menu');
+            const items = dropdown.querySelectorAll('.dropdown-item');
+            const icon = toggle.querySelector('.material-symbols-outlined');
 
-        const bookFilter = document.getElementById('bookFilter');
-        if (bookFilter) {
-            bookFilter.addEventListener('change', function() {
-                updateParams('book', this.value);
+            toggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const isShowing = menu.style.display === 'block';
+                
+                // Hide all menus
+                document.querySelectorAll('.dropdown-menu').forEach(m => m.style.display = 'none');
+                document.querySelectorAll('.custom-dropdown .material-symbols-outlined').forEach(i => i.style.transform = 'rotate(0deg)');
+
+                if (!isShowing) {
+                    menu.style.display = 'block';
+                    if (icon) icon.style.transform = 'rotate(180deg)';
+                }
             });
-        }
+
+            items.forEach(item => {
+                item.addEventListener('click', function() {
+                    const value = this.getAttribute('data-value');
+                    const type = dropdown.id === 'dropdown-book' ? 'book' : 'role';
+                    updateParams(type, value);
+                });
+            });
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.custom-dropdown')) {
+                document.querySelectorAll('.dropdown-menu').forEach(m => m.style.display = 'none');
+                document.querySelectorAll('.custom-dropdown .material-symbols-outlined').forEach(i => i.style.transform = 'rotate(0deg)');
+            }
+        });
     });
 </script>
 {% endblock %}
