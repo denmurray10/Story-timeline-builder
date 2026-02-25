@@ -19,7 +19,7 @@
     .card-premium {
         background: #ffffff;
         border: 1px solid #e2e8f0;
-        border-radius: 16px;
+        border-radius: 20px;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
         transition: all 0.2s ease-in-out;
         margin-bottom: 0;
@@ -82,7 +82,7 @@
 
     .portrait-container {
         aspect-ratio: 4/5;
-        border-radius: 12px;
+        border-radius: 20px;
         background-color: #f1f5f9;
         position: relative;
         overflow: hidden;
@@ -140,6 +140,31 @@
     .btn-action-primary:hover {
         background: #1e293b;
         color: white;
+    }
+
+    .btn-manage-map {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        background: #1e293b;
+        color: white;
+        border: none;
+        border-radius: 14px;
+        padding: 0.65rem 1rem;
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    .btn-manage-map:hover {
+        background: #0f172a;
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
     
     .timeline-pill {
@@ -203,7 +228,7 @@
     .avatar-option {
         cursor: pointer;
         border: 2px solid transparent;
-        border-radius: 12px;
+        border-radius: 14px;
         padding: 4px;
         transition: all 0.2s;
         aspect-ratio: 1;
@@ -667,8 +692,8 @@
                                 </div>
                             {% endfor %}
                             
-                            <a href="{% url 'relationship_map' %}" class="btn btn-outline-primary btn-sm border-dashed rounded-3 py-2 mt-2 fw-bold uppercase tracking-widest" style="font-size: 0.6rem;">
-                                Manage Full Map <i class="bi bi-arrow-right ms-1"></i>
+                            <a href="{% url 'relationship_map' %}" class="btn-manage-map w-100 py-2.5 mt-2 fw-bold uppercase tracking-widest d-flex align-items-center justify-content-center gap-2">
+                                Manage Full Map <i class="bi bi-arrow-right"></i>
                             </a>
                         </div>
                     </div>
@@ -798,7 +823,7 @@
 <!-- AI Deep Dive Modal -->
 <div class="modal fade" id="deepDiveModal" tabindex="-1" aria-labelledby="deepDiveModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content border-0 shadow-lg rounded-4">
+    <div class="modal-content border-0 shadow-lg rounded-5">
       <div class="modal-header border-0 pb-0">
         <h5 class="modal-title font-dm-serif text-primary" id="deepDiveModalLabel"><i class="bi bi-magic"></i> Deep Dive Insight</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
