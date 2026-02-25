@@ -21,7 +21,6 @@
         border-radius: 16px;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
         transition: all 0.2s ease-in-out;
-        height: 100%;
         margin-bottom: 0;
     }
     .card-premium:hover {
@@ -51,28 +50,33 @@
 
     .form-control-premium {
         border-radius: 8px;
-        border: 1px solid #e2e8f0;
-        font-size: 0.9rem;
+        border: none !important;
+        font-size: 0.95rem;
         padding: 0.5rem 0.75rem;
-        background-color: #f8fafc;
+        background-color: transparent;
         width: 100%;
         color: #1e293b;
         transition: all 0.2s;
+        outline: none !important;
+        box-shadow: none !important;
+    }
+    .form-control-premium:hover {
+        background-color: #f8fafc;
     }
     .form-control-premium:focus {
-        border-color: #6366f1;
-        outline: none;
+        outline: none !important;
         background-color: #ffffff;
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.05) !important;
     }
     
     textarea.form-control-premium {
-        min-height: 100px;
-        background-color: #ffffff;
-        border-style: dashed;
-    }
-    textarea.form-control-premium:focus {
-        border-style: solid;
+        height: auto;
+        min-height: 50px;
+        background-color: transparent;
+        padding: 0.5rem 0.75rem;
+        resize: none;
+        overflow: hidden;
+        line-height: 1.6;
     }
 
     .portrait-container {
@@ -212,6 +216,12 @@
         border-color: #6366f1;
         background: rgba(99, 102, 241, 0.1);
     }
+    .draggable-zone { min-height: 100px; }
+    .draggable-card { cursor: grab; transition: transform 0.2s, box-shadow 0.2s; }
+    .draggable-card:active { cursor: grabbing; }
+    .sortable-ghost { opacity: 0.4; border: 2px dashed #6366f1 !important; }
+    .drag-handle { cursor: grab; color: #d1d5db; margin-right: 8px; opacity: 0; transition: opacity 0.2s ease, color 0.2s ease; }
+    .card-premium:hover .drag-handle { color: #6366f1; opacity: 1; }
 </style>
 {% endblock %}
 
@@ -234,6 +244,10 @@
                 </span>
                 <span class="text-muted" style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">
                     Introduced In: <strong class="text-dark">{{ character.introduction_book.title|default:"Unknown Book" }}</strong>
+                </span>
+                <span class="mx-2 text-muted">|</span>
+                <span class="text-muted" style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">
+                    Theme: <span class="d-inline-block rounded-circle align-middle" style="width: 14px; height: 14px; background-color: {{ character.color_code|default:'#6366f1' }}; border: 1px solid rgba(0,0,0,0.1);"></span>
                 </span>
             </div>
         </div>
@@ -258,202 +272,303 @@
             {{ form.avatar_id }}
         </div>
 
-        <div class="row g-4">
-            
-            <!-- COLUMN 1: Visual Identity & Physicals -->
+        <div class="row g-4" id="character-draggable-row">
+            <!-- COLUMN 1: Visual Identity & Status -->
             <div class="col-lg-3">
-                <div class="card-premium">
-                    <div class="card-header-premium border-bottom-0 pb-0">
-                        <i class="bi bi-person-bounding-box text-muted"></i> Identity
-                    </div>
-                    <div class="card-body p-4 pt-3 flex-grow-0">
-                        
-                        <!-- Portrait Container -->
-                        <div class="portrait-container border shadow-sm mb-4" onclick="document.getElementById('{{ form.profile_image.id_for_label }}').click()">
-                            {% if character.profile_pic_url %}
-                            <img src="{{ character.profile_pic_url }}" id="profilePreview" class="portrait-img">
-                            {% else %}
-                            <div id="profilePlaceholder" class="w-100 h-100 d-flex flex-column align-items-center justify-content-center text-muted bg-light">
-                                <i class="bi bi-person fs-1 opacity-50"></i>
-                                <span class="uppercase tracking-widest mt-2" style="font-size: 0.65rem; font-weight: 700;">No Photo</span>
-                            </div>
-                            {% endif %}
-                            
-                            <button type="button" id="generatePortraitBtn" class="btn btn-light rounded-circle shadow-sm position-absolute" style="bottom: 10px; right: 10px; width: 36px; height: 36px; padding: 0; z-index: 10;" title="Generate AI Portrait" onclick="event.stopPropagation(); generatePortraitCall();">
-                                <i class="bi bi-magic text-primary"></i>
-                            </button>
-                            
-                            <div class="portrait-overlay">
-                                <i class="bi bi-upload fs-2 mb-2"></i>
-                                <span class="uppercase tracking-widest fw-bold" style="font-size: 0.7rem;">Upload Image</span>
-                            </div>
+                <!-- Locked Visual Identity -->
+                <div class="card-premium mb-4 overflow-hidden" id="card-identity">
+                    <!-- Portrait Container -->
+                    <div class="portrait-container border-0 rounded-0 shadow-none mb-0 w-100" onclick="document.getElementById('{{ form.profile_image.id_for_label }}').click()">
+                        {% if character.profile_pic_url %}
+                        <img src="{{ character.profile_pic_url }}" id="profilePreview" class="portrait-img">
+                        {% else %}
+                        <div id="profilePlaceholder" class="w-100 h-100 d-flex flex-column align-items-center justify-content-center text-muted bg-light" style="min-height: 350px;">
+                            <i class="bi bi-person fs-1 opacity-50"></i>
+                            <span class="uppercase tracking-widest mt-2" style="font-size: 0.65rem; font-weight: 700;">No Photo</span>
                         </div>
-
+                        {% endif %}
                         
-
-                        <!-- Brand Colour -->
-                        <label class="trait-label">Theme Tint</label>
-                        <div class="d-flex align-items-center gap-2">
-                            <input type="color" name="color_code" class="form-control form-control-color border-0 p-1" value="{{ form.color_code.value|default:'#6366f1' }}" style="height: 35px; width: 45px; border-radius: 8px;">
-                            <span class="text-muted" style="font-size: 0.7rem;">Timeline color representation</span>
-                        </div>
-
-                    </div>
-                    
-                    <div class="card-footer bg-light border-top p-4">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="form-check form-switch m-0">
-                                <input class="form-check-input" type="checkbox" role="switch" name="is_active" id="id_is_active" {% if form.is_active.value %}checked{% endif %}>
-                                <label class="form-check-label fw-bold ms-2" for="id_is_active" style="font-size: 0.85rem;">Active character</label>
-                            </div>
+                        <button type="button" id="generatePortraitBtn" class="btn btn-light rounded-circle shadow-sm position-absolute" style="bottom: 15px; right: 15px; width: 40px; height: 40px; padding: 0; z-index: 10;" title="Generate AI Portrait" onclick="event.stopPropagation(); generatePortraitCall();">
+                            <i class="bi bi-magic fs-5 text-primary"></i>
+                        </button>
+                        
+                        <div class="portrait-overlay">
+                            <i class="bi bi-upload fs-2 mb-2"></i>
+                            <span class="uppercase tracking-widest fw-bold" style="font-size: 0.7rem;">Upload Image</span>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- COLUMN 2: Psychology & Story -->
-            <div class="col-lg-5">
-                <div class="d-flex flex-column gap-4 h-100">
-                    
-                    <!-- Relationships Panel -->
-                    <div class="card-premium">
-                        <div class="card-header-premium flex-wrap justify-content-between">
-                            <div class="d-flex align-items-center gap-2">
-                                <i class="bi bi-bezier2 text-muted"></i> Social Dynamics
-                            </div>
-                            <a href="{% url 'relationship_map' %}" class="text-decoration-none text-primary" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">
-                                View Map <i class="bi bi-box-arrow-up-right"></i>
-                            </a>
+                <!-- Draggable Area for Col 1 -->
+                <div class="draggable-zone" id="char-col-1">
+                    <!-- Meta Details -->
+                <!-- Personality Traits Card (NEW) -->
+                <div class="card-premium draggable-card mb-4" id="card-traits">
+                    <div class="card-header-premium border-bottom-0 pb-0">
+                        <i class="bi bi-grip-vertical drag-handle"></i>
+                        <i class="bi bi-lightning-charge text-muted"></i> Personality Traits
+                    </div>
+                    <div class="card-body p-4 pt-3">
+                        <textarea name="traits" class="form-control-premium" style="min-height: 120px;" placeholder="Key personality traits and quirks...">{{ form.traits.value|default_if_none:'' }}</textarea>
+                    </div>
+                </div>
+
+                <div class="card-premium draggable-card mb-4" id="card-meta">
+                    <div class="card-header-premium flex-wrap justify-content-between">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-grip-vertical drag-handle"></i>
+                            <i class="bi bi-info-circle text-muted"></i> Meta Data
                         </div>
-                        <div class="card-body p-0 position-relative overflow-hidden" style="min-height: 250px; background: #fafafa;">
-                            <!-- Simplified Map Mockup -->
-                            <svg class="position-absolute w-100 h-100" style="z-index: 0; opacity: 0.3;">
-                                {% for rel in relationships %}
-                                <line x1="50%" y1="50%" x2="{% cycle '20%' '80%' '50%' %}" y2="{% cycle '20%' '20%' '80%' %}" stroke="{{ rel.get_color_code }}" stroke-width="2" />
+                        <div class="form-check form-switch m-0">
+                            <input class="form-check-input scale-75" type="checkbox" role="switch" name="is_active" id="id_is_active" {% if form.is_active.value %}checked{% endif %}>
+                            <label class="form-check-label fw-bold ms-1" for="id_is_active" style="font-size: 0.75rem;">Active</label>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <label class="trait-label text-dark">Character Role</label>
+                            <select name="role" class="form-select form-select-sm border-0 bg-light fw-bold" style="font-size: 0.85rem;">
+                                {% for choice in form.role.field.choices %}
+                                <option value="{{ choice.0 }}" {% if form.role.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="trait-label text-dark">Debut Book</label>
+                            <select name="introduction_book" class="form-select form-select-sm border-0 bg-light" style="font-size: 0.8rem;">
+                                {% for choice in form.introduction_book.field.choices %}
+                                <option value="{{ choice.0 }}" {% if form.introduction_book.value == choice.0|stringformat:"i" or form.introduction_book.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="trait-label text-dark">Debut Chapter</label>
+                            <select name="introduction_chapter" class="form-select form-select-sm border-0 bg-light" style="font-size: 0.8rem;">
+                                {% for choice in form.introduction_chapter.field.choices %}
+                                <option value="{{ choice.0 }}" {% if form.introduction_chapter.value == choice.0|stringformat:"i" or form.introduction_chapter.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="trait-label m-0 text-dark">Theme Tint</label>
+                            <input type="color" name="color_code" class="form-control form-control-color border-0 p-0" value="{{ form.color_code.value|default:'#6366f1' }}" style="height: 24px; width: 40px; border-radius: 4px; cursor:pointer;">
+                        </div>
+                    </div>
+                </div> <!-- End card-meta -->
+            </div> <!-- End Draggable Area for Col 1 (char-col-1) -->
+        </div> <!-- End COLUMN 1 (col-lg-3) -->
+
+            <!-- COLUMN 2: Social & Psychology -->
+            <div class="col-lg-4 draggable-zone" id="char-col-2">
+                <div class="card-premium draggable-card mb-4 overflow-hidden" id="card-social">
+                    <div class="card-header-premium flex-wrap justify-content-between">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-grip-vertical drag-handle"></i>
+                            <i class="bi bi-bezier2 text-muted"></i> Social Dynamics
+                        </div>
+                        <a href="{% url 'relationship_map' %}" class="text-decoration-none text-primary" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">
+                            View Map <i class="bi bi-box-arrow-up-right"></i>
+                        </a>
+                    </div>
+                    <div class="card-body p-0 position-relative overflow-hidden" style="min-height: 280px; background: #fafafa; border-bottom: 1px solid #f1f5f9;">
+                        <!-- Relationship Visualization -->
+                        <div class="position-absolute w-100 h-100" style="z-index: 1;">
+                            <svg class="w-100 h-100" style="opacity: 0.8;">
+                                {% for rel in relationships|slice:":5" %}
+                                    <line x1="50%" y1="50%" x2="{% cycle '15%' '85%' '50%' '20%' '80%' %}" y2="{% cycle '20%' '25%' '80%' '75%' '72%' %}" stroke="{{ rel.get_color_code }}" stroke-width="2" />
                                 {% endfor %}
                             </svg>
-                            <div class="d-flex align-items-center justify-content-center h-100 position-absolute w-100" style="z-index: 10;">
-                                <!-- Primary Node -->
-                                <div class="d-flex flex-column align-items-center me-4">
-                                    <div class="rel-node shadow-lg border-opacity-50" style="width: 72px; height: 72px; border-width: 4px; border-color: white; background-image: url('{{ character.profile_pic_url }}');">
-                                        {% if not character.profile_pic_url %}<div class="w-100 h-100 bg-primary bg-opacity-10 d-flex align-items-center justify-content-center rounded-circle"><i class="bi bi-person text-primary"></i></div>{% endif %}
-                                    </div>
-                                    <span class="badge bg-white text-dark shadow-sm border mt-n2 rounded-pill px-3" style="z-index: 5;">You</span>
+                        </div>
+
+                        <div class="d-flex align-items-center justify-content-center h-100 position-relative" style="z-index: 10; min-height: 280px;">
+                            <!-- Primary Node (Central) -->
+                            <div class="d-flex flex-column align-items-center" style="position: relative; z-index: 15;">
+                                <div class="rel-node shadow-lg border-opacity-50" style="width: 72px; height: 72px; border-width: 4px; border-color: white; background-image: url('{{ character.profile_pic_url }}');">
+                                    {% if not character.profile_pic_url %}<div class="w-100 h-100 bg-primary bg-opacity-10 d-flex align-items-center justify-content-center rounded-circle"><i class="bi bi-person text-primary"></i></div>{% endif %}
                                 </div>
-                                
-                                <!-- Contacts -->
-                                <div class="position-absolute w-100 h-100" style="pointer-events: none;">
-                                    {% for rel in relationships|slice:":3" %}
-                                    {% with other=rel.character_a %}
-                                    {% if other == character %}{% with other=rel.character_b %}{% endwith %}{% endif %}
-                                    <div class="position-absolute d-flex flex-column align-items-center" style="left: {% cycle '20%' '75%' '50%' %}; top: {% cycle '25%' '30%' '80%' %}; pointer-events: auto;">
-                                        <div class="rel-node border-light" style="background-image: url('{{ other.profile_pic_url }}');">
-                                            {% if not other.profile_pic_url %}<div class="w-100 h-100 bg-light d-flex align-items-center justify-content-center rounded-circle"><i class="bi bi-person text-muted"></i></div>{% endif %}
-                                        </div>
-                                        <span class="badge bg-white bg-opacity-75 text-dark border shadow-sm mt-1 px-2" style="font-size: 0.6rem;">{{ other.name|truncatechars:12 }}</span>
-                                    </div>
-                                    {% endwith %}
-                                    {% endfor %}
-                                </div>
+                                <span class="badge bg-white text-dark shadow-sm border mt-n2 rounded-pill px-3" style="z-index: 20;">You</span>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Psychology -->
-                    <div class="card-premium">
-                        <div class="card-header-premium">
-                            <i class="bi bi-heart-pulse text-muted"></i> Deep Psychology
-                        </div>
-                        <div class="card-body p-4">
-                            <div class="row g-4">
-                                <div class="col-md-6 border-end">
-                                    <div class="d-flex align-items-center gap-2 mb-2">
-                                        <i class="bi bi-star-fill text-warning"></i>
-                                        <label class="trait-label m-0 text-dark">Core Desire</label>
-                                    </div>
-                                    <textarea name="core_desire" class="form-control-premium" style="min-height: 80px;" placeholder="What does they want most?">{{ form.core_desire.value|default_if_none:'' }}</textarea>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="d-flex align-items-center gap-2 mb-2">
-                                        <i class="bi bi-virus text-danger"></i>
-                                        <label class="trait-label m-0 text-dark">Fatal Flaw</label>
-                                    </div>
-                                    <textarea name="fatal_flaw" class="form-control-premium" style="min-height: 80px;" placeholder="What weakness will be their downfall?">{{ form.fatal_flaw.value|default_if_none:'' }}</textarea>
-                                </div>
-                                <div class="col-12 mt-4 pt-4 border-top">
-                                    <label class="trait-label text-dark mb-2"><i class="bi bi-journal-text text-primary me-2"></i> Bio / General Description</label>
-                                    <textarea name="description" class="form-control-premium" style="min-height: 150px;">{{ form.description.value|default_if_none:'' }}</textarea>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                </div>
-            </div>
-
-            <!-- COLUMN 3: Plot Integration & Timeline -->
-            <div class="col-lg-4">
-                <div class="d-flex flex-column gap-4 h-100">
-                    
-
-                    <!-- Events Timeline -->
-                    <div class="card-premium flex-grow-1">
-                        <div class="card-header-premium bg-light border-bottom">
-                            <i class="bi bi-clock-history text-muted"></i> Key Events Timeline
-                        </div>
-                        <div class="card-body p-4 overflow-auto position-relative" style="max-height: 700px;" id="timeline-container-sidebar">
-                            <!-- Background Timeline Line -->
-                            <div class="position-absolute" style="left: 31px; top: 30px; bottom: 30px; width: 2px; background: #e2e8f0; z-index: 0;"></div>
-                            <!-- Active Progress Line -->
-                            <div id="timeline-progress-line" class="position-absolute" style="left: 31px; top: 30px; width: 2px; background: var(--char-accent, #6366f1); z-index: 10; transition: height 0.7s ease-in-out; height: 0;"></div>
                             
-                            <div class="d-flex flex-column gap-5 position-relative z-10">
-                                {% if events %}
-                                    {% for event in events %}
-                                    <div class="position-relative ps-5 event-item">
-                                        <div class="d-flex gap-4">
-                                            <!-- Node -->
-                                            <div class="rounded-circle border-2 border-white bg-white shadow-sm d-flex align-items-center justify-content-center shrink-0 js-timeline-node" style="width: 24px; height: 24px; margin-left: -29px; position: relative; z-index: 20;">
-                                                <div class="rounded-circle js-timeline-dot {% if event.is_written %}bg-primary{% else %}border border-dashed border-secondary{% endif %}" style="width: 10px; height: 10px;"></div>
+                            <!-- Improved Contacts Mapping (Placed at ends of lines) -->
+                            {% for rel in relationships|slice:":5" %}
+                                <div class="position-absolute d-flex flex-column align-items-center" style="left: {% cycle '15%' '85%' '50%' '20%' '80%' %}; top: {% cycle '20%' '25%' '80%' '75%' '72%' %}; transform: translate(-50%, -50%); cursor: help;" title="{{ rel.get_relationship_type_display }} - Strength: {{ rel.strength }}">
+                                    {% if rel.character_a == character %}
+                                        {% with other=rel.character_b %}
+                                            <div class="rel-node border-white shadow-sm" style="width: 42px; height: 42px; background-image: url('{{ other.profile_pic_url|default:'' }}'); border-width: 3px;">
+                                                {% if not other.profile_pic_url %}<div class="w-100 h-100 bg-light d-flex align-items-center justify-content-center rounded-circle"><i class="bi bi-person text-muted"></i></div>{% endif %}
                                             </div>
-
-                                            <!-- Card -->
-                                            <div class="flex-grow-1 bg-white border rounded-3 p-3 shadow-sm hover-shadow-lg transition">
-                                                <div class="d-flex justify-content-between align-items-start mb-1">
-                                                    <span class="text-[10px] font-bold uppercase tracking-wider text-muted">
-                                                        {% if event.chapter %}Chapter {{ event.chapter.chapter_number }}{% else %}{{ event.story_date|upper|default:"Planned" }}{% endif %}
-                                                    </span>
-                                                </div>
-                                                <h6 class="m-0 fw-bold text-dark" style="font-size: 0.9rem;">
-                                                    <a href="{% url 'event_detail' event.pk %}" class="text-dark text-decoration-none hover-primary">
-                                                        {{ event.title }}
-                                                    </a>
-                                                </h6>
-                                                {% if event.description %}
-                                                <p class="text-muted m-0 mt-2 line-clamp-2" style="font-size: 0.8rem; line-height: 1.4;" title="{{ event.description }}">
-                                                    {{ event.description }}
-                                                </p>
-                                                {% endif %}
+                                            <span class="badge bg-white text-dark border shadow-sm mt-1 px-2" style="font-size: 0.6rem; font-weight: 700; transform: translateY(-2px);">{{ other.name|truncatechars:10 }}</span>
+                                        {% endwith %}
+                                    {% else %}
+                                        {% with other=rel.character_a %}
+                                            <div class="rel-node border-white shadow-sm" style="width: 42px; height: 42px; background-image: url('{{ other.profile_pic_url|default:'' }}'); border-width: 3px;">
+                                                {% if not other.profile_pic_url %}<div class="w-100 h-100 bg-light d-flex align-items-center justify-content-center rounded-circle"><i class="bi bi-person text-muted"></i></div>{% endif %}
                                             </div>
-                                        </div>
-                                    </div>
-                                    {% endfor %}
-                                {% else %}
-                                    <div class="text-center py-5 text-muted">
-                                        <i class="bi bi-calendar-x fs-1 opacity-25 mb-3 d-block"></i>
-                                        <span class="uppercase tracking-widest fw-bold" style="font-size: 0.7rem;">Not assigned to any plot events</span>
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        <div class="card-footer bg-white border-top text-center py-3">
-                            <span class="badge bg-primary bg-opacity-10 text-primary uppercase tracking-widest p-2">Total Apperances: {{ events.count }}</span>
+                                            <span class="badge bg-white text-dark border shadow-sm mt-1 px-2" style="font-size: 0.6rem; font-weight: 700; transform: translateY(-2px);">{{ other.name|truncatechars:10 }}</span>
+                                        {% endwith %}
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
                         </div>
                     </div>
+                    <!-- Relationship Details List -->
+                    <div class="card-footer bg-white border-0 p-4">
+                        <label class="trait-label mb-3">Key Connections</label>
+                        <div class="d-flex flex-column gap-3">
+                            {% for rel in relationships|slice:":5" %}
+                                {% if rel.character_a == character %}{% with other=rel.character_b %}
+                                <div class="d-flex align-items-center justify-content-between bg-light rounded-4 p-3 border border-dashed hover-lift transition-all">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="rounded-circle bg-white border shadow-sm d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; overflow: hidden;">
+                                            {% if other.profile_pic_url %}<img src="{{ other.profile_pic_url }}" class="w-100 h-100 object-fit-cover">{% else %}<i class="bi bi-person text-muted" style="font-size: 0.8rem;"></i>{% endif %}
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-dark" style="font-size: 0.85rem;">{{ other.name }}</div>
+                                            <div class="text-muted" style="font-size: 0.65rem;">Strength: {{ rel.strength }}/10</div>
+                                        </div>
+                                    </div>
+                                    <span class="badge rounded-pill" style="background: {{ rel.get_color_code }}15; color: {{ rel.get_color_code }}; font-size: 0.65rem; border: 1px solid {{ rel.get_color_code }}30; padding: 0.4em 0.8em;">
+                                        {{ rel.get_relationship_type_display }}
+                                    </span>
+                                </div>
+                                {% endwith %}{% else %}{% with other=rel.character_a %}
+                                <div class="d-flex align-items-center justify-content-between bg-light rounded-4 p-3 border border-dashed hover-lift transition-all">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="rounded-circle bg-white border shadow-sm d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; overflow: hidden;">
+                                            {% if other.profile_pic_url %}<img src="{{ other.profile_pic_url }}" class="w-100 h-100 object-fit-cover">{% else %}<i class="bi bi-person text-muted" style="font-size: 0.8rem;"></i>{% endif %}
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-dark" style="font-size: 0.85rem;">{{ other.name }}</div>
+                                            <div class="text-muted" style="font-size: 0.65rem;">Strength: {{ rel.strength }}/10</div>
+                                        </div>
+                                    </div>
+                                    <span class="badge rounded-pill" style="background: {{ rel.get_color_code }}15; color: {{ rel.get_color_code }}; font-size: 0.65rem; border: 1px solid {{ rel.get_color_code }}30; padding: 0.4em 0.8em;">
+                                        {{ rel.get_relationship_type_display }}
+                                    </span>
+                                </div>
+                                {% endwith %}{% endif %}
+                            {% empty %}
+                                <div class="text-center py-4 text-muted bg-light rounded-4 border border-dashed" style="font-size: 0.8rem; font-style: italic;">
+                                    <i class="bi bi-people fs-4 d-block mb-1 opacity-50"></i>
+                                    No known connections yet.
+                                </div>
+                            {% endfor %}
+                            
+                            <a href="{% url 'relationship_map' %}" class="btn btn-outline-primary btn-sm border-dashed rounded-3 py-2 mt-2 fw-bold uppercase tracking-widest" style="font-size: 0.6rem;">
+                                Manage Full Map <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
 
+                <!-- Psychology Panel -->
+                <div class="card-premium draggable-card mb-4" id="card-psychology">
+                    <div class="card-header-premium border-bottom-0">
+                        <i class="bi bi-grip-vertical drag-handle"></i>
+                        <i class="bi bi-heart-pulse text-muted"></i> Deep Psychology
+                    </div>
+                    <div class="card-body p-4 pt-0">
+                        <div class="mb-4">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi bi-star-fill text-warning"></i>
+                                <label class="trait-label m-0 text-dark">Core Desire</label>
+                            </div>
+                            <textarea name="core_desire" class="form-control-premium" style="min-height: 100px;" placeholder="What does this character crave?">{{ form.core_desire.value|default_if_none:'' }}</textarea>
+                        </div>
+                        <div class="mb-0">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi bi-virus text-danger"></i>
+                                <label class="trait-label m-0 text-dark">Fatal Flaw</label>
+                            </div>
+                            <textarea name="fatal_flaw" class="form-control-premium" style="min-height: 100px;" placeholder="What leads to their undoing?">{{ form.fatal_flaw.value|default_if_none:'' }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Motivation Card (NEW) -->
+                <div class="card-premium draggable-card mb-4" id="card-motivation">
+                    <div class="card-header-premium border-bottom-0 pb-0">
+                        <i class="bi bi-grip-vertical drag-handle"></i>
+                        <i class="bi bi-compass text-muted"></i> Motivation
+                    </div>
+                    <div class="card-body p-4 pt-3">
+                        <textarea name="motivation" class="form-control-premium" style="min-height: 120px;" placeholder="What drives this character?">{{ form.motivation.value|default_if_none:'' }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Goals Card (NEW) -->
+                <div class="card-premium draggable-card mb-4" id="card-goals">
+                    <div class="card-header-premium border-bottom-0 pb-0">
+                        <i class="bi bi-grip-vertical drag-handle"></i>
+                        <i class="bi bi-flag text-muted"></i> Goals & Objectives
+                    </div>
+                    <div class="card-body p-4 pt-3">
+                        <textarea name="goals" class="form-control-premium" style="min-height: 120px;" placeholder="Long-term and short-term objectives...">{{ form.goals.value|default_if_none:'' }}</textarea>
+                    </div>
                 </div>
             </div>
 
+            <!-- COLUMN 3: Narrative & Timeline -->
+            <div class="col-lg-5 draggable-zone" id="char-col-3">
+                <!-- Biography Card -->
+                <div class="card-premium draggable-card mb-4" id="card-bio">
+                    <div class="card-header-premium border-bottom-0">
+                        <i class="bi bi-grip-vertical drag-handle"></i>
+                        <i class="bi bi-journal-text text-muted"></i> Biography & Arc
+                    </div>
+                    <div class="card-body p-4 pt-0">
+                        <textarea name="description" class="form-control-premium" style="min-height: 250px;" placeholder="Describe the character's journey...">{{ form.description.value|default_if_none:'' }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Events Timeline Card -->
+                <div class="card-premium draggable-card mb-4" id="card-timeline">
+                    <div class="card-header-premium border-bottom">
+                        <i class="bi bi-grip-vertical drag-handle"></i>
+                        <i class="bi bi-clock-history text-muted"></i> Key Events
+                    </div>
+                    <div class="card-body p-4 overflow-auto position-relative" style="max-height: 500px;" id="timeline-container-sidebar">
+                        <!-- Background Timeline Line -->
+                        <div class="position-absolute" style="left: 31px; top: 30px; bottom: 30px; width: 2px; background: #e2e8f0; z-index: 0;"></div>
+                        <!-- Active Progress Line -->
+                        <div id="timeline-progress-line" class="position-absolute" style="left: 31px; top: 30px; width: 2px; background: var(--char-accent, #6366f1); z-index: 10; transition: height 0.7s ease-in-out; height: 0;"></div>
+                        
+                        <div class="d-flex flex-column gap-5 position-relative z-10">
+                            {% if events %}
+                                {% for event in events %}
+                                <div class="position-relative ps-5 event-item">
+                                    <div class="d-flex gap-4">
+                                        <!-- Node -->
+                                        <div class="rounded-circle border-2 border-white bg-white shadow-sm d-flex align-items-center justify-content-center shrink-0 js-timeline-node" style="width: 24px; height: 24px; margin-left: -29px; position: relative; z-index: 20;">
+                                            <div class="rounded-circle js-timeline-dot {% if event.is_written %}bg-primary{% else %}border border-dashed border-secondary{% endif %}" style="width: 10px; height: 10px;"></div>
+                                        </div>
+
+                                        <!-- Card -->
+                                        <div class="flex-grow-1 bg-white rounded-3 p-3 shadow-sm hover-shadow-lg transition">
+                                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                                <span class="text-[10px] font-bold uppercase tracking-wider text-muted">
+                                                    {% if event.chapter %}Chapter {{ event.chapter.chapter_number }}{% else %}{{ event.story_date|upper|default:"Planned" }}{% endif %}
+                                                </span>
+                                            </div>
+                                            <h6 class="m-0 fw-bold text-dark" style="font-size: 0.9rem;">
+                                                <a href="{% url 'event_detail' event.pk %}" class="text-dark text-decoration-none hover-primary">
+                                                    {{ event.title }}
+                                                </a>
+                                            </h6>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="text-center py-5 text-muted">
+                                    <i class="bi bi-calendar-x fs-1 opacity-25 mb-3 d-block"></i>
+                                    <span class="uppercase tracking-widest fw-bold" style="font-size: 0.7rem;">Not assigned to any plot events</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </form>
 </div>
@@ -481,6 +596,7 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 <script>
     function generatePortraitCall() {
         if (!confirm('Generate a new AI portrait for this character?')) return;
@@ -661,8 +777,70 @@
         }
 
         window.addEventListener('scroll', updateTimelineScroll);
-        timelineContainer.addEventListener('scroll', updateTimelineScroll);
+        // Initialize Auto-resize for textareas
+        function resizeTextarea(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = (textarea.scrollHeight) + 'px';
+        }
+
+        const allTextareas = document.querySelectorAll('.form-control-premium');
+        allTextareas.forEach(textarea => {
+            textarea.addEventListener('input', () => resizeTextarea(textarea));
+            // Trigger initial resize
+            setTimeout(() => resizeTextarea(textarea), 100);
+        });
+
+        if (timelineContainer) timelineContainer.addEventListener('scroll', updateTimelineScroll);
         updateTimelineScroll();
+
+        // Initialize Sortable
+        const columns = ['char-col-1', 'char-col-2', 'char-col-3'];
+        columns.forEach(colId => {
+            const el = document.getElementById(colId);
+            if (el) {
+                new Sortable(el, {
+                    group: 'character-profile',
+                    animation: 250,
+                    ghostClass: 'sortable-ghost',
+                    handle: '.drag-handle',
+                    onEnd: () => {
+                        const layout = {};
+                        columns.forEach(id => {
+                            const colEl = document.getElementById(id);
+                            if (colEl) layout[id] = Array.from(colEl.children).map(c => c.id);
+                        });
+                        localStorage.setItem('character-profile-layout-{{ character.id }}', JSON.stringify(layout));
+                        
+                        // Trigger resize for all textareas after drop to ensure layout is correct
+                        allTextareas.forEach(ta => resizeTextarea(ta));
+                    }
+                });
+            }
+        });
+
+        // Load saved layout
+        const savedLayout = localStorage.getItem('character-profile-layout-{{ character.id }}');
+        if (savedLayout) {
+            try {
+                const layout = JSON.parse(savedLayout);
+                Object.keys(layout).forEach(colId => {
+                    const colEl = document.getElementById(colId);
+                    if (colEl) {
+                        layout[colId].forEach(cardId => {
+                            // Don't move the locked identity card via saved layout
+                            if (cardId === 'card-identity') return;
+                            
+                            const cardEl = document.getElementById(cardId);
+                            if (cardEl) colEl.appendChild(cardEl);
+                        });
+                    }
+                });
+                // Ensure textareas are resized after layout is restored
+                setTimeout(() => {
+                    allTextareas.forEach(ta => resizeTextarea(ta));
+                }, 200);
+            } catch(e) { console.error("Layout load error", e); }
+        }
     });
 </script>
 {% endblock %}

@@ -688,6 +688,32 @@ class CharacterRelationship(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def get_other_character(self, character):
+        if self.character_a_id == character.id:
+            return self.character_b
+        return self.character_a
+
+    def get_color_code(self):
+        colors = {
+            'friend': '#10b981',      # Emerald
+            'ally': '#34d399',        # Emerald 400
+            'enemy': '#ef4444',       # Red
+            'nemesis': '#b91c1c',     # Red 700
+            'romantic': '#ec4899',    # Pink
+            'family': '#f59e0b',      # Amber
+            'rival': '#f97316',       # Orange
+            'mentor': '#6366f1',      # Indigo
+            'protege': '#818cf8',     # Indigo 400
+            'professional': '#64748b',# Slate
+            'acquaintance': '#94a3b8',# Slate 400
+            'complicated': '#8b5cf6', # Violet
+            'neutral': '#cbd5e1',     # Slate 300
+        }
+        return colors.get(self.relationship_type, '#94a3b8')
+
+    def __str__(self):
+        return f"{self.character_a.name} & {self.character_b.name} ({self.get_relationship_type_display()})"
+
 class InteractionSummaryCache(models.Model):
     """
     Caches the 1/3, 2/3, 3/3 chronological interaction snapshots 
