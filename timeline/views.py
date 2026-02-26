@@ -265,6 +265,12 @@ def staff_dashboard(request):
         'total_characters': Character.objects.count(),
         'total_posts': Post.objects.count(),
         'total_world_entries': WorldEntry.objects.count(),
+        # AI Specific Metrics
+        'ai_assisted_books': Book.objects.filter(ai_assisted=True).count(),
+        'character_deep_dives': Character.objects.exclude(Q(deep_dive_notes__isnull=True) | Q(deep_dive_notes='')).count(),
+        'active_story_scans': StoryScanStatus.objects.filter(status__in=['pending', 'running']).count(),
+        'total_story_scans': StoryScanStatus.objects.count(),
+        'ai_relationships': CharacterRelationship.objects.count(), # Assuming these are AI-driven/monitored
     }
     
     # AI Usage month-to-date range
