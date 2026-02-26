@@ -267,8 +267,25 @@ def staff_dashboard(request):
         'total_world_entries': WorldEntry.objects.count(),
     }
     
-    # Recent User Registrations
-    recent_users = User.objects.all().order_by('-date_joined')[:10]
+    # AI Usage month-to-date range
+    now_dt = timezone.now()
+    month_start = now_dt.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    
+    # Recent Logins with Monthly Stats and Online Detection
+    # Threshold for "Active Now" is activity in the last 15 minutes
+    active_now_threshold = now_dt - timezone.timedelta(minutes=15)
+    
+    from django.db.models import Max
+    recent_users = User.objects.all().annotate(
+        book_count=Count('books', distinct=True),
+        deepseek_tokens=Sum('aiusagelog__total_tokens', filter=Q(aiusagelog__service_name='DeepSeek', aiusagelog__timestamp__gte=month_start)),
+        deepseek_cost=Sum('aiusagelog__cost_estimate', filter=Q(aiusagelog__service_name='DeepSeek', aiusagelog__timestamp__gte=month_start)),
+        last_activity=Max('activity_logs__timestamp')
+    ).order_by('-last_login')[:10]
+    
+    # Add a property to each user object for template use
+    for u in recent_users:
+        u.is_online = u.last_activity and u.last_activity >= active_now_threshold
     
     # Recent System Activity (LogEntries)
     recent_activity = LogEntry.objects.all().select_related('user', 'content_type').order_by('-action_time')[:15]

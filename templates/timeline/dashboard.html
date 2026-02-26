@@ -57,6 +57,75 @@
     .form-check.form-switch.me-3.mb-0 {
         display: none !important;
     }
+    
+    /* Change blue sections in Dashboard Widgets modal to black */
+    #widgetsModal .nav-pills .nav-link.active {
+        background-color: var(--dark-universal, rgba(33, 37, 41, 1)) !important;
+        color: #ffffff !important;
+        border-color: var(--dark-universal, rgba(33, 37, 41, 1)) !important;
+    }
+    
+    #widgetsModal .nav-pills .nav-link {
+        color: #000000 !important;
+    }
+    
+    #widgetsModal .form-check-input:checked {
+        background-color: var(--dark-universal, rgba(33, 37, 41, 1)) !important;
+        border-color: var(--dark-universal, rgba(33, 37, 41, 1)) !important;
+    }
+    
+    #widgetsModal .form-check-input:focus {
+        border-color: var(--dark-universal, rgba(33, 37, 41, 1)) !important;
+        box-shadow: 0 0 0 0.25rem rgba(33, 37, 41, 0.25) !important;
+    }
+
+    /* Coming Soon Hover Bubble */
+    .coming-soon-hover {
+        position: relative;
+        cursor: help !important;
+        opacity: 0.6;
+        transition: opacity 0.2s;
+    }
+    .coming-soon-hover:hover {
+        opacity: 1;
+        background-color: rgba(0, 0, 0, 0.03);
+    }
+    .coming-soon-bubble {
+        visibility: hidden;
+        width: 190px;
+        background-color: #1e293b;
+        color: #ffffff;
+        text-align: center;
+        border-radius: 12px;
+        padding: 10px 14px;
+        position: absolute;
+        z-index: 1050;
+        left: 105%;
+        top: 50%;
+        transform: translateY(-50%) translateX(-10px);
+        opacity: 0;
+        transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        font-size: 0.75rem;
+        line-height: 1.4;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+        pointer-events: none;
+        font-weight: 500;
+    }
+    .coming-soon-bubble::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        right: 100%;
+        margin-top: -6px;
+        border-width: 6px;
+        border-style: solid;
+        border-color: transparent #1e293b transparent transparent;
+    }
+    .coming-soon-hover:hover .coming-soon-bubble {
+        visibility: visible;
+        opacity: 1;
+        transform: translateY(-50%) translateX(0);
+    }
 </style>
 {% endblock %}
 {% block sidebar_block %}
@@ -69,8 +138,20 @@
         <a class="nav-link {% if 'book' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'book_list' %}"><i class="bi bi-book"></i> Manuscripts</a>
         <a class="nav-link {% if 'character' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'character_list' %}"><i class="bi bi-people"></i> Characters</a>
         <a class="nav-link {% if 'relationship' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'relationship_map' %}"><i class="bi bi-diagram-3"></i> Relationship Map</a>
-        <a class="nav-link {% if request.resolver_match.url_name == 'horizontal_timeline' %}active{% endif %}" href="{% url 'horizontal_timeline' %}"><i class="bi bi-clock-history"></i> Timeline</a>
-        <a class="nav-link {% if 'world' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'world_list' %}"><i class="bi bi-globe"></i> World Wiki</a>
+        <div class="nav-link coming-soon-hover">
+            <i class="bi bi-clock-history"></i> Timeline
+            <div class="coming-soon-bubble">
+                <i class="bi bi-stars text-warning me-1"></i>
+                Timeline features will be available soon in future versions.
+            </div>
+        </div>
+        <div class="nav-link coming-soon-hover">
+            <i class="bi bi-globe"></i> World Wiki
+            <div class="coming-soon-bubble">
+                <i class="bi bi-stars text-warning me-1"></i>
+                World Wiki features will be available soon in future versions.
+            </div>
+        </div>
         <a class="nav-link {% if request.resolver_match.url_name == 'post_list' %}active{% endif %}" href="{% url 'post_list' %}"><i class="bi bi-journal-text"></i> Blog</a>
         <hr class="my-3 opacity-10">
         <a class="nav-link" href="{% url 'event_create' %}"><i class="bi bi-plus-circle"></i> New Event</a>
@@ -283,7 +364,9 @@
     <div class="row g-3" id="writerModeContainer" style="display: none;">
         <div class="col-lg-4 draggable-zone" id="writer-col-1">
             <div class="dash-card dash-pill-card p-4 draggable-card mb-4 bg-dark text-white shadow-lg" id="card-writing-mode" style="border-radius: 20px;">
-                <div class="dash-card-header d-flex align-items-center opacity-75 mb-3"><i class="bi bi-grip-vertical drag-handle me-2"></i>Writing Mode</div>
+                <div class="dash-card-header d-flex align-items-center text-white mb-3">
+                    <i class="bi bi-grip-vertical drag-handle me-2"></i>Writing Mode
+                </div>
                 <div class="px-2">
                     <h3 class="mb-2 fw-bold text-white">{{ latest_book.title|default:"Continue Your Manuscript" }}</h3>
                     <p class="opacity-75 mb-4">Jump back into your last edited chapter. Distraction-free, AI-powered writing awaits.</p>
@@ -378,7 +461,9 @@
         <div class="col-lg-6 draggable-zone" id="col-left">
             <!-- Writing Mode Card (Architect View) -->
             <div class="dash-card dash-pill-card p-4 draggable-card mb-3 bg-dark text-white shadow-lg" id="card-writing-mode-architect" style="border-radius: 20px;">
-                <div class="dash-card-header d-flex align-items-center opacity-75 mb-3"><i class="bi bi-grip-vertical drag-handle me-2"></i>Writing Mode</div>
+                <div class="dash-card-header d-flex align-items-center text-white mb-3">
+                    <i class="bi bi-grip-vertical drag-handle me-2"></i>Writing Mode
+                </div>
                 <div class="px-2">
                     <h6 class="mb-2 fw-bold text-white">{{ latest_book.title|default:"Continue Your Manuscript" }}</h6>
                     <p class="opacity-75 mb-4 small" style="font-size: 0.75rem;">Jump back into your last edited chapter. Distraction-free, AI-powered writing awaits.</p>
@@ -545,10 +630,16 @@
             <div class="dash-card p-3 draggable-card mb-3" id="card-character-spotlight">
                 <div class="dash-card-header d-flex align-items-center mb-2"><i class="bi bi-grip-vertical drag-handle"></i>Spotlight</div>
                 <div class="d-flex align-items-center mb-3">
-                    <div class="me-3">
-                        {% if spotlight_character.profile_pic_url %}<img src="{{ spotlight_character.profile_pic_url }}" class="rounded-circle shadow-sm" style="width: 50px; height: 50px; object-fit: cover;">{% else %}<div class="rounded-circle bg-light d-flex align-items-center justify-content-center border" style="width: 50px; height: 50px; font-size: 1.2rem; color: #6b7280;">{{ spotlight_character.name|first }}</div>{% endif %}
+                    <div class="me-2">
+                        {% if spotlight_character.profile_pic_url %}
+                        <img src="{{ spotlight_character.profile_pic_url }}" class="rounded-circle shadow-sm" style="width: 36px; height: 36px; object-fit: cover;">
+                        {% else %}
+                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center border" style="width: 36px; height: 36px; font-size: 1rem; color: #6b7280;">
+                            {{ spotlight_character.name|first }}
+                        </div>
+                        {% endif %}
                     </div>
-                    <div><h6 class="mb-0 fw-bold">{{ spotlight_character.name }}</h6><small class="text-muted">{{ spotlight_character.get_role_display }}</small></div>
+                    <div><h6 class="mb-0 fw-bold" style="font-size:0.9rem;">{{ spotlight_character.name }}</h6><small class="text-muted">{{ spotlight_character.get_role_display }}</small></div>
                 </div>
                 <div id="spotlight-response-area" class="p-2 bg-light rounded-3 mb-2 small" style="display:none;"><div id="spotlight-loading" style="display:none;" class="text-center py-1"><div class="ai-loading-dots"><span></span><span></span><span></span></div></div><div id="spotlight-text" class="fst-italic text-secondary"></div></div>
                 <button class="btn-premium btn-premium-light !w-full !py-2 !text-xs" id="btn-character-deep-dive" data-char-id="{{ spotlight_character.id }}"><i class="bi bi-magic"></i> Deep Dive</button>
