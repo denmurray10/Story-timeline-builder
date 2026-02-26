@@ -899,7 +899,8 @@ def generate_daily_focus_tasks(user):
             tasks_text = response.text
             try:
                 _log_ai_usage(user, 'Gemini', 'gemini-1.5-flash', response.usage_metadata.prompt_token_count, response.usage_metadata.candidates_token_count)
-            except: pass
+            except Exception as e:
+                logger.error(f"Failed to log AI usage for Gemini: {e}")
         else:
             tasks_text = "- Add a new scene to your current book.\n- Flesh out a secondary character.\n- Review your last chapter."
 
