@@ -37,6 +37,7 @@
             --success: #16a34a;
             --warning: #f59e0b;
             --danger: #ef4444;
+            --dark-universal: rgba(33, 37, 41, 1);
         }
 
         body {
@@ -119,8 +120,9 @@
             gap: 8px;
             padding: 12px 24px;
             border-radius: 9999px;
-            font-size: 0.875rem;
-            font-weight: 500;
+            font-size: 0.875rem !important;
+            font-weight: 600 !important;
+            font-family: 'Inter', sans-serif !important;
             white-space: nowrap;
             transition: all 0.2s ease;
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
@@ -128,7 +130,6 @@
             text-decoration: none !important;
             cursor: pointer;
             flex-shrink: 0;
-            font-family: 'Inter', sans-serif;
         }
 
         .btn-premium:hover {
@@ -140,13 +141,30 @@
 
         .btn-premium-light { background-color: #ffffff; color: #1a1a1a; border-color: #e5e5e5; }
         .btn-premium-light:hover { background-color: #f9fafb; border-color: #d1d5db; }
-        .btn-premium-dark { background-color: #000000; color: #ffffff; }
+        .btn-premium-dark { background-color: var(--dark-universal); color: #ffffff; }
         .btn-premium-dark:hover { background-color: #1a1a1a; }
         .btn-premium-danger { background-color: #ffffff; color: #dc2626; border-color: #fecaca; }
         .btn-premium-danger:hover { background-color: #dc2626; color: #ffffff; border-color: #dc2626; }
 
+        /* Utilities */
+        .bg-dark { background-color: var(--dark-universal) !important; }
+        .btn-dark { background-color: var(--dark-universal) !important; border-color: var(--dark-universal) !important; }
+
         /* Fallback for standard bootstrap .btn to look consistent */
-        .btn { border-radius: 9999px; padding: 10px 20px; font-weight: 500; transition: all 0.2s ease; }
+        .btn { 
+            border-radius: 9999px; 
+            padding: 10px 20px; 
+            font-family: 'Inter', sans-serif !important;
+            font-weight: 600 !important;
+            font-size: 0.875rem !important;
+            transition: all 0.2s ease; 
+        }
+
+        button {
+            font-family: 'Inter', sans-serif !important;
+            font-weight: 600 !important;
+            font-size: 0.875rem !important;
+        }
 
         /* FORMS */
         .form-control, .form-select {
@@ -181,7 +199,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container-fluid">
             <a class="navbar-brand d-flex align-items-center" href="{% url 'timeline_home' %}">
-                <img src="{% static 'img/logo.webp' %}" alt="Story Timeline Builder Logo" style="height: 200px; width: auto; margin-right: 10px;">
+                <img src="{% static 'img/logo.webp' %}" alt="Story Timeline Builder Logo" style="height: 3.5rem; width: auto; margin-right: 10px;">
             </a>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">

@@ -390,6 +390,8 @@ def subscribe_newsletter(request):
     """
     email = request.POST.get('email', '').strip()
     subscription_type = request.POST.get('subscription_type', 'changelog')
+    # Get consent for IP storage (default to False if not provided)
+    consent_store_ip = request.POST.get('consent_store_ip') == 'on'
     
     if not email:
         messages.error(request, 'Please enter a valid email address.')
@@ -401,6 +403,16 @@ def subscribe_newsletter(request):
         ip_address = x_forwarded_for.split(',')[0].strip()
     else:
         ip_address = request.META.get('REMOTE_ADDR')
+    
+    # Process IP based on consent
+    stored_ip = None
+    if consent_store_ip and ip_address:
+        # Hash the IP address for additional privacy using SHA256 with salt
+        # This anonymizes the IP while still allowing detection of duplicate subscriptions from same IP
+        salt = settings.SECRET_KEY
+        ip_hash = hashlib.sha256(f"{salt}{ip_address}".encode()).hexdigest()
+        stored_ip = ip_hash
+    # If consent is False, stored_ip remains None
     
     # Check if already subscribed
     existing = NewsletterSubscription.objects.filter(
@@ -415,7 +427,8 @@ def subscribe_newsletter(request):
             # Re-activate
             existing.is_active = True
             existing.user = request.user if request.user.is_authenticated else None
-            existing.ip_address = ip_address
+            existing.ip_address = stored_ip
+            existing.consent_store_ip = consent_store_ip
             existing.save()
             return redirect('subscribe_thank_you')
     
@@ -424,7 +437,8 @@ def subscribe_newsletter(request):
         email=email,
         user=request.user if request.user.is_authenticated else None,
         subscription_type=subscription_type,
-        ip_address=ip_address,
+        ip_address=stored_ip,
+        consent_store_ip=consent_store_ip,
     )
     
     return redirect('subscribe_thank_you')
@@ -720,6 +734,9 @@ def dashboard(request):
     estimated_days_left = int(remaining_words / words_per_day) if words_per_day > 0 else 999
     estimated_finish_date = today + timezone.timedelta(days=estimated_days_left) if words_per_day > 0 else None
 
+    # Latest book for the writing mode card
+    latest_chapter = Chapter.objects.filter(book__user=request.user).order_by('-updated_at').first()
+    latest_book = latest_chapter.book if latest_chapter else user_books.order_by('-created_at').first()
 
     context = {
         'user_books': user_books,
@@ -727,6 +744,7 @@ def dashboard(request):
         'selected_book': selected_book,
         'selected_series': selected_series,
         'books': books,
+        'latest_book': latest_book,
         'character_count': characters.count(),
         'total_events': total_events,
         'events_written': events_written,
@@ -1379,8 +1397,8 @@ def run_background_book_import(book_id, content, user_id):
             book.status = 'drafting'  # Allow user to see partial results
             book.import_progress = 100
             book.save()
-        except:
-            pass
+        except Exception as db_e:
+            logger.error(f"Database update failed for book {book_id} during error recovery: {db_e}")
 
 
 @login_required
@@ -1412,7 +1430,6 @@ def api_series_list(request):
 
 
 @login_required
-@csrf_exempt
 @require_POST
 def api_book_create(request):
     """API endpoint to create a new book from the Typeform modal."""
@@ -1484,6 +1501,7 @@ def api_book_create(request):
     except Exception as e:
         logger.error(f"Error creating book API: {e}")
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+@login_required
 def book_delete(request, pk):
     """Delete a book."""
     book = get_object_or_404(Book, pk=pk, user=request.user)
@@ -1511,7 +1529,10 @@ def book_delete(request, pk):
 
 @login_required
 def export_story_bible(request, pk):
-    """View to export a professional Story Bible for a book."""
+    """
+    Export a book as a 'Story Bible' (printable HTML).
+    Includes: Overview, Characters, Timeline, World Metadata.
+    """
     book = get_object_or_404(Book, pk=pk, user=request.user)
     
     # Gather data
@@ -1612,24 +1633,28 @@ def api_relationship_data(request):
         })
         
     edges = []
+    
+    # Color mapping for different relationship types
+    REL_COLORS = {
+        'romantic': '#ff2d55',
+        'enemy': '#d00e00',
+        'nemesis': '#450a0a',
+        'rival': '#f97316',
+        'ally': '#10b981',
+        'friend': '#0ea5e9',
+        'mentor': '#f5b60b',
+        'protege': '#22d3ee',
+        'family': '#8b5cf6',
+        'professional': '#475569',
+        'acquaintance': '#2dd4bf',
+        'complicated': '#d946ef',
+        'neutral': '#9ca3af',
+    }
+
     for rel in relationships:
         # Map strength to width
         width = max(1, rel.strength / 2)
-        
-        # Style based on type
-        color = '#94a3b8'  # Gray (Default)
-        if rel.relationship_type == 'romantic': color = '#ff2d55'
-        elif rel.relationship_type == 'enemy': color = '#d00e00'
-        elif rel.relationship_type == 'nemesis': color = '#450a0a'
-        elif rel.relationship_type == 'rival': color = '#f97316'
-        elif rel.relationship_type == 'ally': color = '#10b981'
-        elif rel.relationship_type == 'friend': color = '#0ea5e9'
-        elif rel.relationship_type == 'mentor': color = '#f5b60b'
-        elif rel.relationship_type == 'protege': color = '#22d3ee'
-        elif rel.relationship_type == 'family': color = '#8b5cf6'
-        elif rel.relationship_type == 'professional': color = '#475569'
-        elif rel.relationship_type == 'acquaintance': color = '#2dd4bf'
-        elif rel.relationship_type == 'complicated': color = '#d946ef'
+        color = REL_COLORS.get(rel.relationship_type, '#94a3b8')
         
         edges.append({
             'id': rel.id,
@@ -1681,6 +1706,20 @@ def api_manage_relationship(request):
             return JsonResponse({'status': 'success', 'message': 'Relationship deleted'})
 
         # Handle Create/Update
+        char_a_id = data.get('character_a')
+        char_b_id = data.get('character_b')
+        rel_type = data.get('relationship_type')
+
+        # Safeguard: required fields for save
+        if not rel_id:
+            if not (char_a_id and char_b_id and rel_type):
+                return JsonResponse({'status': 'error', 'message': 'Missing required fields'}, status=400)
+            
+            # Duplicate check
+            if CharacterRelationship.objects.filter(user=request.user, character_a_id=char_a_id, character_b_id=char_b_id).exists():
+                return JsonResponse({'status': 'error', 'message': 'Relationship already exists!'}, status=400)
+
+        # Prepare form
         if rel_id:
             rel = get_object_or_404(CharacterRelationship, id=rel_id, user=request.user)
             form = CharacterRelationshipForm(data, instance=rel, user=request.user)
@@ -1690,6 +1729,15 @@ def api_manage_relationship(request):
         if form.is_valid():
             rel = form.save(commit=False)
             rel.user = request.user
+            
+            # Explicitly cast and set numeric fields safely if provided in data
+            for field in ['strength', 'trust_level', 'predictability']:
+                if field in data:
+                    try:
+                        setattr(rel, field, int(data.get(field)))
+                    except (ValueError, TypeError):
+                        pass
+                
             rel.save()
             
             # Invalidate Cache on Save (Manual edits override AI suggestions)
@@ -2398,9 +2446,10 @@ def api_generate_portrait(request, pk):
         traits = (character.traits or "")[:150]
         prompt = f"ultra realistic close up portrait of {character.name}, {desc}. {traits}. hyper detail, cinematic lighting, magic neon, Canon EOS R3, nikon, f/1.4, ISO 200, 1/160s, 8K, RAW, unedited, symmetrical balance, in-frame, 8K"
         
-        getimg_api_key = "key-UDd6UDTyum504olT8Hn3KIxMjKUQbdyG73HePVbzHYSdDsE0LkrgZ8uZIRhSCYhV967umbnUs1GyYaVcbmKIC0PmKNqIawV"
+        getimg_api_key = getattr(settings, 'GETIMG_API_KEY', os.environ.get('GETIMG_API_KEY'))
         
-        if getimg_api_key == "PUT_YOUR_GETIMG_API_KEY_HERE":
+        if not getimg_api_key or getimg_api_key == "PUT_YOUR_GETIMG_API_KEY_HERE":
+            logger.error("GETIMG_API_KEY is missing in settings and environment.")
             return JsonResponse({"status": "error", "message": "API key for getimg.ai is missing."})
         
         url = "https://api.getimg.ai/v1/flux-schnell/text-to-image"
@@ -2417,7 +2466,14 @@ def api_generate_portrait(request, pk):
             "authorization": f"Bearer {getimg_api_key}"
         }
         
-        response = requests.post(url, headers=headers, data=payload)
+        try:
+            response = requests.post(url, headers=headers, data=payload, timeout=(10, 60))
+        except requests.exceptions.Timeout:
+            logger.error(f"Image generation timeout for character {character.pk}")
+            return JsonResponse({"status": "error", "message": "The AI generation service is taking too long. Please try again later."}, status=504)
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Image generation request error for character {character.pk}: {e}")
+            return JsonResponse({"status": "error", "message": "Could not connect to the image generation service. Please check your connection or try again later."}, status=503)
         
         if response.status_code == 200:
             result = response.json()
@@ -3023,181 +3079,6 @@ def horizontal_timeline(request):
 
 
 @login_required
-def relationship_map(request):
-    """
-    Renders the relationship visualization page.
-    """
-    characters = Character.objects.filter(user=request.user)
-    return render(request, 'timeline/relationship_map.html', {'characters': characters})
-
-
-@login_required
-def api_relationship_data(request):
-    """
-    Returns JSON data for the Vis.js network graph.
-    Nodes = Characters
-    Edges = Relationships
-    """
-    characters = Character.objects.filter(user=request.user)
-    relationships = CharacterRelationship.objects.filter(user=request.user)
-    
-    nodes = []
-    for char in characters:
-        node = {
-            'id': char.id,
-            'label': char.name,
-            'group': char.role, 
-            'color': char.color_code or '#97c2fc',
-            'description': char.description[:100] + '...' if char.description else '',
-            'profile_pic_url': char.profile_pic_url
-        }
-        
-        if char.profile_pic_url:
-            node['shape'] = 'circularImage'
-            node['image'] = char.profile_pic_url
-            node['brokenImage'] = 'https://via.placeholder.com/50' # Fallback
-            node['size'] = 30
-        else:
-             node['shape'] = 'dot'
-             
-        nodes.append(node)
-        
-    edges = []
-    
-    # Color mapping matching the front-end legend
-    REL_COLORS = {
-        'friend': '#3b82f6',      # Blue
-        'ally': '#10b981',        # Green
-        'enemy': '#b91c1c',       # Dark Red
-        'romantic': '#f43f5e',    # Pink/Rose
-        'family': '#8b5cf6',      # Purple
-        'professional': '#64748b',# Slate
-        'rival': '#f97316',       # Orange
-        'mentor': '#eab308',      # Yellow
-        'neutral': '#9ca3af',     # Gray
-    }
-    
-    for rel in relationships:
-        color = REL_COLORS.get(rel.relationship_type, '#9ca3af')
-        
-        edges.append({
-            'id': rel.id,
-            'from': rel.character_a.id,
-            'to': rel.character_b.id,
-            'label': rel.get_relationship_type_display(),
-            'title': rel.description, # tooltip
-            'width': rel.strength / 2, # scale 1-10 to 0.5-5 width
-            'color': {'color': color, 'highlight': color},
-            'type_key': rel.relationship_type,
-            'strength': rel.strength,
-            'trust_level': rel.trust_level,
-            'power_dynamic': rel.power_dynamic,
-            'evolution': rel.evolution,
-            'status': rel.relationship_status,
-            'visibility': rel.visibility,
-            'conflict_source': rel.conflict_source,
-            'character_a_wants': rel.character_a_wants,
-            'character_b_wants': rel.character_b_wants,
-            'first_impression': rel.first_impression,
-            'shared_secret': rel.shared_secret,
-            'vulnerability': rel.vulnerability,
-            'major_shared_moments': rel.major_shared_moments,
-            'predictability': rel.predictability
-        })
-        
-    return JsonResponse({'nodes': nodes, 'edges': edges})
-
-
-@login_required
-@require_POST
-def api_manage_relationship(request):
-    """
-    AJAX Endpoint to Create, Update, or Delete a relationship.
-    """
-    try:
-        data = json.loads(request.body)
-        action = data.get('action')
-        rel_id = data.get('id')
-        
-        if action == 'delete':
-            rel = get_object_or_404(CharacterRelationship, pk=rel_id, user=request.user)
-            rel.delete()
-            return JsonResponse({'status': 'success', 'message': 'Relationship deleted'})
-            
-        elif action == 'save':
-            char_a_id = data.get('character_a')
-            char_b_id = data.get('character_b')
-            rel_type = data.get('relationship_type')
-            desc = data.get('description', '')
-            strength = int(data.get('strength', 5))
-            trust = int(data.get('trust_level', 5))
-            power = data.get('power_dynamic', 'balanced')
-            evolution = data.get('evolution', '')
-            status = data.get('relationship_status', 'active')
-            visibility = data.get('visibility', 'public')
-            conflict = data.get('conflict_source', '')
-            a_wants = data.get('character_a_wants', '')
-            b_wants = data.get('character_b_wants', '')
-            
-            if not (char_a_id and char_b_id and rel_type):
-                 return JsonResponse({'status': 'error', 'message': 'Missing required fields'}, status=400)
-
-            if rel_id:
-                # Update existing
-                rel = get_object_or_404(CharacterRelationship, pk=rel_id, user=request.user)
-                rel.character_a_id = char_a_id
-                rel.character_b_id = char_b_id
-                rel.relationship_type = rel_type
-                rel.description = desc
-                rel.strength = strength
-                rel.trust_level = trust
-                rel.power_dynamic = power
-                rel.evolution = evolution
-                rel.relationship_status = status
-                rel.visibility = visibility
-                rel.conflict_source = conflict
-                rel.character_a_wants = a_wants
-                rel.character_b_wants = b_wants
-                rel.first_impression = data.get('first_impression', rel.first_impression)
-                rel.shared_secret = data.get('shared_secret', rel.shared_secret)
-                rel.vulnerability = data.get('vulnerability', rel.vulnerability)
-                rel.major_shared_moments = data.get('major_shared_moments', rel.major_shared_moments)
-                rel.predictability = data.get('predictability', rel.predictability)
-                rel.save()
-            else:
-                # Create new (check duplicates first)
-                if CharacterRelationship.objects.filter(user=request.user, character_a_id=char_a_id, character_b_id=char_b_id).exists():
-                     return JsonResponse({'status': 'error', 'message': 'Relationship already exists!'}, status=400)
-                     
-                rel = CharacterRelationship.objects.create(
-                    user=request.user,
-                    character_a_id=char_a_id,
-                    character_b_id=char_b_id,
-                    relationship_type=rel_type,
-                    description=desc,
-                    strength=strength,
-                    trust_level=trust,
-                    power_dynamic=power,
-                    evolution=evolution,
-                    relationship_status=status,
-                    visibility=visibility,
-                    conflict_source=conflict,
-                    character_a_wants=a_wants,
-                    character_b_wants=b_wants,
-                    first_impression=data.get('first_impression', ''),
-                    shared_secret=data.get('shared_secret', ''),
-                    vulnerability=data.get('vulnerability', ''),
-                    major_shared_moments=data.get('major_shared_moments', ''),
-                    predictability=data.get('predictability', 5)
-                )
-                
-            return JsonResponse({'status': 'success', 'id': rel.id})
-            
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
-
-
-@login_required
 @require_POST
 def api_suggest_relationship(request):
     """
@@ -3333,36 +3214,6 @@ def api_suggest_relationship(request):
     except Exception as e:
         print(f"AI Suggest Error: {e}")
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
-
-
-@login_required
-def export_story_bible(request, pk):
-    """
-    Export a book as a 'Story Bible' (printable HTML).
-    Includes: Overview, Characters, Timeline, World Metadata.
-    """
-    book = get_object_or_404(Book, pk=pk, user=request.user)
-    
-    # Context Data
-    characters = Character.objects.filter(user=request.user).order_by('role', 'name')
-    # Filter characters that appear in this book if possible, but global list is often better for a bible
-    
-    # Events specific to this book (or all if not assigned?)
-    # Let's show events linked to this book + unassigned ones if relevant? 
-    # Usually just the book's events.
-    events = Event.objects.filter(user=request.user, book=book).order_by('chronological_order', 'sequence_order')
-    
-    tags = Tag.objects.filter(user=request.user).order_by('category', 'name')
-    
-    context = {
-        'book': book,
-        'characters': characters,
-        'events': events,
-        'tags': tags,
-        'now': timezone.now()
-    }
-    return render(request, 'timeline/story_bible_export.html', context)
-
 
 @login_required
 @require_POST

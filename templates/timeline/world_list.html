@@ -9,6 +9,7 @@
         theme: {
             extend: {
                 colors: {
+                    "black": "#212529",
                     "primary": "#136dec",
                     "background-light": "#F5F3F0",
                     "background-dark": "#101822",
@@ -101,7 +102,7 @@
                 <div class="flex items-center gap-1 border-r border-[#D8D4CE] pr-4 mr-2">
                     <button class="size-10 rounded-full flex items-center justify-center text-slate-600 hover:bg-black/5 hover:text-charcoal transition-colors relative group" title="Ghostwriter AI Assistance"><span class="material-symbols-outlined">auto_awesome</span></button>
                 </div>
-                <a href="{% url 'world_create' %}" class="btn-premium btn-premium-dark !py-2.5 !px-5 !text-sm">
+                <a href="{% url 'world_create' %}" class="btn-premium btn-premium-dark !py-2.5 !px-5">
                     <span class="material-symbols-outlined text-[20px]">add</span>
                     <span>New Entry</span>
                 </a>
@@ -121,14 +122,17 @@
                 {% endif %}
                 <div class="flex items-center justify-between">
                     <div class="flex gap-2">
-                        <a href="{% url 'world_list' %}" class="btn-premium {% if not active_category %}btn-premium-dark{% else %}btn-premium-light{% endif %} !py-1.5 !px-4 !text-sm">All</a>
+                        <a href="{% url 'world_list' %}" class="btn-premium {% if not active_category %}btn-premium-dark{% else %}btn-premium-light{% endif %} !py-1.5 !px-4">All</a>
                         {% for cat_val, cat_label in categories %}
-                        <a href="{% url 'world_list' %}?category={{ cat_val }}" class="btn-premium {% if active_category == cat_val %}btn-premium-dark{% else %}btn-premium-light{% endif %} !py-1.5 !px-4 !text-sm">{{ cat_label }}</a>
+                        <a href="{% url 'world_list' %}?category={{ cat_val }}" class="btn-premium {% if active_category == cat_val %}btn-premium-dark{% else %}btn-premium-light{% endif %} !py-1.5 !px-4">{{ cat_label }}</a>
                         {% endfor %}
                     </div>
                     <div class="flex items-center gap-2 text-sm text-slate-500">
                         <span>Sort by:</span>
-                        <button class="flex items-center gap-1 font-semibold text-charcoal hover:text-primary transition-colors">Last Edited <span class="material-symbols-outlined text-[16px]">expand_more</span></button>
+                        <button id="sort-last-edited" data-order="desc" aria-label="Sort entries by last edited date" class="flex items-center gap-1 font-semibold text-charcoal hover:text-primary transition-colors">
+                            Last Edited 
+                            <span id="sort-direction-icon" class="material-symbols-outlined text-[16px]">expand_more</span>
+                        </button>
                     </div>
                 </div>
 
@@ -159,7 +163,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-12" id="codexGrid">
                     {% for entry in entries|slice:"1:" %}
-                    <div class="group bg-white rounded-xl shadow-sm border border-[#E0DCD6] overflow-hidden hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col codex-card" data-title="{{ entry.title|lower }}">
+                    <div class="group bg-white rounded-xl shadow-sm border border-[#E0DCD6] overflow-hidden hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col codex-card" data-title="{{ entry.title|lower }}" data-timestamp="{{ entry.updated_at|date:'U' }}">
                         <div class="h-48 bg-cover bg-center relative" style="background-image: url('{% if entry.image %}{{ entry.image.url }}{% else %}https://images.unsplash.com/photo-1544377193-33dcf4d68fb5?q=80&w=1932&auto=format&fit=crop{% endif %}');">
                             <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm">
                                 <a href="{% url 'world_edit' entry.pk %}" class="text-charcoal no-underline"><span class="material-symbols-outlined text-[18px] block">edit</span></a>
@@ -179,7 +183,7 @@
                         </div>
                     </div>
                     {% endfor %}
-                    <a href="{% url 'world_create' %}" class="group border-2 border-dashed border-[#D8D4CE] rounded-xl p-6 flex flex-col items-center justify-center text-center hover:border-primary hover:bg-primary/5 transition-all duration-300 min-h-[300px] no-underline">
+                    <a href="{% url 'world_create' %}" id="createCard" class="group border-2 border-dashed border-[#D8D4CE] rounded-xl p-6 flex flex-col items-center justify-center text-center hover:border-primary hover:bg-primary/5 transition-all duration-300 min-h-[300px] no-underline">
                         <div class="size-12 rounded-full bg-[#EBE9E6] flex items-center justify-center mb-4 group-hover:bg-white group-hover:text-primary transition-colors text-slate-400"><span class="material-symbols-outlined text-3xl">add</span></div>
                         <h4 class="text-lg font-serif-display font-medium text-slate-500 group-hover:text-primary mb-1">Create New Entry</h4>
                         <p class="text-xs text-slate-400">Add lore, maps, or items</p>
@@ -203,6 +207,10 @@
     document.addEventListener('DOMContentLoaded', function () {
         const searchInput = document.getElementById('codexSearch');
         const cards = document.querySelectorAll('.codex-card');
+        const sortBtn = document.getElementById('sort-last-edited');
+        const grid = document.getElementById('codexGrid');
+        const createCard = document.getElementById('createCard');
+
         if (searchInput) {
             searchInput.addEventListener('input', function (e) {
                 const term = e.target.value.toLowerCase();
@@ -210,6 +218,31 @@
                     const title = card.getAttribute('data-title');
                     card.style.display = title.includes(term) ? 'flex' : 'none';
                 });
+            });
+        }
+
+        if (sortBtn && grid) {
+            sortBtn.addEventListener('click', function() {
+                const currentOrder = sortBtn.getAttribute('data-order');
+                const nextOrder = currentOrder === 'desc' ? 'asc' : 'desc';
+                const icon = document.getElementById('sort-direction-icon');
+                
+                sortBtn.setAttribute('data-order', nextOrder);
+                icon.innerText = nextOrder === 'desc' ? 'expand_more' : 'expand_less';
+                
+                const cardArray = Array.from(document.querySelectorAll('.codex-card'));
+                
+                cardArray.sort((a, b) => {
+                    const timeA = parseInt(a.getAttribute('data-timestamp'));
+                    const timeB = parseInt(b.getAttribute('data-timestamp'));
+                    return nextOrder === 'desc' ? timeB - timeA : timeA - timeB;
+                });
+
+                // Clear and re-append
+                cardArray.forEach(card => grid.appendChild(card));
+                
+                // Always keep create card at the end
+                if (createCard) grid.appendChild(createCard);
             });
         }
     });

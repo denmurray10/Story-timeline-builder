@@ -22,7 +22,8 @@
                     "card-dark": "#1e1e2e",
                     "navy-header": "#16213e",
                     "navy-header-dark": "#0d1326",
-                    "branddark": "#1A1A1A",
+                    "black": "#212529",
+                    "branddark": "#212529",
                     "text-muted": "#666666",
                 },
                 fontFamily: {
@@ -59,6 +60,7 @@
             <div class="relative w-full md:w-auto custom-dropdown" id="dropdown-book">
                 <button type="button" class="btn-premium btn-premium-light !py-2.5 !px-6 !text-left w-full md:min-w-[300px] !rounded-full dropdown-toggle flex justify-between items-center" style="border-radius: 9999px !important;">
                     <span class="truncate">{{ selected_book_title }}</span>
+                    <span class="material-symbols-outlined transition-transform duration-300">expand_more</span>
                 </button>
                 <div class="dropdown-menu absolute z-[100] right-0 left-0 mt-2 w-full bg-white dark:bg-card-dark border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl overflow-hidden py-2 animate-in fade-in slide-in-from-top-2 duration-200" style="display: none;">
                     <div class="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Navigation</div>
@@ -96,6 +98,7 @@
             <div class="relative w-full md:w-auto custom-dropdown" id="dropdown-role">
                 <button type="button" class="btn-premium btn-premium-light !py-2.5 !px-6 !text-left w-full md:min-w-[180px] !rounded-full dropdown-toggle flex justify-between items-center" style="border-radius: 9999px !important;">
                     <span class="truncate">{{ selected_role_title }}</span>
+                    <span class="material-symbols-outlined transition-transform duration-300">expand_more</span>
                 </button>
                 <div class="dropdown-menu absolute z-[100] right-0 left-0 mt-2 w-full bg-white dark:bg-card-dark border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl overflow-hidden py-2 animate-in fade-in slide-in-from-top-2 duration-200" style="display: none;">
                     <button type="button" class="dropdown-item w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" data-value="">All Roles</button>
@@ -162,7 +165,7 @@
                     <span class="font-medium text-xs">{{ character.events.count }} Events</span>
                 </div>
                 <div class="flex gap-2">
-                    <a href="{% url 'character_detail' character.pk %}" class="px-4 py-1.5 bg-slate-100 hover:bg-black hover:text-white rounded-full text-slate-600 text-[11px] font-bold tracking-widest uppercase transition-all flex items-center justify-center text-decoration-none">
+                    <a href="{% url 'character_detail' character.pk %}" class="btn px-4 py-1.5 bg-slate-100 hover:bg-black hover:text-white transition-all flex items-center justify-center text-decoration-none">
                         View Profile
                     </a>
                 </div>
@@ -228,7 +231,7 @@
                 
                 // Hide all menus
                 document.querySelectorAll('.dropdown-menu').forEach(m => m.style.display = 'none');
-                document.querySelectorAll('.custom-dropdown .material-symbols-outlined').forEach(i => i.style.transform = 'rotate(0deg)');
+                document.querySelectorAll('.custom-dropdown .dropdown-toggle .material-symbols-outlined').forEach(i => i.style.transform = 'rotate(0deg)');
 
                 if (!isShowing) {
                     menu.style.display = 'block';
@@ -248,7 +251,7 @@
         document.addEventListener('click', function(e) {
             if (!e.target.closest('.custom-dropdown')) {
                 document.querySelectorAll('.dropdown-menu').forEach(m => m.style.display = 'none');
-                document.querySelectorAll('.custom-dropdown .material-symbols-outlined').forEach(i => i.style.transform = 'rotate(0deg)');
+                document.querySelectorAll('.custom-dropdown .dropdown-toggle .material-symbols-outlined').forEach(i => i.style.transform = 'rotate(0deg)');
             }
         });
     });

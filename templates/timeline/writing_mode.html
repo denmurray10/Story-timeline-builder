@@ -15,6 +15,7 @@
             theme: {
                 extend: {
                     colors: {
+                        "black": "#212529",
                         "primary": "#13daec", 
                         "primary-dark": "#0ea5b5",
                         "accent-green": "#22c55e",
@@ -111,7 +112,7 @@
 
     /* Selection Bubble Tooltip */
     #bubble-menu {
-        background-color: #111827;
+        background-color: #212529;
         color: white;
         border-radius: 999px;
         padding: 6px 12px;
@@ -130,8 +131,9 @@
         gap: 4px;
         border-radius: 999px;
         transition: all 0.2s;
-        font-size: 12px;
-        font-weight: 500;
+        font-family: 'Inter', sans-serif !important;
+        font-size: 0.875rem !important;
+        font-weight: 600 !important;
     }
     .bubble-btn:hover { color: white; background: rgba(255,255,255,0.1); }
     .bubble-divider { width: 1px; height: 16px; background: rgba(255,255,255,0.1); margin: 0 4px; }
@@ -186,7 +188,7 @@
         </div>
 
         <!-- Main Workspace -->
-        <div class="flex flex-1 overflow-hidden relative bg-[#F2F0EB] dark:bg-[#121212]">
+        <div class="flex flex-1 overflow-hidden relative bg-[#F2F0EB] dark:bg-[#212529]">
             <!-- LEFT COLUMN (Outside to Inside: Drawer -> Rail) -->
             <div id="left-column" class="flex h-full shrink-0 items-start z-30 transition-all duration-300">
                 <!-- DRAWERS (Outside) -->
@@ -350,7 +352,7 @@
                         <!-- STAGE 1: Standard Tools -->
                         <div id="pill-standard-tools" class="flex items-center gap-4 h-full">
                             <div class="flex items-center gap-3 pr-4 border-r border-slate-100 dark:border-white/5 h-6">
-                                <button class="text-[11px] font-bold text-slate-700 dark:text-slate-300">Noto Serif</button>
+                                <button class="btn !bg-transparent !p-0">Noto Serif</button>
                                 <span class="material-symbols-outlined text-[16px] text-slate-400">expand_more</span>
                             </div>
                             <div class="flex items-center gap-3 pr-4 border-r border-slate-100 dark:border-slate-800 h-6">
@@ -359,9 +361,9 @@
                                 <button onclick="applyMagic('underline')" class="material-symbols-outlined text-[18px] text-slate-400 hover:text-blue-500 transition-colors">format_underlined</button>
                             </div>
                             <!-- Penn Launcher -->
-                            <button onclick="switchPillState('ai-main')" class="flex items-center gap-2 text-emerald-600 hover:text-emerald-700 transition-colors group">
+                            <button onclick="switchPillState('ai-main')" class="btn !bg-transparent !p-0 flex items-center gap-2 text-emerald-600 hover:text-emerald-700 transition-colors group">
                                 <span class="material-symbols-outlined text-[18px] group-hover:rotate-12 transition-transform">history_edu</span>
-                                <span class="text-[10px] font-black tracking-widest uppercase">Penn</span>
+                                <span>Penn</span>
                             </button>
                         </div>
 
@@ -371,9 +373,9 @@
                                 <span class="material-symbols-outlined text-sm">arrow_back</span>
                             </button>
                             <div class="flex items-center gap-2">
-                                <button onclick="switchPillState('ai-drafting')" class="px-3 py-1 rounded-lg bg-emerald-600 text-white text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-emerald-700 shadow-sm transition-all whitespace-nowrap">Drafting</button>
-                                <button onclick="switchPillState('ai-refine')" class="px-3 py-1 rounded-lg border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 transition-all whitespace-nowrap">Refine</button>
-                                <button onclick="switchPillState('ai-analysis')" class="px-3 py-1 rounded-lg border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 text-[10px] font-bold tracking-widest uppercase cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 transition-all whitespace-nowrap">Analysis</button>
+                                <button onclick="switchPillState('ai-drafting')" class="btn px-3 py-1 bg-emerald-600 text-white cursor-pointer hover:bg-emerald-700 shadow-sm transition-all whitespace-nowrap">Drafting</button>
+                                <button onclick="switchPillState('ai-refine')" class="btn px-3 py-1 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 transition-all whitespace-nowrap">Refine</button>
+                                <button onclick="switchPillState('ai-analysis')" class="btn px-3 py-1 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 transition-all whitespace-nowrap">Analysis</button>
                             </div>
                         </div>
 
@@ -383,9 +385,9 @@
                                 <span class="material-symbols-outlined text-sm">arrow_back</span>
                             </button>
                             <div class="flex items-center gap-2">
-                                <button onclick="applyMagic('improve')" class="px-3 py-1 rounded-lg border border-blue-200 bg-blue-50 text-blue-600 text-[10px] font-bold tracking-widest uppercase hover:bg-blue-100 shadow-sm transition-all">Guided Draft</button>
-                                <button class="px-3 py-1 rounded-lg border border-slate-100 text-slate-600 text-[10px] font-bold tracking-widest uppercase hover:bg-slate-50 transition-all">Expand</button>
-                                <button class="px-3 py-1 rounded-lg border border-slate-100 text-slate-600 text-[10px] font-bold tracking-widest uppercase hover:bg-slate-50 transition-all">Dialogue</button>
+                                <button onclick="applyMagic('improve')" class="btn px-3 py-1 border border-blue-200 bg-blue-50 text-blue-600 hover:bg-blue-100 shadow-sm transition-all">Guided Draft</button>
+                                <button class="btn px-3 py-1 border border-slate-100 text-slate-600 hover:bg-slate-50 transition-all">Expand</button>
+                                <button class="btn px-3 py-1 border border-slate-100 text-slate-600 hover:bg-slate-50 transition-all">Dialogue</button>
                             </div>
                         </div>
 
@@ -395,8 +397,8 @@
                                 <span class="material-symbols-outlined text-sm">arrow_back</span>
                             </button>
                             <div class="flex items-center gap-2">
-                                <button class="px-3 py-1 rounded-lg border border-slate-100 text-slate-600 text-[10px] font-bold tracking-widest uppercase hover:bg-slate-50 transition-all">Show Don't Tell</button>
-                                <button class="px-3 py-1 rounded-lg border border-slate-100 text-slate-600 text-[10px] font-bold tracking-widest uppercase hover:bg-slate-50 transition-all">Sensory Detail</button>
+                                <button class="btn px-3 py-1 border border-slate-100 text-slate-600 hover:bg-slate-50 transition-all">Show Don't Tell</button>
+                                <button class="btn px-3 py-1 border border-slate-100 text-slate-600 hover:bg-slate-50 transition-all">Sensory Detail</button>
                             </div>
                         </div>
 
@@ -406,8 +408,8 @@
                                 <span class="material-symbols-outlined text-sm">arrow_back</span>
                             </button>
                             <div class="flex items-center gap-2">
-                                <button class="px-3 py-1 rounded-lg border border-slate-100 text-slate-600 text-[10px] font-bold tracking-widest uppercase hover:bg-slate-50 transition-all">Pacing Pulse</button>
-                                <button class="px-3 py-1 rounded-lg border border-slate-100 text-slate-600 text-[10px] font-bold tracking-widest uppercase hover:bg-slate-50 transition-all">Continuity</button>
+                                <button class="btn px-3 py-1 border border-slate-100 text-slate-600 hover:bg-slate-50 transition-all">Pacing Pulse</button>
+                                <button class="btn px-3 py-1 border border-slate-100 text-slate-600 hover:bg-slate-50 transition-all">Continuity</button>
                             </div>
                         </div>
                     </div>

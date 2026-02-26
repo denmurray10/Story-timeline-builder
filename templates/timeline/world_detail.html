@@ -8,7 +8,7 @@
         darkMode: "class",
         theme: {
             extend: {
-                colors: { "primary": "#136dec", "background-light": "#F5F3F0", "charcoal": "#2C3E50" },
+                colors: { "black": "#212529", "primary": "#136dec", "background-light": "#F5F3F0", "charcoal": "#2C3E50" },
                 fontFamily: { "display": ['"DM Serif Display"', "serif"], "sans": ['"Inter"', "sans-serif"] },
             },
         },
@@ -54,7 +54,7 @@
                 <nav class="hidden md:flex items-center gap-2 text-sm text-slate-400 font-medium"><a href="{% url 'world_list' %}" class="hover:text-charcoal transition-colors no-underline">Codex</a><span class="material-symbols-outlined text-[16px]">chevron_right</span><span class="text-slate-500">{{ entry.get_category_display }}</span></nav>
             </div>
             <div class="flex items-center gap-3">
-                <a href="{% url 'world_edit' entry.pk %}" class="btn-premium btn-premium-light !py-2 !px-4 !text-sm"><span class="material-symbols-outlined text-[18px]">edit</span>Edit Entry</a>
+                <a href="{% url 'world_edit' entry.pk %}" class="btn-premium btn-premium-light !py-2 !px-4"><span class="material-symbols-outlined text-[18px]">edit</span>Edit Entry</a>
                 <a href="{% url 'world_delete' entry.pk %}" class="btn-premium btn-premium-danger !size-10 !p-0 !flex !items-center !justify-center" title="Delete Entry"><span class="material-symbols-outlined">delete</span></a>
             </div>
         </div>
@@ -84,7 +84,7 @@
                                 <div class="flex items-center gap-2 mb-4 text-primary"><span class="material-symbols-outlined fill text-[20px]">auto_awesome</span><span class="text-xs font-bold uppercase tracking-widest text-primary/80">AI Insights</span></div>
                                 <h4 class="text-lg font-serif-display mb-3">Ghostwriter Intel</h4>
                                 <p class="text-slate-300 text-xs leading-relaxed mb-4">Click to generate a deep-scan analysis of how this <strong>{{ entry.title }}</strong> impacts your overall series architecture.</p>
-                                <button class="btn-premium btn-premium-light !w-full !py-2.5 !text-xs">Generate Analysis</button>
+                                <button id="generateAnalysisBtn" class="btn-premium btn-premium-light !w-full !py-2.5 !text-xs" onclick="generateAnalysisHandler()">Generate Analysis</button>
                             </div>
                             <div class="absolute -bottom-6 -right-6 size-32 rounded-full bg-primary/20 blur-3xl group-hover:size-40 transition-all"></div>
                         </div>
@@ -102,4 +102,30 @@
         </div>
     </main>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function generateAnalysisHandler() {
+        const btn = document.getElementById('generateAnalysisBtn');
+        const originalContent = btn.innerHTML;
+        
+        // Show loading state
+        btn.disabled = true;
+        btn.style.opacity = '0.7';
+        btn.style.cursor = 'not-allowed';
+        btn.innerHTML = '<span class="material-symbols-outlined text-[14px] animate-spin" style="vertical-align: middle; margin-right: 8px;">progress_activity</span>Analyzing...';
+        
+        // Fake delay for "scanning" feel
+        setTimeout(() => {
+            alert("Ghostwriter Insight: World Entry Deep-Scan is currently in development. This feature will allow Penn to automatically link your codex entries to relevant plot points in your manuscripts.");
+            
+            // Reset button
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            btn.style.cursor = 'pointer';
+            btn.innerHTML = originalContent;
+        }, 1500);
+    }
+</script>
 {% endblock %}

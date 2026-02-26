@@ -955,6 +955,10 @@ class NewsletterSubscription(models.Model):
     is_active = models.BooleanField(default=True)
     subscribed_at = models.DateTimeField(auto_now_add=True)
     ip_address = models.GenericIPAddressField(null=True, blank=True)
+    consent_store_ip = models.BooleanField(
+        default=False,
+        help_text="User consent to store their IP address for security and analytics purposes"
+    )
 
     class Meta:
         ordering = ['-subscribed_at']
