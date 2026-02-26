@@ -510,7 +510,15 @@
                 <div class="dash-card-header d-flex align-items-center mb-2"><i class="bi bi-grip-vertical drag-handle"></i>Arc Snapshot</div>
                 {% if arc_snapshot %}
                 <div class="d-flex align-items-center mb-3">
-                    <div class="avatar-small me-2" style="width:36px;height:36px;background-color:{{arc_snapshot.character.color_code|default:'#6366f1'}};border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-weight:bold;">{{ arc_snapshot.character.name|slice:":1" }}</div>
+                    <div class="me-2">
+                        {% if arc_snapshot.character.profile_pic_url %}
+                        <img src="{{ arc_snapshot.character.profile_pic_url }}" class="rounded-circle shadow-sm" style="width: 36px; height: 36px; object-fit: cover;">
+                        {% else %}
+                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center border" style="width: 36px; height: 36px; font-size: 1rem; color: #6b7280; background-color: {{arc_snapshot.character.color_code|default:'#6366f1'}}; color: white; font-weight: bold;">
+                            {{ arc_snapshot.character.name|first }}
+                        </div>
+                        {% endif %}
+                    </div>
                     <div><h6 class="mb-0 fw-bold" style="font-size:0.9rem;">{{ arc_snapshot.character.name }}</h6><small class="text-muted">{{ arc_snapshot.character.get_role_display }}</small></div>
                 </div>
                 <div class="p-2 bg-light rounded-3 mb-3 border">
