@@ -99,6 +99,7 @@
                 <div class="tab-content" id="widgetTabsContent">
                     <div class="tab-pane fade show active" id="core-widgets" role="tabpanel">
                         <div class="list-group list-group-flush">
+                            <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0"><div><h6 class="mb-0 fw-semibold">Writing Mode Card</h6><small class="text-muted">Quick link to your latest chapter.</small></div><div class="form-check form-switch"><input class="form-check-input widget-toggle" type="checkbox" data-card-id="card-writing-mode-architect" checked></div></div>
                             <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0"><div><h6 class="mb-0 fw-semibold">Story Stats</h6><small class="text-muted">Total counts of books, characters, etc.</small></div><div class="form-check form-switch"><input class="form-check-input widget-toggle" type="checkbox" data-card-id="card-stats" checked></div></div>
                             <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0"><div><h6 class="mb-0 fw-semibold">Recent Activity</h6><small class="text-muted">Show your latest 5 platform saves.</small></div><div class="form-check form-switch"><input class="form-check-input widget-toggle" type="checkbox" data-card-id="card-recent" checked></div></div>
                             <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0"><div><h6 class="mb-0 fw-semibold">Your Books</h6><small class="text-muted">Quick access to your library.</small></div><div class="form-check form-switch"><input class="form-check-input widget-toggle" type="checkbox" data-card-id="card-books" checked></div></div>
@@ -337,6 +338,16 @@
 
     <div class="row g-3" id="writerWidgets">
         <div class="col-lg-6 draggable-zone" id="col-left">
+            <!-- Writing Mode Card (Architect View) -->
+            <div class="dash-card dash-pill-card p-4 draggable-card mb-3 bg-dark text-white shadow-lg" id="card-writing-mode-architect" style="border-radius: 20px;">
+                <div class="dash-card-header d-flex align-items-center text-white mb-3"><i class="bi bi-grip-vertical drag-handle me-2"></i><span class="badge bg-dark">Writing Mode</span></div>
+                <div class="px-2">
+                    <h6 class="mb-2 fw-bold">Continue Your Manuscript</h6>
+                    <p class="opacity-75 mb-4 small" style="font-size: 0.75rem;">Jump back into your last edited chapter. Distraction-free, AI-powered writing awaits.</p>
+                    <a href="{% url 'writing_mode_latest' %}" class="btn-premium btn-premium-light !w-full !py-2 !text-xs !font-bold"><i class="bi bi-pencil-square me-2"></i> Start Writing Now</a>
+                </div>
+            </div>
+            
             <!-- Today's Focus -->
             <div class="dash-card dash-pill-card p-3 draggable-card mb-3" id="card-focus">
                 <div class="dash-card-header d-flex align-items-center justify-content-between">

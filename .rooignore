@@ -1,0 +1,8 @@
+venv/
+.venv/
+migrations/
+__pycache__/
+staticfiles/
+node_modules/
+.git/
+*.pyc

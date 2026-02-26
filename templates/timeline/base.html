@@ -216,8 +216,10 @@
                     <a class="nav-link {% if 'book' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'book_list' %}"><i class="bi bi-book"></i> Manuscripts</a>
                     <a class="nav-link {% if 'character' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'character_list' %}"><i class="bi bi-people"></i> Characters</a>
                     <a class="nav-link {% if 'relationship' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'relationship_map' %}"><i class="bi bi-diagram-3"></i> Relationship Map</a>
+                    {% if request.resolver_match.url_name != 'dashboard' %}
                     <a class="nav-link {% if request.resolver_match.url_name == 'horizontal_timeline' %}active{% endif %}" href="{% url 'horizontal_timeline' %}"><i class="bi bi-clock-history"></i> Timeline</a>
                     <a class="nav-link {% if 'world' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'world_list' %}"><i class="bi bi-globe"></i> World Wiki</a>
+                    {% endif %}
                     <a class="nav-link {% if request.resolver_match.url_name == 'post_list' %}active{% endif %}" href="{% url 'post_list' %}"><i class="bi bi-journal-text"></i> Blog</a>
                     <hr class="my-3 opacity-10">
                     <a class="nav-link" href="{% url 'event_create' %}"><i class="bi bi-plus-circle"></i> New Event</a>

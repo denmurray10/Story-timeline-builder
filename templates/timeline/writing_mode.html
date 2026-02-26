@@ -187,196 +187,159 @@
 
         <!-- Main Workspace -->
         <div class="flex flex-1 overflow-hidden relative bg-[#F2F0EB] dark:bg-[#121212]">
-            <!-- LEFT DRAWER STACK -->
-            <div id="left-drawer-stack" class="flex h-full shrink-0 items-start transition-all duration-300">
-                <!-- Codex Drawer -->
-                <aside id="drawer-world" class="w-0 overflow-hidden transition-all duration-300 flex flex-col h-full bg-transparent">
-                    <div class="w-64 flex flex-col h-full">
-                        <div class="p-4 flex items-center justify-between">
-                            <h2 class="text-[10px] font-black tracking-widest uppercase text-slate-400 opacity-60">Story Bible</h2>
-                            <button onclick="toggleDrawer('world')" class="p-1 hover:bg-black/5 dark:hover:bg-white/5 rounded transition-colors">
-                                <span class="material-symbols-outlined text-sm text-slate-400">close</span>
-                            </button>
-                        </div>
-                        <div class="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar">
-                            <div class="p-4 bg-white dark:bg-slate-900 rounded-2xl shadow-md border border-slate-200/50 dark:border-white/10">
-                                <div class="flex items-center gap-2 mb-2">
-                                    <span class="material-symbols-outlined text-blue-500 text-sm">globe</span>
-                                    <span class="text-[10px] font-bold uppercase tracking-tight text-slate-500">World Setting</span>
-                                </div>
-                                <h4 class="text-xs font-bold mb-1">Aethelgard</h4>
-                                <p class="text-[10px] text-slate-500 line-clamp-2">The floating kingdom of the sky-reachers, built upon the bones of ancient giants.</p>
+            <!-- LEFT COLUMN (Outside to Inside: Drawer -> Rail) -->
+            <div id="left-column" class="flex h-full shrink-0 items-start z-30 transition-all duration-300">
+                <!-- DRAWERS (Outside) -->
+                <div id="left-drawer-stack" class="flex h-full shrink-0 items-start overflow-hidden">
+                    <!-- Codex Drawer -->
+                    <aside id="drawer-world" class="w-0 overflow-hidden transition-all duration-300 flex flex-col h-full bg-transparent">
+                        <div class="w-64 flex flex-col h-full bg-white dark:bg-[#1a2c2e] border-r border-slate-200 dark:border-white/5">
+                            <div class="p-4 flex items-center justify-between">
+                                <h2 class="text-[10px] font-black tracking-widest uppercase text-slate-400 opacity-60">Story Bible</h2>
+                                <button onclick="toggleDrawer('world')" class="p-1 hover:bg-black/5 dark:hover:bg-white/5 rounded transition-colors">
+                                    <span class="material-symbols-outlined text-sm text-slate-400">close</span>
+                                </button>
                             </div>
-                        </div>
-                    </div>
-                </aside>
-
-                <!-- Audit Drawer -->
-                <aside id="drawer-audit" class="w-0 overflow-hidden transition-all duration-300 flex flex-col h-full bg-transparent">
-                    <div class="w-64 flex flex-col h-full">
-                        <div class="p-4 flex items-center justify-between">
-                            <h2 class="text-[10px] font-black tracking-widest uppercase text-slate-400 opacity-60">Manuscript Health</h2>
-                            <button onclick="toggleDrawer('audit')" class="p-1 hover:bg-black/5 dark:hover:bg-white/5 rounded transition-colors">
-                                <span class="material-symbols-outlined text-sm text-slate-400">close</span>
-                            </button>
-                        </div>
-                        <div class="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar">
-                            <div class="p-4 bg-white dark:bg-slate-900 rounded-2xl shadow-md border border-slate-200/50 dark:border-white/10">
-                                <h4 class="text-xs font-bold mb-3">Health Score: 94%</h4>
-                                <div class="space-y-2">
-                                    <div class="flex justify-between text-[9px] font-bold uppercase text-slate-400">
-                                        <span>Pacing</span>
-                                        <span class="text-emerald-500">Excellent</span>
+                            <div class="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar">
+                                <div class="p-4 bg-white dark:bg-slate-900 rounded-2xl shadow-md border border-slate-200/50 dark:border-white/10">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="material-symbols-outlined text-blue-500 text-sm">globe</span>
+                                        <span class="text-[10px] font-bold uppercase tracking-tight text-slate-500">World Setting</span>
                                     </div>
-                                    <div class="w-full h-1 bg-slate-100 rounded-full overflow-hidden">
-                                        <div class="bg-emerald-500 h-full w-[90%]"></div>
+                                    <h4 class="text-xs font-bold mb-1">Aethelgard</h4>
+                                    <p class="text-[10px] text-slate-500 line-clamp-2">The floating kingdom of the sky-reachers, built upon the bones of ancient giants.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </aside>
+
+                    <!-- Audit Drawer -->
+                    <aside id="drawer-audit" class="w-0 overflow-hidden transition-all duration-300 flex flex-col h-full bg-transparent">
+                        <div class="w-64 flex flex-col h-full bg-white dark:bg-[#1a2c2e] border-r border-slate-200 dark:border-white/5">
+                            <div class="p-4 flex items-center justify-between">
+                                <h2 class="text-[10px] font-black tracking-widest uppercase text-slate-400 opacity-60">Manuscript Health</h2>
+                                <button onclick="toggleDrawer('audit')" class="p-1 hover:bg-black/5 dark:hover:bg-white/5 rounded transition-colors">
+                                    <span class="material-symbols-outlined text-sm text-slate-400">close</span>
+                                </button>
+                            </div>
+                            <div class="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar">
+                                <div class="p-4 bg-white dark:bg-slate-900 rounded-2xl shadow-md border border-slate-200/50 dark:border-white/10">
+                                    <h4 class="text-xs font-bold mb-3">Health Score: 94%</h4>
+                                    <div class="space-y-2">
+                                        <div class="flex justify-between text-[9px] font-bold uppercase text-slate-400">
+                                            <span>Pacing</span>
+                                            <span class="text-emerald-500">Excellent</span>
+                                        </div>
+                                        <div class="w-full h-1 bg-slate-100 rounded-full overflow-hidden">
+                                            <div class="bg-emerald-500 h-full w-[90%]"></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </aside>
+                    </aside>
 
-                <!-- History Drawer -->
-                <aside id="drawer-history" class="w-0 overflow-hidden transition-all duration-300 flex flex-col h-full bg-transparent">
-                    <div class="w-64 flex flex-col h-full">
-                        <div class="p-4 flex items-center justify-between">
-                            <h2 class="text-[10px] font-black tracking-widest uppercase text-slate-400 opacity-60">Version History</h2>
-                            <button onclick="toggleDrawer('history')" class="p-1 hover:bg-black/5 dark:hover:bg-white/5 rounded transition-colors">
-                                <span class="material-symbols-outlined text-sm text-slate-400">close</span>
-                            </button>
-                        </div>
-                        <div class="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar">
-                            <div class="border-l-2 border-blue-500/30 pl-4 py-1 space-y-4">
-                                <div class="relative">
-                                    <div class="absolute -left-[21px] top-1 w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
-                                    <div class="text-[10px] font-bold text-slate-700 dark:text-slate-300">Draft v2.4 (Current)</div>
-                                    <div class="text-[9px] text-slate-400 italic">2 minutes ago</div>
-                                </div>
-                                <div class="relative opacity-60">
-                                    <div class="absolute -left-[21px] top-1 w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-700"></div>
-                                    <div class="text-[10px] font-bold text-slate-600">Draft v2.3</div>
-                                    <div class="text-[9px] text-slate-400">1 hour ago</div>
+                    <!-- History Drawer -->
+                    <aside id="drawer-history" class="w-0 overflow-hidden transition-all duration-300 flex flex-col h-full bg-transparent">
+                        <div class="w-64 flex flex-col h-full bg-white dark:bg-[#1a2c2e] border-r border-slate-200 dark:border-white/5">
+                            <div class="p-4 flex items-center justify-between">
+                                <h2 class="text-[10px] font-black tracking-widest uppercase text-slate-400 opacity-60">Version History</h2>
+                                <button onclick="toggleDrawer('history')" class="p-1 hover:bg-black/5 dark:hover:bg-white/5 rounded transition-colors">
+                                    <span class="material-symbols-outlined text-sm text-slate-400">close</span>
+                                </button>
+                            </div>
+                            <div class="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar">
+                                <div class="border-l-2 border-blue-500/30 pl-4 py-1 space-y-4">
+                                    <div class="relative">
+                                        <div class="absolute -left-[21px] top-1 w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
+                                        <div class="text-[10px] font-bold text-slate-700 dark:text-slate-300">Draft v2.4 (Current)</div>
+                                        <div class="text-[9px] text-slate-400 italic">2 minutes ago</div>
+                                    </div>
+                                    <div class="relative opacity-60">
+                                        <div class="absolute -left-[21px] top-1 w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-700"></div>
+                                        <div class="text-[10px] font-bold text-slate-600">Draft v2.3</div>
+                                        <div class="text-[9px] text-slate-400">1 hour ago</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </aside>
+                    </aside>
 
-                <!-- Reference Stitch Drawer -->
-                <aside id="drawer-reference" class="w-0 overflow-hidden transition-all duration-300 flex flex-col h-full bg-transparent">
-                    <div class="w-64 flex flex-col h-full">
-                        <div class="p-4 flex items-center justify-between">
-                            <h2 class="text-[10px] font-black tracking-widest uppercase text-slate-400 opacity-60">Reference Stitch</h2>
-                            <button onclick="toggleDrawer('reference')" class="p-1 hover:bg-black/5 dark:hover:bg-white/5 rounded transition-colors">
-                                <span class="material-symbols-outlined text-sm text-slate-400">close</span>
-                            </button>
-                        </div>
-                        <div id="stitch-zone" class="flex-1 overflow-y-auto p-3 space-y-4 no-scrollbar min-h-[200px] pointer-events-auto">
-                            <!-- Draggable Demo Cards -->
-                            <div class="p-3 bg-white dark:bg-white/5 border border-slate-200/50 dark:border-white/10 rounded-xl group relative shadow-md hover:shadow-lg transition-shadow">
-                                <!-- Dashboard Style Drag Handle -->
-                                <div class="absolute top-3 left-3 drag-handle">
-                                    <i class="bi bi-grip-vertical text-[20px]"></i>
-                                </div>
-                                <div class="flex items-center gap-2 mb-2 pl-8">
-                                    <div class="w-2 h-2 rounded-full bg-blue-500"></div>
-                                    <span class="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">CHARACTER: ELARA</span>
-                                </div>
-                                <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed italic pl-8">"The last of the star-callers. Driven by the prophecy of the falling sky."</p>
+                    <!-- Reference Stitch Drawer -->
+                    <aside id="drawer-reference" class="w-0 overflow-hidden transition-all duration-300 flex flex-col h-full bg-transparent">
+                        <div class="w-64 flex flex-col h-full bg-white dark:bg-[#1a2c2e] border-r border-slate-200 dark:border-white/5">
+                            <div class="p-4 flex items-center justify-between">
+                                <h2 class="text-[10px] font-black tracking-widest uppercase text-slate-400 opacity-60">Reference Stitch</h2>
+                                <button onclick="toggleDrawer('reference')" class="p-1 hover:bg-black/5 dark:hover:bg-white/5 rounded transition-colors">
+                                    <span class="material-symbols-outlined text-sm text-slate-400">close</span>
+                                </button>
                             </div>
-
-                            <div class="p-3 bg-white dark:bg-white/5 border border-slate-200/50 dark:border-white/10 rounded-xl group relative shadow-md hover:shadow-lg transition-shadow">
-                                <!-- Dashboard Style Drag Handle -->
-                                <div class="absolute top-3 left-3 drag-handle">
-                                    <i class="bi bi-grip-vertical text-[20px]"></i>
+                            <div id="stitch-zone" class="flex-1 overflow-y-auto p-3 space-y-4 no-scrollbar min-h-[200px] pointer-events-auto">
+                                <!-- Draggable Demo Cards -->
+                                <div class="p-3 bg-white dark:bg-white/5 border border-slate-200/50 dark:border-white/10 rounded-xl group relative shadow-md hover:shadow-lg transition-shadow">
+                                    <div class="absolute top-3 left-3 drag-handle">
+                                        <i class="bi bi-grip-vertical text-[20px]"></i>
+                                    </div>
+                                    <div class="flex items-center gap-2 mb-2 pl-8">
+                                        <div class="w-2 h-2 rounded-full bg-blue-500"></div>
+                                        <span class="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">CHARACTER: ELARA</span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed italic pl-8">"The last of the star-callers. Driven by the prophecy of the falling sky."</p>
                                 </div>
-                                <div class="flex items-center gap-2 mb-2 pl-8">
-                                    <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
-                                    <span class="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">LORE: THE VOID-WEAVE</span>
-                                </div>
-                                <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed pl-8">A fabric made of condensed shadows. Used to bind the Great Serpent.</p>
                             </div>
                         </div>
+                    </aside>
+                </div>
+
+                <!-- RAIL (Inside) -->
+                <nav id="left-nav-rail" class="w-14 border-r border-slate-200 dark:border-white/5 flex flex-col items-center py-4 gap-4 bg-white dark:bg-black z-40 transition-all duration-300">
+                    <div class="group relative cursor-pointer">
+                        <button type="button" class="p-2 text-slate-400 hover:text-blue-500 transition-colors" title="Story Bible" onclick="toggleDrawer('world')">
+                            <span class="material-symbols-outlined text-[20px]">menu_book</span>
+                        </button>
+                        <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Story Bible</div>
                     </div>
-                </aside>
+
+                    <div class="group relative cursor-not-allowed opacity-40" aria-disabled="true" title="Manuscript - Coming soon">
+                        <button type="button" class="p-2 text-slate-400 transition-colors pointer-events-none" title="Manuscript">
+                            <span class="material-symbols-outlined text-[20px]">edit_note</span>
+                            <div class="absolute right-1.5 top-1.5 w-1.5 h-1.5 bg-slate-400 rounded-full border-2 border-white dark:border-[#1a2c2e]"></div>
+                        </button>
+                    </div>
+
+                    <div class="group relative cursor-pointer">
+                        <button type="button" class="p-2 text-slate-400 hover:text-blue-500 transition-colors" title="Draft Management" onclick="toggleDrawer('history')">
+                            <span class="material-symbols-outlined text-[20px]">history</span>
+                        </button>
+                    </div>
+
+                    <div class="group relative cursor-pointer">
+                        <button type="button" class="p-2 text-slate-400 hover:text-amber-500 transition-colors" title="Manuscript Health" onclick="toggleDrawer('audit')">
+                            <span class="material-symbols-outlined text-[20px]">fact_check</span>
+                        </button>
+                    </div>
+
+                    <div class="group relative cursor-pointer">
+                        <button type="button" class="p-2 text-slate-400 hover:text-purple-500 transition-colors" title="Snippets" onclick="toggleDrawer('reference')">
+                            <span class="material-symbols-outlined text-[20px]">collections_bookmark</span>
+                        </button>
+                    </div>
+
+                    <div class="flex-1"></div>
+
+                    <div class="group relative cursor-pointer">
+                        <button type="button" class="p-2 text-slate-400 hover:text-blue-500 transition-colors" title="Zen Mode" onclick="toggleZenMode()">
+                            <span class="material-symbols-outlined text-[20px]">self_improvement</span>
+                        </button>
+                    </div>
+
+                    <div class="group relative cursor-pointer">
+                        <button type="button" class="p-2 text-slate-400 hover:text-blue-500 transition-colors" title="Toggle Theme" onclick="toggleTheme()">
+                            <span class="material-symbols-outlined text-[20px]" id="theme-icon">dark_mode</span>
+                        </button>
+                    </div>
+                </nav>
             </div>
-
-            <!-- Left Navigation Rail (Story OS Production Bar) - Moved Inwards -->
-            <nav id="left-nav-rail" class="w-14 border-r border-slate-200 dark:border-white/5 flex flex-col items-center py-4 gap-4 bg-white dark:bg-black z-10 transition-all duration-300">
-                <div class="group relative cursor-pointer">
-                    <button type="button" class="p-2 text-slate-400 hover:text-blue-500 transition-colors" title="Story Bible" onclick="toggleDrawer('world')">
-                        <span class="material-symbols-outlined text-[20px]">menu_book</span>
-                    </button>
-                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Story Bible</div>
-                </div>
-
-                <div class="group relative cursor-not-allowed opacity-40" aria-disabled="true" title="Manuscript - Coming soon">
-                    <button type="button" class="p-2 text-slate-400 transition-colors pointer-events-none" title="Manuscript">
-                        <span class="material-symbols-outlined text-[20px]">edit_note</span>
-                        <div class="absolute right-1.5 top-1.5 w-1.5 h-1.5 bg-slate-400 rounded-full border-2 border-white dark:border-[#1a2c2e]"></div>
-                    </button>
-                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Active Draft (Coming Soon)</div>
-                </div>
-
-                <div class="group relative cursor-pointer">
-                    <button type="button" class="p-2 text-slate-400 hover:text-blue-500 transition-colors" title="Draft Management" onclick="toggleDrawer('history')">
-                        <span class="material-symbols-outlined text-[20px]">history</span>
-                    </button>
-                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Version History</div>
-                </div>
-
-                <div class="group relative cursor-pointer">
-                    <button type="button" class="p-2 text-slate-400 hover:text-amber-500 transition-colors" title="Manuscript Health" onclick="toggleDrawer('audit')">
-                        <span class="material-symbols-outlined text-[20px]">fact_check</span>
-                    </button>
-                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Style Audit</div>
-                </div>
-
-                <div class="group relative cursor-not-allowed opacity-40" aria-disabled="true" title="Collaboration - Coming soon">
-                    <button type="button" class="p-2 text-slate-400 transition-colors pointer-events-none" title="Collaboration">
-                        <span class="material-symbols-outlined text-[20px]">groups</span>
-                    </button>
-                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Team Access (Coming Soon)</div>
-                </div>
-
-                <div class="group relative cursor-pointer">
-                    <button type="button" class="p-2 text-slate-400 hover:text-purple-500 transition-colors" title="Snippets" onclick="toggleDrawer('reference')">
-                        <span class="material-symbols-outlined text-[20px]">collections_bookmark</span>
-                    </button>
-                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Reference Stitch</div>
-                </div>
-
-                <div class="group relative cursor-not-allowed opacity-40" aria-disabled="true" title="Publishing - Coming soon">
-                    <button type="button" class="p-2 text-slate-400 transition-colors pointer-events-none" title="Publishing">
-                        <span class="material-symbols-outlined text-[20px]">file_download</span>
-                    </button>
-                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Export & Publish (Coming Soon)</div>
-                </div>
-
-                <div class="flex-1"></div>
-
-                <div class="group relative cursor-pointer">
-                    <button type="button" class="p-2 text-slate-400 hover:text-blue-500 transition-colors" title="Zen Mode" onclick="toggleZenMode()">
-                        <span class="material-symbols-outlined text-[20px]">self_improvement</span>
-                    </button>
-                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Zen Mode</div>
-                </div>
-
-                <div class="group relative cursor-pointer">
-                    <button type="button" class="p-2 text-slate-400 hover:text-blue-500 transition-colors" title="Toggle Theme" onclick="toggleTheme()">
-                        <span class="material-symbols-outlined text-[20px]" id="theme-icon">dark_mode</span>
-                    </button>
-                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Switch Appearance</div>
-                </div>
-
-                <div class="group relative cursor-not-allowed opacity-40" aria-disabled="true" title="Settings - Coming soon">
-                    <button type="button" class="p-2 text-slate-400 transition-colors pointer-events-none" title="Settings">
-                        <span class="material-symbols-outlined text-[20px]">settings</span>
-                    </button>
-                    <div class="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Preferences (Coming Soon)</div>
-                </div>
-            </nav>
 
 
             <!-- Center: Writing Canvas -->
@@ -465,107 +428,78 @@
                         <div id="writing-editor" class="writing-area font-display text-lg text-slate-700 dark:text-slate-300">
                             {{ chapter.content|safe }}
                         </div>
-                </div>
+                    </div>
+                </div> <!-- Correctly closing the max-w-[1000px] container -->
             </main>
 
-            <!-- RIGHT COLLAPSIBLE DRAWER: AI Assistant -->
-            <aside id="drawer-ghostwriter" class="w-0 overflow-hidden transition-all duration-300 flex flex-col shrink-0 z-20">
-                <div class="w-80 flex flex-col h-full p-6">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="font-bold text-text-main dark:text-white">Penn Assistant</h3>
-                        <button onclick="toggleDrawer('ghostwriter')" class="text-slate-400 hover:text-slate-600 transition-colors">
-                            <span class="material-symbols-outlined">close</span>
-                        </button>
-                    </div>
+            <!-- RIGHT COLUMN (Inside to Outside: Rail -> Drawer) -->
+            <div id="right-column" class="flex h-full shrink-0 items-start z-30 transition-all duration-300">
+                <!-- RAIL (Inside) -->
+                <aside id="right-nav-rail" class="w-14 border-l border-slate-200 dark:border-white/5 flex flex-col h-full items-center py-4 gap-4 bg-white dark:bg-black z-40 transition-all duration-300">
+                    <div id="intelligence-rail-source" class="flex flex-col items-center gap-4">
+                        <div class="group relative cursor-pointer" title="AI Assistant">
+                            <button type="button" class="p-2 text-emerald-500 transition-colors" onclick="toggleDrawer('ghostwriter')">
+                                <span class="material-symbols-outlined text-[20px]">history_edu</span>
+                            </button>
+                            <div class="absolute right-full mr-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Penn AI</div>
+                        </div>
 
-                    <!-- Draggable AI Card Source -->
-                    <div id="ai-card-source" class="space-y-4">
-                        <div id="penn-drawer-main" class="p-4 bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-white/10 rounded-2xl shadow-md group relative transition-all duration-300 w-full" data-type="ai-penn">
-                            <!-- Dashboard Style Drag Handle -->
-                            <div class="absolute top-4 left-3 drag-handle">
-                                <i class="bi bi-grip-vertical text-[22px]"></i>
-                            </div>
-
-                            <div class="flex items-center justify-between gap-2 mb-3 pl-8">
-                                <div class="flex items-center gap-2 text-blue-500">
-                                    <i class="bi bi-chat-heart text-[18px]"></i>
-                                    <span class="text-[10px] font-bold tracking-wider uppercase">Ask Penn...</span>
-                                </div>
-                            </div>
-                            <div class="space-y-3 mb-4 max-h-48 overflow-y-auto no-scrollbar messages-area text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed border-b border-slate-100 dark:border-white/5 pb-3">
-                                <div class="opacity-75">Brainstorming? Character trouble? Just ask.</div>
-                            </div>
-                            <div class="relative">
-                                <div class="flex items-center gap-2 p-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-full shadow-inner focus-within:border-blue-500/50 transition-colors">
-                                    <input type="text" placeholder="Type your question..." 
-                                           class="w-full bg-transparent border-0 px-3 py-1 text-[11px] focus:outline-none focus:ring-0"
-                                           onkeypress="if(event.key === 'Enter') { event.stopPropagation(); window.sendToStitchedPenn('penn-drawer-main', this.value); }">
-                                    <button class="w-7 h-7 flex items-center justify-center bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors shadow-sm" 
-                                            onclick="event.stopPropagation(); const input = this.previousElementSibling; window.sendToStitchedPenn('penn-drawer-main', input.value)">
-                                        <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
-                                    </button>
-                                </div>
-                            </div>
+                        <div class="group relative cursor-pointer" title="Insights">
+                            <button type="button" class="p-2 text-slate-400 hover:text-blue-500 transition-colors">
+                                <span class="material-symbols-outlined text-[20px]">insights</span>
+                            </button>
                         </div>
                     </div>
 
                     <div class="flex-1"></div>
-                    <p class="text-[10px] text-slate-400 text-center italic">Drag the card to the left column to keep it open while you write.</p>
-                </div>
-            </aside>
 
-            <!-- Right: Story Intelligence Rail (Production Toolbar) -->
-            <aside class="w-14 border-l border-slate-200 dark:border-white/5 flex flex-col items-center py-4 gap-4 bg-white dark:bg-black z-10 shrink-0">
-                <!-- Intelligence Source for Stitching -->
-                <div id="intelligence-rail-source" class="flex flex-col items-center gap-4">
-                    <!-- Tactical AI (Click to Open Assistant) -->
-                    <div class="group relative cursor-pointer" title="AI Assistant" onclick="toggleDrawer('ghostwriter')">
-                        <button class="p-2 text-emerald-500 transition-colors pointer-events-none">
-                            <span class="material-symbols-outlined text-[20px]">history_edu</span>
+                    <div class="group relative cursor-pointer" title="Focus Mode">
+                        <button type="button" class="p-2 text-slate-400 hover:text-blue-500 transition-colors" onclick="toggleFullScreen()">
+                            <span class="material-symbols-outlined text-[20px]" id="fullscreen-icon">fullscreen</span>
                         </button>
-                        <div class="absolute right-full mr-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Penn AI</div>
                     </div>
+                </aside>
 
-                    <!-- Editorial Insights -->
-                    <div class="group relative cursor-pointer" title="Insights">
-                        <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors">
-                            <span class="material-symbols-outlined text-[20px]">insights</span>
-                        </button>
-                        <div class="absolute right-full mr-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Editorial Insights</div>
+                <!-- DRAWER (Outside) -->
+                <aside id="drawer-ghostwriter" class="w-0 overflow-hidden transition-all duration-300 flex flex-col h-full shrink-0 z-20">
+                    <div class="w-80 flex flex-col h-full p-6 bg-white dark:bg-[#1a2c2e] border-l border-slate-200 dark:border-white/5">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-bold text-text-main dark:text-white">Penn Assistant</h3>
+                            <button onclick="toggleDrawer('ghostwriter')" class="text-slate-400 hover:text-slate-600 transition-colors">
+                                <span class="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+
+                        <div id="ai-card-source" class="space-y-4">
+                            <div id="penn-drawer-main" class="p-4 bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-white/10 rounded-2xl shadow-md group relative transition-all duration-300 w-full" data-type="ai-penn">
+                                <div class="absolute top-4 left-3 drag-handle">
+                                    <i class="bi bi-grip-vertical text-[22px]"></i>
+                                </div>
+                                <div class="flex items-center justify-between gap-2 mb-3 pl-8">
+                                    <div class="flex items-center gap-2 text-blue-500">
+                                        <i class="bi bi-chat-heart text-[18px]"></i>
+                                        <span class="text-[10px] font-bold tracking-wider uppercase">Ask Penn...</span>
+                                    </div>
+                                </div>
+                                <div class="space-y-3 mb-4 max-h-48 overflow-y-auto no-scrollbar messages-area text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed border-b border-slate-100 dark:border-white/5 pb-3">
+                                    <div class="opacity-75">Brainstorming? Character trouble? Just ask.</div>
+                                </div>
+                                <div class="relative">
+                                    <div class="flex items-center gap-2 p-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-full shadow-inner focus-within:border-blue-500/50 transition-colors">
+                                        <input type="text" placeholder="Type your question..." 
+                                               class="w-full bg-transparent border-0 px-3 py-1 text-[11px] focus:outline-none focus:ring-0"
+                                               onkeypress="if(event.key === 'Enter') { event.stopPropagation(); window.sendToStitchedPenn('penn-drawer-main', this.value); }">
+                                        <button class="w-7 h-7 flex items-center justify-center bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors shadow-sm" 
+                                                onclick="event.stopPropagation(); const input = this.previousElementSibling; window.sendToStitchedPenn('penn-drawer-main', input.value)">
+                                            <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-
-                    <!-- Scene Analytics -->
-                    <div class="group relative cursor-pointer" title="Analytics">
-                        <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors">
-                            <span class="material-symbols-outlined text-[20px]">equalizer</span>
-                        </button>
-                        <div class="absolute right-full mr-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Scene Analytics</div>
-                    </div>
-                </div>
-
-                <div class="flex-1"></div>
-
-                <div class="group relative cursor-pointer" title="Comments">
-                    <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors">
-                        <span class="material-symbols-outlined text-[20px]">comment</span>
-                    </button>
-                    <div class="absolute right-full mr-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Comments</div>
-                </div>
-
-                <div class="group relative cursor-pointer" onclick="toggleFullScreen()" title="Focus Mode">
-                    <button class="p-2 text-slate-400 hover:text-blue-500 transition-colors">
-                        <span class="material-symbols-outlined text-[20px]" id="fullscreen-icon">fullscreen</span>
-                    </button>
-                    <div class="absolute right-full mr-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Fullscreen</div>
-                </div>
-
-                <div class="group relative cursor-pointer" title="Support">
-                    <button class="p-2 text-slate-300 hover:text-slate-500 transition-colors">
-                        <span class="material-symbols-outlined text-[20px]">help_outline</span>
-                    </button>
-                    <div class="absolute right-full mr-2 px-2 py-1 bg-slate-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">Help</div>
-                </div>
-            </aside>
+                </aside>
+            </div>
         </div>
 
         <!-- Bottom: Story Timeline Strip -->
@@ -692,14 +626,9 @@
         if (forceOpen || !isOpen) {
             drawer.classList.remove('w-0');
             drawer.classList.add(widthClass);
-            
-            // Add border separation based on direction
-            if (!isLeft) {
-                drawer.classList.add('border-l', 'border-slate-200', 'dark:border-white/5');
-            }
         } else {
             drawer.classList.add('w-0');
-            drawer.classList.remove(widthClass, 'border-l', 'border-slate-200', 'dark:border-white/5');
+            drawer.classList.remove(widthClass);
         }
 
         // Apply Symmetric Cushioning
@@ -707,84 +636,88 @@
     };
 
     function updateLayoutSymmetry() {
-        const leftStack = document.getElementById('left-drawer-stack');
-        const rightDrawer = document.getElementById('drawer-ghostwriter');
         const mainCanvas = document.querySelector('main');
+        const leftColumn = document.getElementById('left-column');
+        const rightColumn = document.getElementById('right-column');
         
-        // Calculate Total Active Widths
+        // Calculate Total Active Drawer Widths
         let leftWidth = 0;
         ['world', 'audit', 'reference', 'history'].forEach(id => {
             const d = document.getElementById(`drawer-${id}`);
-            if (d && d.classList.contains('w-64')) leftWidth += 256;
+            if (d && (d.classList.contains('w-64') || d.style.width === '16rem')) leftWidth = 256;
         });
 
-        const rightWidth = rightDrawer.classList.contains('w-80') ? 320 : 0;
+        const ghost = document.getElementById('drawer-ghostwriter');
+        const rightWidth = (ghost && (ghost.classList.contains('w-80') || ghost.style.width === '20rem')) ? 320 : 0;
         
         // available padding in main to keep content centered
-        // We want the editor page (max-w-[1000px]) to stay centered in the combined space
         // Total Space = window.innerWidth - (Rails = 112)
         const totalWorkspace = window.innerWidth - 112;
         const editorMaxWidth = 1000;
         const availableMargin = Math.max(0, (totalWorkspace - editorMaxWidth) / 2);
 
-        // Conditional Push: Only push if side-width > available-margin
+        // Conditional Push: Only push if drawer width > available-margin
         const leftPush = Math.max(0, leftWidth - availableMargin);
         const rightPush = Math.max(0, rightWidth - availableMargin);
 
         // Apply padding to main to shift content
-        // This keeps the editor centered as long as drawers don't "touch" it
         mainCanvas.style.paddingLeft = `${leftPush}px`;
         mainCanvas.style.paddingRight = `${rightPush}px`;
 
-        // Also adjust rail borders if needed (visual polish)
+        // Adjust rail borders (visual polish between rail and drawer)
         const leftRail = document.getElementById('left-nav-rail');
-        if (leftWidth > 0) {
-            leftRail.classList.add('border-l');
-        } else {
-            leftRail.classList.remove('border-l'); 
+        if (leftRail) {
+            if (leftWidth > 0) leftRail.classList.add('border-l');
+            else leftRail.classList.remove('border-l');
+        }
+
+        const rightRail = document.getElementById('right-nav-rail');
+        if (rightRail) {
+            if (rightWidth > 0) rightRail.classList.add('border-r');
+            else rightRail.classList.remove('border-r');
         }
     }
 
-    // Initial check
-    window.addEventListener('resize', updateLayoutSymmetry);
-
-    // Theme & Zen Logic
-    window.toggleTheme = function() {
-        document.documentElement.classList.toggle('dark');
-        const icon = document.getElementById('theme-icon');
-        icon.innerText = document.documentElement.classList.contains('dark') ? 'light_mode' : 'dark_mode';
-    };
-
     window.toggleZenMode = function() {
-        const nav = document.querySelector('nav');
+        const leftCol = document.getElementById('left-column');
+        const rightCol = document.getElementById('right-column');
         const header = document.getElementById('mac-title-bar');
         const subheader = document.getElementById('editor-sub-header');
         const footer = document.querySelector('footer');
-        const asideRight = document.querySelector('aside:not(#drawer-reference)');
-        const asideLeft = document.getElementById('drawer-reference');
         
-        // Hide open drawers
-        document.querySelectorAll('aside[id^="drawer-"], div[id^="drawer-"]').forEach(d => {
+        // Hide open drawers first
+        document.querySelectorAll('aside[id^="drawer-"]').forEach(d => {
             d.classList.add('w-0');
-            d.classList.remove('w-80', 'border-l', 'border-r');
+            d.classList.remove('w-80', 'w-64');
         });
 
         const isZen = document.body.classList.toggle('zen-mode-active');
         
-        if (isZen) {
-            nav.classList.add('hidden');
-            header.classList.add('opacity-0', 'pointer-events-none');
-            subheader.classList.add('opacity-0', 'pointer-events-none');
-            footer.classList.add('opacity-0', 'pointer-events-none');
-            asideRight.classList.add('hidden');
-            asideLeft.classList.add('hidden');
-        } else {
-            nav.classList.remove('hidden');
-            header.classList.remove('opacity-0', 'pointer-events-none');
-            subheader.classList.remove('opacity-0', 'pointer-events-none');
-            footer.classList.remove('opacity-0', 'pointer-events-none');
-            asideRight.classList.remove('hidden');
-            asideLeft.classList.remove('hidden');
+        const uiElements = [leftCol, rightCol, header, subheader, footer];
+        uiElements.forEach(el => {
+            if (!el) return;
+            if (isZen) {
+                el.classList.add('opacity-0', 'pointer-events-none');
+                setTimeout(() => el.classList.add('hidden'), 300);
+            } else {
+                el.classList.remove('hidden');
+                setTimeout(() => el.classList.remove('opacity-0', 'pointer-events-none'), 10);
+            }
+        });
+        
+        // Re-center after UI change
+        setTimeout(updateLayoutSymmetry, 310);
+    };
+
+    // Initial check & resize
+    window.addEventListener('resize', updateLayoutSymmetry);
+    window.addEventListener('load', updateLayoutSymmetry);
+
+    window.toggleTheme = function() {
+        document.documentElement.classList.toggle('dark');
+        const icon = document.getElementById('theme-icon');
+        if (icon) {
+            icon.innerText = document.documentElement.classList.contains('dark') ? 'light_mode' : 'dark_mode';
         }
     };
 
