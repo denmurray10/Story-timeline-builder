@@ -14,6 +14,37 @@ document.addEventListener('DOMContentLoaded', function () {
         const userInitial = container.dataset.userInitial || (username.charAt(0).toUpperCase());
         const userRole = container.dataset.userRole || 'Member';
 
+        // Detect mobile view for navigation injection
+        const isMobile = window.innerWidth <= 1100;
+
+        let navLinksHTML = '';
+        if (isMobile) {
+            navLinksHTML = `
+                <div class="account-label mt-2">Navigation</div>
+                <a href="/dashboard/" class="account-menu-item">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/books/" class="account-menu-item">
+                    <i class="bi bi-book"></i>
+                    <span>Manuscripts</span>
+                </a>
+                <a href="/characters/" class="account-menu-item">
+                    <i class="bi bi-people"></i>
+                    <span>Characters</span>
+                </a>
+                <a href="/relationship-map/" class="account-menu-item">
+                    <i class="bi bi-diagram-3"></i>
+                    <span>Relationship Map</span>
+                </a>
+                <a href="/blog/" class="account-menu-item">
+                    <i class="bi bi-journal-text"></i>
+                    <span>Blog</span>
+                </a>
+                <hr class="account-divider">
+            `;
+        }
+
         // Create the dropdown HTML
         const dropdownHTML = `
             <div class="account-dropdown-wrapper">
@@ -22,6 +53,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     <div class="account-label">Account</div>
                     <div class="account-username">${username}</div>
                     <hr class="account-divider">
+                    ${navLinksHTML}
                     <a href="/account/" class="account-menu-item">
                         <i class="bi bi-person-circle"></i>
                         <span>Account Settings</span>
