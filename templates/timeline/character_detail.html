@@ -524,7 +524,7 @@
                 <div class="card-premium mb-4 overflow-hidden" id="card-identity">
                     <div class="portrait-container border-0 rounded-0 shadow-none mb-0 w-100" onclick="document.getElementById('{{ form.profile_image.id_for_label }}').click()">
                         {% if character.profile_pic_url %}
-                        <img src="{{ character.profile_pic_url }}" id="profilePreview" class="portrait-img">
+                        <img src="{{ character.profile_pic_url }}" alt="{{ character.name }} Profile Picture" id="profilePreview" class="portrait-img">
                         {% else %}
                         <div id="profilePlaceholder" class="w-100 h-100 d-flex flex-column align-items-center justify-content-center text-muted bg-light" style="min-height: 350px;">
                             <i class="bi bi-person fs-1 opacity-50"></i>
@@ -662,7 +662,7 @@
                                 <div class="d-flex align-items-center justify-content-between bg-light rounded-4 p-3 border border-dashed hover-lift transition-all">
                                     <div class="d-flex align-items-center gap-3">
                                         <div class="rounded-circle bg-white border shadow-sm d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; overflow: hidden;">
-                                            {% if other.profile_pic_url %}<img src="{{ other.profile_pic_url }}" class="w-100 h-100 object-fit-cover">{% else %}<i class="bi bi-person text-muted" style="font-size: 0.8rem;"></i>{% endif %}
+                                            {% if other.profile_pic_url %}<img src="{{ other.profile_pic_url }}" alt="{{ other.name }} Avatar" class="w-100 h-100 object-fit-cover">{% else %}<i class="bi bi-person text-muted" style="font-size: 0.8rem;"></i>{% endif %}
                                         </div>
                                         <div>
                                             <div class="fw-bold text-dark" style="font-size: 0.85rem;">{{ other.name }}</div>
@@ -677,7 +677,7 @@
                                 <div class="d-flex align-items-center justify-content-between bg-light rounded-4 p-3 border border-dashed hover-lift transition-all">
                                     <div class="d-flex align-items-center gap-3">
                                         <div class="rounded-circle bg-white border shadow-sm d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; overflow: hidden;">
-                                            {% if other.profile_pic_url %}<img src="{{ other.profile_pic_url }}" class="w-100 h-100 object-fit-cover">{% else %}<i class="bi bi-person text-muted" style="font-size: 0.8rem;"></i>{% endif %}
+                                            {% if other.profile_pic_url %}<img src="{{ other.profile_pic_url }}" alt="{{ other.name }} Avatar" class="w-100 h-100 object-fit-cover">{% else %}<i class="bi bi-person text-muted" style="font-size: 0.8rem;"></i>{% endif %}
                                         </div>
                                         <div>
                                             <div class="fw-bold text-dark" style="font-size: 0.85rem;">{{ other.name }}</div>

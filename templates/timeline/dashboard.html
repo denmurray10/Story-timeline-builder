@@ -480,7 +480,7 @@
                 <div class="d-flex align-items-center mb-3">
                     <div class="me-2">
                         {% if arc_snapshot.character.profile_pic_url %}
-                        <img src="{{ arc_snapshot.character.profile_pic_url }}" class="rounded-circle shadow-sm" style="width: 36px; height: 36px; object-fit: cover;">
+                        <img src="{{ arc_snapshot.character.profile_pic_url }}" alt="{{ arc_snapshot.character.name }} Avatar" class="rounded-circle shadow-sm" style="width: 36px; height: 36px; object-fit: cover;">
                         {% else %}
                         <div class="rounded-circle bg-light d-flex align-items-center justify-content-center border" style="width: 36px; height: 36px; font-size: 1rem; color: #6b7280; background-color: {{arc_snapshot.character.color_code|default:'#6366f1'}}; color: white; font-weight: bold;">
                             {{ arc_snapshot.character.name|first }}
@@ -516,7 +516,7 @@
                 <div class="d-flex align-items-center mb-3">
                     <div class="me-2">
                         {% if spotlight_character.profile_pic_url %}
-                        <img src="{{ spotlight_character.profile_pic_url }}" class="rounded-circle shadow-sm" style="width: 36px; height: 36px; object-fit: cover;">
+                        <img src="{{ spotlight_character.profile_pic_url }}" alt="{{ spotlight_character.name }} Avatar" class="rounded-circle shadow-sm" style="width: 36px; height: 36px; object-fit: cover;">
                         {% else %}
                         <div class="rounded-circle bg-light d-flex align-items-center justify-content-center border" style="width: 36px; height: 36px; font-size: 1rem; color: #6b7280;">
                             {{ spotlight_character.name|first }}
