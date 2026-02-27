@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Story Timeline Builder{% endblock %}</title>
-    <!-- Bootstrap CSS & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
     <link rel="stylesheet" href="{% static 'css/bootstrap-icons/bootstrap-icons.css' %}" />
@@ -45,7 +44,6 @@
             background-color: #f4f1ee;
             color: var(--text-body);
             -webkit-font-smoothing: antialiased;
-            zoom: 0.9;
         }
 
         /* TYPOGRAPHY */
@@ -80,9 +78,7 @@
         /* LAYOUT */
         .container-fluid { padding-top: 10px; }
 
-        /* =============================================
-           STICKY SIDEBAR — universal
-           ============================================= */
+        /* STICKY SIDEBAR */
         .sidebar {
             background-color: #f4f1ee;
             border-right: none;
@@ -117,21 +113,17 @@
         .sidebar .nav-link i { font-size: 1rem; }
         .sidebar .nav-link.active { background-color: #fff; color: #000; }
 
-        /* SIDEBAR SEPARATOR LINES */
         .sidebar hr {
             margin-left: calc(0.9rem + 1.4rem);
             margin-right: calc(0.9rem + 1.4rem);
             border-color: rgba(0, 0, 0, 0.35);
         }
 
-        /* Sidebar nav vertical position */
         .sidebar > nav.nav {
             margin-top: 53px;
         }
 
-        /* =============================================
-           COMING SOON HOVER BUBBLE — universal
-           ============================================= */
+        /* COMING SOON HOVER BUBBLE */
         .coming-soon-hover {
             position: relative;
             cursor: help !important;
@@ -162,6 +154,7 @@
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
             pointer-events: none;
             font-weight: 500;
+            white-space: normal;
         }
         .coming-soon-bubble::after {
             content: "";
@@ -355,7 +348,6 @@
                     <div class="container"><small>&copy; 2026 Story Timeline Builder</small></div>
                 </footer>
             </div>
-
         </div>
     </div>
     {% endblock full_layout %}
@@ -364,9 +356,15 @@
         {% include 'timeline/_project_creation_modal.html' %}
     {% endif %}
 
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js" 
-  integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" 
-  crossorigin="anonymous"></script>
+    <!-- ✅ Scripts in correct order: Bootstrap → jQuery → Sortable → custom → page-specific -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script src="{% static 'js/account-dropdown.js' %}"></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>
