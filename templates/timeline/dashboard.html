@@ -2,6 +2,7 @@
 {% load static %}
 {% block title %}Dashboard - Story Timeline Builder{% endblock %}
 {% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
 <style>
     .sidebar .nav-link { border-radius: 999px; }
     .dash-header-row { margin-bottom: 18px; }
@@ -43,40 +44,35 @@
     .draggable-card:hover .drag-handle { color: #6366f1; opacity: 1; }
     .modal-backdrop.show { opacity: 0.8 !important; backdrop-filter: blur(4px); }
 
-    /* =============================================
-       STICKY SIDEBAR FIX
-       ============================================= */
-    /* Lower main cards section by 20px */
-    .main-cards-row {
-        margin-top: 0 !important;
-    }
-    
-    /* Hide Architect View switcher */
-    .form-check.form-switch.me-3.mb-0 {
-        display: none !important;
-    }
-    
-    /* Change blue sections in Dashboard Widgets modal to black */
+    .main-cards-row { margin-top: 0 !important; }
+
+    .form-check.form-switch.me-3.mb-0 { display: none !important; }
+
     #widgetsModal .nav-pills .nav-link.active {
         background-color: var(--dark-universal, rgba(33, 37, 41, 1)) !important;
         color: #ffffff !important;
         border-color: var(--dark-universal, rgba(33, 37, 41, 1)) !important;
     }
-    
-    #widgetsModal .nav-pills .nav-link {
-        color: #000000 !important;
-    }
-    
+    #widgetsModal .nav-pills .nav-link { color: #000000 !important; }
     #widgetsModal .form-check-input:checked {
         background-color: var(--dark-universal, rgba(33, 37, 41, 1)) !important;
         border-color: var(--dark-universal, rgba(33, 37, 41, 1)) !important;
     }
-    
     #widgetsModal .form-check-input:focus {
         border-color: var(--dark-universal, rgba(33, 37, 41, 1)) !important;
         box-shadow: 0 0 0 0.25rem rgba(33, 37, 41, 0.25) !important;
     }
 
+    /* Faded / inactive widget rows in modal */
+    .widget-row-inactive {
+        opacity: 0.4;
+        pointer-events: none;
+        user-select: none;
+        position: relative;
+    }
+    .widget-row-inactive .form-check-input { cursor: not-allowed; }
+
+    .coming-soon-hover { position: relative; }
     .coming-soon-hover:hover .coming-soon-bubble {
         visibility: visible;
         opacity: 1;
@@ -84,10 +80,14 @@
     }
 </style>
 {% endblock %}
+
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div class="d-flex align-items-center gap-3">
-        <h2 class="mb-0">Dashboard <span class="badge bg-warning text-dark" style="font-size: 0.6rem; vertical-align: middle;">TEST MODE</span></h2>
+        <!-- Title matches Manuscripts serif font -->
+        <h2 class="mb-0" style="font-family: 'DM Serif Display', serif; font-size: 2.5rem; font-weight: 400; letter-spacing: -0.5px;">
+            Dashboard <span class="badge bg-warning text-dark" style="font-size: 0.6rem; vertical-align: middle; font-family: 'Inter', sans-serif;">TEST MODE</span>
+        </h2>
     </div>
     <div class="d-flex align-items-center">
         <select class="form-select form-select-sm me-3 border-0 bg-light rounded-pill px-3 shadow-none fw-semibold text-dark" id="contextSelector" style="width: auto; cursor: pointer; font-size: 0.85rem;">
@@ -105,7 +105,7 @@
                 {% endfor %}
             </optgroup>
         </select>
-        
+
         <div class="form-check form-switch me-3 mb-0">
             <input class="form-check-input" type="checkbox" id="writerModeToggle" style="cursor: pointer;">
             <label class="form-check-label fw-semibold" for="writerModeToggle" style="cursor: pointer;">
@@ -137,26 +137,72 @@
                     <li class="nav-item" role="presentation"><button class="nav-link rounded-pill px-4 py-2" id="tools-tab" data-bs-toggle="tab" data-bs-target="#tools-widgets" type="button" role="tab">Tools & AI</button></li>
                 </ul>
                 <div class="tab-content" id="widgetTabsContent">
+                    <!-- CORE TAB — all 4 are active -->
                     <div class="tab-pane fade show active" id="core-widgets" role="tabpanel">
                         <div class="list-group list-group-flush">
-                            <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0"><div><h6 class="mb-0 fw-semibold">Writing Mode Card</h6><small class="text-muted">Quick link to your latest chapter.</small></div><div class="form-check form-switch"><input class="form-check-input widget-toggle" type="checkbox" data-card-id="card-writing-mode-architect" checked></div></div>
-                            <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0"><div><h6 class="mb-0 fw-semibold">Story Stats</h6><small class="text-muted">Total counts of books, characters, etc.</small></div><div class="form-check form-switch"><input class="form-check-input widget-toggle" type="checkbox" data-card-id="card-stats" checked></div></div>
-                            <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0"><div><h6 class="mb-0 fw-semibold">Recent Activity</h6><small class="text-muted">Show your latest 5 platform saves.</small></div><div class="form-check form-switch"><input class="form-check-input widget-toggle" type="checkbox" data-card-id="card-recent" checked></div></div>
-                            <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0"><div><h6 class="mb-0 fw-semibold">Your Books</h6><small class="text-muted">Quick access to your library.</small></div><div class="form-check form-switch"><input class="form-check-input widget-toggle" type="checkbox" data-card-id="card-books" checked></div></div>
+                            <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0">
+                                <div><h6 class="mb-0 fw-semibold">Writing Mode Card</h6><small class="text-muted">Quick link to your latest chapter.</small></div>
+                                <div class="form-check form-switch"><input class="form-check-input widget-toggle" type="checkbox" data-card-id="card-writing-mode-architect" checked></div>
+                            </div>
+                            <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0">
+                                <div><h6 class="mb-0 fw-semibold">Story Stats</h6><small class="text-muted">Total counts of books, characters, etc.</small></div>
+                                <div class="form-check form-switch"><input class="form-check-input widget-toggle" type="checkbox" data-card-id="card-stats" checked></div>
+                            </div>
+                            <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0">
+                                <div><h6 class="mb-0 fw-semibold">Recent Activity</h6><small class="text-muted">Show your latest 5 platform saves.</small></div>
+                                <div class="form-check form-switch"><input class="form-check-input widget-toggle" type="checkbox" data-card-id="card-recent" checked></div>
+                            </div>
+                            <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0">
+                                <div><h6 class="mb-0 fw-semibold">Your Books</h6><small class="text-muted">Quick access to your library.</small></div>
+                                <div class="form-check form-switch"><input class="form-check-input widget-toggle" type="checkbox" data-card-id="card-books" checked></div>
+                            </div>
                         </div>
                     </div>
+
+                    <!-- TOOLS & AI TAB — all faded/inactive (coming soon) -->
                     <div class="tab-pane fade" id="tools-widgets" role="tabpanel">
+                        <p class="text-muted small mb-3" style="font-size:0.78rem;">These widgets are <strong>coming soon</strong> and will be unlocked as features become available.</p>
                         <div class="list-group list-group-flush">
-                            <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0"><div><h6 class="mb-0 fw-semibold">Today's Focus</h6><small class="text-muted">Generated daily writing tasks.</small></div><div class="form-check form-switch"><input class="form-check-input widget-toggle" type="checkbox" data-card-id="card-focus" checked></div></div>
-                            <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0"><div><h6 class="mb-0 fw-semibold">Character Spotlight</h6><small class="text-muted">A daily random deep dive into a character.</small></div><div class="form-check form-switch"><input class="form-check-input widget-toggle" type="checkbox" data-card-id="card-character-spotlight" checked></div></div>
-                            <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0"><div><h6 class="mb-0 fw-semibold">Relationship Sparkline</h6><small class="text-muted">Quick view of your key character dynamics.</small></div><div class="form-check form-switch"><input class="form-check-input widget-toggle" type="checkbox" data-card-id="card-relationship-sparkline" checked></div></div>
-                            <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0"><div><h6 class="mb-0 fw-semibold">Inspiration Mood Board</h6><small class="text-muted">Random themes and motivations for ideas.</small></div><div class="form-check form-switch"><input class="form-check-input widget-toggle" type="checkbox" data-card-id="card-mood-board" checked></div></div>
-                            <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0"><div><h6 class="mb-0 fw-semibold">World at a Glance</h6><small class="text-muted">Overview of your story bible.</small></div><div class="form-check form-switch"><input class="form-check-input widget-toggle" type="checkbox" data-card-id="card-world-glance" checked></div></div>
-                            <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0"><div><h6 class="mb-0 fw-semibold">Quick Actions</h6><small class="text-muted">Buttons for new events and characters.</small></div><div class="form-check form-switch"><input class="form-check-input widget-toggle" type="checkbox" data-card-id="card-quick-actions" checked></div></div>
-                            <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0"><div><h6 class="mb-0 fw-semibold">Story Support</h6><small class="text-muted">Chat with your writing consultant.</small></div><div class="form-check form-switch"><input class="form-check-input widget-toggle" type="checkbox" data-card-id="card-ai" checked></div></div>
-                            <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0"><div><h6 class="mb-0 fw-semibold">Pacing & Tension</h6><small class="text-muted">Visual map of story intensity.</small></div><div class="form-check form-switch"><input class="form-check-input widget-toggle" type="checkbox" data-card-id="card-pacing" checked></div></div>
-                            <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0"><div><h6 class="mb-0 fw-semibold">Story Beats</h6><small class="text-muted">Track narrative milestones.</small></div><div class="form-check form-switch"><input class="form-check-input widget-toggle" type="checkbox" data-card-id="card-beats" checked></div></div>
-                            <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0"><div><h6 class="mb-0 fw-semibold">Timeline Integrity</h6><small class="text-muted">Identify story inconsistencies.</small></div><div class="form-check form-switch"><input class="form-check-input widget-toggle" type="checkbox" data-card-id="card-integrity" checked></div></div>
+                            <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0 widget-row-inactive">
+                                <div><h6 class="mb-0 fw-semibold">Today's Focus <span class="badge bg-secondary ms-2" style="font-size:0.6rem;">Soon</span></h6><small class="text-muted">Generated daily writing tasks.</small></div>
+                                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" disabled></div>
+                            </div>
+                            <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0 widget-row-inactive">
+                                <div><h6 class="mb-0 fw-semibold">Character Spotlight <span class="badge bg-secondary ms-2" style="font-size:0.6rem;">Soon</span></h6><small class="text-muted">A daily random deep dive into a character.</small></div>
+                                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" disabled></div>
+                            </div>
+                            <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0 widget-row-inactive">
+                                <div><h6 class="mb-0 fw-semibold">Relationship Sparkline <span class="badge bg-secondary ms-2" style="font-size:0.6rem;">Soon</span></h6><small class="text-muted">Quick view of your key character dynamics.</small></div>
+                                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" disabled></div>
+                            </div>
+                            <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0 widget-row-inactive">
+                                <div><h6 class="mb-0 fw-semibold">Inspiration Mood Board <span class="badge bg-secondary ms-2" style="font-size:0.6rem;">Soon</span></h6><small class="text-muted">Random themes and motivations for ideas.</small></div>
+                                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" disabled></div>
+                            </div>
+                            <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0 widget-row-inactive">
+                                <div><h6 class="mb-0 fw-semibold">World at a Glance <span class="badge bg-secondary ms-2" style="font-size:0.6rem;">Soon</span></h6><small class="text-muted">Overview of your story bible.</small></div>
+                                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" disabled></div>
+                            </div>
+                            <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0 widget-row-inactive">
+                                <div><h6 class="mb-0 fw-semibold">Quick Actions <span class="badge bg-secondary ms-2" style="font-size:0.6rem;">Soon</span></h6><small class="text-muted">Buttons for new events and characters.</small></div>
+                                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" disabled></div>
+                            </div>
+                            <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0 widget-row-inactive">
+                                <div><h6 class="mb-0 fw-semibold">Story Support <span class="badge bg-secondary ms-2" style="font-size:0.6rem;">Soon</span></h6><small class="text-muted">Chat with your writing consultant.</small></div>
+                                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" disabled></div>
+                            </div>
+                            <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0 widget-row-inactive">
+                                <div><h6 class="mb-0 fw-semibold">Pacing & Tension <span class="badge bg-secondary ms-2" style="font-size:0.6rem;">Soon</span></h6><small class="text-muted">Visual map of story intensity.</small></div>
+                                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" disabled></div>
+                            </div>
+                            <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0 widget-row-inactive">
+                                <div><h6 class="mb-0 fw-semibold">Story Beats <span class="badge bg-secondary ms-2" style="font-size:0.6rem;">Soon</span></h6><small class="text-muted">Track narrative milestones.</small></div>
+                                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" disabled></div>
+                            </div>
+                            <div class="list-group-item border-0 d-flex justify-content-between align-items-center px-0 widget-row-inactive">
+                                <div><h6 class="mb-0 fw-semibold">Timeline Integrity <span class="badge bg-secondary ms-2" style="font-size:0.6rem;">Soon</span></h6><small class="text-muted">Identify story inconsistencies.</small></div>
+                                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" disabled></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -173,7 +219,6 @@
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content border-0 shadow-2xl" style="border-radius: 20px; overflow: hidden; height: 85vh; background: #fff;">
             <div class="d-flex h-100">
-                <!-- Sidebar -->
                 <div class="d-none d-lg-flex flex-column bg-light border-end" style="width: 280px;">
                     <div class="p-4 border-b">
                         <div class="d-flex align-items-center gap-2 mb-4">
@@ -189,7 +234,6 @@
                             <i class="bi bi-plus-lg"></i> New Chat
                         </button>
                     </div>
-                    
                     <div class="flex-grow-1 overflow-y-auto p-3 pe-2 scroll-premium" style="scrollbar-width: thin;">
                         <div class="text-[10px] font-bold text-muted uppercase tracking-widest mb-3 px-2">Recent Thinking</div>
                         <div class="list-group list-group-flush gap-1" id="penn-recent-queries">
@@ -209,7 +253,6 @@
                             </div>
                         </div>
                     </div>
-                    
                     <div class="p-3 border-top bg-white mt-auto">
                         <div class="d-flex align-items-center justify-content-between">
                             <div class="d-flex align-items-center gap-2">
@@ -226,7 +269,6 @@
                     </div>
                 </div>
 
-                <!-- Main Chat -->
                 <div class="flex-grow-1 d-flex flex-column" style="background: #fdfcf8;">
                     <div class="p-3 px-4 border-bottom d-flex align-items-center justify-content-between bg-white">
                         <div class="d-flex align-items-center gap-3">
@@ -237,23 +279,19 @@
                             </div>
                         </div>
                         <div class="d-flex align-items-center gap-3 h-100">
-                             <div class="d-flex gap-2 text-muted me-3">
-                                 <i class="bi bi-dash-lg"></i>
-                                 <i class="bi bi-fullscreen" style="font-size: 0.8rem;"></i>
-                             </div>
-                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <div class="d-flex gap-2 text-muted me-3">
+                                <i class="bi bi-dash-lg"></i>
+                                <i class="bi bi-fullscreen" style="font-size: 0.8rem;"></i>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                     </div>
-
-                    <div id="penn-modal-chat-history" class="flex-grow-1 overflow-y-auto p-4 md:p-5 scroll-premium" style="scrollbar-width: thin;">
-                    </div>
-
+                    <div id="penn-modal-chat-history" class="flex-grow-1 overflow-y-auto p-4 md:p-5 scroll-premium" style="scrollbar-width: thin;"></div>
                     <div class="p-4 pt-0">
                         <div id="penn-modal-suggestions" class="mb-3 d-flex flex-column gap-2"></div>
                         <div id="penn-modal-loading" style="display: none;" class="text-center mb-3">
                             <div class="ai-loading-dots"><span></span><span></span><span></span></div>
                         </div>
-                        
                         <div class="position-relative shadow-lg" style="border-radius: 16px;">
                             <div class="p-3 bg-white border" style="border-radius: 16px;">
                                 <textarea id="ai-query-modal" class="form-control border-0 bg-transparent shadow-none px-0" placeholder="Ask Penn about your story..." rows="2" style="font-size: 0.95rem; resize: none;"></textarea>
@@ -305,7 +343,6 @@
                 </div>
                 <p class="dash-muted mb-0">Words written today.</p>
             </div>
-            
             <div class="dash-card p-4 draggable-card mb-3" id="card-integrity">
                 <div class="d-flex justify-content-between align-items-center mb-3"><h5 class="dash-card-header mb-0"><i class="bi bi-grip-vertical drag-handle me-2"></i>Timeline Integrity</h5><span class="badge bg-light text-dark border">Found {{ integrity_issues|length }} Issues</span></div>
                 {% if integrity_issues %}<div class="list-group list-group-flush">
@@ -325,7 +362,6 @@
                         <span class="badge bg-white text-dark border"><i class="bi bi-thermometer-half text-danger"></i> Tension: {{ up_next_event.tension_level }}/10</span>
                     </div>
                 </div>
-                
                 {% if pov_reference_char %}
                 <div class="border-top pt-3">
                     <div class="small text-muted fw-bold text-uppercase mb-2" style="font-size:0.65rem;">POV Quick-Reference</div>
@@ -336,7 +372,6 @@
                     {% if pov_reference_char.motivation %}<p class="small text-muted fst-italic mb-0">"{{ pov_reference_char.motivation }}"</p>{% endif %}
                 </div>
                 {% endif %}
-                
                 <div class="mt-3 text-center">
                     <a href="{% url 'event_edit' up_next_event.id %}" class="btn-premium btn-premium-light !py-2 !px-3 !w-full !text-xs">Prep Scene</a>
                 </div>
@@ -344,7 +379,6 @@
                 <div class="text-center py-4 text-muted"><p class="mb-0">You're all caught up! No unwritten scenes planned.</p></div>
                 {% endif %}
             </div>
-            
             <div class="dash-card p-4 draggable-card mb-3" id="card-loops">
                 <div class="d-flex justify-content-between align-items-center mb-3"><h5 class="dash-card-header mb-0"><i class="bi bi-grip-vertical drag-handle me-2"></i>Open Loops</h5><span class="badge bg-light text-dark border">{{ unresolved_rels.count }} Unresolved</span></div>
                 {% if unresolved_rels %}<div class="row g-2">{% for rel in unresolved_rels %}<div class="col-12"><div class="p-2 border rounded bg-light d-flex align-items-center gap-2"><div class="d-flex align-items-center"><div class="avatar-small me-1" style="width:24px;height:24px;background-color:{{rel.character_a.color_code}};border-radius:50%;color:white;font-size:0.6rem;display:flex;align-items:center;justify-content:center;">{{ rel.character_a.name|slice:":1" }}</div><i class="bi bi-arrow-left-right text-muted mx-1" style="font-size: 0.8rem;"></i><div class="avatar-small ms-1" style="width:24px;height:24px;background-color:{{rel.character_b.color_code}};border-radius:50%;color:white;font-size:0.6rem;display:flex;align-items:center;justify-content:center;">{{ rel.character_b.name|slice:":1" }}</div></div><div class="chk-truncate ms-2 flex-grow-1"><div class="fw-semibold" style="font-size:0.85rem;">{{ rel.get_relationship_type_display }}</div><div class="text-muted" style="font-size:0.75rem;">{{ rel.character_a.name }} & {{ rel.character_b.name }}</div></div><a href="{% url 'character_detail' rel.character_a.id %}" class="text-muted"><i class="bi bi-pencil-square"></i></a></div></div>{% endfor %}</div>{% else %}<p class="text-muted small">All relationship arcs are resolved.</p>{% endif %}
@@ -358,7 +392,6 @@
                     <div class="col-6"><div class="p-2 border rounded-3 bg-light"><div class="fw-bold fs-5 text-dark">{{ estimated_finish_date|date:"M j"|default:"TBD" }}</div><div class="small text-muted">est. finish</div></div></div>
                 </div>
             </div>
-            
             <div class="dash-card p-4 draggable-card mb-3" id="card-whereabouts"><h5 class="dash-card-header mb-3"><i class="bi bi-grip-vertical drag-handle me-2"></i>Character Whereabouts</h5><div class="d-flex flex-wrap gap-2">{% for items in char_locations %}<div class="badge bg-white text-dark border p-2 d-flex align-items-center gap-2 rounded-pill fw-normal"><span class="d-inline-block rounded-circle" style="width:8px;height:8px;background-color:{{ items.character.color_code }}"></span><strong>{{ items.character.name }}:</strong><span class="text-muted">{{ items.location }}</span></div>{% empty %}<p class="text-muted small">No location data available.</p>{% endfor %}</div></div>
             <div class="dash-card p-4 draggable-card mb-3" id="card-pacing">
                 <div class="d-flex justify-content-between align-items-center mb-3"><h5 class="dash-card-header mb-0"><i class="bi bi-grip-vertical drag-handle me-2"></i>Pacing & Tension</h5></div>
@@ -390,7 +423,7 @@
                     </button>
                 </div>
             </div>
-            
+
             <!-- Today's Focus -->
             <div class="dash-card dash-pill-card p-3 draggable-card mb-3" id="card-focus">
                 <div class="dash-card-header d-flex align-items-center justify-content-between">
@@ -408,6 +441,7 @@
                     </div>
                 </div>
             </div>
+
             <!-- Stats -->
             <div class="dash-card dash-pill-card p-3 draggable-card mb-3" id="card-stats">
                 <div class="dash-card-header d-flex align-items-center"><i class="bi bi-grip-vertical drag-handle"></i>Stats</div>
@@ -418,6 +452,7 @@
                     <div class="col-3"><div class="dash-stat-icon"><i class="bi bi-journal-text"></i></div><div class="dash-stat-value">{{ chapters_completed }}</div><div class="dash-stat-label">Chapters</div></div>
                 </div>
             </div>
+
             <!-- World at a Glance -->
             <div class="dash-card dash-pill-card p-3 draggable-card mb-3" id="card-world-glance">
                 <div class="dash-card-header d-flex align-items-center mb-2"><i class="bi bi-grip-vertical drag-handle"></i>World at a Glance</div>
@@ -426,9 +461,6 @@
                     <div class="col-6"><div class="p-2 border rounded-3 bg-light"><div class="fw-bold" style="font-size:0.8rem;">Status</div><div class="small text-muted">Books: {{ books.count }}</div></div></div>
                 </div>
             </div>
-            
-            <!-- Cards removed: Worldbuilding Tracker and Architect Integrity Checks -->
-            
         </div>
 
         <div class="col-lg-3 draggable-zone" id="col-middle">
@@ -438,32 +470,9 @@
                     {% for activity in recent_activity %}<li><strong>{{ activity.get_action_display }}: {{ activity.object_name }}</strong><br><span class="dash-muted">{{ activity.model_name }} · {{ activity.timestamp|timesince }} ago</span></li>{% empty %}<li class="dash-muted">No recent activity.</li>{% endfor %}
                 </ul>
             </div>
-            
-            <!-- Subplots Visualizer -->
-            <div class="dash-card p-3 draggable-card mb-3" id="card-subplots">
-                <div class="dash-card-header d-flex align-items-center mb-2"><i class="bi bi-grip-vertical drag-handle"></i>Subplot Threads</div>
-                <ul class="dash-list">
-                    {% for subplot in subplot_data %}
-                    <li class="d-flex justify-content-between align-items-start mb-2 pb-2 {% if not forloop.last %}border-bottom{% endif %}">
-                        <div>
-                            <div class="fw-semibold" style="font-size: 0.85rem;"><span class="badge" style="background-color:{{ subplot.tag.color|default:'#6b7280' }}15; color:{{ subplot.tag.color|default:'#6b7280' }}; border: 1px solid {{ subplot.tag.color|default:'#6b7280' }};">{{ subplot.tag.name }}</span></div>
-                            <div class="small text-muted mt-1">{{ subplot.events_count }} events</div>
-                        </div>
-                        {% if subplot.last_event %}
-                        <div class="text-end">
-                            <div class="small text-muted">Last touched:</div>
-                            <div class="small fw-semibold text-truncate" style="max-width: 120px;" title="{{ subplot.last_event.title }}">{{ subplot.last_event.title }}</div>
-                        </div>
-                        {% else %}
-                        <div class="small text-muted text-end">No events yet</div>
-                        {% endif %}
-                    </li>
-                    {% empty %}
-                    <li class="dash-muted">No subplot tags created yet.</li>
-                    {% endfor %}
-                </ul>
-            </div>
-            
+
+            <!-- *** SUBPLOT THREADS REMOVED *** -->
+
             <!-- Character Arc Snapshot -->
             <div class="dash-card p-3 draggable-card mb-3" id="card-arc-snapshot">
                 <div class="dash-card-header d-flex align-items-center mb-2"><i class="bi bi-grip-vertical drag-handle"></i>Arc Snapshot</div>
@@ -500,6 +509,7 @@
                 <p class="dash-muted mb-0">Add a motivation to a main character to see their arc.</p>
                 {% endif %}
             </div>
+
             {% if spotlight_character %}
             <div class="dash-card p-3 draggable-card mb-3" id="card-character-spotlight">
                 <div class="dash-card-header d-flex align-items-center mb-2"><i class="bi bi-grip-vertical drag-handle"></i>Spotlight</div>
@@ -519,6 +529,7 @@
                 <button class="btn-premium btn-premium-light !w-full !py-2 !text-xs" id="btn-character-deep-dive" data-char-id="{{ spotlight_character.id }}"><i class="bi bi-magic"></i> Deep Dive</button>
             </div>
             {% endif %}
+
             <!-- Relationship Sparkline -->
             <div class="dash-card p-3 draggable-card mb-3" id="card-relationship-sparkline">
                 <div class="dash-card-header d-flex align-items-center mb-2"><i class="bi bi-grip-vertical drag-handle"></i>Character Dynamics</div>
@@ -536,14 +547,52 @@
         </div>
 
         <div class="col-lg-3 draggable-zone" id="col-right">
-             <div class="dash-card p-3 draggable-card mb-3" id="card-quick-actions">
-                <div class="dash-card-header d-flex align-items-center mb-2"><i class="bi bi-grip-vertical drag-handle"></i>Quick Actions</div>
-                <div class="d-flex flex-column gap-2 text-center">
-                    <button data-bs-toggle="modal" data-bs-target="#projectCreationModal" class="btn-premium btn-premium-dark !py-2 !px-4 !text-xs"><i class="bi bi-plus-lg"></i> New Book</button>
-                    <a href="{% url 'character_create' %}" class="btn-premium btn-premium-light !py-2 !px-4 !text-xs"><i class="bi bi-person-plus"></i> New Character</a>
-                    <a href="{% url 'event_create' %}" class="btn-premium btn-premium-light !py-2 !px-4 !text-xs"><i class="bi bi-calendar-plus"></i> New Event</a>
-                </div>
+            <div class="dash-card p-3 draggable-card mb-3" id="card-quick-actions">
+    <div class="dash-card-header d-flex align-items-center mb-2"><i class="bi bi-grip-vertical drag-handle"></i>Quick Actions</div>
+    <div class="d-flex flex-column gap-2 text-center">
+
+        <!-- New Book — fully active -->
+        <button data-bs-toggle="modal" data-bs-target="#projectCreationModal" class="btn-premium btn-premium-dark !py-2 !px-4 !text-xs"><i class="bi bi-plus-lg"></i> New Book</button>
+
+        <!-- New Character — coming soon -->
+        <div class="coming-soon-hover position-relative">
+            <button class="btn-premium btn-premium-light !py-2 !px-4 !text-xs w-100" style="pointer-events: none; opacity: 0.85;">
+                <i class="bi bi-person-plus"></i> New Character
+            </button>
+            <div class="coming-soon-bubble" style="
+                visibility: hidden; opacity: 0; transition: all 0.2s ease;
+                position: absolute; left: 105%; top: 50%; transform: translateY(-50%) translateX(-8px);
+                background: #111827; color: white; font-size: 0.7rem; font-weight: 500;
+                padding: 6px 12px; border-radius: 8px; white-space: nowrap; z-index: 9999;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+                Coming soon ✨
+                <div style="position:absolute; right:100%; top:50%; transform:translateY(-50%);
+                    border:5px solid transparent; border-right-color:#111827;"></div>
             </div>
+        </div>
+
+        <!-- New Event — coming soon -->
+        <div class="coming-soon-hover position-relative">
+            <button class="btn-premium btn-premium-light !py-2 !px-4 !text-xs w-100" style="pointer-events: none; opacity: 0.85;">
+                <i class="bi bi-calendar-plus"></i> New Event
+            </button>
+            <div class="coming-soon-bubble" style="
+                visibility: hidden; opacity: 0; transition: all 0.2s ease;
+                position: absolute; left: 105%; top: 50%; transform: translateY(-50%) translateX(-8px);
+                background: #111827; color: white; font-size: 0.7rem; font-weight: 500;
+                padding: 6px 12px; border-radius: 8px; white-space: nowrap; z-index: 9999;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+                Coming soon ✨
+                <div style="position:absolute; right:100%; top:50%; transform:translateY(-50%);
+                    border:5px solid transparent; border-right-color:#111827;"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+            </div>
+
             <!-- Your Books -->
             <div class="dash-card p-3 draggable-card mb-3" id="card-books">
                 <div class="dash-card-header d-flex align-items-center mb-2"><i class="bi bi-grip-vertical drag-handle"></i>Your Books</div>
@@ -574,6 +623,7 @@
                 <div class="dash-muted">No books found.</div>
                 {% endif %}
             </div>
+
             <!-- Inspiration Mood Board -->
             <div class="dash-card p-3 draggable-card mb-3" id="card-mood-board">
                 <div class="dash-card-header d-flex align-items-center mb-2"><i class="bi bi-grip-vertical drag-handle"></i>Mood Board</div>
@@ -600,29 +650,31 @@
                     {% endfor %}
                 </div>
             </div>
-             <!-- Ask Penn Card -->
-<div class="dash-card p-3 draggable-card mb-3" id="card-ai" style="background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);">
-    <div class="dash-card-header d-flex align-items-center mb-1 text-primary">
-        <i class="bi bi-grip-vertical drag-handle text-muted"></i>
-        <i class="bi bi-chat-heart me-2"></i>Ask Penn...
-    </div>
-    <div id="penn-chat-history" class="mb-2 scroll-premium" style="max-height: 250px; overflow-y: auto; display: none; font-size: 0.82rem; scrollbar-width: thin;">
-    </div>
-    <div class="dash-muted mb-2 small opacity-75" id="penn-intro">Brainstorming? Character trouble? Just ask.</div>
-    <div id="penn-suggestions" class="mb-3 d-flex flex-column gap-2" style="display: none;"></div>
-    <div class="position-relative mt-auto">
-        <div class="d-flex align-items-center gap-2 p-1 bg-white border rounded-pill shadow-sm">
-            <input type="text" class="form-control border-0 bg-transparent !py-0 !text-xs shadow-none" id="ai-query-dash" placeholder="Type your question..." style="font-size: 0.75rem;">
-            <button class="btn btn-dark rounded-circle d-flex align-items-center justify-content-center" id="ai-submit-dash" style="width: 28px; height: 28px; padding: 0;">
-                <i class="bi bi-arrow-up-short fs-5"></i>
-            </button>
+
+            <!-- Ask Penn Card -->
+            <div class="dash-card p-3 draggable-card mb-3" id="card-ai" style="background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);">
+                <div class="dash-card-header d-flex align-items-center mb-1 text-primary">
+                    <i class="bi bi-grip-vertical drag-handle text-muted"></i>
+                    <i class="bi bi-chat-heart me-2"></i>Ask Penn...
+                </div>
+                <div id="penn-chat-history" class="mb-2 scroll-premium" style="max-height: 250px; overflow-y: auto; display: none; font-size: 0.82rem; scrollbar-width: thin;"></div>
+                <div class="dash-muted mb-2 small opacity-75" id="penn-intro">Brainstorming? Character trouble? Just ask.</div>
+                <div id="penn-suggestions" class="mb-3 d-flex flex-column gap-2" style="display: none;"></div>
+                <div class="position-relative mt-auto">
+                    <div class="d-flex align-items-center gap-2 p-1 bg-white border rounded-pill shadow-sm">
+                        <input type="text" class="form-control border-0 bg-transparent !py-0 !text-xs shadow-none" id="ai-query-dash" placeholder="Type your question..." style="font-size: 0.75rem;">
+                        <button class="btn btn-dark rounded-circle d-flex align-items-center justify-content-center" id="ai-submit-dash" style="width: 28px; height: 28px; padding: 0;">
+                            <i class="bi bi-arrow-up-short fs-5"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="penn-loading" style="display: none;" class="text-center mt-2">
+                    <div class="ai-loading-dots"><span></span><span></span><span></span></div>
+                </div>
+            </div>
         </div>
     </div>
-    <div id="penn-loading" style="display: none;" class="text-center mt-2">
-        <div class="ai-loading-dots"><span></span><span></span><span></span></div>
-    </div>
 </div>
-
 
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 <script>
@@ -693,22 +745,18 @@
         });
         applyVisibility();
 
-        // Dashboard AI Consultant (Ask Penn)
+        // Ask Penn
         const aiIn = document.getElementById('ai-query-dash');
         const aiSub = document.getElementById('ai-submit-dash');
         const modIn = document.getElementById('ai-query-modal');
         const modSub = document.getElementById('ai-submit-modal');
-        
         const chatHistoryCont = document.getElementById('penn-chat-history');
         const modalHistoryCont = document.getElementById('penn-modal-chat-history');
-        
         const pennIntro = document.getElementById('penn-intro');
         const pennLoading = document.getElementById('penn-loading');
         const modalLoading = document.getElementById('penn-modal-loading');
-        
         const pennSuggestions = document.getElementById('penn-suggestions');
         const modalSuggestions = document.getElementById('penn-modal-suggestions');
-        
         let chatHistory = [];
 
         if (aiSub) {
@@ -751,64 +799,31 @@
             function addMessage(role, text, silent = false) {
                 chatHistoryCont.style.display = 'block';
                 if(pennIntro) pennIntro.style.display = 'none';
-                
                 [chatHistoryCont, modalHistoryCont].forEach(cont => {
                     if (!cont) return;
                     const isModal = cont === modalHistoryCont;
                     const div = document.createElement('div');
                     div.className = `mb-4 ${role === 'user' ? 'd-flex justify-content-end' : 'd-flex justify-content-start'}`;
-                    
                     let contentHtml = '';
                     if (role === 'user') {
-                        contentHtml = `
-                            <div class="d-flex flex-row-reverse align-items-start gap-3" style="max-width: 85%;">
-                                <div class="avatar-small bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold flex-shrink-0 mt-1" style="width: 32px; height: 32px; font-size: 0.8rem;">
-                                    {{ user.username|slice:":1"|upper }}
-                                </div>
-                                <div class="text-end">
-                                    <div class="text-muted mb-1" style="font-size: 0.65rem;">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} <span class="fw-bold text-dark">You</span></div>
-                                    <div class="p-3 bg-primary text-white shadow-sm" style="border-radius: 18px 4px 18px 18px; font-size: ${isModal ? '0.95rem' : '0.82rem'};">
-                                        ${text}
-                                    </div>
-                                </div>
-                            </div>
-                        `;
+                        contentHtml = `<div class="d-flex flex-row-reverse align-items-start gap-3" style="max-width: 85%;"><div class="avatar-small bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold flex-shrink-0 mt-1" style="width: 32px; height: 32px; font-size: 0.8rem;">{{ user.username|slice:":1"|upper }}</div><div class="text-end"><div class="text-muted mb-1" style="font-size: 0.65rem;">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} <span class="fw-bold text-dark">You</span></div><div class="p-3 bg-primary text-white shadow-sm" style="border-radius: 18px 4px 18px 18px; font-size: ${isModal ? '0.95rem' : '0.82rem'};">${text}</div></div></div>`;
                     } else {
-                        contentHtml = `
-                            <div class="d-flex align-items-start gap-3" style="max-width: 85%;">
-                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 mt-1" style="width: 32px; height: 32px; font-size: 0.8rem;">
-                                    <i class="bi bi-chat-heart"></i>
-                                </div>
-                                <div>
-                                    <div class="text-muted mb-1" style="font-size: 0.65rem;"><span class="fw-bold text-dark">Penn</span> ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
-                                    <div class="p-3 bg-white border shadow-sm text-dark" style="border-radius: 4px 18px 18px 18px; font-size: ${isModal ? '0.95rem' : '0.82rem'}; line-height: 1.6;">
-                                        ${text}
-                                    </div>
-                                </div>
-                            </div>
-                        `;
+                        contentHtml = `<div class="d-flex align-items-start gap-3" style="max-width: 85%;"><div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 mt-1" style="width: 32px; height: 32px; font-size: 0.8rem;"><i class="bi bi-chat-heart"></i></div><div><div class="text-muted mb-1" style="font-size: 0.65rem;"><span class="fw-bold text-dark">Penn</span> ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div><div class="p-3 bg-white border shadow-sm text-dark" style="border-radius: 4px 18px 18px 18px; font-size: ${isModal ? '0.95rem' : '0.82rem'}; line-height: 1.6;">${text}</div></div></div>`;
                     }
                     div.innerHTML = contentHtml;
                     cont.appendChild(div);
                     cont.scrollTop = cont.scrollHeight;
                 });
-                
                 if (!silent) {
                     if (chatHistory.length === 0 || chatHistory[chatHistory.length-1].content !== text) {
                         chatHistory.push({role: role, content: text});
                         localStorage.setItem('penn_chat_history', JSON.stringify(chatHistory));
-                        
                         if (role === 'user') {
                             const recentCont = document.getElementById('penn-recent-queries');
                             if (recentCont) {
                                 const item = document.createElement('div');
                                 item.className = 'list-group-item list-group-item-action border-0 rounded-lg p-2 px-3 mb-1';
-                                item.innerHTML = `
-                                    <div class="d-flex align-items-center gap-2 text-truncate">
-                                        <i class="bi bi-chat-left-text text-muted small"></i>
-                                        <div class="text-truncate small fw-medium">${text}</div>
-                                    </div>
-                                `;
+                                item.innerHTML = `<div class="d-flex align-items-center gap-2 text-truncate"><i class="bi bi-chat-left-text text-muted small"></i><div class="text-truncate small fw-medium">${text}</div></div>`;
                                 recentCont.prepend(item);
                             }
                         }
@@ -843,27 +858,20 @@
                 pennSuggestions.style.display = 'none';
                 modalSuggestions.style.display = 'none';
                 addMessage('user', q);
-                
                 [aiIn, modIn, aiSub, modSub].forEach(el => el.disabled = true);
                 if(isModal) modalLoading.style.display = 'block';
                 else pennLoading.style.display = 'block';
-
                 fetch('{% url "api_ai_consultant" %}', {
                     method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
-                    body: JSON.stringify({ query: q, history: chatHistory.slice(0, -1) }) 
+                    body: JSON.stringify({ query: q, history: chatHistory.slice(0, -1) })
                 }).then(r => r.json()).then(data => {
                     pennLoading.style.display = 'none';
                     modalLoading.style.display = 'none';
-                    [aiIn, modIn, aiSub, modSub].forEach(el => {
-                        el.disabled = false;
-                        el.value = '';
-                    });
+                    [aiIn, modIn, aiSub, modSub].forEach(el => { el.disabled = false; el.value = ''; });
                     inputEl.focus();
-                    
                     if (data.status === 'success') {
                         let responseText = data.response;
                         responseText = responseText.replace(/\*\*/g, '').replace(/\*/g, '').replace(/#/g, '');
-                        
                         let followUps = [];
                         if (responseText.includes('FOLLOW_UP:')) {
                             const parts = responseText.split('FOLLOW_UP:');
@@ -883,7 +891,6 @@
             aiIn.addEventListener('keypress', (e) => { if (e.key === 'Enter') aiSub.click(); });
             modIn.addEventListener('keypress', (e) => { if (e.key === 'Enter') modSub.click(); });
 
-            // Persistence: Load chat history
             const savedHistory = localStorage.getItem('penn_chat_history');
             if (savedHistory) {
                 try {
@@ -893,61 +900,60 @@
                 } catch(e) { localStorage.removeItem('penn_chat_history'); }
             }
 
-            // Proactive Greeting
             const lastGreet = localStorage.getItem('penn_last_greet');
             const now = Date.now();
             if (!lastGreet || (now - parseInt(lastGreet)) > (1000 * 60 * 60 * 6)) {
-                 setTimeout(() => {
-                     proactiveGreet();
-                     localStorage.setItem('penn_last_greet', now.toString());
-                 }, 3000);
+                setTimeout(() => {
+                    proactiveGreet();
+                    localStorage.setItem('penn_last_greet', now.toString());
+                }, 3000);
             }
         }
 
-        // Sortable & Widget Logic
+        // Sortable
         const columns = ['col-left', 'col-middle', 'col-right', 'writer-col-1', 'writer-col-2', 'writer-col-3'];
-columns.forEach(colId => {
-    const el = document.getElementById(colId);
-    if (el) {
-        new Sortable(el, {
-            group: 'dashboard',
-            animation: 250,
-            ghostClass: 'sortable-ghost',
-            handle: '.drag-handle',
-            onEnd: () => {
-                const layout = {};
-                columns.forEach(id => {
-                    const colEl = document.getElementById(id);
-                    if (colEl) layout[id] = Array.from(colEl.children).map(c => c.id);
+        columns.forEach(colId => {
+            const el = document.getElementById(colId);
+            if (el) {
+                new Sortable(el, {
+                    group: 'dashboard',
+                    animation: 250,
+                    ghostClass: 'sortable-ghost',
+                    handle: '.drag-handle',
+                    onEnd: () => {
+                        const layout = {};
+                        columns.forEach(id => {
+                            const colEl = document.getElementById(id);
+                            if (colEl) layout[id] = Array.from(colEl.children).map(c => c.id);
+                        });
+                        localStorage.setItem('dashboard-layout', JSON.stringify(layout));
+                    }
                 });
-                localStorage.setItem('dashboard-layout', JSON.stringify(layout));
             }
         });
-    }
-});
 
-// ── Load layout (default matches current preferred arrangement) ──
-const defaultLayout = {
-    'col-left':     ['card-writing-mode-architect', 'card-focus', 'card-stats', 'card-ai', 'card-world-glance'],
-    'col-middle':   ['card-recent', 'card-arc-snapshot', 'card-relationship-sparkline', 'card-subplots'],
-    'col-right':    ['card-quick-actions', 'card-books', 'card-mood-board', 'card-character-spotlight'],
-    'writer-col-1': ['card-writing-mode', 'card-sprint', 'card-integrity'],
-    'writer-col-2': ['card-up-next', 'card-loops'],
-    'writer-col-3': ['card-estimator', 'card-whereabouts', 'card-pacing', 'card-beats']
-};
-const savedLayout = localStorage.getItem('dashboard-layout');
-const layoutToApply = savedLayout ? JSON.parse(savedLayout) : defaultLayout;
-try {
-    Object.keys(layoutToApply).forEach(colId => {
-        const colEl = document.getElementById(colId);
-        if (colEl) {
-            layoutToApply[colId].forEach(cardId => {
-                const cardEl = document.getElementById(cardId);
-                if (cardEl) colEl.appendChild(cardEl);
+        // Default layout — subplot removed
+        const defaultLayout = {
+            'col-left':     ['card-writing-mode-architect', 'card-focus', 'card-stats', 'card-ai', 'card-world-glance'],
+            'col-middle':   ['card-recent', 'card-arc-snapshot', 'card-relationship-sparkline'],
+            'col-right':    ['card-quick-actions', 'card-books', 'card-mood-board', 'card-character-spotlight'],
+            'writer-col-1': ['card-writing-mode', 'card-sprint', 'card-integrity'],
+            'writer-col-2': ['card-up-next', 'card-loops'],
+            'writer-col-3': ['card-estimator', 'card-whereabouts', 'card-pacing', 'card-beats']
+        };
+        const savedLayout = localStorage.getItem('dashboard-layout');
+        const layoutToApply = savedLayout ? JSON.parse(savedLayout) : defaultLayout;
+        try {
+            Object.keys(layoutToApply).forEach(colId => {
+                const colEl = document.getElementById(colId);
+                if (colEl) {
+                    layoutToApply[colId].forEach(cardId => {
+                        const cardEl = document.getElementById(cardId);
+                        if (cardEl) colEl.appendChild(cardEl);
+                    });
+                }
             });
-        }
-    });
-} catch(e) { console.error("Layout load error", e); }
+        } catch(e) { console.error("Layout load error", e); }
 
         // Spotlight Deep Dive
         const spotlightBtn = document.getElementById('btn-character-deep-dive');
@@ -967,7 +973,7 @@ try {
                 });
             });
         }
-        
+
         // Today's Focus Widget Logic
         const btnAddFocus = document.getElementById('btn-add-focus-task');
         const focusContainer = document.getElementById('add-focus-task-container');
@@ -980,7 +986,6 @@ try {
                 focusContainer.style.display = focusContainer.style.display === 'none' ? 'block' : 'none';
                 if (focusContainer.style.display === 'block') inputNewFocus.focus();
             });
-
             btnSaveFocus.addEventListener('click', () => {
                 const text = inputNewFocus.value.trim();
                 if (!text) return;
@@ -1004,10 +1009,7 @@ try {
                     }
                 });
             });
-
-            inputNewFocus.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') btnSaveFocus.click();
-            });
+            inputNewFocus.addEventListener('keypress', (e) => { if (e.key === 'Enter') btnSaveFocus.click(); });
 
             function attachFocusTaskListener(item) {
                 item.style.cursor = 'pointer';
@@ -1031,11 +1033,11 @@ try {
                     });
                 });
             }
-
             document.querySelectorAll('.focus-task-item').forEach(attachFocusTaskListener);
         }
     });
 </script>
+
 <!-- Writing Mode Coming Soon Modal -->
 <div class="modal fade" id="writingModeComingSoonModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
@@ -1061,4 +1063,3 @@ try {
 </div>
 
 {% endblock %}
-
