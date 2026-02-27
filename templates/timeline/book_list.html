@@ -66,10 +66,10 @@
                         your active projects and archives.</p>
                 </div>
                 <div class="flex gap-3">
-                    <a href="{% url 'book_import' %}" class="btn-premium btn-premium-light !py-2.5">
+                    <button type="button" class="btn-premium btn-premium-light !py-2.5" data-bs-toggle="modal" data-bs-target="#importComingSoonModal">
                         <span class="material-symbols-outlined text-lg">upload</span>
                         Import with AI
-                    </a>
+                    </button>   
                     <button data-bs-toggle="modal" data-bs-target="#projectCreationModal" class="btn-premium btn-premium-dark !py-2.5">
                         <span class="material-symbols-outlined text-lg">add</span>
                         New Project
@@ -261,4 +261,27 @@
         }
     });
 </script>
+<!-- Import with AI Coming Soon Modal -->
+<div class="modal fade" id="importComingSoonModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 text-center" style="border-radius: 24px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);">
+      <div class="modal-body p-5">
+        <div class="mb-4" style="font-size: 3rem;">🤖</div>
+        <h3 class="fw-bold text-dark mb-3" style="font-size: 1.6rem;">Import with AI is Coming Soon</h3>
+        <p class="text-muted mb-4" style="font-size: 0.95rem; line-height: 1.7; max-width: 320px; margin: 0 auto 1.5rem;">
+            Paste in your manuscript and our AI will automatically extract your
+            <strong class="text-dark">characters, timelines, events</strong> and story structure — ready to work with instantly.
+        </p>
+        <div class="d-flex align-items-center justify-content-center gap-2 mb-4 p-3 rounded-3" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+            <i class="bi bi-stars text-warning fs-5"></i>
+            <span style="font-size: 0.8rem; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.05em;">Crafted with love — arriving soon</span>
+        </div>
+        <button type="button" class="btn-premium btn-premium-dark !px-6 !py-3" data-bs-dismiss="modal">
+            Can't Wait! 🚀
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
