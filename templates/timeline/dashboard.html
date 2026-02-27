@@ -286,7 +286,9 @@
                 <div class="px-2">
                     <h3 class="mb-2 fw-bold text-white">{{ latest_book.title|default:"Continue Your Manuscript" }}</h3>
                     <p class="opacity-75 mb-4">Jump back into your last edited chapter. Distraction-free, AI-powered writing awaits.</p>
-                    <a href="{% url 'writing_mode_latest' %}" class="btn-premium btn-premium-light !w-full !py-3 !font-bold"><i class="bi bi-pencil-square me-2"></i> Start Writing Now</a>
+                    <button type="button" class="btn-premium btn-premium-light !w-full !py-3 !font-bold" data-bs-toggle="modal" data-bs-target="#writingModeComingSoonModal">
+                        <i class="bi bi-pencil-square me-2"></i> Start Writing Now
+                    </button>
                 </div>
             </div>
             <div class="dash-card p-4 draggable-card mb-3 text-center" id="card-sprint">
@@ -383,7 +385,9 @@
                 <div class="px-2">
                     <h6 class="mb-2 fw-bold text-white">{{ latest_book.title|default:"Continue Your Manuscript" }}</h6>
                     <p class="opacity-75 mb-4 small" style="font-size: 0.75rem;">Jump back into your last edited chapter. Distraction-free, AI-powered writing awaits.</p>
-                    <a href="{% url 'writing_mode_latest' %}" class="btn-premium btn-premium-light !w-full !py-2 !text-xs !font-bold"><i class="bi bi-pencil-square me-2"></i> Start Writing Now</a>
+                    <button type="button" class="btn-premium btn-premium-light !w-full !py-2 !text-xs !font-bold" data-bs-toggle="modal" data-bs-target="#writingModeComingSoonModal">
+                        <i class="bi bi-pencil-square me-2"></i> Start Writing Now
+                    </button>
                 </div>
             </div>
             
@@ -909,19 +913,48 @@
 
         // Sortable & Widget Logic
         const columns = ['col-left', 'col-middle', 'col-right', 'writer-col-1', 'writer-col-2', 'writer-col-3'];
-        columns.forEach(colId => {
-            const el = document.getElementById(colId);
-            if (el) {
-                new Sortable(el, { group: 'dashboard', animation: 250, ghostClass: 'sortable-ghost', handle: '.drag-handle', onEnd: () => {
-                    const layout = {};
-                    columns.forEach(id => {
-                        const colEl = document.getElementById(id);
-                        if (colEl) layout[id] = Array.from(colEl.children).map(c => c.id);
-                    });
-                    localStorage.setItem('dashboard-layout', JSON.stringify(layout));
-                }});
+columns.forEach(colId => {
+    const el = document.getElementById(colId);
+    if (el) {
+        new Sortable(el, {
+            group: 'dashboard',
+            animation: 250,
+            ghostClass: 'sortable-ghost',
+            handle: '.drag-handle',
+            onEnd: () => {
+                const layout = {};
+                columns.forEach(id => {
+                    const colEl = document.getElementById(id);
+                    if (colEl) layout[id] = Array.from(colEl.children).map(c => c.id);
+                });
+                localStorage.setItem('dashboard-layout', JSON.stringify(layout));
             }
         });
+    }
+});
+
+// ── Load layout (default matches current preferred arrangement) ──
+const defaultLayout = {
+    'col-left':     ['card-writing-mode-architect', 'card-focus', 'card-stats', 'card-ai', 'card-world-glance'],
+    'col-middle':   ['card-recent', 'card-arc-snapshot', 'card-relationship-sparkline', 'card-subplots'],
+    'col-right':    ['card-quick-actions', 'card-books', 'card-mood-board', 'card-character-spotlight'],
+    'writer-col-1': ['card-writing-mode', 'card-sprint', 'card-integrity'],
+    'writer-col-2': ['card-up-next', 'card-loops'],
+    'writer-col-3': ['card-estimator', 'card-whereabouts', 'card-pacing', 'card-beats']
+};
+const savedLayout = localStorage.getItem('dashboard-layout');
+const layoutToApply = savedLayout ? JSON.parse(savedLayout) : defaultLayout;
+try {
+    Object.keys(layoutToApply).forEach(colId => {
+        const colEl = document.getElementById(colId);
+        if (colEl) {
+            layoutToApply[colId].forEach(cardId => {
+                const cardEl = document.getElementById(cardId);
+                if (cardEl) colEl.appendChild(cardEl);
+            });
+        }
+    });
+} catch(e) { console.error("Layout load error", e); }
 
         // Spotlight Deep Dive
         const spotlightBtn = document.getElementById('btn-character-deep-dive');
@@ -1010,4 +1043,29 @@
         }
     });
 </script>
+<!-- Writing Mode Coming Soon Modal -->
+<div class="modal fade" id="writingModeComingSoonModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 text-center" style="border-radius: 24px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);">
+      <div class="modal-body p-5">
+        <div class="mb-4" style="font-size: 3rem;">✍️</div>
+        <h3 class="fw-bold text-dark mb-3" style="font-size: 1.6rem;">Writing Mode is Coming Soon</h3>
+        <p class="text-muted mb-4" style="font-size: 0.95rem; line-height: 1.7; max-width: 320px; margin: 0 auto 1.5rem;">
+            We promise — it will be <strong class="text-dark">everything you dreamed of</strong>.
+            Distraction-free writing, AI-powered suggestions, and a canvas built for storytellers.
+            Worth the wait.
+        </p>
+        <div class="d-flex align-items-center justify-content-center gap-2 mb-4 p-3 rounded-3" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+            <i class="bi bi-stars text-warning fs-5"></i>
+            <span style="font-size: 0.8rem; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.05em;">Crafted with love — arriving soon</span>
+        </div>
+        <button type="button" class="btn-premium btn-premium-dark !px-6 !py-3" data-bs-dismiss="modal">
+            Can't Wait! 🚀
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
+
