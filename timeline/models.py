@@ -968,3 +968,35 @@ class NewsletterSubscription(models.Model):
     def __str__(self):
         return f"{self.email} ({self.get_subscription_type_display()})"
 
+
+class UserProfile(models.Model):
+    """
+    Extends the base User model with additional profile information.
+    """
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    account_level = models.CharField(max_length=50, default='Writer')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Profile for {self.user.username}"
+
+    def save(self, *args, **kwargs):
+        # Auto-compress and resize profile picture if it was just uploaded
+        if self.profile_picture and isinstance(self.profile_picture.file, UploadedFile):
+            self.profile_picture = compress_image(self.profile_picture, target_type='character_profile')
+        super().save(*args, **kwargs)
+
+
+class TechnicalSupportMessage(models.Model):
+    """
+    Stores messages sent by users to technical support.
+    """
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='support_messages')
+    message = models.TextField()
+    is_resolved = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Support message from {self.user.username} at {self.created_at}"

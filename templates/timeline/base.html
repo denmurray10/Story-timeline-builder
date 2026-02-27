@@ -335,7 +335,8 @@
                     <div id="account-dropdown-container" class="account-dropdown-container"
                          data-username="{{ user.username }}"
                          data-user-initial="{{ user.username|slice:':1'|upper }}"
-                         data-user-role="{% if user.is_superuser %}Admin{% else %}Member{% endif %}">
+                         data-user-role="{% if user.is_superuser %}Admin{% else %}Member{% endif %}"
+                         data-csrf="{{ csrf_token }}">
                     </div>
                     {% endif %}
                     {% block content %}{% endblock %}

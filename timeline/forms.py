@@ -4,7 +4,7 @@ Forms for the Timeline app.
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Series, Book, Chapter, Character, Event, Tag, CharacterRelationship, WorldEntry
+from .models import Series, Book, Chapter, Character, Event, Tag, CharacterRelationship, WorldEntry, UserProfile, TechnicalSupportMessage
 
 
 class UserRegisterForm(forms.ModelForm):
@@ -281,10 +281,39 @@ class TagForm(forms.ModelForm):
         }
 
 
+
 class UserAccountForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'username', 'email']
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'First Name'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Last Name'}),
+            'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email Address'}),
+        }
+
+
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['profile_picture']
+        widgets = {
+            'profile_picture': forms.FileInput(attrs={'class': 'form-control'}),
+        }
+
+
+class TechnicalSupportMessageForm(forms.ModelForm):
+    class Meta:
+        model = TechnicalSupportMessage
+        fields = ['message']
+        widgets = {
+            'message': forms.Textarea(attrs={
+                'class': 'form-control', 
+                'rows': 4, 
+                'placeholder': 'Tell us about the problem you are experiencing...'
+            }),
+        }
 
 
 class CharacterRelationshipForm(forms.ModelForm):

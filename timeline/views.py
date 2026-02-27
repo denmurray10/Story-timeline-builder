@@ -33,10 +33,11 @@ from ebooklib import epub
 from bs4 import BeautifulSoup
 import tempfile
 
-from .models import Series, Book, Chapter, Character, Event, Tag, CharacterRelationship, AIFocusTask, ActivityLog, WorldEntry, InteractionSummaryCache, RelationshipAnalysisCache, StoryScanStatus, AIUsageLog, ChangelogEntry, NewsletterSubscription
+from .models import Series, Book, Chapter, Character, Event, Tag, CharacterRelationship, AIFocusTask, ActivityLog, WorldEntry, InteractionSummaryCache, RelationshipAnalysisCache, StoryScanStatus, AIUsageLog, ChangelogEntry, NewsletterSubscription, UserProfile, TechnicalSupportMessage
 from .forms import (
     UserRegisterForm, SeriesForm, BookForm, ChapterForm, CharacterForm, 
-    EventForm, TagForm, UserAccountForm, CharacterRelationshipForm, WorldEntryForm
+    EventForm, TagForm, UserAccountForm, CharacterRelationshipForm, WorldEntryForm,
+    UserProfileForm, TechnicalSupportMessageForm
 )
 from .utils.ai_context import ContextResolver
 from .context_engine import ContextEngine
@@ -131,16 +132,52 @@ class CustomLoginView(DjangoLoginView):
 
 @login_required
 def account(request):
-    """View and edit user account details."""
+    """View and edit user account details and profile information."""
+    user_profile, created = UserProfile.objects.get_or_create(user=request.user)
+    
+    # Initialize forms
+    form = UserAccountForm(instance=request.user)
+    profile_form = UserProfileForm(instance=user_profile)
+    support_form = TechnicalSupportMessageForm()
+    
     if request.method == 'POST':
-        form = UserAccountForm(request.POST, instance=request.user)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Account details updated successfully!')
+        action = request.POST.get('action')
+        
+        if action == 'update_account':
+            form = UserAccountForm(request.POST, instance=request.user)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Account details updated successfully!')
+                return redirect('account')
+                
+        elif action == 'update_profile_pic':
+            profile_form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
+            if profile_form.is_valid():
+                profile_form.save()
+                messages.success(request, 'Profile picture updated successfully!')
+                return redirect('account')
+                
+        elif action == 'remove_profile_pic':
+            user_profile.profile_picture.delete(save=True)
+            messages.success(request, 'Profile picture removed.')
             return redirect('account')
-    else:
-        form = UserAccountForm(instance=request.user)
-    return render(request, 'timeline/account.html', {'form': form})
+            
+        elif action == 'send_support':
+            support_form = TechnicalSupportMessageForm(request.POST)
+            if support_form.is_valid():
+                support_msg = support_form.save(commit=False)
+                support_msg.user = request.user
+                support_msg.save()
+                messages.success(request, 'Your message has been sent to technical support. We will get back to you soon!')
+                return redirect('account')
+
+    context = {
+        'form': form,
+        'profile_form': profile_form,
+        'support_form': support_form,
+        'user_profile': user_profile,
+    }
+    return render(request, 'timeline/account.html', context)
 
 def landing_page_v2(request):
     """
@@ -380,6 +417,9 @@ def staff_dashboard(request):
             'product': NewsletterSubscription.objects.filter(subscription_type='product', is_active=True).count(),
             'blog': NewsletterSubscription.objects.filter(subscription_type='blog', is_active=True).count(),
         },
+        # Technical Support Messages
+        'support_messages': TechnicalSupportMessage.objects.select_related('user').all().order_by('-created_at')[:20],
+        'unresolved_support_count': TechnicalSupportMessage.objects.filter(is_resolved=False).count(),
     }
     return render(request, 'timeline/staff_dashboard.html', context)
 

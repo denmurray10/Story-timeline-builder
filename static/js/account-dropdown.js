@@ -22,13 +22,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     <div class="account-label">Account</div>
                     <div class="account-username">${username}</div>
                     <hr class="account-divider">
-                    <a href="/account/settings/" class="account-menu-item">
+                    <a href="/account/" class="account-menu-item">
                         <i class="bi bi-person-circle"></i>
                         <span>Account Settings</span>
                     </a>
                     <hr class="account-divider">
-                    <form action="/accounts/logout/" method="post" class="account-logout-form">
-                        <input type="hidden" name="csrfmiddlewaretoken" value="${getCSRFToken()}">
+                    <form action="/logout/" method="post" class="account-logout-form">
+                        <input type="hidden" name="csrfmiddlewaretoken" value="${container.dataset.csrf || getCSRFToken()}">
                         <button type="submit" class="account-menu-item account-logout">
                             <i class="bi bi-box-arrow-right"></i>
                             <span>Sign Out</span>
@@ -80,10 +80,25 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Helper function to get CSRF token
+    // Helper function to get CSRF token from DOM as fallback
     function getCSRFToken() {
         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
-        return csrfToken ? csrfToken.value : '';
+        if (csrfToken) return csrfToken.value;
+
+        // Try to get from cookie as last resort
+        const name = 'csrftoken';
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue || '';
     }
 
     // Update chevron rotation

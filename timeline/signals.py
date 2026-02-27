@@ -1,6 +1,6 @@
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
-from .models import Book, Chapter, Character, Event, Tag, CharacterRelationship, ActivityLog
+from .models import Book, Chapter, Character, Event, Tag, CharacterRelationship, ActivityLog, UserProfile
 
 @receiver(post_save, sender=Book)
 @receiver(post_save, sender=Chapter)
@@ -70,14 +70,32 @@ def log_delete_activity(sender, instance, **kwargs):
 from django.contrib.auth.models import User
 from .utils.demo_data import clone_demo_data_for_user
 
+
+
+
+
 @receiver(post_save, sender=User)
-def create_demo_data(sender, instance, created, **kwargs):
+def handle_user_creation(sender, instance, created, **kwargs):
     """
-    When a new user is created, copy the demo 'Alice in Wonderland' data to their account.
+    Handles initialization logic for new users:
+    1. Ensures UserProfile exists.
+    2. Clones demo data (Alice in Wonderland).
     """
-    if created and instance.id != 1:  # Protect the original demo/admin user
-        try:
-            clone_demo_data_for_user(instance, source_book_id=1)
-        except Exception as e:
-            # We don't want a failure here to completely break user signup
-            print(f"Error copying demo book for {instance}: {e}")
+    if not instance.id:
+        return
+
+    # 1. Ensure Profile exists regardless of 'created' (safeguard)
+    profile, profile_created = UserProfile.objects.get_or_create(user=instance)
+    
+    if created:
+        # 2. Clone Demo Data for new users only
+        if instance.id != 1:  # Protect the original demo/admin user
+            try:
+                clone_demo_data_for_user(instance, source_book_id=1)
+            except Exception as e:
+                # We don't want a failure here to completely break user signup
+                print(f"Error copying demo book for {instance}: {e}")
+    else:
+        # Update Profile if not just created
+        if not profile_created:
+            profile.save()

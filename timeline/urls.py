@@ -106,6 +106,7 @@ urlpatterns = [
     path('api/ai/generate-prose/', views.api_generate_prose, name='api_generate_prose'),
     path('api/ai/penn-proactive-insight/', views.api_penn_proactive_insight, name='api_penn_proactive_insight'),
     path('account/', views.account, name='account'),
+    path('account/settings/', views.account, name='account_settings'),
     path('search/', views.search_results, name='search_results'),
     path('staff/dashboard/', views.staff_dashboard, name='staff_dashboard'),
     path('changelog/', views.changelog, name='changelog'),

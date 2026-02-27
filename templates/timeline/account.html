@@ -1,39 +1,286 @@
-{% extends "timeline/base.html" %}
-{% block title %}Account Settings - Story Timeline Builder{% endblock %}
-{% block content %}
-<div class="container py-4">
-    <div class="row justify-content-center">
-        <div class="col-md-7 col-lg-6">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0"><i class="bi bi-person-circle"></i> Account Settings</h4>
-                </div>
-                <div class="card-body p-4">
-                    <form method="post">
-                        {% csrf_token %}
-                        {% for field in form %}
-                        <div class="mb-3">
-                            <label for="{{ field.id_for_label }}" class="form-label fw-bold">{{ field.label }}</label>
-                            {{ field }}
-                            {% if field.help_text %}
-                            <small class="form-text text-muted">{{ field.help_text|safe }}</small>
-                            {% endif %}
-                            {% if field.errors %}
-                            <div class="text-danger mt-1">
-                                {% for error in field.errors %}
-                                <small>{{ error }}</small>
-                                {% endfor %}
-                            </div>
-                            {% endif %}
-                        </div>
-                        {% endfor %}
-                        <button type="submit" class="btn btn-primary w-100 py-2">
-                            <i class="bi bi-save"></i> Save Changes
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+{% extends "timeline/base.html" %}
+{% block title %}Account Settings - Story Timeline Builder{% endblock %}
+
+{% block extra_css %}
+<style>
+    .account-settings-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    
+    .settings-card {
+        background: var(--bg-surface);
+        border-radius: 16px;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 2rem;
+        overflow: hidden;
+    }
+    
+    .settings-card-header {
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid var(--border-color);
+        background: linear-gradient(to right, #ffffff, #f9fafb);
+    }
+    
+    .settings-card-header h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-heading);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .settings-card-header h3 i {
+        color: var(--accent);
+    }
+    
+    .settings-card-body {
+        padding: 2rem;
+    }
+    
+    .profile-photo-section {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .profile-photo-preview {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid #fff;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        background-color: var(--accent-soft);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        font-weight: 700;
+        color: var(--accent);
+    }
+    
+    .profile-photo-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .account-level-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: var(--accent-soft);
+        color: var(--accent);
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+    
+    .btn-premium-sm {
+        padding: 8px 16px;
+        font-size: 0.8125rem !important;
+    }
+    
+    .form-group-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+    
+    @media (max-width: 768px) {
+        .form-group-grid {
+            grid-template-columns: 1fr;
+        }
+        .profile-photo-section {
+            flex-direction: column;
+            text-align: center;
+            gap: 1rem;
+        }
+    }
+    
+    .section-divider {
+        height: 1px;
+        background-color: var(--border-color);
+        margin: 2rem 0;
+    }
+    
+    .support-contact-footer {
+        text-align: center;
+        margin-top: 1rem;
+        color: var(--text-muted);
+        font-size: 0.875rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="account-settings-container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Account Settings</h1>
+        <div class="account-level-badge">
+            <i class="bi bi-stars"></i>
+            {{ user_profile.account_level }} Account
+        </div>
+    </div>
+
+    <!-- User Profile Card -->
+    <div class="settings-card">
+        <div class="settings-card-header">
+            <h3><i class="bi bi-person-circle"></i> Profile Information</h3>
+        </div>
+        <div class="settings-card-body">
+            <!-- Profile Photo Section -->
+            <div class="profile-photo-section">
+                {% if user_profile.profile_picture %}
+                    <img src="{{ user_profile.profile_picture.url }}" alt="{{ user.username }}" class="profile-photo-preview">
+                {% else %}
+                    <div class="profile-photo-preview">
+                        {{ user.username|slice:":1"|upper }}
+                    </div>
+                {% endif %}
+                
+                <div class="profile-photo-controls">
+                    <form action="{% url 'account' %}" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="update_profile_pic">
+                        <div class="mb-2">
+                            <label for="id_profile_picture" class="btn btn-premium btn-premium-light btn-premium-sm">
+                                <i class="bi bi-cloud-arrow-up"></i> Upload new photo
+                            </label>
+                            {{ profile_form.profile_picture }}
+                        </div>
+                        <button type="submit" class="btn btn-premium btn-premium-dark btn-premium-sm">
+                            Save Photo
+                        </button>
+                    </form>
+                    
+                    {% if user_profile.profile_picture %}
+                        <form action="{% url 'account' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="remove_profile_pic">
+                            <button type="submit" class="btn btn-premium btn-premium-danger btn-premium-sm">
+                                <i class="bi bi-trash"></i> Remove
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+
+            <form action="{% url 'account' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="update_account">
+                
+                <div class="form-group-grid">
+                    <div class="mb-3">
+                        <label for="{{ form.username.id_for_label }}" class="form-label fw-bold">Username</label>
+                        {{ form.username }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.email.id_for_label }}" class="form-label fw-bold">Email Address</label>
+                        {{ form.email }}
+                    </div>
+                </div>
+                
+                <div class="form-group-grid">
+                    <div class="mb-3">
+                        <label for="{{ form.first_name.id_for_label }}" class="form-label fw-bold">First Name</label>
+                        {{ form.first_name }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.last_name.id_for_label }}" class="form-label fw-bold">Last Name</label>
+                        {{ form.last_name }}
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-premium btn-premium-dark w-100">
+                        <i class="bi bi-check-circle"></i> Update My Account
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Security & Subscription Section (Side by side on desktop) -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="settings-card h-100">
+                <div class="settings-card-header">
+                    <h3><i class="bi bi-shield-lock"></i> Security</h3>
+                </div>
+                <div class="settings-card-body d-flex flex-column justify-content-between">
+                    <p class="text-muted small mb-4">
+                        Protect your creative work. We recommend choosing a strong, unique password.
+                    </p>
+                    <a href="/accounts/password/change/" class="btn btn-premium btn-premium-light w-100">
+                        <i class="bi bi-key"></i> Reset Password
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="settings-card h-100">
+                <div class="settings-card-header">
+                    <h3><i class="bi bi-rocket"></i> Subscription</h3>
+                </div>
+                <div class="settings-card-body d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="mb-2 fw-bold">Current Plan</div>
+                        <div class="account-level-badge mb-3">
+                            <i class="bi bi-pen"></i> Writer
+                        </div>
+                        <p class="text-muted small">
+                            You currently have access to all core story-building tools and unlimited manuscripts.
+                        </p>
+                    </div>
+                    <button class="btn btn-premium btn-premium-light w-100" disabled>
+                         Manage Subscription (Coming Soon)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Technical Support Card -->
+    <div class="settings-card mt-5">
+        <div class="settings-card-header">
+            <h3><i class="bi bi-headset"></i> Message Technical Support</h3>
+        </div>
+        <div class="settings-card-body">
+            <p class="text-muted small mb-4">
+                Encountering an issue or have a suggestion? Send a direct message to our technical team below.
+            </p>
+            <form action="{% url 'account' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="send_support">
+                <div class="mb-3">
+                    {{ support_form.message }}
+                </div>
+                <button type="submit" class="btn btn-premium btn-premium-dark w-100">
+                    <i class="bi bi-send"></i> Send Message to Support
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="support-contact-footer">
+        Need immediate help? Reach us at support@storybuilder.com
+    </div>
+</div>
+
+<script>
+    // Styling the file input label to look like our premium button
+    document.addEventListener('DOMContentLoaded', function() {
+        const fileInput = document.getElementById('id_profile_picture');
+        if (fileInput) {
+            fileInput.style.display = 'none';
+        }
+    });
+</script>
 {% endblock %}

@@ -4,7 +4,25 @@ This allows you to manage all your models through Django's admin interface.
 """
 
 from django.contrib import admin
-from .models import Book, Chapter, Character, Event, Tag, CharacterRelationship
+from .models import Book, Chapter, Character, Event, Tag, CharacterRelationship, UserProfile, TechnicalSupportMessage
+
+
+@admin.register(UserProfile)
+class UserProfileAdmin(admin.ModelAdmin):
+    list_display = ['user', 'account_level']
+    search_fields = ['user__username', 'account_level']
+
+
+@admin.register(TechnicalSupportMessage)
+class TechnicalSupportMessageAdmin(admin.ModelAdmin):
+    list_display = ['user', 'message_preview', 'created_at', 'is_resolved']
+    list_filter = ['is_resolved', 'created_at']
+    search_fields = ['user__username', 'message']
+    readonly_fields = ['created_at']
+
+    def message_preview(self, obj):
+        return obj.message[:50] + "..." if len(obj.message) > 50 else obj.message
+    message_preview.short_description = 'Message'
 
 
 @admin.register(Book)
