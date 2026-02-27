@@ -21,6 +21,7 @@ urlpatterns = [
     path('landingpagev2.html', views.landing_page_v2),
     path('pricing/', views.pricing_page, name='pricing'),
     path('coming-soon/', views.coming_soon, name='coming_soon'),
+    path('api/waitlist/signup/', views.api_waitlist_signup, name='api_waitlist_signup'),
     path('manuscripts/', views.manuscripts_preview, name='manuscripts_preview'),
     
     # Error Page Previews (DEBUG ONLY)

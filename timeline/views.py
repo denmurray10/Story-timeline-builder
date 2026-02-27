@@ -33,7 +33,7 @@ from ebooklib import epub
 from bs4 import BeautifulSoup
 import tempfile
 
-from .models import Series, Book, Chapter, Character, Event, Tag, CharacterRelationship, AIFocusTask, ActivityLog, WorldEntry, InteractionSummaryCache, RelationshipAnalysisCache, StoryScanStatus, AIUsageLog, ChangelogEntry, NewsletterSubscription, UserProfile, TechnicalSupportMessage
+from .models import Series, Book, Chapter, Character, Event, Tag, CharacterRelationship, AIFocusTask, ActivityLog, WorldEntry, InteractionSummaryCache, RelationshipAnalysisCache, StoryScanStatus, AIUsageLog, ChangelogEntry, NewsletterSubscription, UserProfile, TechnicalSupportMessage, WaitlistSignup
 from .forms import (
     UserRegisterForm, SeriesForm, BookForm, ChapterForm, CharacterForm, 
     EventForm, TagForm, UserAccountForm, CharacterRelationshipForm, WorldEntryForm,
@@ -198,6 +198,43 @@ def coming_soon(request):
     Renders the coming soon / waitlist page.
     """
     return render(request, 'timeline/coming_soon.html')
+
+
+@csrf_exempt
+@require_POST
+def api_waitlist_signup(request):
+    """
+    API endpoint for waitlist signups on the coming soon page.
+    """
+    try:
+        data = json.loads(request.body)
+        first_name = data.get('first_name')
+        email = data.get('email')
+        writer_type = data.get('writer_type', '')
+        genre = data.get('genre', '')
+        groups = data.get('groups', '')
+        platforms = data.get('platforms', '')
+
+        if not first_name or not email:
+            return JsonResponse({'status': 'error', 'message': 'First name and email are required.'}, status=400)
+
+        signup, created = WaitlistSignup.objects.get_or_create(
+            email=email,
+            defaults={
+                'first_name': first_name,
+                'writer_type': writer_type,
+                'genre': genre,
+                'writing_groups': groups,
+                'platform_preference': platforms
+            }
+        )
+
+        if not created:
+            return JsonResponse({'status': 'success', 'message': 'You are already on the waitlist!'})
+
+        return JsonResponse({'status': 'success', 'message': 'Signed up successfully!'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
 
 
@@ -420,6 +457,9 @@ def staff_dashboard(request):
         # Technical Support Messages
         'support_messages': TechnicalSupportMessage.objects.select_related('user').all().order_by('-created_at')[:20],
         'unresolved_support_count': TechnicalSupportMessage.objects.filter(is_resolved=False).count(),
+        # Waitlist Signups
+        'waitlist_signups': WaitlistSignup.objects.all().order_by('-signed_up_at')[:50],
+        'waitlist_count': WaitlistSignup.objects.count(),
     }
     return render(request, 'timeline/staff_dashboard.html', context)
 

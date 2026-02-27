@@ -1,309 +1,310 @@
-{% load static %}
-<!DOCTYPE html>
-<html class="scroll-smooth" lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Story Timeline Builder - Newsletter Subscribed</title>
-    <meta content="AI-powered writing platform for storytellers. Plan, draft, and polish your fictional world."
-        name="description" />
-    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
-    <script>
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        primary: "#333333",
-                        accent: "#F4EBD9",
-                        "background-light": "#F2F0EB",
-                        "background-dark": "#121212",
-                        "surface-light": "#FFFFFF",
-                        "surface-dark": "#1E1E1E",
-                        "text-light": "#333333",
-                        "text-dark": "#E0E0E0",
-                        "border-light": "#E5E5E5",
-                        "border-dark": "#333333",
-                        "green-success": "#4CAF50",
-                        "wax-red": "#A62C2C",
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        serif: ['DM Serif Display', 'serif'],
-                        display: ['Playfair Display', 'serif'],
-                    },
-                    borderRadius: {
-                        DEFAULT: "0.5rem",
-                        'xl': '0.75rem',
-                        '2xl': '1rem',
-                        '3xl': '1.5rem',
-                    },
-                    boxShadow: {
-                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
-                        'card': '0 10px 30px -5px rgba(0, 0, 0, 0.08)',
-                    }
-                },
-            },
-        };
-    </script>
-    <style type="text/tailwindcss">
-        .glass-panel {
-            backdrop-filter: blur(8px);
-            background: rgba(255, 255, 255, 0.7);
-        }
-        .dark .glass-panel {
-            background: rgba(30, 30, 30, 0.7);
-        }
-        .wax-seal {
-            background: radial-gradient(circle at 30% 30%, #D44242, #A62C2C);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2), inset 0 0 4px rgba(0,0,0,0.3);
-        }
-        /* Nav Padding Scroll Logic */
-        nav {
-            top: 50px !important;
-            transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
-        }
-        nav.scrolled {
-            top: 0 !important;
-        }
-        .dark nav.scrolled {
-            top: 0 !important;
-        }
-    </style>
-</head>
-<body
-    class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-sans transition-colors duration-300 antialiased selection:bg-accent selection:text-primary flex flex-col min-h-screen">
-    <nav id="main-nav"
-        class="fixed w-full z-50 left-0 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md border-b border-transparent">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
-                <a href="{% url 'landing_page_v2' %}" class="flex-shrink-0 flex items-center cursor-pointer">
-                    <img src="{% static 'img/logo.webp' %}" alt="Story Timeline Builder"
-                        style="height: 3.5rem; width: auto;">
-                </a>
-                <div class="hidden md:flex items-center space-x-8">
-                    <a class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-white transition-colors"
-                        href="{% url 'coming_soon' %}">Features</a>
-                    <a class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-white transition-colors"
-                        href="{% url 'pricing' %}">Pricing</a>
-                    <a class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-white transition-colors"
-                        href="{% url 'coming_soon' %}">Resources</a>
-                    <a class="bg-primary text-white dark:bg-white dark:text-primary px-5 py-2.5 rounded-full text-sm font-medium hover:opacity-90 transition-opacity shadow-sm"
-                        href="{% url 'login' %}">Start Writing</a>
-                </div>
-                <div class="md:hidden flex items-center">
-                    <button class="text-primary dark:text-white p-2">
-                        <span class="material-icons-outlined">menu</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </nav>
-    <main
-        class="flex-grow flex items-center justify-center relative pt-[200px] pb-[60px] overflow-hidden min-h-[calc(100vh-80px)]">
-        <div
-            class="absolute top-[5%] left-[5%] w-32 h-32 bg-yellow-200/20 dark:bg-yellow-600/5 rounded-full blur-3xl -z-10">
-        </div>
-        <div
-            class="absolute bottom-[20%] right-[10%] w-80 h-80 bg-purple-200/30 dark:bg-purple-900/10 rounded-full blur-3xl -z-10">
-        </div>
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-                <div class="relative order-2 lg:order-1">
-                    <!-- Top-Left Card Blur -->
-                    <div
-                        class="absolute -top-12 -left-12 w-48 h-48 bg-yellow-200/30 dark:bg-yellow-600/10 rounded-full blur-3xl -z-10 pointer-events-none">
-                    </div>
-                    <div
-                        class="relative bg-white dark:bg-surface-dark rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 p-8 md:p-12 transform rotate-1 transition-transform hover:rotate-0 duration-500">
-                        <div
-                            class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-green-50 to-transparent dark:from-green-900/20 rounded-bl-3xl z-10 opacity-50">
-                        </div>
-                        <div class="font-serif text-lg leading-loose text-gray-800 dark:text-gray-200 opacity-80">
-                            <div
-                                class="flex items-center justify-between mb-6 border-b border-gray-100 dark:border-gray-800 pb-4">
-                                <h3 class="font-bold text-2xl text-primary dark:text-white">Chapter 1: The Inner Circle
-                                </h3>
-                                <span
-                                    class="text-xs font-sans font-medium text-green-600 bg-green-50 dark:bg-green-900/30 dark:text-green-400 px-3 py-1 rounded-full uppercase tracking-wider">Subscribed</span>
-                            </div>
-                            <p class="mb-4">The letter arrived sealed in heavy wax. "You are no longer writing in
-                                solitude," the inscription read. The ink shimmered slightly, as if still wet.</p>
-                            <p class="mb-4">The protagonist looked up from the desk, realising the silence of the room
-                                was now filled with potential.</p>
-                            <p>A new ally had joined the party. The story was about to get much more interesting...</p>
-                        </div>
-                        <div class="mt-8 flex items-center gap-3">
-                            <div class="h-1 w-full bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-                                <div class="h-full bg-green-500 w-1/3 animate-pulse"></div>
-                            </div>
-                            <span class="text-xs font-mono text-gray-400">INDEXING...</span>
-                        </div>
-                    </div>
-                    <div class="absolute -bottom-10 -right-6 md:-right-10 z-20 max-w-xs w-full">
-                        <div
-                            class="glass-panel border border-white/20 dark:border-gray-700/50 rounded-2xl p-4 shadow-card backdrop-blur-md">
-                            <div class="flex items-start gap-4">
-                                <div class="relative flex-shrink-0">
-                                    <div
-                                        class="w-12 h-12 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-white shadow-lg">
-                                        <span class="material-symbols-outlined text-2xl">edit_note</span>
-                                    </div>
-                                    <span
-                                        class="absolute -top-1 -right-1 w-3 h-3 bg-green-400 border-2 border-white dark:border-surface-dark rounded-full"></span>
-                                </div>
-                                <div class="flex-1">
-                                    <div
-                                        class="bg-white dark:bg-gray-800 rounded-lg rounded-tl-none p-3 shadow-sm border border-gray-100 dark:border-gray-700 relative">
-                                        <p class="text-sm text-gray-700 dark:text-gray-300 italic leading-relaxed">
-                                            "Welcome aboard. I’ve added your seat to the drafting table. Watch for my
-                                            owl—your first dispatch is currently taking flight."</p>
-                                    </div>
-                                    <div class="mt-2 flex gap-2">
-                                        <span
-                                            class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Penn
-                                            - Digital Assistant</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="order-1 lg:order-2 text-center lg:text-left mb-12 lg:mb-0">
-                    <div class="relative inline-flex mb-8">
-                        <div
-                            class="flex items-center gap-4 bg-white dark:bg-surface-dark px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-800 shadow-soft">
-                            <div
-                                class="relative w-10 h-7 bg-accent/30 dark:bg-accent/10 border border-primary/10 rounded flex items-center justify-center">
-                                <span
-                                    class="material-symbols-outlined text-primary/40 dark:text-white/40 text-lg">mail</span>
-                                <div
-                                    class="absolute -bottom-1 -right-1 w-4 h-4 wax-seal rounded-full flex items-center justify-center">
-                                    <div class="w-2 h-2 border border-white/20 rounded-full"></div>
-                                </div>
-                            </div>
-                            <span
-                                class="text-xs font-semibold tracking-widest uppercase text-gray-500 dark:text-gray-400">Dispatch
-                                Pending</span>
-                        </div>
-                        <div class="absolute -right-4 -top-4 text-primary/20 dark:text-white/10 rotate-12">
-                            <span class="material-symbols-outlined text-3xl">send</span>
-                        </div>
-                    </div>
-                    <h1 class="text-5xl md:text-6xl font-serif text-primary dark:text-white mb-6 leading-tight">
-                        Welcome to the <br />
-                        <span class="font-display italic font-normal text-gray-500 dark:text-gray-400">inner
-                            circle.</span>
-                    </h1>
-                    <p class="text-lg text-gray-600 dark:text-gray-400 mb-10 leading-relaxed max-w-lg mx-auto lg:mx-0">
-                        Thank you for joining our community of storytellers. Expect weekly insights on world-building,
-                        character development, and exclusive writing prompts delivered straight to your inbox.
-                    </p>
-                    <div class="space-y-6 max-w-md mx-auto lg:mx-0">
-                        <div class="flex flex-col sm:flex-row gap-4">
-                            <a class="bg-primary text-white dark:bg-white dark:text-primary px-8 py-3.5 rounded-full font-medium hover:scale-105 transition-transform duration-200 shadow-md flex items-center justify-center gap-2 group"
-                                href="{% url 'dashboard' %}">
-                                Go to Dashboard <span
-                                    class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
-                            </a>
-                        </div>
-                        <div class="pt-2 text-center lg:text-left">
-                            <a class="text-sm font-medium text-gray-500 hover:text-primary dark:hover:text-white transition-colors inline-flex items-center gap-1 border-b border-transparent hover:border-gray-300 dark:hover:border-gray-600 pb-0.5"
-                                href="#">
-                                <span class="material-symbols-outlined text-sm">history_edu</span>
-                                Read the Archive
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-    <footer class="bg-background-light dark:bg-background-dark pt-20 pb-10 relative">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-16">
-                <div class="col-span-2 lg:col-span-2">
-                    <div class="flex items-center mb-4">
-                        <img src="{% static 'img/logo.webp' %}" alt="Story Timeline Builder"
-                            style="height: 3.5rem; width: auto;">
-                    </div>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 max-w-xs mb-6">
-                        Architecting narrative worlds through a synthesis of structured planning, contextual
-                        intelligence, and uncompromised creative flow.
-                    </p>
-                </div>
-                <div>
-                    <h4 class="font-bold text-primary dark:text-white mb-4">Product</h4>
-                    <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
-                        <li><a class="hover:text-primary dark:hover:text-white"
-                                href="{% url 'coming_soon' %}">Features</a></li>
-                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'pricing' %}">Pricing</a>
-                        </li>
-                        <li><a class="hover:text-primary dark:hover:text-white"
-                                href="{% url 'changelog' %}">Changelog</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-bold text-primary dark:text-white mb-4">Resources</h4>
-                    <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
-                        <li><a class="hover:text-primary dark:hover:text-white"
-                                href="{% url 'coming_soon' %}">Community</a></li>
-                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Help
-                                Center</a></li>
-                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Blog</a>
-                        </li>
-                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Writers
-                                Guide</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-bold text-primary dark:text-white mb-4">Legal</h4>
-                    <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
-                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Privacy
-                                Policy</a></li>
-                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Terms of
-                                Service</a></li>
-                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Cookie
-                                Policy</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div
-                class="border-t border-gray-200 dark:border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-                <p class="text-sm text-gray-500 dark:text-gray-400">© 2026 Story Timeline Builder. All rights reserved.
-                </p>
-                <div class="flex gap-4 text-gray-400">
-                    <a class="hover:text-primary dark:hover:text-white transition-colors"
-                        href="{% url 'coming_soon' %}"><span class="material-icons-outlined">flutter_dash</span></a>
-                    <a class="hover:text-primary dark:hover:text-white transition-colors"
-                        href="{% url 'coming_soon' %}"><span class="material-icons-outlined">code</span></a>
-                </div>
-            </div>
-        </div>
-    </footer>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const nav = document.getElementById('main-nav');
-            const handleScroll = () => {
-                if (window.scrollY > 10) {
-                    nav.classList.add('scrolled');
-                } else {
-                    nav.classList.remove('scrolled');
-                }
-            };
-            window.addEventListener('scroll', handleScroll);
-            handleScroll(); // Initial check
-            // Theme Toggle Demo Logic
-            const themeBtn = document.getElementById('theme-toggle-btn');
-            const zenBtn = document.getElementById('zen-mode-btn');
-            const mockup = document.getElementById('writing-pad-mockup');
-            const sidebar = document.getElementById('mockup-sidebar');
-            if (themeBtn && mockup) {
-                themeBtn.addEventListener('click', () => {
-                    mockup.classList.toggle('dark');
-                });
-            }
-        });
-    </script>
-</body>
+{% load static %}
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Story Timeline Builder - Newsletter Subscribed</title>
+    <meta content="AI-powered writing platform for storytellers. Plan, draft, and polish your fictional world."
+        name="description" />
+    <link rel="stylesheet" href="{% static 'css/fonts.css' %}" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#333333",
+                        accent: "#F4EBD9",
+                        "background-light": "#F2F0EB",
+                        "background-dark": "#121212",
+                        "surface-light": "#FFFFFF",
+                        "surface-dark": "#1E1E1E",
+                        "text-light": "#333333",
+                        "text-dark": "#E0E0E0",
+                        "border-light": "#E5E5E5",
+                        "border-dark": "#333333",
+                        "green-success": "#4CAF50",
+                        "wax-red": "#A62C2C",
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['DM Serif Display', 'serif'],
+                        display: ['Playfair Display', 'serif'],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem",
+                        'xl': '0.75rem',
+                        '2xl': '1rem',
+                        '3xl': '1.5rem',
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'card': '0 10px 30px -5px rgba(0, 0, 0, 0.08)',
+                    }
+                },
+            },
+        };
+    </script>
+    <style type="text/tailwindcss">
+        .glass-panel {
+            backdrop-filter: blur(8px);
+            background: rgba(255, 255, 255, 0.7);
+        }
+        .dark .glass-panel {
+            background: rgba(30, 30, 30, 0.7);
+        }
+        .wax-seal {
+            background: radial-gradient(circle at 30% 30%, #D44242, #A62C2C);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2), inset 0 0 4px rgba(0,0,0,0.3);
+        }
+        /* Nav Padding Scroll Logic */
+        nav {
+            top: 50px !important;
+            transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+        }
+        nav.scrolled {
+            top: 0 !important;
+        }
+        .dark nav.scrolled {
+            top: 0 !important;
+        }
+    </style>
+</head>
+<body
+    class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-sans transition-colors duration-300 antialiased selection:bg-accent selection:text-primary flex flex-col min-h-screen">
+    <nav id="main-nav"
+        class="fixed w-full z-50 left-0 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md border-b border-transparent">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <a href="{% url 'landing_page_v2' %}" class="flex-shrink-0 flex items-center cursor-pointer">
+                    <img src="{% static 'img/logo.webp' %}" alt="Story Timeline Builder"
+                        style="height: 3.5rem; width: auto;">
+                </a>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-white transition-colors"
+                        href="{% url 'coming_soon' %}">Features</a>
+                    <a class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-white transition-colors"
+                        href="{% url 'pricing' %}">Pricing</a>
+                    <a class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-white transition-colors"
+                        href="{% url 'coming_soon' %}">Resources</a>
+                    <a class="bg-primary text-white dark:bg-white dark:text-primary px-5 py-2.5 rounded-full text-sm font-medium hover:opacity-90 transition-opacity shadow-sm"
+                        href="{% url 'register' %}">Start Writing</a>
+                </div>
+                <div class="md:hidden flex items-center">
+                    <button class="text-primary dark:text-white p-2">
+                        <span class="material-icons-outlined">menu</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <main
+        class="flex-grow flex items-center justify-center relative pt-[200px] pb-[60px] overflow-hidden min-h-[calc(100vh-80px)]">
+        <div
+            class="absolute top-[5%] left-[5%] w-32 h-32 bg-yellow-200/20 dark:bg-yellow-600/5 rounded-full blur-3xl -z-10">
+        </div>
+        <div
+            class="absolute bottom-[20%] right-[10%] w-80 h-80 bg-purple-200/30 dark:bg-purple-900/10 rounded-full blur-3xl -z-10">
+        </div>
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+                <div class="relative order-2 lg:order-1">
+                    <!-- Top-Left Card Blur -->
+                    <div
+                        class="absolute -top-12 -left-12 w-48 h-48 bg-yellow-200/30 dark:bg-yellow-600/10 rounded-full blur-3xl -z-10 pointer-events-none">
+                    </div>
+                    <div
+                        class="relative bg-white dark:bg-surface-dark rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 p-8 md:p-12 transform rotate-1 transition-transform hover:rotate-0 duration-500">
+                        <div
+                            class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-green-50 to-transparent dark:from-green-900/20 rounded-bl-3xl z-10 opacity-50">
+                        </div>
+                        <div class="font-serif text-lg leading-loose text-gray-800 dark:text-gray-200 opacity-80">
+                            <div
+                                class="flex items-center justify-between mb-6 border-b border-gray-100 dark:border-gray-800 pb-4">
+                                <h3 class="font-bold text-2xl text-primary dark:text-white">Chapter 1: The Inner Circle
+                                </h3>
+                                <span
+                                    class="text-xs font-sans font-medium text-green-600 bg-green-50 dark:bg-green-900/30 dark:text-green-400 px-3 py-1 rounded-full uppercase tracking-wider">Subscribed</span>
+                            </div>
+                            <p class="mb-4">The letter arrived sealed in heavy wax. "You are no longer writing in
+                                solitude," the inscription read. The ink shimmered slightly, as if still wet.</p>
+                            <p class="mb-4">The protagonist looked up from the desk, realising the silence of the room
+                                was now filled with potential.</p>
+                            <p>A new ally had joined the party. The story was about to get much more interesting...</p>
+                        </div>
+                        <div class="mt-8 flex items-center gap-3">
+                            <div class="h-1 w-full bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                                <div class="h-full bg-green-500 w-1/3 animate-pulse"></div>
+                            </div>
+                            <span class="text-xs font-mono text-gray-400">INDEXING...</span>
+                        </div>
+                    </div>
+                    <div class="absolute -bottom-10 -right-6 md:-right-10 z-20 max-w-xs w-full">
+                        <div
+                            class="glass-panel border border-white/20 dark:border-gray-700/50 rounded-2xl p-4 shadow-card backdrop-blur-md">
+                            <div class="flex items-start gap-4">
+                                <div class="relative flex-shrink-0">
+                                    <div
+                                        class="w-12 h-12 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-white shadow-lg">
+                                        <span class="material-symbols-outlined text-2xl">edit_note</span>
+                                    </div>
+                                    <span
+                                        class="absolute -top-1 -right-1 w-3 h-3 bg-green-400 border-2 border-white dark:border-surface-dark rounded-full"></span>
+                                </div>
+                                <div class="flex-1">
+                                    <div
+                                        class="bg-white dark:bg-gray-800 rounded-lg rounded-tl-none p-3 shadow-sm border border-gray-100 dark:border-gray-700 relative">
+                                        <p class="text-sm text-gray-700 dark:text-gray-300 italic leading-relaxed">
+                                            "Welcome aboard. I’ve added your seat to the drafting table. Watch for my
+                                            owl—your first dispatch is currently taking flight."</p>
+                                    </div>
+                                    <div class="mt-2 flex gap-2">
+                                        <span
+                                            class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Penn
+                                            - Digital Assistant</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="order-1 lg:order-2 text-center lg:text-left mb-12 lg:mb-0">
+                    <div class="relative inline-flex mb-8">
+                        <div
+                            class="flex items-center gap-4 bg-white dark:bg-surface-dark px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-800 shadow-soft">
+                            <div
+                                class="relative w-10 h-7 bg-accent/30 dark:bg-accent/10 border border-primary/10 rounded flex items-center justify-center">
+                                <span
+                                    class="material-symbols-outlined text-primary/40 dark:text-white/40 text-lg">mail</span>
+                                <div
+                                    class="absolute -bottom-1 -right-1 w-4 h-4 wax-seal rounded-full flex items-center justify-center">
+                                    <div class="w-2 h-2 border border-white/20 rounded-full"></div>
+                                </div>
+                            </div>
+                            <span
+                                class="text-xs font-semibold tracking-widest uppercase text-gray-500 dark:text-gray-400">Dispatch
+                                Pending</span>
+                        </div>
+                        <div class="absolute -right-4 -top-4 text-primary/20 dark:text-white/10 rotate-12">
+                            <span class="material-symbols-outlined text-3xl">send</span>
+                        </div>
+                    </div>
+                    <h1 class="text-5xl md:text-6xl font-serif text-primary dark:text-white mb-6 leading-tight">
+                        Welcome to the <br />
+                        <span class="font-display italic font-normal text-gray-500 dark:text-gray-400">inner
+                            circle.</span>
+                    </h1>
+                    <p class="text-lg text-gray-600 dark:text-gray-400 mb-10 leading-relaxed max-w-lg mx-auto lg:mx-0">
+                        Thank you for joining our community of storytellers. Expect weekly insights on world-building,
+                        character development, and exclusive writing prompts delivered straight to your inbox.
+                    </p>
+                    <div class="space-y-6 max-w-md mx-auto lg:mx-0">
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <a class="bg-primary text-white dark:bg-white dark:text-primary px-8 py-3.5 rounded-full font-medium hover:scale-105 transition-transform duration-200 shadow-md flex items-center justify-center gap-2 group"
+                                href="{% url 'dashboard' %}">
+                                Go to Dashboard <span
+                                    class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                            </a>
+                        </div>
+                        <div class="pt-2 text-center lg:text-left">
+                            <a class="text-sm font-medium text-gray-500 hover:text-primary dark:hover:text-white transition-colors inline-flex items-center gap-1 border-b border-transparent hover:border-gray-300 dark:hover:border-gray-600 pb-0.5"
+                                href="#">
+                                <span class="material-symbols-outlined text-sm">history_edu</span>
+                                Read the Archive
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer class="bg-background-light dark:bg-background-dark pt-20 pb-10 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-16">
+                <div class="col-span-2 lg:col-span-2">
+                    <div class="flex items-center mb-4">
+                        <img src="{% static 'img/logo.webp' %}" alt="Story Timeline Builder"
+                            style="height: 3.5rem; width: auto;">
+                    </div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 max-w-xs mb-6">
+                        Architecting narrative worlds through a synthesis of structured planning, contextual
+                        intelligence, and uncompromised creative flow.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-primary dark:text-white mb-4">Product</h4>
+                    <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+                        <li><a class="hover:text-primary dark:hover:text-white"
+                                href="{% url 'coming_soon' %}">Features</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'pricing' %}">Pricing</a>
+                        </li>
+                        <li><a class="hover:text-primary dark:hover:text-white"
+                                href="{% url 'changelog' %}">Changelog</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-primary dark:text-white mb-4">Resources</h4>
+                    <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+                        <li><a class="hover:text-primary dark:hover:text-white"
+                                href="{% url 'coming_soon' %}">Community</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Help
+                                Center</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Blog</a>
+                        </li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Writers
+                                Guide</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-primary dark:text-white mb-4">Legal</h4>
+                    <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Privacy
+                                Policy</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Terms of
+                                Service</a></li>
+                        <li><a class="hover:text-primary dark:hover:text-white" href="{% url 'coming_soon' %}">Cookie
+                                Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div
+                class="border-t border-gray-200 dark:border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-sm text-gray-500 dark:text-gray-400">© 2026 Story Timeline Builder. All rights reserved.
+                </p>
+                <div class="flex gap-4 text-gray-400">
+                    <a class="hover:text-primary dark:hover:text-white transition-colors"
+                        href="{% url 'coming_soon' %}"><span class="material-icons-outlined">flutter_dash</span></a>
+                    <a class="hover:text-primary dark:hover:text-white transition-colors"
+                        href="{% url 'coming_soon' %}"><span class="material-icons-outlined">code</span></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const nav = document.getElementById('main-nav');
+            const handleScroll = () => {
+                if (window.scrollY > 10) {
+                    nav.classList.add('scrolled');
+                } else {
+                    nav.classList.remove('scrolled');
+                }
+            };
+            window.addEventListener('scroll', handleScroll);
+            handleScroll(); // Initial check
+            // Theme Toggle Demo Logic
+            const themeBtn = document.getElementById('theme-toggle-btn');
+            const zenBtn = document.getElementById('zen-mode-btn');
+            const mockup = document.getElementById('writing-pad-mockup');
+            const sidebar = document.getElementById('mockup-sidebar');
+            if (themeBtn && mockup) {
+                themeBtn.addEventListener('click', () => {
+                    mockup.classList.toggle('dark');
+                });
+            }
+        });
+    </script>
+</body>
 </html>

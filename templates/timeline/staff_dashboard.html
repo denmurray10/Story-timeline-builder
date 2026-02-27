@@ -130,6 +130,13 @@
             <div class="text-muted small">Unresolved Requests</div>
         </div>
     </div>
+    <div class="col-md-3">
+        <div class="staff-card p-4" style="border-left-color: #8b5cf6;">
+            <div class="text-muted small fw-bold text-uppercase mb-1">Coming Soon Waitlist</div>
+            <div class="h2 mb-1 fw-bold">{{ waitlist_count }}</div>
+            <div class="text-muted small">Potential Users</div>
+        </div>
+    </div>
 </div>
 {% if deepseek_balance %}
 <div class="row g-3 mb-5">
@@ -309,6 +316,58 @@
                         {% empty %}
                         <tr>
                             <td colspan="5" class="text-center py-4 text-muted">No support messages received yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Waitlist Signups Section -->
+        <div class="staff-card overflow-hidden mt-4">
+            <div class="p-4 border-bottom d-flex justify-content-between align-items-center bg-light">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-person-plus me-2"></i> Coming Soon Waitlist</h5>
+                <span class="badge bg-primary rounded-pill">{{ waitlist_count }} Total Signups</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-staff mb-0">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Role & Genre</th>
+                            <th>Writing Groups</th>
+                            <th>Platforms</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for signup in waitlist_signups %}
+                        <tr>
+                            <td>
+                                <div class="fw-bold text-dark">{{ signup.first_name }}</div>
+                                <div class="text-muted small">{{ signup.email }}</div>
+                            </td>
+                            <td>
+                                <div class="text-dark">{{ signup.writer_type|title }}</div>
+                                <div class="text-muted small">{{ signup.genre|title }}</div>
+                            </td>
+                            <td>
+                                <div class="text-muted small" style="max-width: 150px; white-space: normal;">{{ signup.writing_groups|default:"None" }}</div>
+                            </td>
+                            <td>
+                                <div class="text-muted small">{{ signup.platform_preference|default:"None" }}</div>
+                            </td>
+                            <td class="text-muted small">{{ signup.signed_up_at|date:"M d, Y" }}</td>
+                            <td>
+                                <a href="/admin/timeline/waitlistsignup/{{ signup.id }}/change/" class="btn btn-sm btn-outline-dark">
+                                    View
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">No waitlist signups yet.</td>
                         </tr>
                         {% endfor %}
                     </tbody>

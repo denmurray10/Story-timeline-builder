@@ -1000,3 +1000,22 @@ class TechnicalSupportMessage(models.Model):
 
     def __str__(self):
         return f"Support message from {self.user.username} at {self.created_at}"
+class WaitlistSignup(models.Model):
+    """
+    Stores users who sign up for the waitlist on the 'coming soon' page.
+    """
+    first_name = models.CharField(max_length=100)
+    email = models.EmailField(unique=True)
+    writer_type = models.CharField(max_length=50, blank=True)
+    genre = models.CharField(max_length=50, blank=True)
+    writing_groups = models.CharField(max_length=200, blank=True)
+    platform_preference = models.CharField(max_length=200, blank=True)
+    signed_up_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-signed_up_at']
+        verbose_name = "Waitlist Signup"
+        verbose_name_plural = "Waitlist Signups"
+
+    def __str__(self):
+        return f"{self.first_name} ({self.email})"

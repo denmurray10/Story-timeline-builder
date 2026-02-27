@@ -4,7 +4,15 @@ This allows you to manage all your models through Django's admin interface.
 """
 
 from django.contrib import admin
-from .models import Book, Chapter, Character, Event, Tag, CharacterRelationship, UserProfile, TechnicalSupportMessage
+from .models import Book, Chapter, Character, Event, Tag, CharacterRelationship, UserProfile, TechnicalSupportMessage, WaitlistSignup
+
+
+@admin.register(WaitlistSignup)
+class WaitlistSignupAdmin(admin.ModelAdmin):
+    list_display = ['first_name', 'email', 'writer_type', 'signed_up_at']
+    list_filter = ['writer_type', 'genre', 'signed_up_at']
+    search_fields = ['first_name', 'email', 'writing_groups']
+    readonly_fields = ['signed_up_at']
 
 
 @admin.register(UserProfile)
