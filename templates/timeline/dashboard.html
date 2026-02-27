@@ -601,35 +601,28 @@
                 </div>
             </div>
              <!-- Ask Penn Card -->
-             <div class="dash-card p-3 draggable-card mb-3" id="card-ai" style="background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);">
-                <div class="dash-card-header d-flex align-items-center justify-content-between mb-1 text-primary">
-                    <div class="d-flex align-items-center">
-                        <i class="bi bi-grip-vertical drag-handle text-muted"></i>
-                        <i class="bi bi-chat-heart me-2"></i>Ask Penn...
-                    </div>
-                    <button class="btn btn-link btn-sm text-muted p-0" id="btn-expand-penn" data-bs-toggle="modal" data-bs-target="#pennModal">
-                        <i class="bi bi-arrows-angle-expand" style="font-size: 0.8rem;"></i>
-                    </button>
-                </div>
-                <div id="penn-chat-history" class="mb-2 scroll-premium" style="max-height: 250px; overflow-y: auto; display: none; font-size: 0.82rem; scrollbar-width: thin;">
-                </div>
-                <div class="dash-muted mb-2 small opacity-75" id="penn-intro">Brainstorming? Character trouble? Just ask.</div>
-                <div id="penn-suggestions" class="mb-3 d-flex flex-column gap-2" style="display: none;"></div>
-                <div class="position-relative mt-auto">
-                    <div class="d-flex align-items-center gap-2 p-1 bg-white border rounded-pill shadow-sm">
-                        <input type="text" class="form-control border-0 bg-transparent !py-0 !text-xs shadow-none" id="ai-query-dash" placeholder="Type your question..." style="font-size: 0.75rem;">
-                        <button class="btn btn-dark rounded-circle d-flex align-items-center justify-content-center" id="ai-submit-dash" style="width: 28px; height: 28px; padding: 0;">
-                            <i class="bi bi-arrow-up-short fs-5"></i>
-                        </button>
-                    </div>
-                </div>
-                <div id="penn-loading" style="display: none;" class="text-center mt-2">
-                    <div class="ai-loading-dots"><span></span><span></span><span></span></div>
-                </div>
-            </div>
+<div class="dash-card p-3 draggable-card mb-3" id="card-ai" style="background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);">
+    <div class="dash-card-header d-flex align-items-center mb-1 text-primary">
+        <i class="bi bi-grip-vertical drag-handle text-muted"></i>
+        <i class="bi bi-chat-heart me-2"></i>Ask Penn...
+    </div>
+    <div id="penn-chat-history" class="mb-2 scroll-premium" style="max-height: 250px; overflow-y: auto; display: none; font-size: 0.82rem; scrollbar-width: thin;">
+    </div>
+    <div class="dash-muted mb-2 small opacity-75" id="penn-intro">Brainstorming? Character trouble? Just ask.</div>
+    <div id="penn-suggestions" class="mb-3 d-flex flex-column gap-2" style="display: none;"></div>
+    <div class="position-relative mt-auto">
+        <div class="d-flex align-items-center gap-2 p-1 bg-white border rounded-pill shadow-sm">
+            <input type="text" class="form-control border-0 bg-transparent !py-0 !text-xs shadow-none" id="ai-query-dash" placeholder="Type your question..." style="font-size: 0.75rem;">
+            <button class="btn btn-dark rounded-circle d-flex align-items-center justify-content-center" id="ai-submit-dash" style="width: 28px; height: 28px; padding: 0;">
+                <i class="bi bi-arrow-up-short fs-5"></i>
+            </button>
         </div>
     </div>
+    <div id="penn-loading" style="display: none;" class="text-center mt-2">
+        <div class="ai-loading-dots"><span></span><span></span><span></span></div>
+    </div>
 </div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 <script>
