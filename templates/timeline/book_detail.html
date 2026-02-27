@@ -17,10 +17,10 @@
         theme: {
             extend: {
                 colors: {
-                    primary: "#1A1A1A", // Very dark grey, almost black
-                    accent: "#F4EBD9", // Warm parchment
-                    "warm-white": "#FDFCF8", // The story bible page color
-                    "background-light": "#F2F0EB", // Outer background
+                    primary: "#1A1A1A",
+                    accent: "#F4EBD9",
+                    "warm-white": "#FDFCF8",
+                    "background-light": "#F2F0EB",
                     "surface-light": "#FFFFFF",
                     "text-main": "#262626",
                     "text-muted": "#666666",
@@ -41,9 +41,7 @@
 </script>
 <style type="text/tailwindcss">
     @layer utilities {
-        .text-balance {
-            text-wrap: balance;
-        }
+        .text-balance { text-wrap: balance; }
         .grid-lines {
             background-size: 40px 40px;
             background-image: linear-gradient(to right, rgba(0,0,0,0.03) 1px, transparent 1px),
@@ -52,22 +50,18 @@
     }
 </style>
 <style>
-    /* Reset basic styles within our Tailwind wrapper to avoid conflicts with Bootstrap */
     .tailwind-wrapper a {
         text-decoration: none;
     }
-
-    .tailwind-wrapper button {
+    .tailwind-wrapper button:not([class]) {
         border: none;
         background: none;
     }
-
     .delete-project-btn:hover {
         background-color: #dc2626 !important;
         color: white !important;
         border-color: #dc2626 !important;
     }
-
     .delete-project-btn:hover span {
         color: white !important;
     }
@@ -75,32 +69,30 @@
 {% endblock %}
 
 {% block content %}
-<div
-    class="tailwind-wrapper bg-background-light text-text-main font-sans antialiased min-h-screen flex flex-col relative overflow-x-hidden selection:bg-black selection:text-white rounded-xl">
+<div class="tailwind-wrapper bg-background-light text-text-main font-sans antialiased min-h-screen flex flex-col relative overflow-x-hidden selection:bg-black selection:text-white rounded-xl">
 
-    <!-- Deep Scan Progress Modal (Bootstrap) -->
+    <!-- ===================== MODALS ===================== -->
+
+    <!-- Deep Scan Progress Modal -->
     <div class="modal fade" id="deepScanModal" data-bs-backdrop="static" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered tailwind-reset">
             <div class="modal-content shadow-lg border-0 rounded-2xl overflow-hidden">
                 <div class="modal-header bg-black text-white border-0 p-4">
-                    <h5 class="modal-title font-serif flex items-center gap-2 m-0"><span
-                            class="material-symbols-outlined">psychology</span> Omniscience Scan</h5>
+                    <h5 class="modal-title font-serif flex items-center gap-2 m-0">
+                        <span class="material-symbols-outlined">psychology</span> Omniscience Scan
+                    </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                         id="btn-close-scan-x" style="display:none;"></button>
                 </div>
                 <div class="modal-body p-6 text-center bg-white">
                     <div id="scan-init">
-                        <span
-                            class="material-symbols-outlined text-black text-5xl block mb-4 animate-pulse">auto_awesome</span>
+                        <span class="material-symbols-outlined text-black text-5xl block mb-4 animate-pulse">auto_awesome</span>
                         <h4 class="font-serif text-2xl text-black mb-2">Initializing Deep Scan</h4>
-                        <p class="text-text-muted text-sm text-balance">DeepSeek R1 will now meticulously analyse your
-                            entire story to build a unified Story Bible.</p>
+                        <p class="text-text-muted text-sm text-balance">DeepSeek R1 will now meticulously analyse your entire story to build a unified Story Bible.</p>
                     </div>
                     <div id="scan-active" style="display:none;">
                         <div class="w-full bg-background-light rounded-full h-3 mb-4 overflow-hidden">
-                            <div id="scan-progress-bar"
-                                class="bg-black h-3 rounded-full transition-all duration-300 w-0"
-                                role="progressbar"></div>
+                            <div id="scan-progress-bar" class="bg-black h-3 rounded-full transition-all duration-300 w-0" role="progressbar"></div>
                         </div>
                         <h5 id="scan-step-title" class="font-serif text-xl text-black mb-1">Analysing...</h5>
                         <p id="scan-step-desc" class="text-text-muted text-sm mb-0">Starting engines...</p>
@@ -108,59 +100,177 @@
                     <div id="scan-complete" style="display:none;">
                         <span class="material-symbols-outlined text-green-600 text-5xl block mb-4">check_circle</span>
                         <h4 class="font-serif text-2xl text-black mb-2">Scan Complete!</h4>
-                        <p class="text-text-muted text-sm text-balance">All character profiles, relationships, and world
-                            markers have been pre-cached across the app.</p>
-                        <button
-                            class="mt-6 w-full py-3 bg-black text-white rounded-lg text-sm font-medium hover:bg-opacity-90 transition-colors"
-                            data-bs-dismiss="modal">Excellent</button>
+                        <p class="text-text-muted text-sm text-balance">All character profiles, relationships, and world markers have been pre-cached across the app.</p>
+                        <button class="mt-6 w-full py-3 bg-black text-white rounded-lg text-sm font-medium hover:bg-opacity-90 transition-colors" data-bs-dismiss="modal">Excellent</button>
                     </div>
                     <div id="scan-error" style="display:none;">
                         <span class="material-symbols-outlined text-red-500 text-5xl block mb-4">error</span>
                         <h4 class="font-serif text-2xl text-black mb-2">Scan Failed</h4>
                         <p id="scan-error-msg" class="text-red-600 text-sm"></p>
-                        <button
-                            class="mt-6 w-full py-3 bg-gray-100 text-black border border-border-subtle rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
-                            data-bs-dismiss="modal">Close</button>
+                        <button class="mt-6 w-full py-3 bg-gray-100 text-black border border-border-subtle rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors" data-bs-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Main Content Area -->
+    <!-- Writing Mode Coming Soon Modal -->
+    <div class="modal fade" id="writingModeComingSoonModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 text-center" style="border-radius: 24px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);">
+                <div class="modal-body p-5">
+                    <div class="mb-4" style="font-size: 3rem;">✍️</div>
+                    <h3 class="fw-bold text-dark mb-3" style="font-size: 1.6rem;">Writing Mode is Coming Soon</h3>
+                    <p class="text-muted mb-4" style="font-size: 0.95rem; line-height: 1.7; max-width: 320px; margin: 0 auto 1.5rem;">
+                        We promise — it will be <strong class="text-dark">everything you dreamed of</strong>.
+                        Distraction-free writing, AI-powered suggestions, and a canvas built for storytellers.
+                        Worth the wait.
+                    </p>
+                    <div class="d-flex align-items-center justify-content-center gap-2 mb-4 p-3 rounded-3" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                        <i class="bi bi-stars text-warning fs-5"></i>
+                        <span style="font-size: 0.8rem; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.05em;">Crafted with love — arriving soon</span>
+                    </div>
+                    <button type="button" class="btn-premium btn-premium-dark !px-6 !py-3" data-bs-dismiss="modal"
+                        style="background-color: #111827 !important; color: white !important; border: none;">
+                        Can't Wait! 🚀
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deep Story Scan Unavailable Modal -->
+    <div class="modal fade" id="deepScanUnavailableModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 text-center" style="border-radius: 24px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);">
+                <div class="modal-body p-5">
+                    <div class="mb-4" style="font-size: 3rem;">🔬</div>
+                    <h3 class="fw-bold text-dark mb-3" style="font-size: 1.6rem;">Deep Story Scan</h3>
+                    <p class="text-muted mb-4" style="font-size: 0.95rem; line-height: 1.7; max-width: 340px; margin: 0 auto 1.5rem;">
+                        Sorry, unfortunately the Deep Story Scan is <strong class="text-dark">not currently active</strong>. It requires a large amount of content to fully understand what you have written, what you are trying to achieve, and how it can help.
+                    </p>
+                    <div class="d-flex align-items-center justify-content-center gap-2 mb-4 p-3 rounded-3" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                        <i class="bi bi-book text-dark fs-5"></i>
+                        <span style="font-size: 0.8rem; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.05em;">See it in action via <em>Through The Looking Glass</em></span>
+                    </div>
+                    <p class="text-muted mb-4" style="font-size: 0.85rem; line-height: 1.6;">
+                        You can see a Deep Story Scanned book in your profile via <strong class="text-dark">Through The Looking Glass</strong>, complete with updated Character Relationships and character details.
+                    </p>
+                    <button type="button" class="btn-premium btn-premium-dark !px-6 !py-3" data-bs-dismiss="modal"
+                        style="background-color: #111827 !important; color: white !important; border: none;">
+                        Got It 👍
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Upload Coming Soon Modal -->
+    <div class="modal fade" id="bulkUploadModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 text-center" style="border-radius: 24px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);">
+                <div class="modal-body p-5">
+                    <div class="mb-4" style="font-size: 3rem;">📤</div>
+                    <h3 class="fw-bold text-dark mb-3" style="font-size: 1.6rem;">Bulk Upload</h3>
+                    <p class="text-muted mb-4" style="font-size: 0.95rem; line-height: 1.7; max-width: 340px; margin: 0 auto 1.5rem;">
+                        There's no point uploading your content just yet — you won't be able to <strong class="text-dark">review it, enhance it, or bring it to life</strong> until the writing tools are ready.
+                    </p>
+                    <div class="d-flex align-items-center justify-content-center gap-2 mb-4 p-3 rounded-3" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                        <i class="bi bi-clock text-warning fs-5"></i>
+                        <span style="font-size: 0.8rem; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.05em;">This feature will be available shortly</span>
+                    </div>
+                    <button type="button" class="btn-premium btn-premium-dark !px-6 !py-3" data-bs-dismiss="modal"
+                        style="background-color: #111827 !important; color: white !important; border: none;">
+                        Makes Sense! 👌
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Timeline Coming Soon Modal -->
+    <div class="modal fade" id="timelineComingSoonModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 text-center" style="border-radius: 24px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);">
+                <div class="modal-body p-5">
+                    <div class="mb-4" style="font-size: 3rem;">🗓️</div>
+                    <h3 class="fw-bold text-dark mb-3" style="font-size: 1.6rem;">Timeline — Coming Soon</h3>
+                    <p class="text-muted mb-4" style="font-size: 0.95rem; line-height: 1.7; max-width: 340px; margin: 0 auto 1.5rem;">
+                        Our Timeline feature will help you <strong class="text-dark">keep track of all your characters' events</strong> across multiple stories — at the drop of a click.
+                    </p>
+                    <div class="d-flex align-items-center justify-content-center gap-2 mb-4 p-3 rounded-3" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                        <i class="bi bi-stars text-warning fs-5"></i>
+                        <span style="font-size: 0.8rem; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.05em;">Currently in development — available soon</span>
+                    </div>
+                    <button type="button" class="btn-premium btn-premium-dark !px-6 !py-3" data-bs-dismiss="modal"
+                        style="background-color: #111827 !important; color: white !important; border: none;">
+                        Can't Wait! 🚀
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- World Codex Coming Soon Modal -->
+    <div class="modal fade" id="worldCodexModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 text-center" style="border-radius: 24px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);">
+                <div class="modal-body p-5">
+                    <div class="mb-4" style="font-size: 3rem;">🌍</div>
+                    <h3 class="fw-bold text-dark mb-3" style="font-size: 1.6rem;">The World Codex</h3>
+                    <p class="text-muted mb-4" style="font-size: 0.95rem; line-height: 1.7; max-width: 340px; margin: 0 auto 1.5rem;">
+                        The World Codex is <strong class="text-dark">currently under development</strong>. We feel it's a feature that will help authors define their stories and create wonderful worlds for your imagination — so we want to make sure the <strong class="text-dark">worlds are spinning in the right direction</strong> before letting you in.
+                    </p>
+                    <div class="d-flex align-items-center justify-content-center gap-2 mb-4 p-3 rounded-3" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                        <i class="bi bi-globe text-dark fs-5"></i>
+                        <span style="font-size: 0.8rem; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.05em;">Your world is being built</span>
+                    </div>
+                    <button type="button" class="btn-premium btn-premium-dark !px-6 !py-3" data-bs-dismiss="modal"
+                        style="background-color: #111827 !important; color: white !important; border: none;">
+                        Worth The Wait 🌟
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== MAIN CONTENT ===================== -->
     <main class="relative z-10 flex-grow w-full px-4 md:px-10 py-8 md:py-10 max-w-7xl mx-auto">
 
         <header class="mb-12 relative z-10">
             <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6 mb-6">
                 <div class="space-y-4 max-w-3xl">
                     <div class="flex items-center gap-3">
-                        <span
-                            class="px-2.5 py-0.5 rounded-full bg-green-100 text-green-800 text-[10px] font-bold uppercase tracking-wider border border-green-200">{{ book.get_status_display }}</span>
+                        <span class="px-2.5 py-0.5 rounded-full bg-green-100 text-green-800 text-[10px] font-bold uppercase tracking-wider border border-green-200">{{ book.get_status_display }}</span>
                         {% if book.series %}
-                        <span
-                            class="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider border border-primary/20">{{ book.series.title }}</span>
+                        <span class="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider border border-primary/20">{{ book.series.title }}</span>
                         {% endif %}
                         {% if book.series_order %}
-                        <span
-                            class="px-2.5 py-0.5 rounded-full bg-bg-white text-text-main text-[10px] font-bold uppercase tracking-wider border border-gray-100">Book
-                            {{ book.series_order }}</span>
+                        <span class="px-2.5 py-0.5 rounded-full bg-bg-white text-text-main text-[10px] font-bold uppercase tracking-wider border border-gray-100">Book {{ book.series_order }}</span>
                         {% endif %}
                         <span class="text-xs text-text-muted font-medium flex items-center gap-1">
                             <span class="material-symbols-outlined text-[14px]">calendar_today</span> Started: {{ book.started_date|default:"Not started" }}
                         </span>
                     </div>
                     <h1 class="font-serif text-5xl md:text-6xl text-black leading-tight m-0">{{ book.title }}</h1>
-
                 </div>
                 <div class="flex items-center gap-3">
-                    <button id="btn-deep-scan" class="btn-premium !bg-white !text-black border border-gray-200 hover:!bg-gray-50 shadow-sm">
+                    <!-- Deep Story Scan — triggers unavailable modal -->
+                    <button type="button"
+                        onclick="new bootstrap.Modal(document.getElementById('deepScanUnavailableModal')).show();"
+                        class="btn-premium !bg-white !text-black border border-gray-200 hover:!bg-gray-50 shadow-sm"
+                        style="border: 1px solid #e5e7eb;">
                         <span class="material-symbols-outlined text-[18px]">psychology</span>
                         Deep Story Scan
                     </button>
-                    <a href="{% url 'book_edit' book.pk %}" class="btn-premium btn-premium-dark no-underline">
+                    <!-- Edit Book — triggers coming soon modal -->
+                    <button type="button"
+                        onclick="new bootstrap.Modal(document.getElementById('writingModeComingSoonModal')).show();"
+                        class="btn-premium btn-premium-dark no-underline"
+                        style="background-color: #111827 !important; color: white !important; border: none;">
                         <span class="material-symbols-outlined text-[18px]">edit_square</span>
                         Edit Book
-                    </a>
+                    </button>
                 </div>
             </div>
             <div class="h-px w-full bg-border-subtle"></div>
@@ -168,10 +278,10 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10">
             <div class="lg:col-span-8 space-y-8">
+
                 <!-- Counters & Stats with Book Cover -->
                 <section class="bg-white rounded-2xl border border-border-subtle py-4 px-6 shadow-sm relative overflow-hidden">
                     <div class="flex flex-col md:flex-row gap-8 relative z-10">
-                        <!-- Book Cover Column -->
                         <div class="w-full md:w-48 shrink-0">
                             <div class="aspect-[2/3] rounded-xl overflow-hidden shadow-lg border border-border-subtle bg-background-light relative group">
                                 {% if book.image %}
@@ -186,7 +296,6 @@
                             </div>
                         </div>
 
-                        <!-- Counters Column -->
                         <div class="flex-grow flex flex-col justify-center gap-2">
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                 <div class="flex flex-col gap-1 p-3 rounded-xl hover:bg-background-light/50 transition-colors cursor-default">
@@ -197,7 +306,6 @@
                                     <span class="text-2xl font-serif text-black">{{ total_words|floatformat:0 }}</span>
                                     <span class="text-[10px] text-text-muted">{{ book.word_count_target|floatformat:0 }} Target</span>
                                 </div>
-
                                 <div class="flex flex-col gap-1 p-3 rounded-xl hover:bg-background-light/50 transition-colors cursor-default">
                                     <div class="flex items-center gap-2 text-text-muted mb-1">
                                         <span class="material-symbols-outlined text-[16px]">menu_book</span>
@@ -206,7 +314,6 @@
                                     <span class="text-2xl font-serif text-black">{{ actual_chapter_count }}</span>
                                     <span class="text-[10px] text-text-muted">Drafts & Notes</span>
                                 </div>
-
                                 <div class="flex flex-col gap-1 p-3 rounded-xl hover:bg-background-light/50 transition-colors cursor-default">
                                     <div class="flex items-center gap-2 text-text-muted mb-1">
                                         <span class="material-symbols-outlined text-[16px]">timeline</span>
@@ -229,7 +336,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="absolute top-0 right-0 w-64 h-64 bg-accent/10 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
                 </section>
 
@@ -246,8 +352,6 @@
                             <p class="italic">No summary has been provided for this manuscript yet. Run a <strong>Deep Story Scan</strong> to analyze your chapters, then set the book status to <strong>Complete</strong> or <strong>Published</strong> to automatically generate a professional premise using DeepSeek Reasoner.</p>
                         {% endif %}
                     </div>
-                    
-                    <!-- Subtle background decoration -->
                     <div class="absolute -bottom-8 -left-8 w-32 h-32 bg-accent/5 rounded-full blur-2xl pointer-events-none"></div>
                 </section>
 
@@ -256,41 +360,45 @@
                     <div class="flex items-center justify-between mb-6">
                         <h2 class="font-serif text-2xl text-black m-0">Chapters</h2>
                         <div class="flex gap-2">
-                            <a href="{% url 'chapter_bulk_upload' book.pk %}" class="btn-premium btn-premium-light !py-2 !px-4 !text-[10px] uppercase tracking-wider">
+                            <!-- Bulk — triggers bulk upload modal -->
+                            <button type="button"
+                                onclick="new bootstrap.Modal(document.getElementById('bulkUploadModal')).show();"
+                                class="btn-premium btn-premium-light !py-2 !px-4 !text-[10px] uppercase tracking-wider">
                                 <span class="material-symbols-outlined text-[16px]">cloud_upload</span> Bulk
-                            </a>
+                            </button>
                             <a href="{% url 'book_export' book.pk %}" class="btn-premium btn-premium-light !py-2 !px-4 !text-[10px] uppercase tracking-wider">
                                 <span class="material-symbols-outlined text-[16px]">ios_share</span> Export
                             </a>
-                            <a href="{% url 'chapter_create' book.pk %}" class="btn-premium btn-premium-dark !py-2 !px-5 !text-[10px] uppercase tracking-wider">
+                            <!-- Add New — triggers writing mode coming soon modal -->
+                            <button type="button"
+                                onclick="new bootstrap.Modal(document.getElementById('writingModeComingSoonModal')).show();"
+                                class="btn-premium btn-premium-dark !py-2 !px-5 !text-[10px] uppercase tracking-wider"
+                                style="background-color: #111827 !important; color: white !important; border: none;">
                                 <span class="material-symbols-outlined text-[16px]">add</span> Add New
-                            </a>
+                            </button>
                         </div>
                     </div>
 
                     <div class="space-y-4">
                         {% for chapter in chapters %}
-                        <div
-                            class="group bg-surface-light border border-border-subtle rounded-xl p-6 hover:shadow-md hover:border-gray-300 transition-all flex gap-4 md:gap-6 items-start relative">
-                            <div
-                                class="font-display text-4xl text-gray-200 group-hover:text-accent font-bold transition-colors w-12 text-right shrink-0">
+                        <div class="group bg-surface-light border border-border-subtle rounded-xl p-6 hover:shadow-md hover:border-gray-300 transition-all flex gap-4 md:gap-6 items-start relative">
+                            <div class="font-display text-4xl text-gray-200 group-hover:text-accent font-bold transition-colors w-12 text-right shrink-0">
                                 {{ chapter.chapter_number|stringformat:"02d" }}
                             </div>
 
                             <div class="flex-grow min-w-0">
-                                <div
-                                    class="flex flex-col md:flex-row justify-between items-start md:items-center mb-2 gap-2">
-                                    <a href="{% url 'chapter_detail' chapter.pk %}" class="no-underline m-0">
-                                        <h3
-                                            class="font-serif text-xl text-black group-hover:text-black transition-colors m-0 truncate">
+                                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-2 gap-2">
+                                    <!-- Chapter title — triggers writing mode coming soon modal -->
+                                    <a href="#"
+                                        onclick="event.preventDefault(); new bootstrap.Modal(document.getElementById('writingModeComingSoonModal')).show();"
+                                        class="no-underline m-0">
+                                        <h3 class="font-serif text-xl text-black group-hover:text-black transition-colors m-0 truncate">
                                             {{ chapter.title }}</h3>
                                     </a>
                                     {% if chapter.is_complete or book.status == 'published' %}
-                                    <span
-                                        class="px-2 py-1 bg-green-50 text-green-700 text-[10px] font-bold uppercase tracking-wider rounded border border-green-100 whitespace-nowrap">Done</span>
+                                    <span class="px-2 py-1 bg-green-50 text-green-700 text-[10px] font-bold uppercase tracking-wider rounded border border-green-100 whitespace-nowrap">Done</span>
                                     {% else %}
-                                    <span
-                                        class="px-2 py-1 bg-gray-100 text-gray-600 text-[10px] font-bold uppercase tracking-wider rounded border border-gray-200 whitespace-nowrap">Drafting</span>
+                                    <span class="px-2 py-1 bg-gray-100 text-gray-600 text-[10px] font-bold uppercase tracking-wider rounded border border-gray-200 whitespace-nowrap">Drafting</span>
                                     {% endif %}
                                 </div>
 
@@ -301,20 +409,17 @@
                                 {% endif %}
 
                                 <div class="flex flex-wrap items-center gap-2 md:gap-4 mt-3">
-                                    <span
-                                        class="text-xs text-text-muted flex items-center gap-1 bg-background-light px-2 py-1 rounded">
+                                    <span class="text-xs text-text-muted flex items-center gap-1 bg-background-light px-2 py-1 rounded">
                                         <span class="material-symbols-outlined text-[14px]">format_align_left</span> {{ chapter.word_count|default:"0" }} words
                                     </span>
-                                    <span
-                                        class="text-xs text-text-muted flex items-center gap-1 bg-background-light px-2 py-1 rounded">
+                                    <span class="text-xs text-text-muted flex items-center gap-1 bg-background-light px-2 py-1 rounded">
                                         <span class="material-symbols-outlined text-[14px]">event</span> {{ chapter.event_count|default:"0" }} events
                                     </span>
                                 </div>
                             </div>
 
-                            <!-- Actions -->
-                            <div
-                                class="absolute top-4 right-4 md:static md:right-auto md:top-auto flex md:flex-col gap-2 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <!-- Actions (edit/delete kept as real links) -->
+                            <div class="absolute top-4 right-4 md:static md:right-auto md:top-auto flex md:flex-col gap-2 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                                 <a href="{% url 'chapter_edit' chapter.pk %}"
                                     class="w-8 h-8 rounded-full bg-background-light flex items-center justify-center text-text-muted hover:bg-white hover:text-black hover:shadow-sm border border-transparent hover:border-border-subtle transition-all"
                                     title="Edit Chapter">
@@ -328,19 +433,21 @@
                             </div>
                         </div>
                         {% empty %}
-                        <div
-                            class="bg-surface-light border border-border-subtle border-dashed rounded-xl p-10 text-center flex flex-col items-center justify-center">
+                        <div class="bg-surface-light border border-border-subtle border-dashed rounded-xl p-10 text-center flex flex-col items-center justify-center">
                             <span class="material-symbols-outlined text-4xl text-gray-300 mb-3">menu_book</span>
                             <p class="text-text-muted text-sm font-medium">No chapters yet. Time to start writing!</p>
-                            <a href="{% url 'chapter_create' book.pk %}"
-                                class="mt-4 px-4 py-2 bg-black text-white rounded-lg text-sm font-medium hover:bg-opacity-90 transition-colors no-underline">Create
-                                First Chapter</a>
+                            <button type="button"
+                                onclick="new bootstrap.Modal(document.getElementById('writingModeComingSoonModal')).show();"
+                                class="mt-4 px-4 py-2 bg-black text-white rounded-lg text-sm font-medium hover:bg-opacity-90 transition-colors"
+                                style="background-color: #111827 !important; color: white !important; border: none;">
+                                Create First Chapter
+                            </button>
                         </div>
                         {% endfor %}
                     </div>
                 </section>
 
-                <!-- Deletion Zone (Danger Zone) -->
+                <!-- Danger Zone -->
                 <section class="mt-16 pt-8 border-t border-red-100">
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 bg-red-50/30 rounded-2xl border border-red-100/50">
                         <div>
@@ -351,7 +458,7 @@
                             <p class="text-[11px] text-text-muted m-0">Deleting this book entirely removes all chapters, drafts, and associated story data. This cannot be undone.</p>
                         </div>
                         <a href="{% url 'book_delete' book.pk %}" class="btn-premium btn-premium-danger">
-                            <span class="material-symbols-outlined text-[18px]">delete_forever</span> 
+                            <span class="material-symbols-outlined text-[18px]">delete_forever</span>
                             <span>Delete Project</span>
                         </a>
                     </div>
@@ -360,91 +467,89 @@
 
             <!-- Right Sidebar Column -->
             <div class="lg:col-span-4 relative min-h-[500px]">
-                <!-- 
-                    The 'lg:absolute lg:inset-0' trick ensures this column 
-                    takes its height from its sibling (the Chapter list) 
-                    instead of growing the page itself.
-                -->
                 <div class="lg:absolute lg:inset-x-0 lg:top-0 lg:bottom-5 overflow-hidden">
                     <div class="space-y-8 pb-24">
+
                         <!-- Events Widget -->
                         <section>
                             <div class="flex items-center justify-between mb-6">
                                 <h2 class="font-serif text-2xl text-black m-0">Key Events</h2>
-                                <a href="{% url 'horizontal_timeline' %}?book={{ book.pk }}"
-                                    class="text-xs font-bold uppercase tracking-wider text-black hover:underline no-underline">View All</a>
+                                <!-- View All — triggers timeline coming soon modal -->
+                                <button type="button"
+                                    onclick="new bootstrap.Modal(document.getElementById('timelineComingSoonModal')).show();"
+                                    class="text-xs font-bold uppercase tracking-wider text-black hover:underline"
+                                    style="background: none; border: none; cursor: pointer; padding: 0;">
+                                    View All
+                                </button>
                             </div>
-        
+
                             <div class="relative" id="timeline-container-sidebar">
-                                <!-- Background Timeline Line -->
                                 <div class="absolute left-[11px] top-6 bottom-12 w-[2px] bg-border-subtle z-0"></div>
-                                <!-- Active Progress Line -->
                                 <div id="timeline-progress-line" class="absolute left-[11px] top-6 w-[2px] bg-black z-10 transition-all duration-700 ease-in-out" style="height: 0;"></div>
-        
+
                                 <div id="events-container" class="space-y-12">
                                     {% for event in events %}
-                            <div class="relative pl-10 event-item" data-index="{{ forloop.counter0 }}">
-                                <!-- Node -->
-                                <div class="absolute left-0 top-1 w-6 h-6 rounded-full border-2 border-border-subtle bg-white z-20 flex items-center justify-center transition-colors duration-300 js-timeline-node">
-                                    <div class="w-2.5 h-2.5 rounded-full transition-colors duration-300 js-timeline-dot {% if not event.is_written %}border border-dashed border-border-subtle{% endif %}"></div>
-                                </div>
-
-                                <!-- Event Card -->
-                                <div class="bg-white py-3.5 px-5 rounded-2xl border border-border-subtle hover:shadow-md transition-all group {% if not event.is_written %}bg-gray-50/50{% endif %}">
-                                    <div class="flex justify-between items-start mb-2">
-                                        <span class="text-[10px] font-bold uppercase tracking-wider text-text-muted">
-                                            {% if event.chapter %}Chapter {{ event.chapter.chapter_number }}{% else %}{{ event.story_date|upper|default:"Planned" }}{% endif %}
-                                        </span>
+                                    <div class="relative pl-10 event-item" data-index="{{ forloop.counter0 }}">
+                                        <div class="absolute left-0 top-1 w-6 h-6 rounded-full border-2 border-border-subtle bg-white z-20 flex items-center justify-center transition-colors duration-300 js-timeline-node">
+                                            <div class="w-2.5 h-2.5 rounded-full transition-colors duration-300 js-timeline-dot {% if not event.is_written %}border border-dashed border-border-subtle{% endif %}"></div>
+                                        </div>
+                                        <div class="bg-white py-3.5 px-5 rounded-2xl border border-border-subtle hover:shadow-md transition-all group {% if not event.is_written %}bg-gray-50/50{% endif %}">
+                                            <div class="flex justify-between items-start mb-2">
+                                                <span class="text-[10px] font-bold uppercase tracking-wider text-text-muted">
+                                                    {% if event.chapter %}Chapter {{ event.chapter.chapter_number }}{% else %}{{ event.story_date|upper|default:"Planned" }}{% endif %}
+                                                </span>
+                                            </div>
+                                            <h4 class="font-serif text-lg text-black mb-1 m-0">
+                                                <a href="{% url 'event_detail' event.pk %}" class="text-black no-underline hover:text-highlight transition-colors">
+                                                    {{ event.title }}
+                                                </a>
+                                            </h4>
+                                            {% if event.description %}
+                                            <p class="text-xs text-text-muted mb-3 m-0 line-clamp-2" title="{{ event.description }}">
+                                                {{ event.description }}
+                                            </p>
+                                            {% endif %}
+                                        </div>
                                     </div>
-                                    <h4 class="font-serif text-lg text-black mb-1 m-0">
-                                        <a href="{% url 'event_detail' event.pk %}" class="text-black no-underline hover:text-highlight transition-colors">
-                                            {{ event.title }}
-                                        </a>
-                                    </h4>
-                                    {% if event.description %}
-                                    <p class="text-xs text-text-muted mb-3 m-0 line-clamp-2" title="{{ event.description }}">
-                                        {{ event.description }}
-                                    </p>
-                                    {% endif %}
-
-
+                                    {% empty %}
+                                    <p class="text-sm text-text-muted text-center py-4 italic">No major events recorded yet.</p>
+                                    {% endfor %}
                                 </div>
+
+                                <!-- Add Event — triggers writing mode coming soon modal -->
+                                <button type="button"
+                                    onclick="new bootstrap.Modal(document.getElementById('writingModeComingSoonModal')).show();"
+                                    class="btn-premium btn-premium-light !w-full border-2 border-dashed !py-4 hover:border-black transition-all"
+                                    style="width: 100%;">
+                                    <span class="material-symbols-outlined text-[20px]">add</span>
+                                    <span class="text-sm font-medium">Add Event</span>
+                                </button>
                             </div>
-                            {% empty %}
-                            <p class="text-sm text-text-muted text-center py-4 italic">No major events recorded yet.</p>
-                            {% endfor %}
-                        </div>
+                        </section>
 
-                        <a href="{% url 'event_create' %}?book={{ book.pk }}" class="btn-premium btn-premium-light !w-full border-2 border-dashed !py-4 hover:border-black transition-all">
-                            <span class="material-symbols-outlined text-[20px]">add</span>
-                            <span class="text-sm font-medium">Add Event</span>
-                        </a>
-                    </div>
-                </section>
+                        <!-- Book Cast Widget -->
+                        <section class="bg-black text-white p-6 rounded-2xl relative overflow-hidden">
+                            <div class="relative z-10">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="font-serif text-xl text-white m-0">In This Book</h3>
+                                    <span class="material-symbols-outlined text-gray-400">group</span>
+                                </div>
+                                <div class="space-y-3">
+                                    <p class="text-sm text-gray-300 leading-relaxed font-light m-0">
+                                        This project touches <strong>{{ book.character_count }}</strong> cataloged characters across its timeline. Go to the World Codex to manage character arcs and relations.
+                                    </p>
+                                </div>
+                                <!-- Visit World Codex — triggers world codex modal -->
+                                <button type="button"
+                                    onclick="new bootstrap.Modal(document.getElementById('worldCodexModal')).show();"
+                                    class="btn-premium btn-premium-dark !w-full !bg-white/10 hover:!bg-white/20 !border-white/10 !text-white mt-4"
+                                    style="width: 100%; background-color: rgba(255,255,255,0.1) !important; color: white !important; border: 1px solid rgba(255,255,255,0.1) !important;">
+                                    Visit World Codex
+                                </button>
+                            </div>
+                            <div class="absolute -bottom-12 -right-12 w-48 h-48 bg-text-main/30 rounded-full blur-3xl"></div>
+                        </section>
 
-                <!-- Book Cast Widget -->
-                <section class="bg-black text-white p-6 rounded-2xl relative overflow-hidden">
-                    <div class="relative z-10">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="font-serif text-xl m-0">In This Book</h3>
-                            <span class="material-symbols-outlined text-gray-400">group</span>
-                        </div>
-
-                        <div class="space-y-3">
-                            <!-- In a full implementation, we would query characters linked to chapters in this book -->
-                            <p class="text-sm text-gray-300 leading-relaxed font-light m-0">
-                                This project touches <strong>{{ book.character_count }}</strong> cataloged characters
-                                across its timeline. Go to the World Codex to manage character arcs and relations.
-                            </p>
-                        </div>
-
-                        <a href="{% url 'character_list' %}" class="btn-premium btn-premium-dark !w-full !bg-white/10 hover:!bg-white/20 !border-white/10 !text-white">
-                            Visit World Codex
-                        </a>
-                    </div>
-                    <!-- Decorative blob -->
-                    <div class="absolute -bottom-12 -right-12 w-48 h-48 bg-text-main/30 rounded-full blur-3xl"></div>
-                </section>
                     </div>
                 </div>
             </div>
@@ -456,20 +561,18 @@
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Init animated progress bar
+        // Animated progress bar
         setTimeout(() => {
             document.querySelectorAll('.js-progress-bar').forEach(bar => {
                 const width = bar.getAttribute('data-width');
-                if (width) {
-                    bar.style.width = width;
-                }
+                if (width) bar.style.width = width;
             });
         }, 150);
 
-        // Deep Scan Logic mapping to the Tailwind UI modal
+        // Deep Scan Logic (kept for when it's re-enabled)
         const btnDeepScan = document.getElementById('btn-deep-scan');
         const modalEl = document.getElementById('deepScanModal');
-        const modal = new bootstrap.Modal(modalEl); // Still using Bootstrap modal JS engine!
+        const modal = new bootstrap.Modal(modalEl);
 
         const scanInit = document.getElementById('scan-init');
         const scanActive = document.getElementById('scan-active');
@@ -482,39 +585,6 @@
         const btnCloseX = document.getElementById('btn-close-scan-x');
 
         let pollInterval = null;
-
-        if (btnDeepScan) {
-            btnDeepScan.onclick = function (e) {
-                e.preventDefault();
-                // Reset modal state
-                scanInit.style.display = 'block';
-                scanActive.style.display = 'none';
-                scanComplete.style.display = 'none';
-                scanError.style.display = 'none';
-                btnCloseX.style.display = 'none';
-                progressBar.style.width = '0%'; // Reset purely visual width
-
-                modal.show();
-
-                // Trigger scan execution immediately
-                fetch('{% url "api_trigger_deep_scan" book.pk %}', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': '{{ csrf_token }}',
-                        'Content-Type': 'application/json'
-                    }
-                })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            startPolling();
-                        } else {
-                            showError(data.message);
-                        }
-                    })
-                    .catch(err => showError(err.message || 'Network error triggering scan.'));
-            };
-        }
 
         function startPolling() {
             scanInit.style.display = 'none';
@@ -559,22 +629,22 @@
             btnCloseX.style.display = 'block';
         }
 
-        // Timeline Scroll Progress Logic
+        // Timeline Scroll Progress
         const timelineContainer = document.getElementById('timeline-container-sidebar');
         const eventItems = document.querySelectorAll('.event-item');
         const progressLine = document.getElementById('timeline-progress-line');
 
         function updateTimelineScroll() {
             if (!timelineContainer || !progressLine || eventItems.length === 0) return;
-            
+
             const screenMiddle = window.innerHeight / 2;
-            let lastActiveIndex = 0; 
-            
+            let lastActiveIndex = 0;
+
             eventItems.forEach((item, index) => {
                 const rect = item.getBoundingClientRect();
                 const node = item.querySelector('.js-timeline-node');
                 const dot = item.querySelector('.js-timeline-dot');
-                
+
                 if (rect.top <= screenMiddle) {
                     lastActiveIndex = index;
                     node.classList.remove('border-border-subtle');
@@ -588,14 +658,12 @@
                 }
             });
 
-            // Ensure first node is always active if nothing else is
             const firstItem = eventItems[0];
             const firstNode = firstItem.querySelector('.js-timeline-node');
             const firstDot = firstItem.querySelector('.js-timeline-dot');
             firstNode.classList.add('border-black');
             firstDot.classList.add('bg-black');
 
-            // Update line height
             const activeItem = eventItems[lastActiveIndex];
             const activeNode = activeItem.querySelector('.js-timeline-node');
             const containerRect = timelineContainer.getBoundingClientRect();
@@ -604,14 +672,9 @@
             progressLine.style.height = `${Math.max(0, relativeTop + 12)}px`;
         }
 
-        window.addEventListener('scroll', () => {
-            requestAnimationFrame(updateTimelineScroll);
-        });
-        window.addEventListener('resize', () => {
-            requestAnimationFrame(updateTimelineScroll);
-        });
+        window.addEventListener('scroll', () => requestAnimationFrame(updateTimelineScroll));
+        window.addEventListener('resize', () => requestAnimationFrame(updateTimelineScroll));
         updateTimelineScroll();
-
     });
 </script>
 {% endblock %}
