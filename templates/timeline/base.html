@@ -13,7 +13,6 @@
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
     <link rel="stylesheet" href="{% static 'css/account-dropdown.css' %}">
     <style>
-        /* Story Timeline Builder-inspired pastel light theme */
         :root {
             --bg-body: #f5f7fb;
             --bg-surface: #ffffff;
@@ -46,6 +45,7 @@
             background-color: #f4f1ee;
             color: var(--text-body);
             -webkit-font-smoothing: antialiased;
+            zoom: 0.9;
         }
 
         /* TYPOGRAPHY */
@@ -73,7 +73,7 @@
             color: var(--text-heading) !important;
         }
         .navbar-brand i { color: var(--accent); margin-right: 6px; }
-        .dashboard-wrapper { margin-top: 40px !important; }
+        .dashboard-wrapper { margin-top: 2rem !important; }
         .dropdown-toggle { color: black !important; }
         .navbar-dark .navbar-nav .nav-link { color: var(--text-muted); font-weight: 500; font-size: 0.95rem; }
 
@@ -81,30 +81,30 @@
         .container-fluid { padding-top: 10px; }
 
         /* =============================================
-           STICKY SIDEBAR — fixed here globally
+           STICKY SIDEBAR — universal
            ============================================= */
         .sidebar {
             background-color: #f4f1ee;
-    border-right: none;
-    padding: 1.2rem 20px 0 50px;  /* reduced from 3.2rem */
-    position: sticky;
-    top: 0;
-    height: 100vh;
-    overflow: visible;
-    align-self: flex-start;
-    flex-shrink: 0;
-    min-width: 0;
+            border-right: none;
+            padding: 0.5rem 20px 0 20px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow: visible;
+            align-self: flex-start;
+            flex-shrink: 0;
+            min-width: 0;
         }
 
-        .sidebar-logo { margin-bottom: 2rem !important; }
-        .main-content { min-height: calc(100vh - 56px); padding: 2.4rem 2.6rem 3rem; }
-        .page-container { max-width: 1100px; margin: 50px auto 0; width: 100%; }
-        @media (max-width: 767px) { .main-content { padding: 1.5rem 1.2rem 2rem; } }
+        .sidebar-logo { margin-bottom: 1.5rem !important; margin-top: 0.2rem !important; }
+        .main-content { min-height: calc(100vh - 56px); padding: 2rem 2.6rem 3rem; }
+        .page-container { max-width: 1100px; margin: 0 auto; width: 100%; }
+        @media (max-width: 767px) { .main-content { padding: 1.2rem 1.2rem 2rem; } }
 
         /* SIDEBAR NAV */
         .sidebar .nav-link {
             color: var(--text-muted);
-            padding: 0.55rem 1.4rem;
+            padding: 0.4rem 1.4rem;
             margin: 0.15rem 0.9rem;
             border-radius: 999px;
             font-size: 0.92rem;
@@ -112,20 +112,71 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            white-space: nowrap;
         }
         .sidebar .nav-link i { font-size: 1rem; }
         .sidebar .nav-link.active { background-color: #fff; color: #000; }
 
-        /* SIDEBAR SEPARATOR LINES - Align with icons */
+        /* SIDEBAR SEPARATOR LINES */
         .sidebar hr {
             margin-left: calc(0.9rem + 1.4rem);
             margin-right: calc(0.9rem + 1.4rem);
             border-color: rgba(0, 0, 0, 0.35);
         }
 
-        /* Move menu down 25px */
+        /* Sidebar nav vertical position */
         .sidebar > nav.nav {
-            margin-top: 25px;
+            margin-top: 53px;
+        }
+
+        /* =============================================
+           COMING SOON HOVER BUBBLE — universal
+           ============================================= */
+        .coming-soon-hover {
+            position: relative;
+            cursor: help !important;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+        .coming-soon-hover:hover {
+            opacity: 1;
+            background-color: rgba(0, 0, 0, 0.03);
+        }
+        .coming-soon-bubble {
+            visibility: hidden;
+            width: 190px;
+            background-color: #1e293b;
+            color: #ffffff;
+            text-align: center;
+            border-radius: 12px;
+            padding: 10px 14px;
+            position: absolute;
+            z-index: 1050;
+            left: 105%;
+            top: 50%;
+            transform: translateY(-50%) translateX(-10px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            font-size: 0.75rem;
+            line-height: 1.4;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+            pointer-events: none;
+            font-weight: 500;
+        }
+        .coming-soon-bubble::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            right: 100%;
+            margin-top: -6px;
+            border-width: 6px;
+            border-style: solid;
+            border-color: transparent #1e293b transparent transparent;
+        }
+        .coming-soon-hover:hover .coming-soon-bubble {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(-50%) translateX(10px);
         }
 
         /* CARDS & PANELS */
@@ -161,14 +212,11 @@
             cursor: pointer;
             flex-shrink: 0;
         }
-
         .btn-premium:hover {
             transform: translateY(-1px) scale(1.02);
             box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
         }
-
         .btn-premium:active { transform: translateY(0) scale(1); }
-
         .btn-premium-light { background-color: #ffffff; color: #1a1a1a; border-color: #e5e5e5; }
         .btn-premium-light:hover { background-color: #f9fafb; border-color: #d1d5db; }
         .btn-premium-dark { background-color: var(--dark-universal); color: #ffffff; }
@@ -180,7 +228,6 @@
         .bg-dark { background-color: var(--dark-universal) !important; }
         .btn-dark { background-color: var(--dark-universal) !important; border-color: var(--dark-universal) !important; }
 
-        /* Fallback for standard bootstrap .btn to look consistent */
         .btn {
             border-radius: 9999px;
             padding: 10px 20px;
@@ -189,7 +236,6 @@
             font-size: 0.875rem !important;
             transition: all 0.2s ease;
         }
-
         button {
             font-family: 'Inter', sans-serif !important;
             font-weight: 600 !important;
@@ -244,33 +290,33 @@
 
     {% block full_layout %}
     <div class="container-fluid">
-        <!-- =============================================
-             STICKY SIDEBAR FIX — min-height + align-items
-             ============================================= -->
         <div class="row" style="min-height: 100vh; align-items: flex-start;">
             {% if user.is_authenticated %}
             {% block sidebar_block %}
             <div class="col-md-2 d-none d-md-block sidebar">
-                <div class="sidebar-logo text-center" style="margin-top: 30px; margin-bottom: 2rem;">
-                    <img src="{% static 'img/logo.png' %}" alt="Story Timeline Builder Logo" style="height: 4.0rem; width: auto;">
-                </div>
-                <div class="px-4 mb-4">
-                    <form action="{% url 'search_results' %}" method="GET">
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text bg-white border-end-0 rounded-start-pill py-2"><i class="bi bi-search text-muted"></i></span>
-                            <input type="text" name="q" class="form-control border-start-0 rounded-end-pill py-2 ps-0" placeholder="Search..." aria-label="Search">
-                        </div>
-                    </form>
+                <div style="margin-top: 10px; margin-bottom: 2rem; padding-left: 10px;">
+                    <img src="{% static 'img/logo.png' %}" alt="Story Timeline Builder Logo"
+                         style="height: 4.0rem !important; width: auto !important; max-height: 4.0rem !important; display: block;">
                 </div>
                 <nav class="nav flex-column">
                     <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
                     <a class="nav-link {% if 'book' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'book_list' %}"><i class="bi bi-book"></i> Manuscripts</a>
                     <a class="nav-link {% if 'character' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'character_list' %}"><i class="bi bi-people"></i> Characters</a>
                     <a class="nav-link {% if 'relationship' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'relationship_map' %}"><i class="bi bi-diagram-3"></i> Relationship Map</a>
-                    {% if request.resolver_match.url_name != 'dashboard' %}
-                    <a class="nav-link {% if request.resolver_match.url_name == 'horizontal_timeline' %}active{% endif %}" href="{% url 'horizontal_timeline' %}"><i class="bi bi-clock-history"></i> Timeline</a>
-                    <a class="nav-link {% if 'world' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'world_list' %}"><i class="bi bi-globe"></i> World Wiki</a>
-                    {% endif %}
+                    <div class="nav-link coming-soon-hover">
+                        <i class="bi bi-clock-history"></i> Timeline
+                        <div class="coming-soon-bubble">
+                            <i class="bi bi-stars text-warning me-1"></i>
+                            Timeline features will be available soon in future versions.
+                        </div>
+                    </div>
+                    <div class="nav-link coming-soon-hover">
+                        <i class="bi bi-globe"></i> World Wiki
+                        <div class="coming-soon-bubble">
+                            <i class="bi bi-stars text-warning me-1"></i>
+                            World Wiki features will be available soon in future versions.
+                        </div>
+                    </div>
                     <a class="nav-link {% if request.resolver_match.url_name == 'post_list' %}active{% endif %}" href="{% url 'post_list' %}"><i class="bi bi-journal-text"></i> Blog</a>
                     <hr class="my-3 opacity-10">
                     <a class="nav-link" href="{% url 'event_create' %}"><i class="bi bi-plus-circle"></i> New Event</a>
@@ -284,10 +330,6 @@
             {% endblock sidebar_block %}
             {% endif %}
 
-            <!-- =============================================
-                 FOOTER MOVED INSIDE THE COLUMN — keeps row
-                 alive to prevent sticky jump at bottom
-                 ============================================= -->
             <div class="col-md-{% if user.is_authenticated %}10{% else %}12{% endif %} main-content">
                 {% if messages %}
                     {% for message in messages %}
@@ -304,7 +346,6 @@
                          data-username="{{ user.username }}"
                          data-user-initial="{{ user.username|slice:':1'|upper }}"
                          data-user-role="{% if user.is_superuser %}Admin{% else %}Member{% endif %}">
-                        <!-- Account dropdown will be inserted here by JavaScript -->
                     </div>
                     {% endif %}
                     {% block content %}{% endblock %}
@@ -319,7 +360,6 @@
     </div>
     {% endblock full_layout %}
 
-    <!-- Global Project Creation Modal -->
     {% if user.is_authenticated %}
         {% include 'timeline/_project_creation_modal.html' %}
     {% endif %}

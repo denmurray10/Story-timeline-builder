@@ -39,7 +39,7 @@
         <hr class="my-4 opacity-10">
 
         <div class="blog-content" style="font-size: 1.1rem; line-height: 1.8; color: var(--text-body);">
-            {{ post.content|linebreaks }}
+            {{ post.content|safe }}
         </div>
     </div>
 </div>

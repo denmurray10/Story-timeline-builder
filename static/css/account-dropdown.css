@@ -121,7 +121,7 @@
     transition: background-color 0.2s ease, box-shadow 0.2s ease;
     min-height: auto;
     line-height: normal;
-    margin: 0.15rem 0.9rem;
+    margin-left: -1rem;
     height: auto;
     width: 220px;
 }

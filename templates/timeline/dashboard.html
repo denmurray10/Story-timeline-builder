@@ -46,22 +46,9 @@
     /* =============================================
        STICKY SIDEBAR FIX
        ============================================= */
-    .sidebar {
-        position: sticky;
-        top: 0;
-        height: 100vh;
-        overflow-y: visible;
-        align-self: flex-start;
-    }
-
-    /* Move lefthand side menu down 25px on dashboard */
-    .sidebar > nav.nav {
-        margin-top: 53px;
-    }
-    
     /* Lower main cards section by 20px */
     .main-cards-row {
-        margin-top: 20px !important;
+        margin-top: 0 !important;
     }
     
     /* Hide Architect View switcher */
@@ -90,48 +77,6 @@
         box-shadow: 0 0 0 0.25rem rgba(33, 37, 41, 0.25) !important;
     }
 
-    /* Coming Soon Hover Bubble */
-    .coming-soon-hover {
-        position: relative;
-        cursor: help !important;
-        opacity: 0.6;
-        transition: opacity 0.2s;
-    }
-    .coming-soon-hover:hover {
-        opacity: 1;
-        background-color: rgba(0, 0, 0, 0.03);
-    }
-    .coming-soon-bubble {
-        visibility: hidden;
-        width: 190px;
-        background-color: #1e293b;
-        color: #ffffff;
-        text-align: center;
-        border-radius: 12px;
-        padding: 10px 14px;
-        position: absolute;
-        z-index: 1050;
-        left: 105%;
-        top: 50%;
-        transform: translateY(-50%) translateX(-10px);
-        opacity: 0;
-        transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        font-size: 0.75rem;
-        line-height: 1.4;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
-        pointer-events: none;
-        font-weight: 500;
-    }
-    .coming-soon-bubble::after {
-        content: "";
-        position: absolute;
-        top: 50%;
-        right: 100%;
-        margin-top: -6px;
-        border-width: 6px;
-        border-style: solid;
-        border-color: transparent #1e293b transparent transparent;
-    }
     .coming-soon-hover:hover .coming-soon-bubble {
         visibility: visible;
         opacity: 1;
@@ -139,41 +84,6 @@
     }
 </style>
 {% endblock %}
-{% block sidebar_block %}
-<div class="col-md-2 d-none d-md-block sidebar">
-    <div class="sidebar-logo text-center" style="margin-top: 50px; margin-bottom: 2rem;">
-        <img src="{% static 'img/logo.png' %}" alt="Story Timeline Builder Logo" style="height: 4.0rem; width: auto;">
-    </div>
-    <nav class="nav flex-column">
-        <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
-        <a class="nav-link {% if 'book' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'book_list' %}"><i class="bi bi-book"></i> Manuscripts</a>
-        <a class="nav-link {% if 'character' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'character_list' %}"><i class="bi bi-people"></i> Characters</a>
-        <a class="nav-link {% if 'relationship' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'relationship_map' %}"><i class="bi bi-diagram-3"></i> Relationship Map</a>
-        <div class="nav-link coming-soon-hover">
-            <i class="bi bi-clock-history"></i> Timeline
-            <div class="coming-soon-bubble">
-                <i class="bi bi-stars text-warning me-1"></i>
-                Timeline features will be available soon in future versions.
-            </div>
-        </div>
-        <div class="nav-link coming-soon-hover">
-            <i class="bi bi-globe"></i> World Wiki
-            <div class="coming-soon-bubble">
-                <i class="bi bi-stars text-warning me-1"></i>
-                World Wiki features will be available soon in future versions.
-            </div>
-        </div>
-        <a class="nav-link {% if request.resolver_match.url_name == 'post_list' %}active{% endif %}" href="{% url 'post_list' %}"><i class="bi bi-journal-text"></i> Blog</a>
-        <hr class="my-3 opacity-10">
-        <a class="nav-link" href="{% url 'event_create' %}"><i class="bi bi-plus-circle"></i> New Event</a>
-        <a class="nav-link" href="{% url 'character_create' %}"><i class="bi bi-person-plus"></i> New Character</a>
-        {% if user.is_superuser %}
-        <hr class="my-3 opacity-10">
-        <a class="nav-link {% if request.resolver_match.url_name == 'staff_dashboard' %}active{% endif %}" href="{% url 'staff_dashboard' %}"><i class="bi bi-shield-lock"></i> Admin Dashboard</a>
-        {% endif %}
-    </nav>
-</div>
-{% endblock sidebar_block %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div class="d-flex align-items-center gap-3">
