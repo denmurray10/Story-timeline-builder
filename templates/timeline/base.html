@@ -363,5 +363,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <script src="{% static 'js/account-dropdown.js' %}"></script>
     {% block extra_js %}{% endblock %}
+    <!-- Hidden CSRF token for JS components -->
+    <div style="display:none">{% csrf_token %}</div>
 </body>
 </html>

@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     </a>
                     <hr class="account-divider">
                     <form action="/logout/" method="post" class="account-logout-form">
-                        <input type="hidden" name="csrfmiddlewaretoken" value="${container.dataset.csrf || getCSRFToken()}">
+                        <input type="hidden" name="csrfmiddlewaretoken" class="js-csrf-input" value="">
                         <button type="submit" class="account-menu-item account-logout">
                             <i class="bi bi-box-arrow-right"></i>
                             <span>Sign Out</span>
@@ -77,6 +77,21 @@ document.addEventListener('DOMContentLoaded', function () {
             dropdownCard.addEventListener('click', function (e) {
                 e.stopPropagation();
             });
+
+            // Set the CSRF token on load and ensure it's there on submit
+            const csrfInput = dropdownCard.querySelector('.js-csrf-input');
+            const logoutForm = dropdownCard.querySelector('.account-logout-form');
+
+            const refreshCSRF = () => {
+                const token = container.dataset.csrf || getCSRFToken();
+                if (csrfInput && token) csrfInput.value = token;
+            };
+
+            refreshCSRF();
+
+            if (logoutForm) {
+                logoutForm.addEventListener('submit', refreshCSRF);
+            }
         }
     }
 
