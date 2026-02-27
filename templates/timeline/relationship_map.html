@@ -86,8 +86,6 @@
 
     }
 
-    /* Professional Form Styling */
-
     .overlay-content {
 
         max-width: 650px;
@@ -200,8 +198,6 @@
 
     }
 
-    /* Filter Bar Area */
-
     .filter-bar {
 
         background: #f8fafc;
@@ -274,8 +270,6 @@
 
     }
 
-    /* Zoom Controls */
-
     .zoom-controls {
 
         position: absolute;
@@ -330,6 +324,198 @@
 
     }
 
+    /* Connection Detail Modal */
+
+    #connection-modal-overlay {
+
+        display: none;
+
+        position: absolute;
+
+        top: 0;
+
+        left: 0;
+
+        width: 100%;
+
+        height: 100%;
+
+        background: #fff;
+
+        z-index: 20;
+
+        overflow-y: auto;
+
+        border-radius: 12px;
+
+    }
+
+    .connection-modal-header {
+
+        background: linear-gradient(135deg, #e2e8f0 0%, #f1f5f9 100%);
+
+        padding: 2rem 2rem 3rem;
+
+        position: relative;
+
+        text-align: center;
+
+        color: #1e293b;
+
+        border-bottom: 1px solid #cbd5e1;
+
+    }
+
+    .connection-modal-avatars {
+
+        display: flex;
+
+        justify-content: center;
+
+        align-items: center;
+
+        margin-bottom: 1rem;
+
+        position: relative;
+
+        height: 90px;
+
+    }
+
+    .connection-modal-avatar {
+
+        width: 80px;
+
+        height: 80px;
+
+        border-radius: 50%;
+
+        border: 3px solid #fff;
+
+        object-fit: cover;
+
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+
+        position: absolute;
+
+    }
+
+    .connection-modal-avatar-placeholder {
+
+        width: 80px;
+
+        height: 80px;
+
+        border-radius: 50%;
+
+        border: 3px solid #fff;
+
+        background: #94a3b8;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        font-size: 1.5rem;
+
+        color: #fff;
+
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+
+        position: absolute;
+
+    }
+
+    .connection-modal-body {
+
+        padding: 2rem;
+
+        max-width: 720px;
+
+        margin: 0 auto;
+
+    }
+
+    .info-card {
+
+        background: #f8fafc;
+
+        border: 1px solid #e2e8f0;
+
+        border-radius: 12px;
+
+        padding: 1rem 1.25rem;
+
+        margin-bottom: 1rem;
+
+    }
+
+    .info-card-label {
+
+        font-size: 0.7rem;
+
+        font-weight: 700;
+
+        text-transform: uppercase;
+
+        letter-spacing: 0.05rem;
+
+        color: #94a3b8;
+
+        margin-bottom: 0.3rem;
+
+    }
+
+    .info-card-value {
+
+        font-size: 0.9rem;
+
+        color: #1e293b;
+
+    }
+
+    /* Side panel profile pic */
+
+    .side-panel-avatar {
+
+        width: 80px;
+
+        height: 80px;
+
+        border-radius: 50%;
+
+        object-fit: cover;
+
+        border: 3px solid #e2e8f0;
+
+        margin-bottom: 0.75rem;
+
+    }
+
+    .side-panel-avatar-placeholder {
+
+        width: 80px;
+
+        height: 80px;
+
+        border-radius: 50%;
+
+        background: #f1f5f9;
+
+        border: 3px solid #e2e8f0;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        margin: 0 auto 0.75rem;
+
+    }
+
 </style>
 
 {% endblock %}
@@ -341,14 +527,6 @@
     <h1><i class="bi bi-diagram-3"></i> Relationship Map</h1>
 
     <div>
-
-        <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#relationshipModal"
-
-            id="btn-quick-add">
-
-            <i class="bi bi-plus-circle"></i> Quick Link
-
-        </button>
 
         <a href="{% url 'relationship_list' %}" class="btn btn-outline-secondary">
 
@@ -364,89 +542,37 @@
 
     <div class="legend">
 
-        <div class="legend-item">
+        <div class="legend-item"><div class="legend-color" style="background: #0ea5e9;"></div> Friend</div>
 
-            <div class="legend-color" style="background: #0ea5e9;"></div> Friend
+        <div class="legend-item"><div class="legend-color" style="background: #10b981;"></div> Ally</div>
 
-        </div>
+        <div class="legend-item"><div class="legend-color" style="background: #d00e00;"></div> Enemy</div>
 
-        <div class="legend-item">
+        <div class="legend-item"><div class="legend-color" style="background: #450a0a;"></div> Nemesis</div>
 
-            <div class="legend-color" style="background: #10b981;"></div> Ally
+        <div class="legend-item"><div class="legend-color" style="background: #ff2d55;"></div> Romantic</div>
 
-        </div>
+        <div class="legend-item"><div class="legend-color" style="background: #8b5cf6;"></div> Family</div>
 
-        <div class="legend-item">
+        <div class="legend-item"><div class="legend-color" style="background: #f5b60b;"></div> Mentor</div>
 
-            <div class="legend-color" style="background: #d00e00;"></div> Enemy
+        <div class="legend-item"><div class="legend-color" style="background: #22d3ee;"></div> Protege</div>
 
-        </div>
+        <div class="legend-item"><div class="legend-color" style="background: #f97316;"></div> Rival</div>
 
-        <div class="legend-item">
+        <div class="legend-item"><div class="legend-color" style="background: #475569;"></div> Pro</div>
 
-            <div class="legend-color" style="background: #450a0a;"></div> Nemesis
+        <div class="legend-item"><div class="legend-color" style="background: #2dd4bf;"></div> Acquaintance</div>
 
-        </div>
+        <div class="legend-item"><div class="legend-color" style="background: #d946ef;"></div> Complicated</div>
 
-        <div class="legend-item">
-
-            <div class="legend-color" style="background: #ff2d55;"></div> Romantic
-
-        </div>
-
-        <div class="legend-item">
-
-            <div class="legend-color" style="background: #8b5cf6;"></div> Family
-
-        </div>
-
-        <div class="legend-item">
-
-            <div class="legend-color" style="background: #f5b60b;"></div> Mentor
-
-        </div>
-
-        <div class="legend-item">
-
-            <div class="legend-color" style="background: #22d3ee;"></div> Protege
-
-        </div>
-
-        <div class="legend-item">
-
-            <div class="legend-color" style="background: #f97316;"></div> Rival
-
-        </div>
-
-        <div class="legend-item">
-
-            <div class="legend-color" style="background: #475569;"></div> Pro
-
-        </div>
-
-        <div class="legend-item">
-
-            <div class="legend-color" style="background: #2dd4bf;"></div> Acquaintance
-
-        </div>
-
-        <div class="legend-item">
-
-            <div class="legend-color" style="background: #d946ef;"></div> Complicated
-
-        </div>
-
-        <div class="legend-item">
-
-            <div class="legend-color" style="background: #9ca3af;"></div> Neutral
-
-        </div>
+        <div class="legend-item"><div class="legend-color" style="background: #9ca3af;"></div> Neutral</div>
 
     </div>
 
     <div class="text-muted small">
 
-        <i class="bi bi-info-circle"></i> <b>Tip:</b> Click a relationship line (edge) to edit the connection.
+        <i class="bi bi-info-circle"></i> <b>Tip:</b> Click a node for character info. Click a line to view the connection.
 
     </div>
 
@@ -456,11 +582,7 @@
 
     <span class="text-muted small fw-bold text-uppercase me-2"><i class="bi bi-filter"></i> Filter:</span>
 
-    <div id="filter-pills" class="d-flex flex-wrap gap-2">
-
-        <!-- JS will populate these -->
-
-    </div>
+    <div id="filter-pills" class="d-flex flex-wrap gap-2"></div>
 
 </div>
 
@@ -490,7 +612,7 @@
 
             </div>
 
-            <!-- Overlay Modal -->
+            <!-- Edit Relationship Form Overlay -->
 
             <div id="relationship-overlay" class="position-absolute top-0 start-0 w-100 h-100 bg-white"
 
@@ -520,8 +642,6 @@
 
                             <input type="hidden" name="id" id="rel-id">
 
-                            <!-- Characters Header Section -->
-
                             <div id="section-header-characters" class="overlay-form-card mb-4 bg-light border-0">
 
                                 <div class="row g-3 align-items-center">
@@ -530,9 +650,7 @@
 
                                         <label class="form-label-pro">Character A</label>
 
-                                        <select name="character_a" id="rel-char-a" class="form-select form-select-pro"
-
-                                            required>
+                                        <select name="character_a" id="rel-char-a" class="form-select form-select-pro" required>
 
                                             {% for char in characters %}
 
@@ -554,9 +672,7 @@
 
                                         <label class="form-label-pro">Character B</label>
 
-                                        <select name="character_b" id="rel-char-b" class="form-select form-select-pro"
-
-                                            required>
+                                        <select name="character_b" id="rel-char-b" class="form-select form-select-pro" required>
 
                                             {% for char in characters %}
 
@@ -572,8 +688,6 @@
 
                             </div>
 
-                            <!-- Sections (Visible logic handled via JS) -->
-
                             <!-- Core Section -->
 
                             <div id="section-core" class="form-section">
@@ -586,41 +700,35 @@
 
                                         <label class="form-label-pro">Relationship Type</label>
 
-                                        <div class="input-group">
+                                        <select name="relationship_type" id="rel-type" class="form-select form-select-pro" required>
 
-                                            <select name="relationship_type" id="rel-type"
+                                            <option value="friend">Friend</option>
 
-                                                class="form-select form-select-pro" required>
+                                            <option value="ally">Ally</option>
 
-                                                <option value="friend">Friend</option>
+                                            <option value="enemy">Enemy</option>
 
-                                                <option value="ally">Ally</option>
+                                            <option value="nemesis">Nemesis</option>
 
-                                                <option value="enemy">Enemy</option>
+                                            <option value="romantic">Romantic</option>
 
-                                                <option value="nemesis">Nemesis</option>
+                                            <option value="family">Family</option>
 
-                                                <option value="romantic">Romantic</option>
+                                            <option value="mentor">Mentor</option>
 
-                                                <option value="family">Family</option>
+                                            <option value="protege">Protege / Apprentice</option>
 
-                                                <option value="mentor">Mentor</option>
+                                            <option value="rival">Rival</option>
 
-                                                <option value="protege">Protege / Apprentice</option>
+                                            <option value="professional">Professional</option>
 
-                                                <option value="rival">Rival</option>
+                                            <option value="acquaintance">Acquaintance</option>
 
-                                                <option value="professional">Professional</option>
+                                            <option value="complicated">Complicated / Ambiguous</option>
 
-                                                <option value="acquaintance">Acquaintance</option>
+                                            <option value="neutral">Neutral</option>
 
-                                                <option value="complicated">Complicated / Ambiguous</option>
-
-                                                <option value="neutral">Neutral</option>
-
-                                            </select>
-
-                                        </div>
+                                        </select>
 
                                     </div>
 
@@ -668,9 +776,7 @@
 
                                             <label class="form-label-pro">Intensity / Strength</label>
 
-                                            <span id="strength-val"
-
-                                                class="badge bg-light text-dark border px-2 py-1">5</span>
+                                            <span id="strength-val" class="badge bg-light text-dark border px-2 py-1">5</span>
 
                                         </div>
 
@@ -684,9 +790,7 @@
 
                                             <label class="form-label-pro">Trust Level</label>
 
-                                            <span id="trust-val"
-
-                                                class="badge bg-light text-dark border px-2 py-1">5</span>
+                                            <span id="trust-val" class="badge bg-light text-dark border px-2 py-1">5</span>
 
                                         </div>
 
@@ -700,9 +804,7 @@
 
                                             <label class="form-label-pro">First Impression</label>
 
-                                            <textarea id="rel-first-impression" class="form-control form-control-pro"
-
-                                                rows="2" placeholder="Initial perception..."></textarea>
+                                            <textarea id="rel-first-impression" class="form-control form-control-pro" rows="2" placeholder="Initial perception..."></textarea>
 
                                         </div>
 
@@ -710,9 +812,7 @@
 
                                             <label class="form-label-pro">Shared Secret</label>
 
-                                            <textarea id="rel-shared-secret" class="form-control form-control-pro"
-
-                                                rows="2" placeholder="What only they know..."></textarea>
+                                            <textarea id="rel-shared-secret" class="form-control form-control-pro" rows="2" placeholder="What only they know..."></textarea>
 
                                         </div>
 
@@ -724,9 +824,7 @@
 
                                             <label class="form-label-pro">Relationship Predictability</label>
 
-                                            <span id="predictability-val"
-
-                                                class="badge bg-light text-dark border px-2 py-1">5</span>
+                                            <span id="predictability-val" class="badge bg-light text-dark border px-2 py-1">5</span>
 
                                         </div>
 
@@ -746,9 +844,7 @@
 
                                         <label class="form-label-pro">Core Vulnerability</label>
 
-                                        <textarea id="rel-vulnerability" class="form-control form-control-pro" rows="2"
-
-                                            placeholder="What they hide or their mutual weakness..."></textarea>
+                                        <textarea id="rel-vulnerability" class="form-control form-control-pro" rows="2" placeholder="What they hide or their mutual weakness..."></textarea>
 
                                     </div>
 
@@ -756,9 +852,7 @@
 
                                         <label class="form-label-pro">Major Shared Moments</label>
 
-                                        <textarea id="rel-moments" class="form-control form-control-pro" rows="2"
-
-                                            placeholder="Summary of defining interactions..."></textarea>
+                                        <textarea id="rel-moments" class="form-control form-control-pro" rows="2" placeholder="Summary of defining interactions..."></textarea>
 
                                     </div>
 
@@ -766,9 +860,7 @@
 
                                         <label class="form-label-pro">General Description</label>
 
-                                        <textarea id="rel-desc" class="form-control form-control-pro" rows="2"
-
-                                            placeholder="Describe their history and current bond..."></textarea>
+                                        <textarea id="rel-desc" class="form-control form-control-pro" rows="2" placeholder="Describe their history and current bond..."></textarea>
 
                                     </div>
 
@@ -780,9 +872,7 @@
 
                             <div id="section-dynamics" class="form-section">
 
-                                <h6 class="form-section-header"><i class="bi bi-lightning me-2"></i> Power & Dynamics
-
-                                </h6>
+                                <h6 class="form-section-header"><i class="bi bi-lightning me-2"></i> Power & Dynamics</h6>
 
                                 <div class="overlay-form-card">
 
@@ -806,9 +896,7 @@
 
                                         <label class="form-label-pro">Deep Source of Conflict</label>
 
-                                        <textarea id="rel-conflict" class="form-control form-control-pro" rows="3"
-
-                                            placeholder="What specifically creates friction between them?"></textarea>
+                                        <textarea id="rel-conflict" class="form-control form-control-pro" rows="3" placeholder="What specifically creates friction between them?"></textarea>
 
                                     </div>
 
@@ -816,9 +904,7 @@
 
                                         <label class="form-label-pro">Evolution over Time</label>
 
-                                        <textarea id="rel-evolution" class="form-control form-control-pro" rows="3"
-
-                                            placeholder="How has this connection changed through the book?"></textarea>
+                                        <textarea id="rel-evolution" class="form-control form-control-pro" rows="3" placeholder="How has this connection changed through the book?"></textarea>
 
                                     </div>
 
@@ -830,33 +916,23 @@
 
                             <div id="section-goals" class="form-section">
 
-                                <h6 class="form-section-header"><i class="bi bi-bullseye me-2"></i> Intentions & Goals
-
-                                </h6>
+                                <h6 class="form-section-header"><i class="bi bi-bullseye me-2"></i> Intentions & Goals</h6>
 
                                 <div class="overlay-form-card">
 
                                     <div class="mb-4">
 
-                                        <label class="form-label-pro" id="label-a-wants">What Character A Wants from
+                                        <label class="form-label-pro" id="label-a-wants">What Character A Wants from B</label>
 
-                                            B</label>
-
-                                        <textarea id="rel-a-wants" class="form-control form-control-pro" rows="4"
-
-                                            placeholder="Their desires, demands, or needs regarding the other..."></textarea>
+                                        <textarea id="rel-a-wants" class="form-control form-control-pro" rows="4" placeholder="Their desires, demands, or needs regarding the other..."></textarea>
 
                                     </div>
 
                                     <div class="mb-0">
 
-                                        <label class="form-label-pro" id="label-b-wants">What Character B Wants from
+                                        <label class="form-label-pro" id="label-b-wants">What Character B Wants from A</label>
 
-                                            A</label>
-
-                                        <textarea id="rel-b-wants" class="form-control form-control-pro" rows="4"
-
-                                            placeholder="Their desires, demands, or needs regarding the other..."></textarea>
+                                        <textarea id="rel-b-wants" class="form-control form-control-pro" rows="4" placeholder="Their desires, demands, or needs regarding the other..."></textarea>
 
                                     </div>
 
@@ -866,9 +942,7 @@
 
                             <div class="d-flex justify-content-between align-items-center mt-5">
 
-                                <button type="button" class="btn btn-outline-danger btn-sm border-0" id="btn-rel-delete"
-
-                                    style="display:none;">
+                                <button type="button" class="btn btn-outline-danger btn-sm border-0" id="btn-rel-delete" style="display:none;">
 
                                     <i class="bi bi-trash me-1"></i> Delete Relationship
 
@@ -876,13 +950,9 @@
 
                                 <div class="d-flex gap-2 ms-auto">
 
-                                    <button type="button" class="btn btn-light px-4 py-2 rounded-pill fw-bold"
+                                    <button type="button" class="btn btn-light px-4 py-2 rounded-pill fw-bold" id="btn-cancel-overlay">Cancel</button>
 
-                                        id="btn-cancel-overlay">Cancel</button>
-
-                                    <button type="button" class="btn btn-dark px-4 py-2 rounded-pill fw-bold"
-
-                                        id="btn-rel-save">Save Changes</button>
+                                    <button type="button" class="btn btn-dark px-4 py-2 rounded-pill fw-bold" id="btn-rel-save">Save Changes</button>
 
                                 </div>
 
@@ -896,9 +966,95 @@
 
             </div>
 
+            <!-- Connection Detail Modal (full map overlay, read view) -->
+
+            <div id="connection-modal-overlay">
+
+                <div class="connection-modal-header">
+
+                    <button type="button" id="btn-close-connection-modal"
+
+                        style="position: absolute; top: 1rem; right: 1rem; background: rgba(0,0,0,0.08); border: none; color: #1e293b; width: 36px; height: 36px; border-radius: 50%; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s;"
+
+                        onmouseover="this.style.background='rgba(0,0,0,0.15)'"
+
+                        onmouseout="this.style.background='rgba(0,0,0,0.08)'">
+
+                        <i class="bi bi-x-lg"></i>
+
+                    </button>
+
+                    <div class="connection-modal-avatars" id="cm-avatars"></div>
+
+                    <h4 class="fw-bold mb-1" id="cm-title"></h4>
+
+                    <p class="mb-0 small text-muted" id="cm-subtitle"></p>
+
+                </div>
+
+                <div class="connection-modal-body">
+
+                    <div class="d-flex gap-2 justify-content-center flex-wrap mb-4" id="cm-badges"></div>
+
+                    <div class="row g-3 mb-3" id="cm-action-buttons"></div>
+
+                    <div id="cm-narrative" style="display:none;">
+
+                        <div class="info-card">
+
+                            <div class="info-card-label"><i class="bi bi-arrow-repeat me-1"></i> Narrative Arc</div>
+
+                            <div class="info-card-value" id="cm-narrative-text"></div>
+
+                        </div>
+
+                    </div>
+
+                    <div id="cm-secret" style="display:none;">
+
+                        <div class="info-card" style="background: #f0f7ff; border-color: #dbeafe;">
+
+                            <div class="info-card-label" style="color: #3b82f6;"><i class="bi bi-lock me-1"></i> Shared Secret</div>
+
+                            <div class="info-card-value fst-italic" id="cm-secret-text"></div>
+
+                        </div>
+
+                    </div>
+
+                    <div id="cm-vulnerability" style="display:none;">
+
+                        <div class="info-card" style="background: #fffaf0; border-color: #fef3c7;">
+
+                            <div class="info-card-label" style="color: #d97706;"><i class="bi bi-shield-exclamation me-1"></i> Mutual Vulnerability</div>
+
+                            <div class="info-card-value" id="cm-vulnerability-text"></div>
+
+                        </div>
+
+                    </div>
+
+                    <div id="cm-conflict" style="display:none;">
+
+                        <div class="info-card" style="background: #fff5f5; border-color: #fee2e2;">
+
+                            <div class="info-card-label" style="color: #ef4444;"><i class="bi bi-exclamation-triangle me-1"></i> Core Friction</div>
+
+                            <div class="info-card-value" id="cm-conflict-text"></div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
         </div>
 
     </div>
+
+    <!-- Right-hand Character Info Panel -->
 
     <div class="col-lg-3">
 
@@ -908,325 +1064,19 @@
 
                 <i class="bi bi-cursor-fill fs-1 d-block mb-3"></i>
 
-                <p>Click a character node or relationship line for details</p>
+                <p>Click a character node for details</p>
 
             </div>
 
         </div>
 
     </div>
-
-</div>
-
-<!-- Relationship Edit/Create Modal -->
-
-<div class="modal fade" id="relationshipModal" tabindex="-1" aria-hidden="true">
-
-    <div class="modal-dialog">
-
-        <div class="modal-content shadow">
-
-            <div class="modal-header bg-light">
-
-                <h5 class="modal-title" id="relModalTitle">Manage Relationship</h5>
-
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-
-            </div>
-
-            <div class="modal-body">
-
-                <form id="relationship-form">
-
-                    {% csrf_token %}
-
-                    <input type="hidden" name="id" id="rel-id">
-
-                    <div class="row mb-3">
-
-                        <div class="col-md-6">
-
-                            <label class="form-label small fw-bold">Character A</label>
-
-                            <select name="character_a" id="rel-char-a" class="form-select" required>
-
-                                {% for char in characters %}
-
-                                <option value="{{ char.id }}">{{ char.name }}</option>
-
-                                {% endfor %}
-
-                            </select>
-
-                        </div>
-
-                        <div class="col-md-6">
-
-                            <label class="form-label small fw-bold">Character B</label>
-
-                            <select name="character_b" id="rel-char-b" class="form-select" required>
-
-                                {% for char in characters %}
-
-                                <option value="{{ char.id }}">{{ char.name }}</option>
-
-                                {% endfor %}
-
-                            </select>
-
-                        </div>
-
-                    </div>
-
-            </div>
-
-            <!-- Tabs -->
-
-            <ul class="nav nav-tabs mb-3" id="relTabs" role="tablist">
-
-                <li class="nav-item" role="presentation">
-
-                    <button class="nav-link active" id="core-tab" data-bs-toggle="tab" data-bs-target="#core"
-
-                        type="button" role="tab">Core</button>
-
-                </li>
-
-                <li class="nav-item" role="presentation">
-
-                    <button class="nav-link" id="dynamics-tab" data-bs-toggle="tab" data-bs-target="#dynamics"
-
-                        type="button" role="tab">Dynamics</button>
-
-                </li>
-
-                <li class="nav-item" role="presentation">
-
-                    <button class="nav-link" id="goals-tab" data-bs-toggle="tab" data-bs-target="#goals" type="button"
-
-                        role="tab">Goals</button>
-
-                </li>
-
-            </ul>
-
-            <div class="tab-content" id="relTabsContent">
-
-                <!-- Tab 1: Core Details -->
-
-                <div class="tab-pane fade show active" id="core" role="tabpanel">
-
-                    <div class="row g-2 mb-3">
-
-                        <div class="col-6">
-
-                            <label class="form-label small fw-bold">Type</label>
-
-                            <select name="relationship_type" id="rel-type" class="form-select">
-
-                                <option value="friend">Friend</option>
-
-                                <option value="ally">Ally</option>
-
-                                <option value="enemy">Enemy</option>
-
-                                <option value="nemesis">Nemesis</option>
-
-                                <option value="romantic">Romantic</option>
-
-                                <option value="family">Family</option>
-
-                                <option value="mentor">Mentor</option>
-
-                                <option value="protege">Protege</option>
-
-                                <option value="professional">Professional</option>
-
-                                <option value="rival">Rival</option>
-
-                                <option value="acquaintance">Acquaintance</option>
-
-                                <option value="complicated">Complicated</option>
-
-                                <option value="neutral">Neutral</option>
-
-                            </select>
-
-                        </div>
-
-                        <div class="col-6">
-
-                            <label class="form-label small fw-bold">Status</label>
-
-                            <select name="relationship_status" id="rel-status" class="form-select">
-
-                                <option value="active">Active</option>
-
-                                <option value="estranged">Estranged</option>
-
-                                <option value="deceased">Deceased</option>
-
-                                <option value="unresolved">Unresolved</option>
-
-                            </select>
-
-                        </div>
-
-                    </div>
-
-                    <div class="mb-3">
-
-                        <label class="form-label small fw-bold">Visibility</label>
-
-                        <select name="visibility" id="rel-visibility" class="form-select">
-
-                            <option value="public">Public Knowledge</option>
-
-                            <option value="secret">Secret</option>
-
-                            <option value="rumored">Rumored/Suspected</option>
-
-                        </select>
-
-                    </div>
-
-                    <div class="mb-3">
-
-                        <label class="form-label small fw-bold d-flex justify-content-between">
-
-                            <span>Strength (Intensity)</span> <span id="strength-val" class="text-muted">5</span>
-
-                        </label>
-
-                        <input type="range" name="strength" id="rel-strength" class="form-range" min="1" max="10"
-
-                            step="1">
-
-                    </div>
-
-                    <div class="mb-3">
-
-                        <label class="form-label small fw-bold d-flex justify-content-between">
-
-                            <span>Trust Level</span> <span id="trust-val" class="text-muted">5</span>
-
-                        </label>
-
-                        <input type="range" name="trust_level" id="rel-trust" class="form-range" min="1" max="10"
-
-                            step="1">
-
-                    </div>
-
-                </div>
-
-                <!-- Tab 2: Dynamics -->
-
-                <div class="tab-pane fade" id="dynamics" role="tabpanel">
-
-                    <div class="mb-3">
-
-                        <label class="form-label small fw-bold">Power Dynamic</label>
-
-                        <select name="power_dynamic" id="rel-power" class="form-select">
-
-                            <option value="balanced">Balanced (=)</option>
-
-                            <option value="a_dominant">Char A Dominant (>)</option>
-
-                            <option value="b_dominant">Char B Dominant (<)< /option>
-
-                        </select>
-
-                    </div>
-
-                    <div class="mb-3">
-
-                        <label class="form-label small fw-bold">Conflict Source</label>
-
-                        <input type="text" name="conflict_source" id="rel-conflict" class="form-control"
-
-                            placeholder="What drives the tension?">
-
-                    </div>
-
-                    <div class="mb-3">
-
-                        <label class="form-label small fw-bold">Evolution Notes</label>
-
-                        <textarea name="evolution" id="rel-evolution" class="form-control" rows="2"
-
-                            placeholder="e.g. Strangers -> Allies -> Rivals"></textarea>
-
-                    </div>
-
-                    <div class="mb-3">
-
-                        <label class="form-label small fw-bold">Description</label>
-
-                        <textarea name="description" id="rel-desc" class="form-control" rows="2"
-
-                            placeholder="Summary of their bond"></textarea>
-
-                    </div>
-
-                </div>
-
-                <!-- Tab 3: Goals -->
-
-                <div class="tab-pane fade" id="goals" role="tabpanel">
-
-                    <div class="mb-3">
-
-                        <label class="form-label small fw-bold">What Character A Wants</label>
-
-                        <textarea name="character_a_wants" id="rel-a-wants" class="form-control" rows="3"
-
-                            placeholder="Goals regarding Character B"></textarea>
-
-                    </div>
-
-                    <div class="mb-3">
-
-                        <label class="form-label small fw-bold">What Character B Wants</label>
-
-                        <textarea name="character_b_wants" id="rel-b-wants" class="form-control" rows="3"
-
-                            placeholder="Goals regarding Character A"></textarea>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-            </form>
-
-        </div>
-
-        <div class="modal-footer bg-light">
-
-            <button type="button" class="btn btn-sm btn-outline-danger me-auto" id="btn-rel-delete"
-
-                style="display:none;">Delete</button>
-
-            <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
-
-            <button type="button" class="btn btn-sm btn-dark" id="btn-rel-save">Save changes</button>
-
-        </div>
-
-    </div>
-
-</div>
 
 </div>
 
 {% endblock %}
 
 {% block extra_js %}
-
-<!-- Vis.js via CDN -->
 
 <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
 
@@ -1237,8 +1087,6 @@
         const container = document.getElementById('relationship-network');
 
         const detailsPanel = document.getElementById('selection-details');
-
-        // Fetch data from API
 
         fetch('{% url "api_relationship_data" %}')
 
@@ -1266,6 +1114,16 @@
 
                 }
 
+                // Build a fast lookup of profile pics by node id
+
+                const profilePicMap = {};
+
+                data.nodes.forEach(n => {
+
+                    if (n.image) { profilePicMap[n.id] = n.image; }
+
+                });
+
                 const options = {
 
                     nodes: {
@@ -1274,13 +1132,7 @@
 
                         size: 25,
 
-                        font: {
-
-                            size: 14,
-
-                            color: '#1f2937'
-
-                        },
+                        font: { size: 14, color: '#1f2937' },
 
                         borderWidth: 2,
 
@@ -1294,25 +1146,11 @@
 
                         colour: { inherit: 'from' },
 
-                        smooth: {
+                        smooth: { type: 'continuous' },
 
-                            type: 'continuous'
+                        font: { size: 10, align: 'middle' },
 
-                        },
-
-                        font: {
-
-                            size: 10,
-
-                            align: 'middle'
-
-                        },
-
-                        arrows: {
-
-                            to: { enabled: true, scaleFactor: 0.5 }
-
-                        }
+                        arrows: { to: { enabled: true, scaleFactor: 0.5 } }
 
                     },
 
@@ -1320,23 +1158,11 @@
 
                         stabilization: true,
 
-                        barnesHut: {
-
-                            gravitationalConstant: -2000,
-
-                            springLength: 200
-
-                        }
+                        barnesHut: { gravitationalConstant: -2000, springLength: 200 }
 
                     },
 
-                    interaction: {
-
-                        hover: true,
-
-                        tooltipDelay: 200
-
-                    }
+                    interaction: { hover: true, tooltipDelay: 200 }
 
                 };
 
@@ -1347,8 +1173,6 @@
                 const filterPillsContainer = document.getElementById('filter-pills');
 
                 let activeFilters = new Set();
-
-                // Store original sets for quick reference
 
                 const originalNodes = JSON.parse(JSON.stringify(data.nodes));
 
@@ -1384,21 +1208,9 @@
 
                     } else {
 
-                        // Filter nodes: include explicitly selected nodes
-
-                        // or nodes connected to selected nodes (to show their relationships)
-
                         const filteredNodes = originalNodes.filter(n => {
 
-                            const isMatched = activeFilters.has(n.id);
-
-                            // If we want to show ONLY connections between selected, stop here.
-
-                            // But usually, if I select "Leo", I want to see Leo and everyone he connects to.
-
-                            if (isMatched) return true;
-
-                            // Check if this node is connected to any active filter node
+                            if (activeFilters.has(n.id)) return true;
 
                             return originalEdges.some(e =>
 
@@ -1410,8 +1222,6 @@
 
                         });
 
-                        // Filter edges: must have at least one end in the active filters
-
                         const filteredEdges = originalEdges.filter(e =>
 
                             activeFilters.has(e.from) || activeFilters.has(e.to)
@@ -1422,21 +1232,9 @@
 
                     }
 
-                    // Update Pill UI
+                    filterPillsContainer.querySelectorAll('.filter-pill').forEach(p => {
 
-                    const pills = filterPillsContainer.querySelectorAll('.filter-pill');
-
-                    pills.forEach(p => {
-
-                        if (activeFilters.has(parseInt(p.dataset.id))) {
-
-                            p.classList.add('active');
-
-                        } else {
-
-                            p.classList.remove('active');
-
-                        }
+                        p.classList.toggle('active', activeFilters.has(parseInt(p.dataset.id)));
 
                     });
 
@@ -1446,25 +1244,129 @@
 
                     const id = parseInt(nodeId);
 
-                    if (activeFilters.has(id)) {
-
-                        activeFilters.delete(id);
-
-                    } else {
-
-                        activeFilters.add(id);
-
-                    }
+                    if (activeFilters.has(id)) { activeFilters.delete(id); } else { activeFilters.add(id); }
 
                     applyFilter();
 
                 }
 
+                // --- CONNECTION MODAL ---
+
+                const connectionModal = document.getElementById('connection-modal-overlay');
+
+                document.getElementById('btn-close-connection-modal').onclick = () => {
+
+                    connectionModal.style.display = 'none';
+
+                };
+
+                function avatarHtml(char, leftOffset, zIndex) {
+
+                    // Try profile_pic_url from the node data directly
+
+                    const pic = char.profile_pic_url || profilePicMap[char.id] || null;
+
+                    const style = `left: calc(50% + ${leftOffset}px); z-index: ${zIndex};`;
+
+                    if (pic) {
+
+                        return `<img src="${pic}" class="connection-modal-avatar" style="${style}" alt="${char.label}" onerror="this.outerHTML='<div class=\\'connection-modal-avatar-placeholder\\' style=\\'${style}\\'><i class=\\'bi bi-person\\'></i></div>'">`;
+
+                    }
+
+                    return `<div class="connection-modal-avatar-placeholder" style="${style}"><i class="bi bi-person"></i></div>`;
+
+                }
+
+                function openConnectionModal(edge, charA, charB) {
+
+                    document.getElementById('cm-avatars').innerHTML =
+
+                        avatarHtml(charA, -55, 1) + avatarHtml(charB, -5, 2);
+
+                    document.getElementById('cm-title').innerText = edge.label;
+
+                    document.getElementById('cm-subtitle').innerHTML =
+
+                        `Between <strong>${charA.label}</strong> &amp; <strong>${charB.label}</strong>`;
+
+                    document.getElementById('cm-badges').innerHTML = `
+
+                        <span class="badge bg-light text-dark border px-3 py-2">${edge.status || 'Active'}</span>
+
+                        <span class="badge bg-light text-dark border px-3 py-2">${edge.visibility || 'Public'}</span>
+
+                        <span class="badge bg-dark text-white px-3 py-2">${edge.strength || 5}/10 Intensity</span>
+
+                        <span class="badge bg-light text-dark border px-3 py-2">Trust: ${edge.trust_level || 5}/10</span>
+
+                    `;
+
+                    document.getElementById('cm-action-buttons').innerHTML = `
+
+                        <div class="col-6">
+
+                            <button class="btn btn-profile-style w-100 py-2 rounded-pill"
+
+                                onclick="openEditFromConnectionModal(${edge.id}, 'core')">
+
+                                <i class="bi bi-heart me-1"></i> Core Detail
+
+                            </button>
+
+                        </div>
+
+                        <div class="col-6">
+
+                            <button class="btn btn-profile-style w-100 py-2 rounded-pill"
+
+                                onclick="openEditFromConnectionModal(${edge.id}, 'dynamics')">
+
+                                <i class="bi bi-lightning me-1"></i> Power Dynamics
+
+                            </button>
+
+                        </div>
+
+                    `;
+
+                    const narrativeText = edge.evolution || edge.title || '';
+
+                    document.getElementById('cm-narrative').style.display = narrativeText ? 'block' : 'none';
+
+                    document.getElementById('cm-narrative-text').innerText = narrativeText;
+
+                    document.getElementById('cm-secret').style.display = edge.shared_secret ? 'block' : 'none';
+
+                    document.getElementById('cm-secret-text').innerText = edge.shared_secret ? `"${edge.shared_secret}"` : '';
+
+                    document.getElementById('cm-vulnerability').style.display = edge.vulnerability ? 'block' : 'none';
+
+                    document.getElementById('cm-vulnerability-text').innerText = edge.vulnerability ? `"${edge.vulnerability}"` : '';
+
+                    document.getElementById('cm-conflict').style.display = edge.conflict_source ? 'block' : 'none';
+
+                    document.getElementById('cm-conflict-text').innerText = edge.conflict_source || '';
+
+                    connectionModal.style.display = 'block';
+
+                    connectionModal.scrollTop = 0;
+
+                }
+
+                window.openEditFromConnectionModal = function (edgeId, section) {
+
+                    connectionModal.style.display = 'none';
+
+                    const edge = data.edges.find(e => e.id === edgeId);
+
+                    if (edge) openModal({ ...edge, type_key: edge.type_key || edge.label.toLowerCase() }, section);
+
+                };
+
+                // --- EDIT OVERLAY ---
+
                 const overlay = document.getElementById('relationship-overlay');
-
-                const overlayTitle = document.getElementById('overlayTitle');
-
-                const relForm = document.getElementById('relationship-form');
 
                 const relIdInput = document.getElementById('rel-id');
 
@@ -1510,62 +1412,27 @@
 
                 const predictabilityVal = document.getElementById('predictability-val');
 
+                const overlayTitle = document.getElementById('overlayTitle');
+
                 const btnSave = document.getElementById('btn-rel-save');
 
                 const btnDelete = document.getElementById('btn-rel-delete');
-                const btnQuickAdd = document.getElementById('btn-quick-add');
-                const btnCloseOverlay = document.getElementById('btn-close-overlay');
-                const btnCancelOverlay = document.getElementById('btn-cancel-overlay');
-                const btnZoomIn = document.getElementById('btn-zoom-in');
-                const btnZoomOut = document.getElementById('btn-zoom-out');
-                // Initial build
-                populateFilterPills();
 
-                // Auto-select character from URL query param (e.g. ?character=3)
-                const urlParams = new URLSearchParams(window.location.search);
-                const preselect = urlParams.get('character');
-                if (preselect) {
-                    const charId = parseInt(preselect);
-                    if (originalNodes.some(n => n.id === charId)) {
-                        activeFilters.add(charId);
-                        applyFilter();
-                    }
-                }
+                relStrength.oninput = () => strengthVal.innerText = relStrength.value;
 
-                // Zoom Logic
-                btnZoomIn.onclick = () => {
-                    const currentScale = network.getScale();
-                    network.moveTo({
-                        scale: currentScale * 1.5,
-                        animation: { duration: 300 }
-                    });
-                };
+                relTrust.oninput = () => trustVal.innerText = relTrust.value;
 
-                btnZoomOut.onclick = () => {
+                relPredictability.oninput = () => predictabilityVal.innerText = relPredictability.value;
 
-                    const currentScale = network.getScale();
+                document.getElementById('btn-close-overlay').onclick = closeOverlay;
 
-                    network.moveTo({
+                document.getElementById('btn-cancel-overlay').onclick = closeOverlay;
 
-                        scale: currentScale * 0.7,
+                function closeOverlay() { overlay.style.display = 'none'; }
 
-                        animation: { duration: 300 }
-
-                    });
-
-                };
-
-                // const relModal = new bootstrap.Modal(document.getElementById('relationshipModal')); // Removed
-
-                // Overlay Toggle Logic
-
-                function openModal(data = null, section = 'core') {
-
-                    // Hide all sections first
+                function openModal(edgeData = null, section = 'core') {
 
                     document.querySelectorAll('.form-section').forEach(s => s.style.display = 'none');
-
-                    // Show the requested section
 
                     const targetSection = document.getElementById(`section-${section}`);
 
@@ -1585,39 +1452,29 @@
 
                         document.getElementById('label-b-wants').innerText = `What ${nameB} Wants from ${nameA}`;
 
-                        if (data) {
+                        overlaySub.innerHTML = edgeData
 
-                            overlaySub.innerHTML = `Relating <strong>${nameA}</strong> and <strong>${nameB}</strong>`;
+                            ? `Relating <strong>${nameA}</strong> and <strong>${nameB}</strong>`
 
-                        } else {
-
-                            overlaySub.innerText = "Refine the connection between your characters.";
-
-                        }
+                            : "Refine the connection between your characters.";
 
                     }
 
-                    if (data) {
+                    if (edgeData) {
 
-                        relIdInput.value = data.id;
+                        relIdInput.value = edgeData.id;
 
-                        relCharA.value = data.from;
+                        relCharA.value = edgeData.from;
 
-                        relCharB.value = data.to;
-
-                        // Hide character selector if editing specific relationship
+                        relCharB.value = edgeData.to;
 
                         if (charHeader) charHeader.style.display = 'none';
 
-                        // Handle type key mapping
-
-                        let typeVal = data.type_key || 'neutral';
+                        let typeVal = edgeData.type_key || 'neutral';
 
                         if (![...relType.options].some(o => o.value === typeVal)) {
 
-                            // Try to find by text if key doesn't match
-
-                            const found = [...relType.options].find(o => o.text.toLowerCase() === data.label.toLowerCase());
+                            const found = [...relType.options].find(o => o.text.toLowerCase() === edgeData.label.toLowerCase());
 
                             if (found) typeVal = found.value;
 
@@ -1625,41 +1482,41 @@
 
                         relType.value = typeVal;
 
-                        relDesc.value = data.title || '';
+                        relDesc.value = edgeData.title || '';
 
-                        relStrength.value = data.strength || 5;
+                        relStrength.value = edgeData.strength || 5;
 
-                        strengthVal.innerText = data.strength || 5;
+                        strengthVal.innerText = edgeData.strength || 5;
 
-                        relTrust.value = data.trust_level || 5;
+                        relTrust.value = edgeData.trust_level || 5;
 
-                        trustVal.innerText = data.trust_level || 5;
+                        trustVal.innerText = edgeData.trust_level || 5;
 
-                        relStatus.value = data.status || 'active';
+                        relStatus.value = edgeData.status || 'active';
 
-                        relVisibility.value = data.visibility || 'public';
+                        relVisibility.value = edgeData.visibility || 'public';
 
-                        relPower.value = data.power_dynamic || 'balanced';
+                        relPower.value = edgeData.power_dynamic || 'balanced';
 
-                        relConflict.value = data.conflict_source || '';
+                        relConflict.value = edgeData.conflict_source || '';
 
-                        relEvolution.value = data.evolution || '';
+                        relEvolution.value = edgeData.evolution || '';
 
-                        relAWants.value = data.character_a_wants || '';
+                        relAWants.value = edgeData.character_a_wants || '';
 
-                        relBWants.value = data.character_b_wants || '';
+                        relBWants.value = edgeData.character_b_wants || '';
 
-                        relFirstImpression.value = data.first_impression || '';
+                        relFirstImpression.value = edgeData.first_impression || '';
 
-                        relSharedSecret.value = data.shared_secret || '';
+                        relSharedSecret.value = edgeData.shared_secret || '';
 
-                        relVulnerability.value = data.vulnerability || '';
+                        relVulnerability.value = edgeData.vulnerability || '';
 
-                        relMoments.value = data.major_shared_moments || '';
+                        relMoments.value = edgeData.major_shared_moments || '';
 
-                        relPredictability.value = data.predictability || 5;
+                        relPredictability.value = edgeData.predictability || 5;
 
-                        predictabilityVal.innerText = data.predictability || 5;
+                        predictabilityVal.innerText = edgeData.predictability || 5;
 
                         overlayTitle.innerText = "Edit Relationship";
 
@@ -1669,7 +1526,7 @@
 
                         relIdInput.value = "";
 
-                        relForm.reset();
+                        document.getElementById('relationship-form').reset();
 
                         strengthVal.innerText = "5";
 
@@ -1681,8 +1538,6 @@
 
                         btnDelete.style.display = 'none';
 
-                        // Show character selector for new relationship
-
                         if (charHeader) charHeader.style.display = 'block';
 
                     }
@@ -1693,55 +1548,81 @@
 
                     relCharB.onchange = updateLabels;
 
-                    // Show Overlay
-
                     overlay.style.display = 'block';
 
                 }
 
-                function closeOverlay() {
+                window.openModalForEdge = function (edgeId, section) {
 
-                    overlay.style.display = 'none';
+                    const edge = data.edges.find(e => e.id === edgeId);
+
+                    if (edge) openModal({ ...edge, type_key: edge.type_key || edge.label.toLowerCase() }, section);
+
+                };
+
+                // Zoom
+
+                document.getElementById('btn-zoom-in').onclick = () =>
+
+                    network.moveTo({ scale: network.getScale() * 1.5, animation: { duration: 300 } });
+
+                document.getElementById('btn-zoom-out').onclick = () =>
+
+                    network.moveTo({ scale: network.getScale() * 0.7, animation: { duration: 300 } });
+
+                // Auto-select from URL
+
+                const urlParams = new URLSearchParams(window.location.search);
+
+                const preselect = urlParams.get('character');
+
+                if (preselect) {
+
+                    const charId = parseInt(preselect);
+
+                    if (originalNodes.some(n => n.id === charId)) {
+
+                        activeFilters.add(charId);
+
+                        applyFilter();
+
+                    }
 
                 }
 
-                btnQuickAdd.onclick = () => openModal();
+                populateFilterPills();
 
-                btnCloseOverlay.onclick = closeOverlay;
-
-                btnCancelOverlay.onclick = closeOverlay;
-
-                // Update slider displays
-
-                relStrength.oninput = function () { strengthVal.innerText = this.value; }
-
-                relTrust.oninput = function () { trustVal.innerText = this.value; }
-
-                relPredictability.oninput = function () { predictabilityVal.innerText = this.value; }
-
-                btnQuickAdd.onclick = () => openModal();
-
-                // Handle clicks for details and editing
+                // --- CLICK HANDLER ---
 
                 network.on("click", function (params) {
 
                     if (params.nodes.length > 0) {
 
+                        // Node click → right-hand panel
+
                         const nodeId = params.nodes[0];
 
                         const char = data.nodes.find(n => n.id === nodeId);
 
+                        const pic = char.profile_pic_url || profilePicMap[nodeId] || null;
+
+                        const picHtml = pic
+
+                            ? `<img src="${pic}" class="side-panel-avatar" alt="${char.label}" onerror="this.outerHTML='<div class=\\'side-panel-avatar-placeholder\\'><i class=\\'bi bi-person fs-2 text-muted\\'></i></div>'">`
+
+                            : `<div class="side-panel-avatar-placeholder"><i class="bi bi-person fs-2 text-muted"></i></div>`;
+
+                        const connections = data.edges.filter(e => e.from === nodeId || e.to === nodeId);
+
                         detailsPanel.innerHTML = `
 
-                            <h4 class="mb-3">${char.label}</h4>
+                            <div class="text-center mb-3">
 
-                            <div class="mb-3">
+                                ${picHtml}
 
-                                <span class="badge" style="background-color: ${char.color}">
+                                <h5 class="fw-bold mb-1">${char.label}</h5>
 
-                                    Character
-
-                                </span>
+                                <span class="badge rounded-pill px-3 py-1" style="background-color:${char.color}; color:#fff; font-size:0.75rem;">Character</span>
 
                             </div>
 
@@ -1749,27 +1630,33 @@
 
                             <hr>
 
-                            <h6>Connections</h6>
+                            <h6 class="small fw-bold text-uppercase text-muted mb-2">Connections</h6>
 
                             <ul class="list-unstyled small">
 
-                                ${data.edges.filter(e => e.from === nodeId || e.to === nodeId).map(e => {
+                                ${connections.length > 0 ? connections.map(e => {
 
-                            const otherId = e.from === nodeId ? e.to : e.from;
+                                    const otherId = e.from === nodeId ? e.to : e.from;
 
-                            const otherChar = data.nodes.find(n => n.id === otherId);
+                                    const otherChar = data.nodes.find(n => n.id === otherId);
 
-                            return `<li class="mb-2">• <strong>${e.label}</strong> with ${otherChar.label}</li>`;
+                                    return `<li class="mb-2 d-flex align-items-center gap-2">
 
-                        }).join('') || 'None identified.'}
+                                        <span class="badge bg-light text-dark border">${e.label}</span>
+
+                                        <span>${otherChar ? otherChar.label : 'Unknown'}</span>
+
+                                    </li>`;
+
+                                }).join('') : '<li class="text-muted fst-italic">No connections yet.</li>'}
 
                             </ul>
 
                             <div class="mt-4">
 
-                                <a href="/characters/${nodeId}/" class="btn btn-sm btn-outline-primary w-100">
+                                <a href="/characters/${nodeId}/" class="btn btn-sm btn-dark w-100 rounded-pill">
 
-                                    <i class="bi bi-person"></i> View Profile
+                                    <i class="bi bi-person me-1"></i> View Profile
 
                                 </a>
 
@@ -1779,6 +1666,8 @@
 
                     } else if (params.edges.length > 0) {
 
+                        // Edge click → connection modal
+
                         const edgeId = params.edges[0];
 
                         const edge = data.edges.find(e => e.id === edgeId);
@@ -1787,143 +1676,7 @@
 
                         const charB = data.nodes.find(n => n.id === edge.to);
 
-                        // Profile-style layout
-
-                        detailsPanel.innerHTML = `
-
-                            <div class="card border-0 shadow-none bg-transparent">
-
-                                <div class="card-body p-0 text-center">
-
-                                    <!-- Overlapping Avatars -->
-
-                                    <div class="d-flex justify-content-center align-items-center mb-3 position-relative" style="height: 80px;">
-
-                                        <div class="position-absolute start-50 translate-middle-x" style="margin-left: -25px; z-index: 1;">
-
-                                            ${charA.profile_pic_url ?
-
-                                `<img src="${charA.profile_pic_url}" class="rounded-circle border border-2 border-white shadow-sm" style="width: 60px; height: 60px; object-fit: cover;">` :
-
-                                `<div class="rounded-circle border border-2 border-white shadow-sm bg-light d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;"><i class="bi bi-person text-muted"></i></div>`
-
-                            }
-
-                                        </div>
-
-                                        <div class="position-absolute start-50 translate-middle-x" style="margin-left: 25px; z-index: 2;">
-
-                                            ${charB.profile_pic_url ?
-
-                                `<img src="${charB.profile_pic_url}" class="rounded-circle border border-2 border-white shadow-sm" style="width: 60px; height: 60px; object-fit: cover;">` :
-
-                                `<div class="rounded-circle border border-2 border-white shadow-sm bg-light d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;"><i class="bi bi-person text-muted"></i></div>`
-
-                            }
-
-                                        </div>
-
-                                    </div>
-
-                                    <h5 class="mb-1 fw-bold text-dark">${edge.label}</h5>
-
-                                    <p class="small text-muted mb-3">
-
-                                        Between <a href="/characters/${charA.id}/" class="text-decoration-none fw-bold text-dark">${charA.label}</a> 
-
-                                        & <a href="/characters/${charB.id}/" class="text-decoration-none fw-bold text-dark">${charB.label}</a>
-
-                                    </p>
-
-                                    <div class="d-flex gap-2 justify-content-center mb-4">
-
-                                        <span class="badge bg-light text-dark border">${edge.status || 'Active'}</span>
-
-                                        <span class="badge bg-light text-dark border">${edge.visibility || 'Public'}</span>
-
-                                        <span class="badge bg-dark text-white border">${edge.strength}/10 Intensity</span>
-
-                                    </div>
-
-                                    <!-- Pill Navigation Buttons (Moved to Top) -->
-
-                                    <div class="d-grid gap-2 mb-3">
-
-                                        <button class="btn btn-profile-style rounded-pill py-2 d-flex align-items-center justify-content-center" 
-
-                                            onclick="openModalForEdge(${edge.id}, 'core')">
-
-                                            <i class="bi bi-heart me-2"></i> Core Detail
-
-                                        </button>
-
-                                        <button class="btn btn-profile-style rounded-pill py-2 d-flex align-items-center justify-content-center" 
-
-                                            onclick="openModalForEdge(${edge.id}, 'dynamics')">
-
-                                            <i class="bi bi-lightning me-2"></i> Power Dynamics
-
-                                        </button>
-
-                                    </div>
-
-                                    <!-- Narrative Arc (Moved up) -->
-
-                                    <div class="text-start bg-light p-3 rounded-3 mb-3 border">
-
-                                        <h6 class="small fw-bold text-uppercase text-muted mb-2">Narrative Arc</h6>
-
-                                        <p class="small mb-0 text-break">${edge.evolution || edge.title || '<span class="text-muted fst-italic">No arc data yet.</span>'}</p>
-
-                                    </div>
-
-                                    <!-- Deep Intelligence Section (Colored Boxes) -->
-
-                                    <div class="text-start mb-4">
-
-                                        ${edge.shared_secret ? `
-
-                                            <div class="bg-light-info p-2 rounded-3 mb-2" style="background-color: #f0f7ff; border: 1px solid #dbeafe;">
-
-                                                <h6 class="small fw-bold text-info text-uppercase mb-1" style="font-size: 0.65rem;">Shared Secret</h6>
-
-                                                <p class="small mb-0 fst-italic">"${edge.shared_secret}"</p>
-
-                                            </div>
-
-                                        ` : ''}
-
-                                        ${edge.vulnerability ? `
-
-                                            <div class="bg-light-warning p-2 rounded-3 mb-2" style="background-color: #fffaf0; border: 1px solid #fef3c7;">
-
-                                                <h6 class="small fw-bold text-warning text-uppercase mb-1" style="font-size: 0.65rem;">Mutual Vulnerability</h6>
-
-                                                <p class="small mb-0">"${edge.vulnerability}"</p>
-
-                                            </div>
-
-                                        ` : ''}
-
-                                        ${edge.conflict_source ? `
-
-                                            <div class="bg-light-danger p-2 rounded-3 mb-2" style="background-color: #fff5f5; border: 1px solid #fee2e2;">
-
-                                                <h6 class="small fw-bold text-danger text-uppercase mb-1" style="font-size: 0.65rem;">Core Friction</h6>
-
-                                                <p class="small mb-0">${edge.conflict_source}</p>
-
-                                            </div>
-
-                                        ` : ''}
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        `;
+                        openConnectionModal(edge, charA, charB);
 
                     } else {
 
@@ -1933,9 +1686,9 @@
 
                                 <i class="bi bi-cursor-fill fs-1 d-block mb-3 opacity-50"></i>
 
-                                <h6 class="fw-bold">Select a Relationship</h6>
+                                <h6 class="fw-bold">Select a Character</h6>
 
-                                <p class="small">Click a line between characters to view details.</p>
+                                <p class="small">Click a node to see their profile and connections.</p>
 
                             </div>
 
@@ -1944,24 +1697,6 @@
                     }
 
                 });
-
-                // Helper to open modal specific section
-
-                window.openModalForEdge = function (edgeId, section) {
-
-                    const edge = data.edges.find(e => e.id === edgeId);
-
-                    if (edge) {
-
-                        // Map type key
-
-                        const type_key = edge.type_key || edge.label.toLowerCase();
-
-                        openModal({ ...edge, type_key: type_key }, section);
-
-                    }
-
-                };
 
                 // AJAX Save
 
@@ -2029,13 +1764,13 @@
 
                     })
 
-                        .then(response => response.json())
+                        .then(r => r.json())
 
                         .then(result => {
 
                             if (result.status === 'success') {
 
-                                location.reload(); // Quickest way to refresh the complex map
+                                location.reload();
 
                             } else {
 
@@ -2047,13 +1782,7 @@
 
                         })
 
-                        .catch(e => {
-
-                            console.error(e);
-
-                            btnSave.disabled = false;
-
-                        });
+                        .catch(e => { console.error(e); btnSave.disabled = false; });
 
                 };
 
@@ -2062,14 +1791,6 @@
                 btnDelete.onclick = function () {
 
                     if (!confirm("Are you sure you want to remove this connection?")) return;
-
-                    const formData = {
-
-                        id: relIdInput.value,
-
-                        action: 'delete'
-
-                    };
 
                     fetch('{% url "api_manage_relationship" %}', {
 
@@ -2083,21 +1804,13 @@
 
                         },
 
-                        body: JSON.stringify(formData)
+                        body: JSON.stringify({ id: relIdInput.value, action: 'delete' })
 
                     })
 
-                        .then(response => response.json())
+                        .then(r => r.json())
 
-                        .then(result => {
-
-                            if (result.status === 'success') {
-
-                                location.reload();
-
-                            }
-
-                        });
+                        .then(result => { if (result.status === 'success') location.reload(); });
 
                 };
 
