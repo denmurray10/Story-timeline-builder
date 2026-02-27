@@ -6,9 +6,11 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.core.files.storage import default_storage
+from django.contrib import messages  # ← Add this import
 import os
 from .models import Post
 from .forms import PostForm
+
 
 class PostList(generic.ListView):
     template_name = 'blog/post_list.html'
@@ -23,7 +25,6 @@ class PostList(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Safely get unique, non-empty categories
         context['categories'] = Post.objects.filter(status=1).exclude(category='').values_list('category', flat=True).distinct().order_by('category')
         context['current_category'] = self.request.GET.get('category')
         if context['posts'].exists():
@@ -31,10 +32,12 @@ class PostList(generic.ListView):
             context['remaining_posts'] = context['posts'][1:]
         return context
 
+
 class PostDetail(generic.DetailView):
     model = Post
     template_name = 'blog/post_detail.html'
     context_object_name = 'post'
+
 
 class PostCreateView(LoginRequiredMixin, UserPassesTestMixin, generic.CreateView):
     model = Post
@@ -47,7 +50,14 @@ class PostCreateView(LoginRequiredMixin, UserPassesTestMixin, generic.CreateView
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        # Success message based on publish status
+        if self.object.status == 1:
+            messages.success(self.request, f'🎉 "{self.object.title}" is now live!')
+        else:
+            messages.info(self.request, f'✏️ "{self.object.title}" has been saved as a draft.')
+        return response
+
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ImageUploadView(LoginRequiredMixin, UserPassesTestMixin, View):

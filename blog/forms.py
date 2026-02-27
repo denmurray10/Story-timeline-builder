@@ -1,6 +1,7 @@
 from django import forms
 from .models import Post
 
+
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
@@ -30,3 +31,13 @@ class PostForm(forms.ModelForm):
                 'class': 'form-select rounded-pill px-4',
             }),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['content'].required = False  # CKEditor hides the textarea, so browser can't validate it
+
+    def clean_content(self):
+        content = self.cleaned_data.get('content', '').strip()
+        if not content:
+            raise forms.ValidationError("Content is required.")
+        return content
