@@ -423,54 +423,8 @@
                 </div>
             </div>
             
-            <!-- Worldbuilding Tracker -->
-            <div class="dash-card p-3 draggable-card mb-3" id="card-worldbuilding">
-                <div class="dash-card-header d-flex align-items-center mb-2"><i class="bi bi-grip-vertical drag-handle"></i>Worldbuilding Progress</div>
-                <div class="mb-3">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <span class="small fw-semibold">{{ world_entries_count }} / {{ worldbuilding_target }} Entries</span>
-                        <span class="small text-muted">{{ worldbuilding_progress }}%</span>
-                    </div>
-                    <div class="dash-progress-bg">
-                        <div class="dash-progress-fill" style="width: {{ worldbuilding_progress }}%; background-color: #10b981;"></div>
-                    </div>
-                </div>
-                <div class="dash-card-sub mb-2 fw-semibold">Suggested to define:</div>
-                <div class="d-flex flex-wrap gap-2">
-                    {% for suggestion in worldbuilding_suggestions %}
-                    <span class="badge bg-light text-dark border"><i class="bi bi-plus text-muted"></i> {{ suggestion|title }}</span>
-                    {% endfor %}
-                </div>
-            </div>
+            <!-- Cards removed: Worldbuilding Tracker and Architect Integrity Checks -->
             
-            <!-- Architect Integrity Checks -->
-            <div class="dash-card dash-pill-card p-3 draggable-card mb-3" id="card-architect-integrity">
-                <div class="dash-card-header d-flex justify-content-between align-items-center mb-2">
-                    <div><i class="bi bi-grip-vertical drag-handle"></i>Integrity Checks</div>
-                    {% if integrity_issues %}<span class="badge bg-danger rounded-pill">{{ integrity_issues|length }}</span>{% else %}<span class="badge bg-success rounded-pill"><i class="bi bi-check"></i></span>{% endif %}
-                </div>
-                {% if integrity_issues %}
-                <div class="list-group list-group-flush">
-                    {% for issue in integrity_issues %}
-                    <div class="list-group-item px-0 border-0 d-flex gap-2 align-items-start py-1">
-                        <div class="mt-1">
-                            {% if issue.type == 'fuzzy_date' %}<i class="bi bi-calendar-range text-warning small"></i>
-                            {% elif issue.type == 'missing_loc' %}<i class="bi bi-geo-alt text-danger small"></i>
-                            {% elif issue.type == 'missing_pov' %}<i class="bi bi-person-fill-exclamation text-danger small"></i>
-                            {% else %}<i class="bi bi-card-text text-info small"></i>{% endif %}
-                        </div>
-                        <div>
-                            <div class="fw-semibold text-dark" style="font-size:0.8rem; line-height: 1.2;">{{ issue.msg }}</div>
-                            <div class="text-muted text-truncate" style="font-size:0.7rem; max-width: 150px;" title="{{ issue.event.title }}">{{ issue.event.title }}</div>
-                        </div>
-                        <a href="{% url 'event_edit' issue.event.id %}" class="btn text-primary p-0 ms-auto" title="Fix"><i class="bi bi-pencil-square small"></i></a>
-                    </div>
-                    {% endfor %}
-                </div>
-                {% else %}
-                <div class="text-center py-2 text-muted small"><i class="bi bi-shield-check text-success fs-3 mb-1 d-block"></i>No structural warnings.</div>
-                {% endif %}
-            </div>
         </div>
 
         <div class="col-lg-3 draggable-zone" id="col-middle">

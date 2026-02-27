@@ -280,12 +280,10 @@
     .ke-body::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
     .ke-body::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
 
-    /* The zigzag list container */
     .ke-list {
         position: relative;
         padding: 0.75rem 0.75rem;
     }
-    /* Central vertical line — positioned via JS between first & last dots */
     .ke-list::before {
         content: '';
         position: absolute;
@@ -299,7 +297,6 @@
         z-index: 0;
     }
 
-    /* Individual event row – uses CSS grid for left/right placement */
     .ke-event {
         position: relative;
         display: grid;
@@ -316,7 +313,6 @@
         to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Centre dot column */
     .ke-dot-col {
         display: flex;
         align-items: center;
@@ -350,7 +346,6 @@
         box-shadow: 0 0 0 2px color-mix(in srgb, var(--role-color, #6366f1) 25%, transparent);
     }
 
-    /* Content card on either side */
     .ke-content {
         min-width: 0;
         text-decoration: none !important;
@@ -373,7 +368,6 @@
         min-width: 0;
     }
 
-    /* Left-side event: content on left, spacer on right */
     .ke-event.ke-left .ke-content {
         grid-column: 1;
         grid-row: 1;
@@ -385,7 +379,6 @@
     .ke-event.ke-left .ke-spacer { grid-column: 3; grid-row: 1; }
     .ke-event.ke-left .ke-meta { justify-content: flex-end; }
 
-    /* Right-side event: spacer on left, content on right */
     .ke-event.ke-right .ke-spacer { grid-column: 1; grid-row: 1; }
     .ke-event.ke-right .ke-dot-col { grid-column: 2; grid-row: 1; }
     .ke-event.ke-right .ke-content {
@@ -455,7 +448,6 @@
         opacity: 1;
     }
 
-    /* Empty state */
     .ke-empty {
         text-align: center;
         padding: 3rem 1.5rem;
@@ -514,7 +506,6 @@
             <button type="button" id="deepDiveBtn" class="btn-action">
                 <i class="bi bi-magic fs-6 text-primary"></i> Deep Dive
             </button>
-
         </div>
     </div>
 
@@ -527,11 +518,10 @@
         </div>
 
         <div class="row g-4" id="character-draggable-row">
-            <!-- COLUMN 1: Visual Identity & Status -->
+            <!-- COLUMN 1 -->
             <div class="col-lg-3">
                 <!-- Locked Visual Identity -->
                 <div class="card-premium mb-4 overflow-hidden" id="card-identity">
-                    <!-- Portrait Container -->
                     <div class="portrait-container border-0 rounded-0 shadow-none mb-0 w-100" onclick="document.getElementById('{{ form.profile_image.id_for_label }}').click()">
                         {% if character.profile_pic_url %}
                         <img src="{{ character.profile_pic_url }}" id="profilePreview" class="portrait-img">
@@ -553,42 +543,70 @@
                     </div>
                 </div>
 
-                <!-- Draggable Area for Col 1 -->
+                <!-- Draggable Area Col 1 -->
                 <div class="draggable-zone" id="char-col-1">
-                    <!-- Meta Details -->
-                <!-- Personality Traits Card (NEW) -->
-                <div class="card-premium draggable-card mb-4" id="card-traits">
-                    <div class="card-header-premium border-bottom-0 pb-0">
-                        <i class="bi bi-grip-vertical drag-handle"></i>
-                        <i class="bi bi-lightning-charge text-muted"></i> Personality Traits
+                    <div class="card-premium draggable-card mb-4" id="card-traits">
+                        <div class="card-header-premium border-bottom-0 pb-0">
+                            <i class="bi bi-grip-vertical drag-handle"></i>
+                            <i class="bi bi-lightning-charge text-muted"></i> Personality Traits
+                        </div>
+                        <div class="card-body p-4 pt-3">
+                            <textarea name="traits" class="form-control-premium" style="min-height: 120px;" placeholder="Key personality traits and quirks...">{{ form.traits.value|default_if_none:'' }}</textarea>
+                        </div>
                     </div>
-                    <div class="card-body p-4 pt-3">
-                        <textarea name="traits" class="form-control-premium" style="min-height: 120px;" placeholder="Key personality traits and quirks...">{{ form.traits.value|default_if_none:'' }}</textarea>
+
+                    <div class="card-premium draggable-card mb-4" id="card-meta">
+                        <div class="card-header-premium flex-wrap justify-content-between">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-grip-vertical drag-handle"></i>
+                                <i class="bi bi-info-circle text-muted"></i> Meta Data
+                            </div>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="mb-3">
+                                <label class="trait-label text-dark">Character Role</label>
+                                <div class="fw-bold px-1 {% if character.role == 'protagonist' %}text-primary{% elif character.role == 'antagonist' %}text-danger{% elif character.role == 'supporting' %}text-success{% else %}text-muted{% endif %}" style="font-size: 0.9rem;">{{ character.get_role_display }}</div>
+                            </div>
+                            <div class="mb-0">
+                                <label class="trait-label text-dark">Debut Book</label>
+                                <div class="text-muted px-1" style="font-size: 0.85rem; font-weight: 500;">{{ character.introduction_book.title|default:"Unknown Book" }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-premium draggable-card mb-4" id="card-secrets">
+                        <div class="card-header-premium border-bottom-0 pb-0">
+                            <i class="bi bi-grip-vertical drag-handle"></i>
+                            <i class="bi bi-incognito text-slate-700"></i> Secrets
+                        </div>
+                        <div class="card-body p-4 pt-3">
+                            <textarea name="secrets" class="form-control-premium" style="min-height: 100px;" placeholder="Information they are fiercely hiding.">{{ form.secrets.value|default_if_none:'' }}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="card-premium draggable-card mb-4" id="card-regrets">
+                        <div class="card-header-premium border-bottom-0 pb-0">
+                            <i class="bi bi-grip-vertical drag-handle"></i>
+                            <i class="bi bi-arrow-counterclockwise text-secondary"></i> Regrets
+                        </div>
+                        <div class="card-body p-4 pt-3">
+                            <textarea name="regrets" class="form-control-premium" style="min-height: 100px;" placeholder="Past actions or mistakes they feel deep remorse over.">{{ form.regrets.value|default_if_none:'' }}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="card-premium draggable-card mb-4" id="card-goals">
+                        <div class="card-header-premium border-bottom-0 pb-0">
+                            <i class="bi bi-grip-vertical drag-handle"></i>
+                            <i class="bi bi-flag text-muted"></i> Goals & Objectives
+                        </div>
+                        <div class="card-body p-4 pt-3">
+                            <textarea name="goals" class="form-control-premium" style="min-height: 120px;" placeholder="Long-term and short-term objectives...">{{ form.goals.value|default_if_none:'' }}</textarea>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="card-premium draggable-card mb-4" id="card-meta">
-                    <div class="card-header-premium flex-wrap justify-content-between">
-                        <div class="d-flex align-items-center gap-2">
-                            <i class="bi bi-grip-vertical drag-handle"></i>
-                            <i class="bi bi-info-circle text-muted"></i> Meta Data
-                        </div>
-                    </div>
-                    <div class="card-body p-4">
-                        <div class="mb-3">
-                            <label class="trait-label text-dark">Character Role</label>
-                            <div class="fw-bold px-1 {% if character.role == 'protagonist' %}text-primary{% elif character.role == 'antagonist' %}text-danger{% elif character.role == 'supporting' %}text-success{% else %}text-muted{% endif %}" style="font-size: 0.9rem;">{{ character.get_role_display }}</div>
-                        </div>
-                        <div class="mb-0">
-                            <label class="trait-label text-dark">Debut Book</label>
-                            <div class="text-muted px-1" style="font-size: 0.85rem; font-weight: 500;">{{ character.introduction_book.title|default:"Unknown Book" }}</div>
-                        </div>
-                    </div>
-                </div> <!-- End card-meta -->
-            </div> <!-- End Draggable Area for Col 1 (char-col-1) -->
-        </div> <!-- End COLUMN 1 (col-lg-3) -->
-
-            <!-- COLUMN 2: Social & Psychology -->
+            <!-- COLUMN 2 -->
             <div class="col-lg-4 draggable-zone" id="char-col-2">
                 <div class="card-premium draggable-card mb-4 overflow-hidden" id="card-social">
                     <div class="card-header-premium flex-wrap justify-content-between">
@@ -601,7 +619,6 @@
                         </a>
                     </div>
                     <div class="card-body p-0 position-relative overflow-hidden" style="min-height: 280px; background: #fafafa; border-bottom: 1px solid #f1f5f9;">
-                        <!-- Relationship Visualization -->
                         <div class="position-absolute w-100 h-100" style="z-index: 1;">
                             <svg class="w-100 h-100" style="opacity: 0.8;">
                                 {% for rel in relationships|slice:":5" %}
@@ -609,17 +626,13 @@
                                 {% endfor %}
                             </svg>
                         </div>
-
                         <div class="d-flex align-items-center justify-content-center h-100 position-relative" style="z-index: 10; min-height: 280px;">
-                            <!-- Primary Node (Central) -->
                             <div class="d-flex flex-column align-items-center" style="position: relative; z-index: 15;">
                                 <div class="rel-node shadow-lg border-opacity-50" style="width: 72px; height: 72px; border-width: 4px; border-color: white; background-image: url('{{ character.profile_pic_url }}');">
                                     {% if not character.profile_pic_url %}<div class="w-100 h-100 bg-primary bg-opacity-10 d-flex align-items-center justify-content-center rounded-circle"><i class="bi bi-person text-primary"></i></div>{% endif %}
                                 </div>
                                 <span class="badge bg-white text-dark shadow-sm border mt-n2 rounded-pill px-3" style="z-index: 20;">You</span>
                             </div>
-                            
-                            <!-- Improved Contacts Mapping (Placed at ends of lines) -->
                             {% for rel in relationships|slice:":5" %}
                                 <div class="position-absolute d-flex flex-column align-items-center" style="left: {% cycle '15%' '85%' '50%' '20%' '80%' %}; top: {% cycle '20%' '25%' '80%' '75%' '72%' %}; transform: translate(-50%, -50%); cursor: help;" title="{{ rel.get_relationship_type_display }} - Strength: {{ rel.strength }}">
                                     {% if rel.character_a == character %}
@@ -641,7 +654,6 @@
                             {% endfor %}
                         </div>
                     </div>
-                    <!-- Relationship Details List -->
                     <div class="card-footer bg-white border-0 p-4">
                         <label class="trait-label mb-3">Key Connections</label>
                         <div class="d-flex flex-column gap-3">
@@ -691,7 +703,6 @@
                     </div>
                 </div>
 
-                <!-- Fears & Phobias Card -->
                 <div class="card-premium draggable-card mb-4" id="card-fears">
                     <div class="card-header-premium border-bottom-0 pb-0">
                         <i class="bi bi-grip-vertical drag-handle"></i>
@@ -702,7 +713,6 @@
                     </div>
                 </div>
 
-                <!-- Character Flaws Card -->
                 <div class="card-premium draggable-card mb-4" id="card-flaws">
                     <div class="card-header-premium border-bottom-0 pb-0">
                         <i class="bi bi-grip-vertical drag-handle"></i>
@@ -713,7 +723,6 @@
                     </div>
                 </div>
 
-                <!-- Internal Conflicts Card -->
                 <div class="card-premium draggable-card mb-4" id="card-internal-conflicts">
                     <div class="card-header-premium border-bottom-0 pb-0">
                         <i class="bi bi-grip-vertical drag-handle"></i>
@@ -724,7 +733,6 @@
                     </div>
                 </div>
 
-                <!-- Unfulfilled Desires Card -->
                 <div class="card-premium draggable-card mb-4" id="card-unfulfilled-desires">
                     <div class="card-header-premium border-bottom-0 pb-0">
                         <i class="bi bi-grip-vertical drag-handle"></i>
@@ -735,29 +743,6 @@
                     </div>
                 </div>
 
-                <!-- Secrets Card -->
-                <div class="card-premium draggable-card mb-4" id="card-secrets">
-                    <div class="card-header-premium border-bottom-0 pb-0">
-                        <i class="bi bi-grip-vertical drag-handle"></i>
-                        <i class="bi bi-incognito text-slate-700"></i> Secrets
-                    </div>
-                    <div class="card-body p-4 pt-3">
-                        <textarea name="secrets" class="form-control-premium" style="min-height: 100px;" placeholder="Information they are fiercely hiding.">{{ form.secrets.value|default_if_none:'' }}</textarea>
-                    </div>
-                </div>
-
-                <!-- Regrets Card -->
-                <div class="card-premium draggable-card mb-4" id="card-regrets">
-                    <div class="card-header-premium border-bottom-0 pb-0">
-                        <i class="bi bi-grip-vertical drag-handle"></i>
-                        <i class="bi bi-arrow-counterclockwise text-secondary"></i> Regrets
-                    </div>
-                    <div class="card-body p-4 pt-3">
-                        <textarea name="regrets" class="form-control-premium" style="min-height: 100px;" placeholder="Past actions or mistakes they feel deep remorse over.">{{ form.regrets.value|default_if_none:'' }}</textarea>
-                    </div>
-                </div>
-
-                <!-- Motivation Card (NEW) -->
                 <div class="card-premium draggable-card mb-4" id="card-motivation">
                     <div class="card-header-premium border-bottom-0 pb-0">
                         <i class="bi bi-grip-vertical drag-handle"></i>
@@ -767,22 +752,10 @@
                         <textarea name="motivation" class="form-control-premium" style="min-height: 120px;" placeholder="What drives this character?">{{ form.motivation.value|default_if_none:'' }}</textarea>
                     </div>
                 </div>
-
-                <!-- Goals Card (NEW) -->
-                <div class="card-premium draggable-card mb-4" id="card-goals">
-                    <div class="card-header-premium border-bottom-0 pb-0">
-                        <i class="bi bi-grip-vertical drag-handle"></i>
-                        <i class="bi bi-flag text-muted"></i> Goals & Objectives
-                    </div>
-                    <div class="card-body p-4 pt-3">
-                        <textarea name="goals" class="form-control-premium" style="min-height: 120px;" placeholder="Long-term and short-term objectives...">{{ form.goals.value|default_if_none:'' }}</textarea>
-                    </div>
-                </div>
             </div>
 
-            <!-- COLUMN 3: Narrative & Timeline -->
+            <!-- COLUMN 3 -->
             <div class="col-lg-5 draggable-zone" id="char-col-3">
-                <!-- Biography Card -->
                 <div class="card-premium draggable-card mb-4" id="card-bio">
                     <div class="card-header-premium border-bottom-0">
                         <i class="bi bi-grip-vertical drag-handle"></i>
@@ -793,7 +766,6 @@
                     </div>
                 </div>
 
-                <!-- Events Timeline Card (Double-Sided Zigzag) -->
                 <div class="card-premium draggable-card mb-4 d-flex flex-column ke-card" id="card-timeline">
                     <div class="card-header-premium border-bottom-0 pb-2 ke-header">
                         <div class="d-flex align-items-center gap-2">
@@ -863,9 +835,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body p-4">
-        <div id="deepDiveContent" class="p-3 bg-light rounded-3 text-dark italic" style="font-size: 1.05rem; line-height: 1.6; border-left: 4px solid #6366f1;">
-            <!-- Content inject -->
-        </div>
+        <div id="deepDiveContent" class="p-3 bg-light rounded-3 text-dark italic" style="font-size: 1.05rem; line-height: 1.6; border-left: 4px solid #6366f1;"></div>
       </div>
       <div class="modal-footer border-0 pt-0 justify-content-between">
         <span class="text-muted tracking-widest uppercase" style="font-size: 0.6rem;">Powered by Project Penn</span>
@@ -878,16 +848,13 @@
 <!-- AI Sync Confirmation Modal -->
 <div class="modal fade" id="syncConfirmModal" tabindex="-1" aria-labelledby="syncConfirmModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content border-0" style="border-radius: 20px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);">
+    <div class="modal-content border-0" style="border-radius: 20px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);">
       <div class="modal-header border-0 pb-0 pt-4 px-4 bg-white" style="border-radius: 20px 20px 0 0;">
-        <h5 class="modal-title font-dm-serif text-dark d-flex align-items-center gap-2" id="syncConfirmModalLabel" style="font-size: 1.6rem;">
-            Sync Profile
-        </h5>
+        <h5 class="modal-title font-dm-serif text-dark" id="syncConfirmModalLabel" style="font-size: 1.6rem;">Sync Profile</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body px-4 py-3 text-dark bg-white" style="font-size: 0.95rem; line-height: 1.6;">
         <p class="mb-4 text-muted" style="font-size: 0.95rem;"><strong>Penn</strong> will analyze the book manuscript and automatically fill in any empty fields in this character's profile.</p>
-        
         <div class="sync-status-box p-3 mb-4" style="background-color: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
             <p class="mb-3 fw-bold text-dark" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">Status of fields to sync:</p>
             <ul class="mb-0 list-unstyled" style="font-size: 0.95rem;">
@@ -898,14 +865,13 @@
                 <li id="status-psychology" class="mb-0 d-flex align-items-center text-muted"><i class="bi bi-circle me-3 fs-6"></i>Deep Psychology (Fears, Flaws, Conflicts)</li>
             </ul>
         </div>
-        
         <div class="d-flex align-items-start gap-3 p-3" style="background-color: #f0fdf4; border-radius: 12px; border: 1px dashed #bbf7d0;">
             <div class="text-success mt-1"><i class="bi bi-shield-check fs-5"></i></div>
             <p class="mb-0 text-success" style="font-size: 0.85rem; font-weight: 500; line-height: 1.4;"><strong>Safe Sync:</strong><br>Existing text will never be overwritten or changed.</p>
         </div>
       </div>
       <div class="modal-footer border-0 px-4 pb-4 pt-1 bg-white justify-content-end gap-2" style="border-radius: 0 0 20px 20px;">
-        <button type="button" class="btn btn-light text-dark" style="border-radius: 9999px; padding: 0.5rem 1.25rem; font-weight: 600; background-color: #fff; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-light text-dark" style="border-radius: 9999px; padding: 0.5rem 1.25rem; font-weight: 600; background-color: #fff; border: 1px solid #e2e8f0;" data-bs-dismiss="modal">Cancel</button>
         <button type="button" class="btn btn-dark d-flex align-items-center gap-2 shadow-sm text-white" style="border-radius: 9999px; padding: 0.5rem 1.25rem; font-weight: 600; background-color: #0f172a; border-color: #0f172a;" id="confirmSyncBtn">
             <i class="bi bi-magic fs-6 text-white"></i> Proceed & Sync
         </button>
@@ -916,16 +882,13 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 <script>
     function generatePortraitCall() {
         if (!confirm('Generate a new AI portrait for this character?')) return;
-        
         const btn = document.getElementById('generatePortraitBtn');
         const icon = btn.querySelector('i');
         btn.disabled = true;
         icon.className = 'bi bi-arrow-repeat text-primary animate-spin';
-        
         fetch("{% url 'api_generate_portrait' character.pk %}", {
             method: 'POST',
             headers: { 'X-CSRFToken': '{{ csrf_token }}' }
@@ -950,27 +913,26 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        
-        // Custom spinning CSS
+
         const style = document.createElement('style');
         style.textContent = `
             .animate-spin { animation: spin 1s linear infinite; display: inline-block; }
             @keyframes spin { 100% { transform: rotate(360deg); } }
         `;
         document.head.appendChild(style);
-        
-        // Deep Dive
+
+        // ── Deep Dive Modal ──
         const deepDiveBtn = document.getElementById('deepDiveBtn');
         const deepDiveContent = document.getElementById('deepDiveContent');
-        const deepDiveModal = new bootstrap.Modal(document.getElementById('deepDiveModal'));
-        
+        const deepDiveModalEl = document.getElementById('deepDiveModal');
+        const deepDiveModal = deepDiveModalEl ? new bootstrap.Modal(deepDiveModalEl) : null;
+
         if (deepDiveBtn) {
             deepDiveBtn.addEventListener('click', function() {
                 const icon = this.querySelector('i');
                 const origClass = icon.className;
                 icon.className = 'bi bi-arrow-repeat animate-spin text-primary fs-6';
-                if(!this.dataset.loading) this.dataset.loading = "1"; else return;
-                
+                if (!this.dataset.loading) this.dataset.loading = "1"; else return;
                 fetch("{% url 'api_character_deep_dive' %}", {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
@@ -981,8 +943,8 @@
                     this.dataset.loading = "";
                     icon.className = origClass;
                     if (data.status === 'success') {
-                        deepDiveContent.innerHTML = data.response;
-                        deepDiveModal.show();
+                        if (deepDiveContent) deepDiveContent.innerHTML = data.response;
+                        if (deepDiveModal) deepDiveModal.show();
                     } else alert('Error: ' + data.message);
                 })
                 .catch(err => {
@@ -992,9 +954,10 @@
             });
         }
 
-        // Sync Trigger
+        // ── Sync Modal ──
         const syncBtn = document.getElementById('syncCharacterBtn');
-        const syncConfirmModal = new bootstrap.Modal(document.getElementById('syncConfirmModal'));
+        const syncConfirmModalEl = document.getElementById('syncConfirmModal');
+        const syncConfirmModal = syncConfirmModalEl ? new bootstrap.Modal(syncConfirmModalEl) : null;
         let isSyncing = false;
 
         function updateSyncFieldStatus(id, isPopulated) {
@@ -1015,36 +978,26 @@
         if (syncBtn) {
             syncBtn.addEventListener('click', function() {
                 if (isSyncing) return;
-                
-                // Show analyzing state
                 const icon = syncBtn.querySelector('i');
                 const origClass = icon.className;
                 icon.className = 'bi bi-arrow-repeat animate-spin fs-6 text-primary';
-                
-                // Simulate Penn checking the fields
                 setTimeout(() => {
-                    // Check standard fields
                     const hasDesc = document.querySelector('textarea[name="description"]')?.value.trim() !== '';
                     const hasMotiv = document.querySelector('textarea[name="motivation"]')?.value.trim() !== '';
                     const hasGoals = document.querySelector('textarea[name="goals"]')?.value.trim() !== '';
                     const hasTraits = document.querySelector('textarea[name="traits"]')?.value.trim() !== '';
-                    
-                    // Deep psych requires all 6 to be filled to be "green/safe"
                     const hasPsych = ['fears', 'flaws', 'internal_conflicts', 'unfulfilled_desires', 'secrets', 'regrets']
                         .every(name => {
                             const el = document.querySelector(`textarea[name="${name}"]`);
                             return el && el.value.trim() !== '';
                         });
-                    
                     updateSyncFieldStatus('status-description', hasDesc);
                     updateSyncFieldStatus('status-motivation', hasMotiv);
                     updateSyncFieldStatus('status-goals', hasGoals);
                     updateSyncFieldStatus('status-traits', hasTraits);
                     updateSyncFieldStatus('status-psychology', hasPsych);
-                    
-                    // Restore button and show modal
                     icon.className = origClass;
-                    syncConfirmModal.show();
+                    if (syncConfirmModal) syncConfirmModal.show();
                 }, 600);
             });
         }
@@ -1054,15 +1007,11 @@
             confirmSyncBtn.addEventListener('click', function() {
                 if (isSyncing) return;
                 isSyncing = true;
-                
                 const icon = syncBtn.querySelector('i');
                 const origClass = icon.className;
                 icon.className = 'bi bi-arrow-repeat animate-spin fs-6 text-primary';
-                
-                // Update modal button state
                 this.disabled = true;
                 this.innerHTML = '<i class="bi bi-arrow-repeat animate-spin"></i> Syncing...';
-                
                 fetch("{% url 'api_character_sync' %}", {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
@@ -1072,26 +1021,22 @@
                 .then(data => {
                     icon.className = origClass;
                     isSyncing = false;
-                    syncConfirmModal.hide();
-                    
-                    if (data.status === 'success') {
-                        // Reload the page to show the new synced data immediately
-                        window.location.reload();
-                    } else alert('Error: ' + data.message);
+                    if (syncConfirmModal) syncConfirmModal.hide();
+                    if (data.status === 'success') window.location.reload();
+                    else alert('Error: ' + data.message);
                 })
                 .catch(err => {
                     icon.className = origClass;
                     isSyncing = false;
-                    syncConfirmModal.hide();
+                    if (syncConfirmModal) syncConfirmModal.hide();
                     alert('An error occurred during sync.');
                 });
             });
         }
 
+        // ── Portrait upload ──
         const avatarIdInput = document.querySelector('input[name="avatar_id"]');
         const imageInput = document.querySelector('input[name="profile_image"]');
-
-        // Profile File Input
         if (imageInput) {
             imageInput.addEventListener('change', function() {
                 if (this.files && this.files[0]) {
@@ -1108,10 +1053,7 @@
                             newPreview.className = 'portrait-img';
                             placeholder.parentNode.replaceChild(newPreview, placeholder);
                         }
-                        
                         if (avatarIdInput) avatarIdInput.value = '';
-                        
-                        // Automatically save the newly uploaded image
                         if (typeof autoSave === 'function') autoSave();
                     }
                     reader.readAsDataURL(this.files[0]);
@@ -1119,20 +1061,18 @@
             });
         }
 
-        // Initialize Auto-resize for textareas
+        // ── Auto-resize textareas ──
         function resizeTextarea(textarea) {
             textarea.style.height = 'auto';
             textarea.style.height = (textarea.scrollHeight) + 'px';
         }
-
         const allTextareas = document.querySelectorAll('.form-control-premium');
         allTextareas.forEach(textarea => {
             textarea.addEventListener('input', () => resizeTextarea(textarea));
-            // Trigger initial resize
             setTimeout(() => resizeTextarea(textarea), 100);
         });
 
-        // Position timeline line between first & last dots
+        // ── Timeline line ──
         function positionTimelineLine() {
             const list = document.querySelector('.ke-list');
             if (!list) return;
@@ -1153,7 +1093,7 @@
         setTimeout(positionTimelineLine, 400);
         window.addEventListener('resize', positionTimelineLine);
 
-        // Initialize Sortable
+        // ── Sortable ──
         const columns = ['char-col-1', 'char-col-2', 'char-col-3'];
         columns.forEach(colId => {
             const el = document.getElementById(colId);
@@ -1170,42 +1110,37 @@
                             if (colEl) layout[id] = Array.from(colEl.children).map(c => c.id);
                         });
                         localStorage.setItem('character-profile-layout-{{ character.id }}', JSON.stringify(layout));
-                        
-                        // Trigger resize for all textareas after drop to ensure layout is correct
                         allTextareas.forEach(ta => resizeTextarea(ta));
                     }
                 });
             }
         });
 
-        // Load saved layout
+        // ── Load layout (Rose's arrangement as default) ──
+        const defaultLayout = {
+            'char-col-1': ['card-traits', 'card-meta', 'card-secrets', 'card-regrets', 'card-goals'],
+    'char-col-2': ['card-social', 'card-internal-conflicts', 'card-motivation', 'card-fears'],
+    'char-col-3': ['card-bio', 'card-timeline', 'card-unfulfilled-desires', 'card-flaws']
+};
         const savedLayout = localStorage.getItem('character-profile-layout-{{ character.id }}');
-        if (savedLayout) {
-            try {
-                const layout = JSON.parse(savedLayout);
-                Object.keys(layout).forEach(colId => {
-                    const colEl = document.getElementById(colId);
-                    if (colEl) {
-                        layout[colId].forEach(cardId => {
-                            // Don't move the locked identity card via saved layout
-                            if (cardId === 'card-identity') return;
-                            
-                            const cardEl = document.getElementById(cardId);
-                            if (cardEl) colEl.appendChild(cardEl);
-                        });
-                    }
-                });
-                // Ensure textareas are resized after layout is restored
-                setTimeout(() => {
-                    allTextareas.forEach(ta => resizeTextarea(ta));
-                }, 200);
-            } catch(e) { console.error("Layout load error", e); }
-        }
+        const layoutToApply = savedLayout ? JSON.parse(savedLayout) : defaultLayout;
+        try {
+            Object.keys(layoutToApply).forEach(colId => {
+                const colEl = document.getElementById(colId);
+                if (colEl) {
+                    layoutToApply[colId].forEach(cardId => {
+                        if (cardId === 'card-identity') return;
+                        const cardEl = document.getElementById(cardId);
+                        if (cardEl) colEl.appendChild(cardEl);
+                    });
+                }
+            });
+            setTimeout(() => { allTextareas.forEach(ta => resizeTextarea(ta)); }, 200);
+        } catch(e) { console.error("Layout load error", e); }
 
-        // Auto-save logic
+        // ── Auto-save ──
         const form = document.getElementById('main-character-form');
         let autoSaveTimer;
-        
         function autoSave() {
             clearTimeout(autoSaveTimer);
             autoSaveTimer = setTimeout(() => {
@@ -1213,21 +1148,15 @@
                 fetch('{% url "character_detail" character.pk %}', {
                     method: 'POST',
                     body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
                 })
                 .then(res => res.json())
-                .then(data => {
-                    console.log('Character auto-saved', data);
-                })
+                .then(data => { console.log('Character auto-saved', data); })
                 .catch(err => console.error('Auto-save failed', err));
-            }, 1000); // 1-second debounce
+            }, 1000);
         }
-
         if (form) {
             form.querySelectorAll('input, select, textarea').forEach(input => {
-                // Ignore file inputs; they shouldn't trigger auto-save normally
                 if (input.type !== 'file' && input.type !== 'hidden') {
                     input.addEventListener('input', autoSave);
                     input.addEventListener('change', autoSave);

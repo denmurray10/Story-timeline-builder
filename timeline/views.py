@@ -593,22 +593,7 @@ def dashboard(request):
         mood_elements.append({'type': 'motivation', 'char': random_char.name, 'content': random_char.motivation})
 
     
-    # --- NEW: Timeline Integrity Data ---
-    # 1. Fuzzy Dates
-    fuzzy_events = events.filter(date_type='fuzzy')
-    # 2. Missing Locations
-    missing_loc_events = events.filter(location='').exclude(title__icontains='chapter') # Exclude potential placeholders
-    # 3. No Description
-    empty_desc_events = events.filter(description='')
 
-    integrity_issues = []
-    for e in fuzzy_events[:3]:
-        integrity_issues.append({'type': 'fuzzy_date', 'event': e, 'msg': 'Fuzzy Date'})
-    for e in missing_loc_events[:3]:
-        integrity_issues.append({'type': 'missing_loc', 'event': e, 'msg': 'Missing Location'})
-    if not integrity_issues and empty_desc_events.exists():
-         for e in empty_desc_events[:3]:
-            integrity_issues.append({'type': 'empty_desc', 'event': e, 'msg': 'No Description'})
 
     # --- NEW: Open Loop Tracker ---
     # Unresolved Relationships
@@ -677,15 +662,7 @@ def dashboard(request):
 
     # === NEW: ARCHITECT MODE CARDS ===
     
-    # 1. Worldbuilding Completion Tracker
-    world_entries_count = world_entries.count()
-    worldbuilding_target = 50 # Arbitrary starter target
-    worldbuilding_progress = min(int((world_entries_count / worldbuilding_target) * 100) if worldbuilding_target > 0 else 0, 100)
-    
-    existing_categories = set(world_entries.values_list('category', flat=True))
-    all_categories = [c[0] for c in WorldEntry.CATEGORY_CHOICES]
-    missing_categories = [c for c in all_categories if c not in existing_categories]
-    worldbuilding_suggestions = missing_categories[:2] if missing_categories else ['Expand a stub entry', 'Add a new location']
+    # --- REMOVED: Worldbuilding Completion Logic ---
     
     # 2. Subplot Thread Visualizer
     subplots = Tag.objects.filter(user=request.user, category='subplot')
@@ -715,10 +692,6 @@ def dashboard(request):
             'last_event': last_event,
         }
         
-    # 4. Timeline Integrity (Extended to catch missing POVs)
-    missing_pov_events = events.filter(pov_character__isnull=True).exclude(scene_type='exposition')
-    for e in missing_pov_events[:3]:
-        integrity_issues.append({'type': 'missing_pov', 'event': e, 'msg': 'Missing POV Character'})
         
     
     # === NEW: WRITER MODE CARDS ===
@@ -777,19 +750,12 @@ def dashboard(request):
         'spotlight_character': spotlight_character,
         'top_relationships': top_relationships,
         'mood_elements': mood_elements,
-        'integrity_issues': integrity_issues,
         'unresolved_rels': unresolved_rels,
         'char_locations': char_locations,
         'pacing_data': pacing_data,
         'forgotten_chars': forgotten_chars[:5], # Top 5
         'story_beats': story_beats,
         'is_test_dashboard': False, 
-        
-        # New Architect/Writer Context
-        'worldbuilding_progress': worldbuilding_progress,
-        'world_entries_count': world_entries_count,
-        'worldbuilding_target': worldbuilding_target,
-        'worldbuilding_suggestions': worldbuilding_suggestions,
         'subplot_data': subplot_data,
         'arc_snapshot': arc_snapshot,
         
