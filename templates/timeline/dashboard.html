@@ -82,15 +82,15 @@
 {% endblock %}
 
 {% block content %}
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+<div class="d-flex justify-content-between align-items-center mb-3">
     <div class="d-flex align-items-center gap-3">
         <!-- Title matches Manuscripts serif font -->
-        <h2 class="mb-0" style="font-family: 'DM Serif Display', serif; font-size: clamp(1.2rem, 5vw, 2.5rem); font-weight: 400; letter-spacing: -0.5px; word-break: break-word;">
+        <h2 class="mb-0" style="font-family: 'DM Serif Display', serif; font-size: 2.5rem; font-weight: 400; letter-spacing: -0.5px;">
             Dashboard <span class="badge bg-warning text-dark" style="font-size: 0.6rem; vertical-align: middle; font-family: 'Inter', sans-serif;">TEST MODE</span>
         </h2>
     </div>
     <div class="d-flex align-items-center d-custom-show-above-1100">
-        <select class="form-select form-select-sm me-3 border-0 bg-light rounded-pill px-3 shadow-none fw-semibold text-dark" id="contextSelector" style="width: auto; cursor: pointer; font-size: 0.85rem; display: inline-block;">
+        <select class="form-select form-select-sm me-3 border-0 bg-light rounded-pill px-3 shadow-none fw-semibold text-dark" id="contextSelector" style="width: auto; cursor: pointer; font-size: 0.85rem;">
             <option value="">All Contexts</option>
             {% if user_series %}
             <optgroup label="Series">
@@ -314,9 +314,8 @@
     </div>
 </div>
 
-<div class="row g-3 mb-3 main-cards-row mx-0">
-    <div class="col-12" id="writerModeContainer" style="display: none;">
-        <div class="row g-3">
+<div class="row g-3 mb-3 main-cards-row">
+    <div class="row g-3" id="writerModeContainer" style="display: none;">
         <div class="col-lg-4 draggable-zone" id="writer-col-1">
             <div class="dash-card dash-pill-card p-4 draggable-card mb-4 bg-dark text-white shadow-lg" id="card-writing-mode" style="border-radius: 20px;">
                 <div class="dash-card-header d-flex align-items-center text-white mb-3">
@@ -408,9 +407,8 @@
             </div>
         </div>
     </div>
-</div>
 
-<div class="row g-3" id="writerWidgets">
+    <div class="row g-3" id="writerWidgets">
         <div class="col-lg-6 draggable-zone" id="col-left">
             <!-- Writing Mode Card (Architect View) -->
             <div class="dash-card dash-pill-card p-4 draggable-card mb-3 bg-dark text-white shadow-lg" id="card-writing-mode-architect" style="border-radius: 20px;">
