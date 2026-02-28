@@ -1369,6 +1369,34 @@
     }
 
 
+    @media (max-width: 992px) {
+        .login-header {
+            padding: 1rem 1.5rem;
+        }
+
+        .login-container {
+            padding: 40px 20px 0.5rem 20px;
+            align-items: flex-start !important;
+        }
+
+        .login-showcase-area {
+            display: none !important;
+        }
+
+        .studio-card {
+            max-width: 500px;
+            min-height: auto !important;
+        }
+
+        .login-form-area {
+            padding: 1.5rem;
+            max-width: 100%;
+        }
+
+        .brand-logo img {
+            height: 2.5rem !important;
+        }
+    }
 </style>
 
 
@@ -1389,6 +1417,7 @@
 
             <img src="{% static 'img/logo.webp' %}" alt="Story Timeline Builder" 
                 width="137" height="56"
+                class="transition-all"
                 style="height: 3.5rem; width: auto;">
 
 
@@ -1398,7 +1427,7 @@
         <nav class="header-nav">
 
 
-            <span>Already have a studio?</span>
+            <span class="hidden sm:inline">Already have a studio?</span>
 
 
             <a href="{% url 'login' %}">Sign In</a>

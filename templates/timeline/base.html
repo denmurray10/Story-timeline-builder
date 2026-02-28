@@ -44,6 +44,12 @@
             background-color: #f4f1ee;
             color: var(--text-body);
             -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            width: 100%;
+        }
+        html {
+            overflow-x: hidden;
+            width: 100%;
         }
 
         /* TYPOGRAPHY */
@@ -326,28 +332,31 @@
 
     {% block full_layout %}
     <div class="container-fluid">
+        {% if user.is_authenticated %}
+        <!-- Mobile Header (Visible below 1100px) -->
+        <div class="d-custom-hide-above-1100 px-4 py-3 border-bottom bg-dark fixed-top" style="z-index: 1030; left: 0; right: 0; width: 100vw;">
+            <div class="d-flex justify-content-between align-items-center w-100">
+                <a href="{% url 'dashboard' %}" class="d-flex align-items-center text-decoration-none">
+                    <img src="{% static 'img/logo.png' %}" alt="Logo" style="height: 2.2rem; width: auto; filter: brightness(0) invert(1);">
+                </a>
+                <button class="btn p-0 text-white d-flex align-items-center justify-content-center text-lowercase" 
+                        type="button" data-bs-toggle="modal" data-bs-target="#mobileMenuModal" 
+                        style="border: none; background: transparent; font-weight: 500; font-family: 'Inter', sans-serif; letter-spacing: 0.3px; font-size: 0.95rem; cursor: pointer; position: relative; z-index: 1031;">
+                    menu
+                </button>
+            </div>
+        </div>
+        {% endif %}
+
         <div class="row" style="min-height: 100vh; align-items: flex-start;">
             {% if user.is_authenticated %}
-            <!-- Mobile Header (Visible below 1100px) -->
-            <div class="col-12 d-custom-hide-above-1100 px-4 py-3 border-bottom bg-white fixed-top" style="z-index: 1030;">
-                <div class="d-flex justify-content-between align-items-center">
-                    <a href="{% url 'dashboard' %}" class="d-flex align-items-center text-decoration-none">
-                        <img src="{% static 'img/logo.png' %}" alt="Logo" style="height: 2.5rem; width: auto;">
-                    </a>
-                    <button class="btn btn-dark rounded-pill px-4 d-flex align-items-center justify-content-center" 
-                            type="button" data-bs-toggle="modal" data-bs-target="#mobileMenuModal" 
-                            style="height: 44px; border: none; background: #212529; font-weight: 700; font-family: 'DM Sans', sans-serif; letter-spacing: 0.5px;">
-                        MENU
-                    </button>
-                </div>
-            </div>
 
             <!-- Mobile Menu Modal -->
             <div class="modal fade mobile-nav-modal" id="mobileMenuModal" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-fullscreen-sm-down">
                     <div class="modal-content">
                         <div class="modal-header border-0 pb-0">
-                            <h5 class="modal-title fw-bold">Menu</h5>
+                            <h5 class="modal-title fw-bold">menu</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">

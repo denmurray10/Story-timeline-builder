@@ -122,12 +122,20 @@
                         href="{% url 'pricing' %}">Pricing</a>
                     <a class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-white transition-colors"
                         href="{% url 'coming_soon' %}">Resources</a>
-                    <a class="bg-primary text-white dark:bg-white dark:text-primary px-5 py-2.5 rounded-full text-sm font-medium hover:opacity-90 transition-opacity shadow-sm"
-                        href="{% url 'register' %}">Start Writing</a>
+                    <div class="flex items-center gap-6">
+                        <a href="{% url 'login' %}" 
+                           class="text-sm font-bold text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white transition-colors">
+                            Login
+                        </a>
+                        <a href="{% url 'register' %}" 
+                           class="bg-primary text-white dark:bg-white dark:text-primary text-[13px] font-bold px-6 py-2.5 rounded-full hover:bg-black dark:hover:bg-gray-100 transition-all shadow-md">
+                            Start Writing
+                        </a>
+                    </div>
                 </div>
                 <div class="md:hidden flex items-center">
-                    <button class="text-primary dark:text-white p-2 text-2xl">
-                        <i class="bi bi-list"></i>
+                    <button id="mobile-menu-open" class="text-primary dark:text-white p-2 text-base font-bold tracking-tight hover:opacity-70 transition-opacity">
+                        menu
                     </button>
                 </div>
             </div>
@@ -705,6 +713,82 @@
                 icon.style.transform = 'rotate(180deg)';
             }
         }
+    </script>
+    <!-- Mobile Menu Modal (Guest) -->
+    <div id="mobile-menu-modal" class="fixed inset-0 z-[100] hidden">
+        <!-- Backdrop -->
+        <div id="mobile-menu-backdrop" class="absolute inset-0 bg-black/40 backdrop-blur-sm opacity-0 transition-opacity duration-300"></div>
+        
+        <!-- Menu Panel -->
+        <div id="mobile-menu-panel" class="absolute right-4 top-4 w-[calc(100%-2rem)] max-w-sm bg-white dark:bg-surface-dark rounded-3xl shadow-2xl border border-gray-100 dark:border-white/5 p-6 translate-y-[-20px] opacity-0 transition-all duration-300 pointer-events-none">
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="text-lg font-bold text-primary dark:text-white">menu</h3>
+                <button id="mobile-menu-close" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">
+                    <i class="bi bi-x-lg text-gray-400"></i>
+                </button>
+            </div>
+            
+            <div class="flex flex-col gap-3">
+                <a href="{% url 'login' %}" class="flex items-center gap-4 p-4 rounded-2xl hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group">
+                    <div class="w-10 h-10 rounded-xl bg-gray-50 dark:bg-white/5 flex items-center justify-center text-gray-400 group-hover:text-primary dark:group-hover:text-white transition-colors">
+                        <i class="bi bi-box-arrow-in-right text-lg"></i>
+                    </div>
+                    <div>
+                        <div class="text-sm font-bold text-primary dark:text-white">Login</div>
+                        <div class="text-xs text-gray-400">Access your stories</div>
+                    </div>
+                </a>
+                
+                <a href="{% url 'register' %}" class="bg-primary text-white dark:bg-white dark:text-primary p-4 rounded-2xl flex items-center justify-between group hover:shadow-lg transition-all">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-white/10 dark:bg-black/10 flex items-center justify-center">
+                            <i class="bi bi-pencil-square"></i>
+                        </div>
+                        <div class="text-sm font-bold">Start Writing</div>
+                    </div>
+                    <i class="bi bi-arrow-right text-sm transition-transform group-hover:translate-x-1"></i>
+                </a>
+            </div>
+            
+            <div class="mt-8 pt-6 border-t border-gray-100 dark:border-white/5">
+                <div class="flex items-center justify-around">
+                    <a href="{% url 'landing_page_v2' %}" class="text-xs font-medium text-gray-400 hover:text-primary dark:hover:text-white transition-colors">Features</a>
+                    <a href="{% url 'pricing' %}" class="text-xs font-medium text-gray-400 hover:text-primary dark:hover:text-white transition-colors">Pricing</a>
+                    <a href="{% url 'coming_soon' %}" class="text-xs font-medium text-gray-400 hover:text-primary dark:hover:text-white transition-colors">Resources</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Pricing Mobile Menu Logic
+        document.addEventListener('DOMContentLoaded', function() {
+            const openBtn = document.getElementById('mobile-menu-open');
+            const closeBtn = document.getElementById('mobile-menu-close');
+            const modal = document.getElementById('mobile-menu-modal');
+            const backdrop = document.getElementById('mobile-menu-backdrop');
+            const panel = document.getElementById('mobile-menu-panel');
+
+            function openMenu() {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    backdrop.classList.replace('opacity-0', 'opacity-100');
+                    panel.classList.remove('translate-y-[-20px]', 'opacity-0', 'pointer-events-none');
+                }, 10);
+            }
+
+            function closeMenu() {
+                backdrop.classList.replace('opacity-100', 'opacity-0');
+                panel.classList.add('translate-y-[-20px]', 'opacity-0', 'pointer-events-none');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 300);
+            }
+
+            if (openBtn) openBtn.addEventListener('click', openMenu);
+            if (closeBtn) closeBtn.addEventListener('click', closeMenu);
+            if (backdrop) backdrop.addEventListener('click', closeMenu);
+        });
     </script>
 </body>
 </html>
