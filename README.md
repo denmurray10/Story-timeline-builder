@@ -131,7 +131,10 @@ Kanban board link: GitHub Projects Board
 Deployment Architecture
 The application is deployed to Heroku, utilizing Neon for managed PostgreSQL hosting, Cloudinary for scalable media storage, and WhiteNoise for highly efficient static file serving.
 
-![Deployment Architecture](https://raw.githubusercontent.com/denmurray10/Story-timeline-builder/main/github_images/
+![Deployment Architecture](https://github.com/denmurray10/Story-timeline-builder/tree/main/github_images)
+![CSS Pass Validation](https://github.com/denmurray10/Story-timeline-builder/tree/main/github_images)
+![HTML Pass Validation](https://github.com/denmurray10/Story-timeline-builder/tree/main/github_images)
+![Lighthouse Pass Validation](https://github.com/denmurray10/Story-timeline-builder/tree/main/github_images)
 
 Manual Testing
 Rigorous manual testing was conducted across all core user journeys.
